@@ -1,0 +1,18 @@
+package com.saturn.rnd.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * Response payload data for successful job application submission.
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ApplicationResponse {
+    private String applicationId;
+    private String fileName;
+}
