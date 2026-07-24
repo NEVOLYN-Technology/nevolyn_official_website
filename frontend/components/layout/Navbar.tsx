@@ -8,6 +8,8 @@
  * - **Active section tracking**: listens to scroll position and highlights
  *   the nav link whose corresponding section is in view. Sections are matched
  *   by element `id` (e.g. `id="about"`, `id="projects"`).
+ * - **Smooth scroll handling**: clicking Home or Logo smooth-scrolls back to `top: 0`
+ *   even when scrolled to the bottom of the page.
  * - **Mobile drawer**: a hamburger menu that collapses into a vertical link
  *   list on small screens and closes automatically on link click.
  *
@@ -97,6 +99,33 @@ export const Navbar = (): JSX.Element => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isHomePage, pathname])
 
+  /** Smooth scroll handler for nav clicks when on the home page */
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string
+  ) => {
+    if (isHomePage) {
+      if (sectionId === 'home') {
+        e.preventDefault()
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        if (window.location.hash) {
+          window.history.pushState(null, '', '/')
+        }
+        setActiveSection('home')
+      } else {
+        const element = document.getElementById(sectionId)
+        if (element) {
+          e.preventDefault()
+          const yOffset = -90 // Offset for fixed navbar height
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
+          window.scrollTo({ top: y, behavior: 'smooth' })
+          window.history.pushState(null, '', `/#${sectionId}`)
+          setActiveSection(sectionId)
+        }
+      }
+    }
+  }
+
   return (
     <nav className={`fixed w-full z-50 border-b border-orange-950/40 transition-all duration-300 ${scrolled
       ? 'bg-background/95 shadow-lg shadow-black/30 backdrop-blur'
@@ -105,7 +134,11 @@ export const Navbar = (): JSX.Element => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex h-[5.5rem] items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center group transition-all duration-300 hover:-translate-y-1 hover:scale-105">
+          <Link
+            href="/"
+            onClick={(e) => handleNavClick(e, 'home')}
+            className="flex items-center group transition-all duration-300 hover:-translate-y-1 hover:scale-105"
+          >
             <img
               src="/saturn-logo.png"
               alt="Saturn Textiles Limited — Research and Development Department"
@@ -121,6 +154,7 @@ export const Navbar = (): JSX.Element => {
                 <Link
                   key={link.label}
                   href={link.href}
+                  onClick={(e) => handleNavClick(e, link.sectionId)}
                   className={`px-4 py-2 text-sm font-bold tracking-wider rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:scale-95 ${isActive
                     ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/40 -translate-y-1 scale-105'
                     : 'text-slate-200 hover:text-orange-400 hover:bg-orange-500/20 hover:shadow-md hover:shadow-orange-500/20'
@@ -136,6 +170,7 @@ export const Navbar = (): JSX.Element => {
           <div className="ml-auto flex items-center space-x-3">
             <Link
               href="/#contact"
+              onClick={(e) => handleNavClick(e, 'contact')}
               className={`hidden rounded-xl border px-5 py-2.5 text-sm font-bold tracking-wide transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:scale-95 lg:inline-flex ${activeSection === 'contact'
                 ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/40 -translate-y-1 scale-105'
                 : 'border-orange-500/60 text-orange-400 hover:bg-orange-500/20 hover:text-orange-300 hover:border-orange-500/80 hover:shadow-md hover:shadow-orange-500/20'
@@ -167,7 +202,10 @@ export const Navbar = (): JSX.Element => {
                   ? 'bg-orange-500 text-white'
                   : 'text-slate-100 hover:bg-orange-950/40 hover:text-orange-300'
                   }`}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => {
+                  setIsOpen(false)
+                  handleNavClick(e, link.sectionId)
+                }}
               >
                 {link.label}
               </Link>

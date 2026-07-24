@@ -11,6 +11,8 @@
  *
  * @module components/layout/Footer
  */
+'use client'
+
 import type { JSX } from 'react'
 import Link from 'next/link'
 import { Mail, MapPin, Phone } from 'lucide-react'
@@ -21,6 +23,16 @@ import { Mail, MapPin, Phone } from 'lucide-react'
  * @returns Rendered site footer component
  */
 export const Footer = (): JSX.Element => {
+  const scrollToHome = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (window.location.pathname === '/') {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      if (window.location.hash) {
+        window.history.pushState(null, '', '/')
+      }
+    }
+  }
+
   return (
     <footer className="text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-blue-950/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -28,11 +40,18 @@ export const Footer = (): JSX.Element => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Brand */}
           <div className="space-y-6">
-            <img
-              src="/saturn-logo.png"
-              alt="Saturn Textiles Limited"
-              className="h-24 w-auto object-contain dark:mix-blend-lighten dark:invert-0 invert"
-            />
+            <Link
+              href="/"
+              onClick={scrollToHome}
+              aria-label="Go to top of Home page"
+              className="inline-block group transition-all duration-300 hover:-translate-y-1 hover:scale-105 cursor-pointer"
+            >
+              <img
+                src="/saturn-logo.png"
+                alt="Saturn Textiles Limited"
+                className="h-24 w-auto object-contain dark:mix-blend-lighten dark:invert-0 invert"
+              />
+            </Link>
             <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-md">
               Driving innovation in textile manufacturing through advanced automation and research.
             </p>

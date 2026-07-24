@@ -44,7 +44,7 @@ export const news: NewsItem[] = [
     description:
       'Appointed Lead AI Systems Engineer and Lead AI Software Engineer to spearhead industrial automation and intelligent textile research.',
     content:
-      'On July 1, 2026, Saturn Textiles Limited expanded its Research & Development Department through the official appointment of a Lead AI Systems Engineer and a Lead AI Software Engineer. These appointments strengthened the department’s capabilities in industrial automation, intelligent manufacturing, and AI-powered textile innovation.',
+      'Saturn Textiles Limited expanded its Research & Development Department through the official appointment of a Lead AI Systems Engineer and a Lead AI Software Engineer. These appointments strengthened the department’s capabilities in industrial automation, intelligent manufacturing, and AI-powered textile innovation.',
     category: 'Team Expansion',
     date: '2026-07-01',
     author: 'Saturn R&D Management',
@@ -56,7 +56,7 @@ export const news: NewsItem[] = [
     description:
       'Executive board approved full financial allocation, enabling Saturn R&D to initiate hardware assembly and software platform development.',
     content:
-      'On February 24, 2026, Saturn Textiles Limited officially approved and signed the funding allocation for the FABINS project. With the required financial and organizational support in place, the Research & Development Department formally commenced development of the AI-powered fabric inspection platform.',
+      'Saturn Textiles Limited officially approved and signed the funding allocation for the FABINS project. With the required financial and organizational support in place, the Research & Development Department formally commenced development of the AI-powered fabric inspection platform.',
     category: 'Project Funding',
     date: '2026-02-24',
     author: 'Saturn R&D Management',
@@ -68,7 +68,7 @@ export const news: NewsItem[] = [
     description:
       'Saturn R&D Management presented the FABINS concept to Managing Director, securing formal executive approval to launch Saturn’s AI fabric inspection initiative.',
     content:
-      'On January 15, 2026, Lead AI Systems Engineer Md Rahinur Rahman presented the FABINS concept to Managing Director Amanullah Chagla. Following executive approval, Saturn Textiles R&D officially launched the industrial AI initiative to modernize fabric quality inspection using computer vision.',
+      'Md Rahinur Rahman presented the FABINS concept to Managing Director Amanullah Chagla. Following executive approval, Saturn Textiles R&D officially launched the industrial AI initiative to modernize fabric quality inspection using computer vision.',
     category: 'Strategic Vision',
     date: '2026-01-15',
     author: 'Saturn R&D Management',
