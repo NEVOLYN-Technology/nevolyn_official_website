@@ -4,6 +4,7 @@ import com.saturn.rnd.dto.TeamMemberDto;
 import com.saturn.rnd.model.TeamMemberEntity;
 import com.saturn.rnd.repository.TeamMemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Service retrieving active dynamic R&D engineering staff profiles.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TeamService {
@@ -19,9 +21,13 @@ public class TeamService {
     private final TeamMemberRepository repository;
 
     public List<TeamMemberDto> getTeamMembers(String department) {
+        log.debug("Querying repository for team members (department filter='{}')", department);
+
         List<TeamMemberEntity> entities = (department != null && !department.isBlank())
                 ? repository.findByDepartmentOrderByDisplayOrderAsc(department)
                 : repository.findAllByOrderByDisplayOrderAsc();
+
+        log.debug("Database returned {} TeamMemberEntity records", entities.size());
 
         return entities.stream().map(this::mapToDto).collect(Collectors.toList());
     }

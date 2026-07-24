@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. PostgreSQL Database Service
+  # ----------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: saturn_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-saturn_rnd_db}
+      POSTGRES_USER: ${DB_USER:-saturn_admin}
+      POSTGRES_PASSWORD: ${DB_PASS:-Saturn_Secure_Pass_2026!}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ----------------------------------------------------------------------------
+  # 2. Spring Boot REST API Service
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: saturn_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME:-saturn_rnd_db}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-saturn_admin}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASS:-Saturn_Secure_Pass_2026!}
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      APP_CORS_ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,https://saturntextiles.com}
+    depends_on:
+      - db
+    volumes:
+      - resume_uploads:/app/uploads
+
+  # ----------------------------------------------------------------------------
+  # 3. Next.js Frontend Service
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: saturn_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  resume_uploads:

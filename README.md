@@ -45,10 +45,11 @@ saturn_rnd_portfolio/               ← Git root (monorepo)
 │   │   └── application.yml         # Port 8080, H2/PostgreSQL config, file upload limits
 │   └── pom.xml                     # Maven build — Spring Boot 3.4.2
 ├── docs/                           ← Project documentation
+│   ├── report.md                   # Zero-to-hero master educational report & engineering audit
+│   ├── CICD_GUIDE.md               # Beginner intuition guide for CI/CD, Docker & domain deployment
 │   ├── FRONTEND_GUIDE.md           # Next.js 16 architecture, component breakdown & content guide
 │   ├── BACKEND_GUIDE.md            # Spring Boot 3 package layout, DB & storage guide
-│   ├── API_INTEGRATION.md          # Spring Boot REST API spec, DTOs, cURL examples
-│   └── PLAN.md                     # Development roadmap & phase status
+│   └── API_INTEGRATION.md          # Master REST API spec, 5-layer code traces & integration guide
 ├── README.md                       ← This file — monorepo overview & quick start
 └── .gitignore                      ← Covers frontend/ and backend/ workspace artifacts
 ```
@@ -124,7 +125,8 @@ For complete DTOs, Controller code, and CORS setup, see [docs/API_INTEGRATION.md
 
 ## 📚 Documentation Links
 
+- 📖 **[Master Educational Report & Audit Handbook (`docs/report.md`)](./docs/report.md)** — Comprehensive zero-to-hero learning guide, architecture audit, API traces, testing suite, and domain deployment.
+- 🤖 **[CI/CD & Deployment Handbook (`docs/CICD_GUIDE.md`)](./docs/CICD_GUIDE.md)** — Beginner intuition guide for CI/CD pipelines, Docker container files, and step-by-step custom domain deployment.
 - 🔌 **[Spring Boot REST API Master Spec (`docs/API_INTEGRATION.md`)](./docs/API_INTEGRATION.md)** — Master API guide with 5-layer code traces, field constraints, cURL examples, CORS config, and tutorial on adding new APIs.
 - ⚛️ **[Frontend Developer Handbook (`docs/FRONTEND_GUIDE.md`)](./docs/FRONTEND_GUIDE.md)** — Next.js 16 architecture, component breakdown, content editing workflows, animations, and API integration.
 - 🍃 **[Backend Developer Handbook (`docs/BACKEND_GUIDE.md`)](./docs/BACKEND_GUIDE.md)** — Spring Boot 3 architecture, package layer responsibilities, JPA database setup, and file storage logic.
-- 🗺️ **[Development Roadmap (`docs/PLAN.md`)](./docs/PLAN.md)** — Project status and completed phases.

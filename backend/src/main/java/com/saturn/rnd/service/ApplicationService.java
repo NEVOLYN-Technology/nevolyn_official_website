@@ -4,6 +4,7 @@ import com.saturn.rnd.dto.ApplicationResponse;
 import com.saturn.rnd.model.JobApplication;
 import com.saturn.rnd.repository.JobApplicationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import java.util.Random;
 /**
  * Business logic service managing job application file uploads and DB storage.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ApplicationService {
@@ -35,7 +37,10 @@ public class ApplicationService {
             MultipartFile resume
     ) {
         String applicationId = String.format("APP-%d-%04d", Year.now().getValue(), random.nextInt(10000));
+        log.debug("Processing job application for '{}', generated ID: {}", name, applicationId);
+
         String storedPath = fileStorageService.storeFile(resume, applicationId + "_" + name.replaceAll("\\s+", "_").toLowerCase());
+        log.debug("Resume stored on disk at path: {}", storedPath);
 
         JobApplication entity = JobApplication.builder()
                 .applicationId(applicationId)
@@ -51,7 +56,8 @@ public class ApplicationService {
                 .originalFileName(resume.getOriginalFilename())
                 .build();
 
-        repository.save(entity);
+        JobApplication savedEntity = repository.save(entity);
+        log.debug("Persisted JobApplication entity to database with PK ID: {}", savedEntity.getId());
 
         return ApplicationResponse.builder()
                 .applicationId(applicationId)

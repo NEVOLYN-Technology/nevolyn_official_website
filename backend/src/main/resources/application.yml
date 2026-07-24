@@ -29,6 +29,15 @@ spring:
       max-file-size: 10MB
       max-request-size: 12MB
 
+logging:
+  level:
+    com.saturn.rnd: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
 app:
   storage:
     upload-dir: ./uploads/resumes
