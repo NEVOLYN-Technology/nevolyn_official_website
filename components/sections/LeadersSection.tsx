@@ -20,6 +20,7 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
@@ -30,7 +31,7 @@ import { fadeInUpVariants, staggerContainer, defaultViewport } from '@/lib/anima
 import type { TeamMember } from '@/lib/data/leaders'
 
 /** High-contrast official LinkedIn SVG logo badge */
-const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
+const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }): JSX.Element => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <rect width="24" height="24" rx="5" fill="#0A66C2"/>
     <path d="M19 19H15.8202V13.8407C15.8202 12.5199 15.3408 11.6163 14.1565 11.6163C13.2505 11.6163 12.716 12.2217 12.4795 12.808C12.3929 13.0182 12.3708 13.3108 12.3708 13.6046V19H9.18972C9.18972 19 9.2323 10.3709 9.18972 9.46736H12.3708V10.8202C12.7937 10.1659 13.5517 9.2323 15.2492 9.2323C17.3392 9.2323 18.9189 10.5975 18.9189 13.5414V19H19Z" fill="white"/>
@@ -38,7 +39,12 @@ const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   </svg>
 )
 
-export function LeadersSection() {
+/**
+ * Leadership section displaying team member profile cards and full detail modal popups.
+ *
+ * @returns Rendered leaders section element
+ */
+export function LeadersSection(): JSX.Element {
   const department = teamDepartments[0]
   const members = department.members
 
@@ -78,7 +84,7 @@ export function LeadersSection() {
             variants={itemVariants}
             className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed"
           >
-            Meet the leadership and engineering professionals driving Artifical Intelligence, Industrial Automation,
+            Meet the leadership and engineering professionals driving Artificial Intelligence, Industrial Automation,
             and next-generation Textile Innovation
           </motion.p>
         </motion.div>

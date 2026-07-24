@@ -20,11 +20,17 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 import { Target, Globe, Cpu, Layers, CheckCircle2 } from 'lucide-react'
 import { fadeUpProps } from '@/lib/animations'
 
-export const AboutSection = () => {
+/**
+ * About section presenting Saturn R&D mission, vision, core engineering activities, and focus pillars.
+ *
+ * @returns Rendered About section component
+ */
+export const AboutSection = (): JSX.Element => {
   return (
     <section id="about" className="py-12 border-t border-slate-200 dark:border-blue-950/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

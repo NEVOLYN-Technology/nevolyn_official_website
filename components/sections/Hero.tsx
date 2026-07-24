@@ -18,11 +18,17 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
-export const Hero = () => (
+/**
+ * Top hero landing section featuring primary value proposition CTAs and animated graphic.
+ *
+ * @returns Rendered hero section element
+ */
+export const Hero = (): JSX.Element => (
   <section className="relative text-slate-900 dark:text-slate-100">
     <div className="relative mx-auto max-w-7xl px-5 pb-12 pt-6 sm:px-8 lg:px-10 lg:pt-10">
       <div className="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr]">

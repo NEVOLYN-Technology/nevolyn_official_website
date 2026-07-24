@@ -8,7 +8,7 @@
  * @module components/ui/badge
  */
 import type { LucideIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
+import type { ReactNode, JSX } from 'react'
 import { cn } from '@/lib/utils'
 
 /**
@@ -51,11 +51,14 @@ export interface BadgeProps {
  * Reach for this instead of a one-off `<span className="rounded-full ...">`
  * so every tag on the site shares the same shape and theme-aware colors.
  *
+ * @param props - Component options including tone, icon, and children
+ * @returns The rendered badge element
+ *
  * @example
  * <Badge tone="success">Active</Badge>
  * <Badge tone="danger" icon={AlertCircle} capitalize>{project.priority}</Badge>
  */
-export function Badge({ children, tone = 'neutral', icon: Icon, capitalize, className }: BadgeProps) {
+export function Badge({ children, tone = 'neutral', icon: Icon, capitalize, className }: BadgeProps): JSX.Element {
   return (
     <span
       className={cn(

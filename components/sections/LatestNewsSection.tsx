@@ -19,6 +19,7 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 import { Calendar, User } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -26,7 +27,12 @@ import { news } from '@/lib/data/latest-news'
 import { fadeLeftProps, fadeUpProps } from '@/lib/animations'
 import { formatDate } from '@/lib/utils'
 
-export const LatestNewsSection = () => {
+/**
+ * News timeline section rendering featured project announcements and recent institutional updates.
+ *
+ * @returns Rendered news section component
+ */
+export const LatestNewsSection = (): JSX.Element => {
   const sortedNews = [...news].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   const featuredNews = sortedNews.filter((item) => item.featured)
   const otherNews = sortedNews.filter((item) => !item.featured)

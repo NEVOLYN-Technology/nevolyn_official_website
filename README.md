@@ -47,9 +47,9 @@ saturn_rnd_portfolio/
 │       ├── innovations.ts      # R&D projects & status
 │       ├── leaders.ts          # Leadership team profiles & bio
 │       └── latest-news.ts      # Milestones & news timeline
-└── docs/                       # Comprehensive documentation
-    ├── ARCHITECTURE.md         # System architecture & data flow
-    └── API_INTEGRATION.md      # Spring Boot REST API integration spec
+└── docs/                       # Project documentation
+    ├── API_INTEGRATION.md      # Spring Boot REST API integration spec
+    └── PLAN.md                 # Development roadmap & status
 ```
 
 ---
@@ -87,7 +87,5 @@ For complete Java DTOs, Controller code, and CORS setup, see [docs/API_INTEGRATI
 
 ## 📚 Complete Documentation Links
 
-- 📐 **[System Architecture Guide (`docs/ARCHITECTURE.md`)](./docs/ARCHITECTURE.md)** — Deep dive into components, data flow, and design patterns.
 - 🔌 **[Spring Boot REST API Spec (`docs/API_INTEGRATION.md`)](./docs/API_INTEGRATION.md)** — Precise backend contract, DTOs, and file upload specifications.
-- 🤝 **[Contributing Guidelines (`CONTRIBUTING.md`)](./CONTRIBUTING.md)** — Coding standards, git branching conventions, and pre-commit checks.
-- 🗺️ **[Development Roadmap (`PLAN.md`)](./PLAN.md)** — Project status and completed phases.
+- 🗺️ **[Development Roadmap (`docs/PLAN.md`)](./docs/PLAN.md)** — Project status and completed phases.

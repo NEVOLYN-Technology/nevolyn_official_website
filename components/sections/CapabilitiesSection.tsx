@@ -16,6 +16,7 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 import { Bot, Sparkles, Activity, Leaf } from 'lucide-react'
 import { fadeUpProps } from '@/lib/animations'
@@ -45,7 +46,12 @@ const FEATURES: { title: string; description: string; icon: LucideIcon }[] = [
   },
 ]
 
-export const CapabilitiesSection = () => {
+/**
+ * Capabilities section highlighting core pillars of industrial research and technology development.
+ *
+ * @returns Rendered capabilities component element
+ */
+export const CapabilitiesSection = (): JSX.Element => {
   return (
     <section className="pt-4 pb-12 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

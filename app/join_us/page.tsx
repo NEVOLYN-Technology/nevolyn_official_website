@@ -23,6 +23,7 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, UploadCloud } from 'lucide-react'
@@ -30,7 +31,12 @@ import Link from 'next/link'
 import { PageShell } from '@/components/layout/PageShell'
 import { cn } from '@/lib/utils'
 
-export default function JoinPage() {
+/**
+ * Job application form page component allowing candidate information and CV PDF upload.
+ *
+ * @returns Rendered join application page element
+ */
+export default function JoinPage(): JSX.Element {
   const [reason, setReason] = useState('')
   const MAX_WORDS = 250
   const wordCount = reason.trim() ? reason.trim().split(/\s+/).length : 0

@@ -23,6 +23,7 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -37,7 +38,12 @@ const NAV_LINKS = [
   { href: '/#latest-news', sectionId: 'latest-news', label: 'LATEST NEWS' },
 ] as const
 
-export const Navbar = () => {
+/**
+ * Site-wide navigation bar component supporting scroll tracking and mobile drawer navigation.
+ *
+ * @returns Rendered site navigation bar element
+ */
+export const Navbar = (): JSX.Element => {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
 

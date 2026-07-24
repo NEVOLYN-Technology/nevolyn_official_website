@@ -27,10 +27,16 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUpProps } from '@/lib/animations'
 
-export const ContactSection = () => {
+/**
+ * Interactive visitor contact form section for R&D inquiries and partner proposals.
+ *
+ * @returns Rendered contact section component
+ */
+export const ContactSection = (): JSX.Element => {
   return (
     <section id="contact" className="py-12 border-t border-slate-200 dark:border-blue-950/40 relative overflow-hidden">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

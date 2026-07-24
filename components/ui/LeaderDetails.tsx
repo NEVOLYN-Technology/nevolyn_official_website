@@ -8,6 +8,7 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -20,7 +21,13 @@ interface LeaderDetailsProps {
   onClose: () => void
 }
 
-export function LeaderDetails({ member, isFeatured, onClose }: LeaderDetailsProps) {
+/**
+ * Full profile modal dialog displaying member biography, key responsibilities, and external profiles.
+ *
+ * @param props - Component props containing member data, featured status, and close handler
+ * @returns Rendered modal dialog element
+ */
+export function LeaderDetails({ member, isFeatured, onClose }: LeaderDetailsProps): JSX.Element {
   // Lock background scroll while modal is mounted
   useEffect(() => {
     document.body.style.overflow = 'hidden'

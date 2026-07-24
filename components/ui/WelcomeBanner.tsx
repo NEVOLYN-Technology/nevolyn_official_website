@@ -1,8 +1,21 @@
+/**
+ * WelcomeBanner — top animated motivational banner shown on the homepage.
+ *
+ * Renders a subtle floating gradient slogan at the top of the content area.
+ *
+ * @module components/ui/WelcomeBanner
+ */
 'use client'
 
+import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 
-export function WelcomeBanner() {
+/**
+ * Animated welcome banner element with infinite floating vertical motion.
+ *
+ * @returns Rendered welcome banner element
+ */
+export function WelcomeBanner(): JSX.Element {
   return (
     <div className="w-full flex items-center justify-center pt-8 pb-3 px-4 bg-transparent text-center">
       <motion.div

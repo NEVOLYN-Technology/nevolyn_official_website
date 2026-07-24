@@ -22,6 +22,7 @@
  */
 'use client'
 
+import type { JSX } from 'react'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tag, Calendar } from 'lucide-react'
@@ -41,7 +42,12 @@ const STATUS_TONE: Record<Project['status'], BadgeTone> = {
 const FILTERS = ['All', 'Ongoing', 'Upcoming', 'Completed'] as const
 type FilterLabel = typeof FILTERS[number]
 
-export const InnovationsSection = () => {
+/**
+ * Filterable projects grid section displaying current and planned R&D innovations.
+ *
+ * @returns Rendered innovations section component
+ */
+export const InnovationsSection = (): JSX.Element => {
   const [activeFilter, setActiveFilter] = useState<FilterLabel>('All')
 
   const filteredProjects = projects.filter((project) => {

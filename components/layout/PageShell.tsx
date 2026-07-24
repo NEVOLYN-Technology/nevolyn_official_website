@@ -17,7 +17,7 @@
  *
  * @module components/layout/PageShell
  */
-import type { ReactNode } from 'react'
+import type { ReactNode, JSX } from 'react'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 
@@ -26,7 +26,13 @@ export interface PageShellProps {
   children: ReactNode
 }
 
-export function PageShell({ children }: PageShellProps) {
+/**
+ * Standard page container wrapping Navbar, main scrollable body content, and Footer.
+ *
+ * @param props - Component props containing child nodes
+ * @returns Rendered page layout wrapper
+ */
+export function PageShell({ children }: PageShellProps): JSX.Element {
   return (
     <main>
       <Navbar />

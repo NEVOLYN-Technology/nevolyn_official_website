@@ -18,6 +18,7 @@
  *
  * @module app/page
  */
+import type { JSX } from 'react'
 import { Navbar } from '@/components/layout/Navbar'
 import { WelcomeBanner } from '@/components/ui/WelcomeBanner'
 import { Hero } from '@/components/sections/Hero'
@@ -29,7 +30,12 @@ import { LatestNewsSection } from '@/components/sections/LatestNewsSection'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { Footer } from '@/components/layout/Footer'
 
-export default function Home() {
+/**
+ * Main application homepage component rendering single-page scrolling sections.
+ *
+ * @returns Rendered home page component
+ */
+export default function Home(): JSX.Element {
   return (
     <main className="w-full">
       <Navbar />
