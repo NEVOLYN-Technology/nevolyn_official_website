@@ -18,7 +18,7 @@ export function WelcomeBanner() {
         className="text-center"
       >
         <p className="text-lg sm:text-xl md:text-2xl font-bold italic tracking-wide bg-gradient-to-r from-orange-400 via-amber-300 to-orange-400 bg-clip-text text-transparent drop-shadow-[0_2px_16px_rgba(249,115,22,0.55)]">
-          Welcome to the Horizon of Next-Generation Textile Intelligence, Automation & Innovation
+          Welcome to the Horizon of Next-Generation Industrial Automation & Innovation
         </p>
       </motion.div>
     </div>
