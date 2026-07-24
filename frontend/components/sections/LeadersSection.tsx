@@ -55,7 +55,7 @@ export function LeadersSection(): JSX.Element {
   const itemVariants = fadeInUpVariants
 
   return (
-    <section id="leaders" className="relative py-12 px-4 md:px-8 overflow-hidden">
+    <section id="leaders" className="relative pt-6 pb-12 px-4 md:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto">
 
         {/* ── Section Header ─────────────────────────────────── */}

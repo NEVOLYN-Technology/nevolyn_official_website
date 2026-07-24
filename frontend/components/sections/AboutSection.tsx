@@ -32,9 +32,9 @@ import { fadeUpProps } from '@/lib/animations'
  */
 export const AboutSection = (): JSX.Element => {
   return (
-    <section id="about" className="py-12 border-t border-slate-200 dark:border-blue-950/40">
+    <section id="about" className="pt-12 pb-6 border-t border-slate-200 dark:border-blue-950/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div {...fadeUpProps(0.1)} className="text-center mb-16">
+        <motion.div {...fadeUpProps(0.1)} className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-orange-500 tracking-tight uppercase">About Us</h2>
 
           {/* Decorative Divider */}
@@ -48,7 +48,7 @@ export const AboutSection = (): JSX.Element => {
         </motion.div>
 
         {/* Mission, Vision, What We Do, Focus Areas */}
-        <div className="relative mb-24">
+        <div className="relative mb-8 sm:mb-12">
           {/* Decorative horizontal connector line (desktop only) */}
           <div className="absolute top-12 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-orange-500/20 to-transparent hidden lg:block" />
 

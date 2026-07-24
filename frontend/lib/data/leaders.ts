@@ -100,14 +100,26 @@ export const teamDepartments: Department[] = [
         id: 'chagla',
         name: 'Chagla Amanullah',
         title: 'Managing Director',
-        bio: 'Providing strategic direction for Saturn Textiles and guiding the company\'s innovation-led future.',
-        responsibilities: [
-          'Strategic direction and innovation roadmap',
-          'Research team leadership and mentorship',
-          'Industry partnerships and collaborations',
-          'Grant acquisition and funding strategy',
-          'Vision for future textile technologies',
+        bio: 'Providing strategic leadership for Saturn Textiles Limited and driving innovation, sustainable growth, and industrial excellence.',
+
+        extendedBio: [
+          'Amanullah Chagla provides the strategic leadership for Saturn Textiles Limited, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and manufacturing excellence work together to create lasting industrial value.',
+
+          'With decades of experience in the global textile and apparel industry, he has led the development and expansion of manufacturing operations while building strong partnerships with internationally recognized brands and organizations. His leadership philosophy combines business excellence with continuous innovation, responsible manufacturing, and long-term value creation for customers and stakeholders alike.',
+
+          'Recognizing research and development as a key driver of future competitiveness, he actively supports the Saturn Textiles R&D Department in advancing AI-powered automation, intelligent manufacturing, computer vision, and next-generation textile technologies. His vision is to establish Saturn Textiles as a future-ready organization where innovation continuously transforms ideas into practical industrial solutions.'
         ],
+
+        email: '',
+
+        responsibilities: [
+          'Define the long-term strategic vision and innovation roadmap for Saturn Textiles Limited',
+          'Lead business growth through operational excellence, digital transformation, and advanced manufacturing',
+          'Oversee and support Research & Development initiatives across the organization',
+          'Build strategic partnerships with global buyers, technology partners, and academic institutions',
+          'Promote sustainable manufacturing, responsible innovation, and continuous improvement',
+          'Mentor leadership teams while fostering a culture of collaboration, integrity, and innovation'
+        ]
       },
       {
         id: 'rahin',

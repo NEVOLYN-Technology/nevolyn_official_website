@@ -1,80 +1,76 @@
 /**
- * News & announcement posts shown on the News section of the Saturn R&D Portfolio.
+ * Recent News & Updates Data Store — Saturn R&D Portfolio.
  *
- * Single source of truth for news timeline.
- * 5 news items total, ordered latest first, top 2 marked as featured.
+ * Single source of truth for chronological news timeline updates.
+ * Rendered in the Recent Updates list section within `LatestNewsSection.tsx`.
+ *
+ * ## Data Management Guidelines
+ * - IDs are formatted as `news-1`, `news-2`, etc.
+ * - Items are ordered by publication date (`date`) in descending order.
+ * - Maintain non-redundant, executive-grade title and description copy.
  *
  * @module lib/data/latest-news
  */
 
-/** Represents a single news milestone or institutional announcement. */
+/**
+ * Represents a single news timeline entry or institutional update.
+ */
 export interface NewsItem {
-  /** Unique identifier — used as React list key. */
+  /** Unique identifier — used as React list key and anchor link. */
   id: string
-  /** Headline title of the milestone. */
+  /** Headline title of the news item. */
   title: string
-  /** Short 1-2 sentence preview description for card layout. */
+  /** Short 1-2 sentence preview description for timeline card. */
   description: string
-  /** Full announcement body content. */
+  /** Full announcement text for detail modal or article view. */
   content: string
-  /** Category tag (e.g. 'Institutional Funding', 'R&D Execution'). */
+  /** Category tag classification (e.g. 'Team Expansion', 'Project Funding', 'Strategic Vision'). */
   category: string
-  /** ISO date string (YYYY-MM-DD) of publication. */
+  /** ISO publication date string (YYYY-MM-DD). */
   date: string
-  /** Authoring team or executive board entity. */
+  /** Publishing division or management body. */
   author: string
-  /** Optional news thumbnail image path (relative to /public). */
+  /** Optional relative path to thumbnail image asset in `/public`. */
   image?: string
-  /** Optional flag marking milestone as featured (promotes to top grid). */
-  featured?: boolean
 }
 
+/**
+ * Chronological news update feed ordered latest-first.
+ */
 export const news: NewsItem[] = [
   {
-    id: '1',
-    title: 'Saturn R&D Secures Full Capital & Resource Approval for FABINS',
-    description: 'Executive Board officially approves comprehensive funding and infrastructure allocation for full-scale FABINS deployment.',
-    content: 'On July 3, 2026, the Executive Board of Saturn officially approved complete capital and operational funding for the FABINS automated fabric inspection platform. This milestone secures long-term R&D resources, high-speed camera infrastructure, model training hardware, and engineering expansion.',
-    category: 'Institutional Funding',
-    date: '2026-07-03',
-    author: 'Saturn Executive Board',
-    featured: true,
-  },
-  {
-    id: '2',
-    title: 'Saturn Engineering Commences Phase-1 System Integration',
-    description: 'R&D engineering team officially initiates core computer vision pipeline training and industrial Hikrobot SDK integration.',
-    content: 'On June 30, 2026, Saturn R&D engineering officially commenced Phase-1 technical implementation for FABINS. Work focuses on fine-tuning YOLO defect detection algorithms, integrating Hikrobot industrial camera SDKs, and engineering the real-time web dashboard architecture.',
-    category: 'R&D Execution',
-    date: '2026-06-30',
-    author: 'Saturn R&D Engineering',
-    featured: true,
-  },
-  {
-    id: '3',
-    title: 'Live FABINS Prototype Demonstration Presented to Executive Board',
-    description: 'Live operational demonstration showcased real-time fabric fault classification and automated industrial camera triggers.',
-    content: 'The Saturn R&D team presented an active live demonstration of the FABINS prototype to company executives on June 24, 2026. The demonstration successfully validated high-speed fabric defect classification, real-time bounding box annotations, and zero-latency Hikrobot camera trigger response.',
-    category: 'Milestone Demo',
-    date: '2026-06-24',
-    author: 'Saturn R&D Team',
-  },
-  {
-    id: '4',
-    title: 'First Capital Allocation Approved for Hikrobot Hardware & GPU Cluster',
-    description: 'Secured initial R&D funding for high-speed Hikrobot camera acquisition, optical setup, and GPU workstation setup.',
-    content: 'On April 27, 2026, Saturn R&D secured its initial capital allocation dedicated to hardware acquisition. This funding enabled the procurement of high-resolution Hikrobot industrial cameras, specialized optical lenses, and high-throughput GPU workstations for model training.',
-    category: 'Hardware Procurement',
-    date: '2026-04-27',
+    id: 'news-1',
+    title: 'Saturn R&D Expands AI Systems Engineering Team',
+    description:
+      'Appointed Lead AI Systems Engineer and Lead AI Software Engineer to spearhead industrial automation and intelligent textile research.',
+    content:
+      'On July 1, 2026, Saturn Textiles Limited expanded its Research & Development Department through the official appointment of a Lead AI Systems Engineer and a Lead AI Software Engineer. These appointments strengthened the department’s capabilities in industrial automation, intelligent manufacturing, and AI-powered textile innovation.',
+    category: 'Team Expansion',
+    date: '2026-07-01',
     author: 'Saturn R&D Management',
   },
+
   {
-    id: '5',
-    title: 'Saturn R&D Unveils Strategic Vision for Automated Fabric Inspection',
-    description: 'Initial R&D pitch submitted outlining AI-driven fabric inspection to revolutionize industrial quality assurance standards.',
-    content: 'The core vision for FABINS was officially formulated and submitted to Saturn leadership in mid-January 2026. The strategic proposal outlined an automated computer vision inspection platform designed to replace manual fabric defect review with real-time AI precision.',
+    id: 'news-2',
+    title: 'FABINS Project Funding & R&D Capital Approved',
+    description:
+      'Executive board approved full financial allocation, enabling Saturn R&D to initiate hardware assembly and software platform development.',
+    content:
+      'On February 24, 2026, Saturn Textiles Limited officially approved and signed the funding allocation for the FABINS project. With the required financial and organizational support in place, the Research & Development Department formally commenced development of the AI-powered fabric inspection platform.',
+    category: 'Project Funding',
+    date: '2026-02-24',
+    author: 'Saturn R&D Management',
+  },
+
+  {
+    id: 'news-3',
+    title: 'FABINS AI Vision Approved & R&D Initiative Launched',
+    description:
+      'Saturn R&D Management presented the FABINS concept to Managing Director, securing formal executive approval to launch Saturn’s AI fabric inspection initiative.',
+    content:
+      'On January 15, 2026, Lead AI Systems Engineer Md Rahinur Rahman presented the FABINS concept to Managing Director Amanullah Chagla. Following executive approval, Saturn Textiles R&D officially launched the industrial AI initiative to modernize fabric quality inspection using computer vision.',
     category: 'Strategic Vision',
     date: '2026-01-15',
-    author: 'Lead AI Systems Engineers',
+    author: 'Saturn R&D Management',
   },
 ]
