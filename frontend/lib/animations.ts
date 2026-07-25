@@ -28,7 +28,7 @@ export interface MotionPropsPreset {
 const EASE_OUT: Transition['ease'] = 'easeOut'
 
 /** Standard viewport trigger: animate every time it enters the view. */
-export const defaultViewport = { once: false, margin: '-100px' } as const
+export const defaultViewport = { once: false, margin: '0px' } as const
 
 /**
  * Parent wrapper variants that stagger its children's entrance animations.

@@ -137,7 +137,7 @@ export const InnovationsSection = (): JSX.Element => {
         </motion.div>
 
         {/* Filter Tabs */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8 sm:mb-10">
+        <motion.div {...fadeUpProps(0.15)} className="flex flex-wrap justify-center gap-3 mb-8 sm:mb-10">
           {FILTERS.map((filter) => {
             const isSelected = activeFilter === filter
             const isMatchingCenteredStatus =
@@ -164,10 +164,10 @@ export const InnovationsSection = (): JSX.Element => {
               </button>
             )
           })}
-        </div>
+        </motion.div>
 
         {/* 3D Horizontal Carousel Stage with Native Smooth Scrolling */}
-        <div className="relative w-full py-4">
+        <motion.div {...fadeUpProps(0.25)} className="relative w-full py-4">
           {/* Previous / Next Arrow Controls */}
           {filteredProjects.length > 1 && (
             <>
@@ -311,7 +311,6 @@ export const InnovationsSection = (): JSX.Element => {
               )
             })}
           </div>
-        </div>
 
         {/* Horizontal Navigation Dots */}
         {filteredProjects.length > 1 && (
@@ -331,6 +330,7 @@ export const InnovationsSection = (): JSX.Element => {
             ))}
           </div>
         )}
+        </motion.div>
       </div>
     </section>
   )

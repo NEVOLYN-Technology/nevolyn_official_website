@@ -110,7 +110,7 @@ export const LatestNewsSection = (): JSX.Element => {
 
         {/* Featured News Carousel */}
         {sortedFeatured.length > 0 && (
-          <div className="mb-14">
+          <motion.div {...fadeUpProps(0.15)} className="mb-14">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
@@ -249,11 +249,11 @@ export const LatestNewsSection = (): JSX.Element => {
                 ))}
               </div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Recent Updates List */}
-        <div>
+        <motion.div {...fadeUpProps(0.2)}>
           <h3 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
             Recent Updates
@@ -302,7 +302,7 @@ export const LatestNewsSection = (): JSX.Element => {
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )
