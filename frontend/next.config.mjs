@@ -31,6 +31,11 @@ const nextConfig = {
   },
 
   /**
+   * Allowed development origins for network access (e.g. mobile/other devices on local network)
+   */
+  allowedDevOrigins: ['192.168.68.103', 'localhost:3000'],
+
+  /**
    * Disable the floating Next.js dev-mode indicator (the "N" badge in the
    * bottom-right corner). It only appears in development and is purely cosmetic.
    */
