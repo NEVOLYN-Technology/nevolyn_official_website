@@ -100,7 +100,7 @@ export const teamDepartments: Department[] = [
         id: 'chagla',
         name: 'Chagla Amanullah',
         title: 'Managing Director',
-        bio: 'Providing strategic leadership for Saturn Textiles Limited and driving innovation, sustainable growth, and industrial excellence.',
+        bio: 'Providing strategic leadership,driving innovation and industrial excellence.',
 
         extendedBio: [
           'Amanullah Chagla provides the strategic leadership for Saturn Textiles Limited, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and manufacturing excellence work together to create lasting industrial value.',

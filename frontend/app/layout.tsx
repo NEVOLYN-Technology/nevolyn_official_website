@@ -3,16 +3,11 @@
  *
  * Sets up:
  * - Global metadata (title, description, OpenGraph, favicon, keywords)
- * - Viewport settings (dark color-scheme, theme color)
+ * - Viewport settings and theme color
  * - Global CSS (`globals.css` — Tailwind + design tokens)
  * - The ambient background (grid + glow blobs behind all content)
  * - The `<Providers>` wrapper (context providers)
  * - Vercel Analytics (production only)
- *
- * ## Dark mode
- * Dark mode is enforced globally via `className="dark"` on `<html>`.
- * To enable user-toggled themes, see `components/providers/ThemeProvider.tsx`
- * for the upgrade path using `next-themes`.
  *
  * @see https://nextjs.org/docs/app/building-your-application/routing/layouts-and-templates
  * @module app/layout
@@ -38,7 +33,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
+  colorScheme: 'light dark',
   themeColor: '#0b1f3a',
   userScalable: true,
 }
@@ -49,14 +44,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth" data-scroll-behavior="smooth">
-      <body className="antialiased bg-[#020914] text-[#e8edf2]">
+    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <body className="antialiased bg-background text-foreground transition-colors duration-500">
         {/* Ambient background — fixed, behind all content, pointer-events disabled */}
         <div className="fixed inset-0 -z-50 pointer-events-none">
           {/* Subtle grid overlay */}
-          <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(57,120,206,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(57,120,206,0.12)_1px,transparent_1px)] [background-size:48px_48px]" />
+          <div className="absolute inset-0 opacity-25 dark:opacity-40 [background-image:linear-gradient(rgba(57,120,206,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(57,120,206,0.12)_1px,transparent_1px)] [background-size:48px_48px]" />
           {/* Left glow */}
-          <div className="absolute -left-40 top-20 h-[32rem] w-[32rem] rounded-full bg-blue-700/15 blur-[120px]" />
+          <div className="absolute -left-40 top-20 h-[32rem] w-[32rem] rounded-full bg-blue-700/10 dark:bg-blue-700/15 blur-[120px]" />
           {/* Right glow */}
           <div className="absolute right-0 top-24 h-[28rem] w-[28rem] rounded-full bg-orange-600/10 blur-[120px]" />
         </div>

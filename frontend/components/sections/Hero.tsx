@@ -108,13 +108,18 @@ export const Hero = (): JSX.Element => (
             </svg>
 
             <img
-              src="/saturn-image.png"
+              src="/saturn-image-dark.png"
               alt="Saturn Textiles Limited Research and Development Division"
-              className="mx-auto block h-auto w-full object-contain drop-shadow-[0_0_35px_rgba(57,120,206,0.4)] drop-shadow-[0_0_35px_rgba(249,115,22,0.4)]"
+              className="mx-auto hidden dark:block h-auto w-full object-contain drop-shadow-[0_0_35px_rgba(57,120,206,0.4)] drop-shadow-[0_0_35px_rgba(249,115,22,0.4)]"
               style={{
                 mixBlendMode: 'lighten',
                 filter: 'contrast(1.45) brightness(1.06) saturate(1.5) hue-rotate(16deg)',
               }}
+            />
+            <img
+              src="/saturn-image-light.png"
+              alt="Saturn Textiles Limited Research and Development Division"
+              className="mx-auto block dark:hidden h-auto w-full object-contain drop-shadow-[0_0_35px_rgba(57,120,206,0.25)] drop-shadow-[0_0_35px_rgba(249,115,22,0.25)]"
             />
           </motion.div>
         </motion.div>

@@ -157,7 +157,7 @@ export const InnovationsSection = (): JSX.Element => {
                     ? "bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white border-orange-400 shadow-md shadow-orange-500/30 -translate-y-1 scale-105 font-extrabold"
                     : isMatchingCenteredStatus
                     ? "bg-orange-500/15 text-orange-400 border-orange-500/60 shadow-[0_0_15px_rgba(249,115,22,0.25)] -translate-y-1 scale-105 font-bold"
-                    : "bg-slate-900/60 dark:bg-slate-900/80 text-slate-300 border-slate-700/80 hover:border-orange-500/80 hover:text-orange-400 hover:shadow-[0_0_12px_rgba(249,115,22,0.2)] backdrop-blur-md"
+                    : "bg-white/80 text-slate-600 border-slate-300 hover:border-orange-500/80 hover:text-orange-500 hover:shadow-[0_0_12px_rgba(249,115,22,0.2)] backdrop-blur-md dark:bg-slate-900/80 dark:text-slate-300 dark:border-slate-700/80 dark:hover:text-orange-400"
                 )}
               >
                 {filter}
@@ -174,14 +174,14 @@ export const InnovationsSection = (): JSX.Element => {
               <button
                 onClick={handlePrev}
                 aria-label="Previous project"
-                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-slate-900/90 border border-slate-700/80 backdrop-blur-xl text-slate-200 hover:bg-orange-500 hover:border-orange-400 hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer group"
+                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-white/90 border border-slate-300 backdrop-blur-xl text-slate-700 hover:bg-orange-500 hover:border-orange-400 hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg shadow-slate-400/25 dark:bg-slate-900/90 dark:border-slate-700/80 dark:text-slate-200 dark:shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer group"
               >
                 <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
               </button>
               <button
                 onClick={handleNext}
                 aria-label="Next project"
-                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-slate-900/90 border border-slate-700/80 backdrop-blur-xl text-slate-200 hover:bg-orange-500 hover:border-orange-400 hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer group"
+                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-white/90 border border-slate-300 backdrop-blur-xl text-slate-700 hover:bg-orange-500 hover:border-orange-400 hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg shadow-slate-400/25 dark:bg-slate-900/90 dark:border-slate-700/80 dark:text-slate-200 dark:shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer group"
               >
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
               </button>
@@ -207,11 +207,11 @@ export const InnovationsSection = (): JSX.Element => {
                     "p-[1.5px] rounded-[28px] transition-all duration-500 ease-out cursor-pointer group transform",
                     isCenter
                       ? "bg-gradient-to-b from-orange-500/70 via-amber-500/40 to-orange-500/30 shadow-[0_20px_50px_rgba(249,115,22,0.22),0_0_25px_rgba(249,115,22,0.15)] -translate-y-4 scale-105 filter blur-0 opacity-100 z-20"
-                      : "bg-slate-800/60 shadow-lg translate-y-2 scale-90 filter blur-[3.5px] opacity-50 z-10 hover:opacity-80 hover:blur-[1px]"
+                      : "bg-slate-300/70 shadow-lg shadow-slate-400/20 dark:bg-slate-800/60 dark:shadow-black/20 translate-y-2 scale-90 filter blur-[3.5px] opacity-50 z-10 hover:opacity-80 hover:blur-[1px]"
                   )}
                 >
                   {/* Inner Card Content Container */}
-                  <div className="relative w-full h-full p-6 sm:p-7 rounded-[26px] bg-slate-950/95 dark:bg-[#070f1e]/95 backdrop-blur-2xl flex flex-col justify-between overflow-hidden">
+                  <div className="relative w-full h-full p-6 sm:p-7 rounded-[26px] bg-white/95 text-slate-900 dark:bg-[#070f1e]/95 dark:text-slate-100 backdrop-blur-2xl flex flex-col justify-between overflow-hidden">
                     {/* Inner Ambient Glow Background */}
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.08),transparent_55%)] pointer-events-none" />
 
@@ -220,18 +220,18 @@ export const InnovationsSection = (): JSX.Element => {
                       "absolute top-0 left-0 right-0 h-1.5 rounded-t-3xl transition-all duration-500",
                       isCenter
                         ? "bg-gradient-to-r from-orange-500 via-amber-400 to-cyan-400 shadow-[0_0_12px_rgba(249,115,22,0.4)]"
-                        : "bg-slate-800"
+                        : "bg-slate-300 dark:bg-slate-800"
                     )} />
 
                     {/* Optional Image Banner if provided */}
                     {project.image && (
-                      <div className="mb-5 -mx-6 -mt-6 sm:-mx-7 sm:-mt-7 overflow-hidden relative h-40 rounded-t-[24px] border-b border-slate-800/80">
+                      <div className="mb-5 -mx-6 -mt-6 sm:-mx-7 sm:-mt-7 overflow-hidden relative h-40 rounded-t-[24px] border-b border-slate-200 dark:border-slate-800/80">
                         <img
                           src={project.image}
                           alt={project.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 dark:from-[#070f1e] via-slate-950/40 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#070f1e] via-white/40 dark:via-slate-950/40 to-transparent" />
                       </div>
                     )}
 
@@ -259,12 +259,12 @@ export const InnovationsSection = (): JSX.Element => {
                       </div>
 
                       {/* Gradient Project Title */}
-                      <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-200 group-hover:from-orange-400 group-hover:to-amber-300 transition-all duration-300 tracking-tight leading-snug mb-3 drop-shadow-sm">
+                      <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-950 via-slate-700 to-slate-600 dark:from-white dark:via-slate-100 dark:to-slate-200 group-hover:from-orange-500 group-hover:to-amber-600 dark:group-hover:from-orange-400 dark:group-hover:to-amber-300 transition-all duration-300 tracking-tight leading-snug mb-3 drop-shadow-sm">
                         {project.title}
                       </h3>
 
                       {/* Description */}
-                      <p className="text-slate-300/90 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[44px]">
+                      <p className="text-slate-600 dark:text-slate-300/90 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[44px]">
                         {project.description}
                       </p>
                     </div>
@@ -274,13 +274,13 @@ export const InnovationsSection = (): JSX.Element => {
                       <div className="mb-5">
                         <div className="flex items-center gap-1.5 mb-2.5">
                           <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-                          <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Tech Stack & Frameworks</span>
+                          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Tech Stack & Frameworks</span>
                         </div>
                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
                           {project.technologies.map((tech) => (
                             <span
                               key={tech}
-                              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/90 text-slate-200 border border-slate-700/80 group-hover:border-orange-400/60 hover:text-orange-300 hover:bg-orange-950/40 hover:shadow-[0_0_10px_rgba(249,115,22,0.2)] transition-all duration-200 shadow-sm"
+                              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300 group-hover:border-orange-400/60 hover:text-orange-600 hover:bg-orange-50 hover:shadow-[0_0_10px_rgba(249,115,22,0.2)] dark:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700/80 dark:hover:text-orange-300 dark:hover:bg-orange-950/40 transition-all duration-200 shadow-sm"
                             >
                               {tech}
                             </span>
@@ -289,7 +289,7 @@ export const InnovationsSection = (): JSX.Element => {
                       </div>
 
                       {/* Date & Interactive CTA Footer */}
-                      <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400 font-medium">
+                      <div className="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-orange-400 shrink-0" />
                           <span>
@@ -300,7 +300,7 @@ export const InnovationsSection = (): JSX.Element => {
                               : `Started ${formatDate(project.startDate)}`}
                           </span>
                         </div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 text-slate-300 border border-slate-800 text-xs font-semibold group-hover:border-orange-500/40 group-hover:text-orange-400 transition-all duration-300">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-900/90 dark:text-slate-300 dark:border-slate-800 text-xs font-semibold group-hover:border-orange-500/40 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300">
                           <img src="/saturn-icon.png" alt="Saturn R&D" className="w-3.5 h-3.5 object-contain shrink-0" />
                           <span>Saturn R&D</span>
                         </div>
@@ -323,7 +323,7 @@ export const InnovationsSection = (): JSX.Element => {
                   "h-2.5 rounded-full transition-all duration-300 cursor-pointer hover:scale-125",
                   i === safeCenteredIndex
                     ? "w-8 bg-gradient-to-r from-orange-500 to-amber-500 shadow-[0_0_12px_rgba(249,115,22,0.6)]"
-                    : "w-2.5 bg-slate-700 hover:bg-orange-400/60"
+                    : "w-2.5 bg-slate-400 dark:bg-slate-700 hover:bg-orange-400/60"
                 )}
                 aria-label={`Go to project ${i + 1}`}
               />

@@ -22,8 +22,6 @@ export interface FeaturedMilestone {
   title: string
   /** High-impact 1-2 sentence summary for 3D card preview. */
   description: string
-  /** Full announcement body text for detail view expansion. */
-  content: string
   /** Category tag classification (e.g. 'Academic Showcase', 'Prototype Demonstration'). */
   category: string
   /** ISO publication date string (YYYY-MM-DD). */
@@ -43,8 +41,6 @@ export const featuredMilestones: FeaturedMilestone[] = [
     title: 'BUET IRAB Technology Showcase Selection',
     description:
       'Selected for an exclusive week-long exhibition at IRAB BUET to demonstrate industrial AI vision and strengthen high-impact industry-academia collaboration.',
-    content:
-      'On July 21, 2026, the FABINS (Fabric Inspection Automation System) project was selected for a week-long technology showcase at IRAB (Institute of Robotics and Automation, BUET). Organized through a collaborative initiative between IRAB and the Department of Electrical and Electronic Engineering (EEE), BUET, the showcase highlighted Saturn Textiles R&D’s work in industrial AI and promoted stronger industry–academia collaboration.',
     category: 'Academic Showcase',
     date: '2026-07-21',
     author: 'Saturn R&D Department',
@@ -55,8 +51,6 @@ export const featuredMilestones: FeaturedMilestone[] = [
     title: 'FABINS AI Prototype & Defect Inspection POC',
     description:
       'Successfully validated real-time automated fabric flaw detection, camera hardware integration, and deep learning throughput for industrial deployment.',
-    content:
-      'On June 28, 2026, the Research & Development Department successfully completed and demonstrated the first functional proof of concept (POC) and prototype of FABINS. The demonstration validated real-time fabric defect detection, AI-powered inspection, industrial camera integration, and the overall feasibility of the platform for future production deployment.',
     category: 'Prototype Demonstration',
     date: '2026-06-28',
     author: 'Saturn R&D Department',

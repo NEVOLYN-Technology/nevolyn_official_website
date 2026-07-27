@@ -29,7 +29,8 @@ import type { JSX } from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { Menu, Moon, Sun, X } from 'lucide-react'
 
 /** Static link definitions. Defined outside the component to avoid re-creating the array on every render. */
 const NAV_LINKS = [
@@ -48,10 +49,14 @@ const NAV_LINKS = [
 export const Navbar = (): JSX.Element => {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
+  const { resolvedTheme, setTheme } = useTheme()
 
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState(isHomePage ? 'home' : '')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   useEffect(() => {
     if (!isHomePage) {
@@ -126,6 +131,30 @@ export const Navbar = (): JSX.Element => {
     }
   }
 
+  // `next-themes` can resolve a saved preference before the first client render.
+  // Keep theme-dependent markup stable until mount to avoid SSR hydration mismatches.
+  const isDark = mounted && resolvedTheme === 'dark'
+  const themeLabel = mounted
+    ? isDark ? 'Switch to light mode' : 'Switch to dark mode'
+    : 'Toggle color theme'
+  const themeToggle = (
+    <button
+      type="button"
+      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+      className="group relative inline-flex h-11 w-[4.75rem] items-center rounded-full border border-orange-400/35 bg-slate-100/90 p-1 shadow-inner shadow-slate-400/20 transition-all duration-500 hover:border-orange-400/70 hover:shadow-lg hover:shadow-orange-500/20 dark:bg-slate-900/90 dark:shadow-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      aria-label={themeLabel}
+      title={themeLabel}
+    >
+      <Sun className="absolute left-2.5 h-4 w-4 text-amber-500 transition-opacity duration-300 dark:text-amber-300" aria-hidden="true" />
+      <Moon className="absolute right-2.5 h-4 w-4 text-slate-400 transition-opacity duration-300 dark:text-slate-300" aria-hidden="true" />
+      <span
+        className={`relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-amber-500 shadow-md transition-transform duration-500 ease-out dark:bg-[#17253b] dark:text-orange-300 ${mounted && isDark ? 'translate-x-9' : 'translate-x-0'}`}
+      >
+        {mounted && isDark ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
+      </span>
+    </button>
+  )
+
   return (
     <nav className={`fixed w-full z-50 border-b border-orange-950/40 transition-all duration-300 ${scrolled
       ? 'bg-background/95 shadow-lg shadow-black/30 backdrop-blur'
@@ -157,7 +186,7 @@ export const Navbar = (): JSX.Element => {
                   onClick={(e) => handleNavClick(e, link.sectionId)}
                   className={`px-4 py-2 text-sm font-bold tracking-wider rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:scale-95 ${isActive
                     ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/40 -translate-y-1 scale-105'
-                    : 'text-slate-200 hover:text-orange-400 hover:bg-orange-500/20 hover:shadow-md hover:shadow-orange-500/20'
+                    : 'text-slate-700 hover:text-orange-500 hover:bg-orange-500/15 hover:shadow-md hover:shadow-orange-500/20 dark:text-slate-200 dark:hover:text-orange-400 dark:hover:bg-orange-500/20'
                     }`}
                 >
                   {link.label}
@@ -168,6 +197,7 @@ export const Navbar = (): JSX.Element => {
 
           {/* Right Section */}
           <div className="ml-auto flex items-center space-x-3">
+            {themeToggle}
             <Link
               href="/#contact"
               onClick={(e) => handleNavClick(e, 'contact')}
@@ -182,7 +212,7 @@ export const Navbar = (): JSX.Element => {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="rounded-lg p-2 text-slate-100 transition-colors hover:bg-slate-800 md:hidden"
+              className="rounded-lg p-2 text-slate-700 transition-colors hover:bg-slate-200 dark:text-slate-100 dark:hover:bg-slate-800 md:hidden"
               aria-label="Toggle menu"
               aria-expanded={isOpen}
             >
@@ -200,7 +230,7 @@ export const Navbar = (): JSX.Element => {
                 href={link.href}
                 className={`block rounded-md px-3 py-2 text-base font-medium transition-colors ${activeSection === link.sectionId
                   ? 'bg-orange-500 text-white'
-                  : 'text-slate-100 hover:bg-orange-950/40 hover:text-orange-300'
+                  : 'text-slate-700 hover:bg-orange-100 hover:text-orange-600 dark:text-slate-100 dark:hover:bg-orange-950/40 dark:hover:text-orange-300'
                   }`}
                 onClick={(e) => {
                   setIsOpen(false)
