@@ -15,6 +15,7 @@
 ```text
 saturn_rnd_portfolio/               ← Git root (monorepo)
 ├── frontend/                       ← Next.js 16 portfolio web application
+│   ├── vercel.json                 # Vercel deployment configuration
 │   ├── app/                        # App Router pages & layouts
 │   │   ├── page.tsx                # Single scrolling homepage
 │   │   └── join_us/page.tsx        # Job application page & CV upload
@@ -44,6 +45,9 @@ saturn_rnd_portfolio/               ← Git root (monorepo)
 │   ├── src/main/resources/
 │   │   └── application.yml         # Port 8080, H2/PostgreSQL config, file upload limits
 │   └── pom.xml                     # Maven build — Spring Boot 3.4.2
+├── .github/workflows/              ← GitHub Actions CI/CD automation
+│   └── ci-cd.yml                   # Automated Next.js build, Spring Boot tests & Render trigger
+├── render.yaml                     ← Render Blueprint spec for Spring Boot Docker + PostgreSQL DB
 ├── docs/                           ← Project documentation
 │   ├── report.md                   # Zero-to-hero master educational report & engineering audit
 │   ├── CICD_GUIDE.md               # Beginner intuition guide for CI/CD, Docker & domain deployment

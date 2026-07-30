@@ -239,3 +239,54 @@ docker compose up -d --build
 # Stop all services:
 docker compose down
 ```
+
+---
+
+## ☁️ 7. Vercel (Frontend) & Render (Backend) Cloud Hosting Guide
+
+For managed serverless/cloud deployment without managing your own VPS, use **Vercel** for the Next.js frontend and **Render** for the Spring Boot backend + PostgreSQL database.
+
+```text
+ ┌──────────────────────┐         HTTP API         ┌──────────────────────┐
+ │  Vercel (Frontend)   │ ───────────────────────> │   Render (Backend)   │
+ │ Next.js App Router   │ <─────────────────────── │ Spring Boot REST API │
+ │ saturn-rnd.vercel.app│         CORS Allowed     └──────────┬───────────┘
+ └──────────────────────┘                                     │
+                                                         PostgreSQL
+                                                              ▼
+                                                   ┌──────────────────────┐
+                                                   │ Render PostgreSQL DB │
+                                                   └──────────────────────┘
+```
+
+### A. Step 1: Deploy Backend & Database on Render (Blueprint)
+1. Log into [Render Dashboard](https://dashboard.render.com/).
+2. Click **New +** -> **Blueprint**.
+3. Connect your GitHub repository (`saturn_rnd_portfolio`).
+4. Render will automatically detect `render.yaml` at the root of the project:
+   - **Database**: `saturn-rnd-db` (PostgreSQL 16)
+   - **Web Service**: `saturn-rnd-backend` (Built via `backend/Dockerfile`)
+5. Click **Apply**.
+6. Once deployed, copy your backend URL (e.g. `https://saturn-rnd-backend.onrender.com`).
+7. Copy your Render Deploy Hook URL from **Settings -> Deploy Hook** in your web service dashboard.
+
+### B. Step 2: Deploy Frontend on Vercel
+1. Log into [Vercel Dashboard](https://vercel.com/dashboard).
+2. Click **Add New...** -> **Project**.
+3. Import your GitHub repository (`saturn_rnd_portfolio`).
+4. Configure Project Settings:
+   - **Framework Preset**: Next.js
+   - **Root Directory**: Select `frontend`
+5. Expand **Environment Variables** and add:
+   - `NEXT_PUBLIC_API_URL`: `https://saturn-rnd-backend.onrender.com` (Your Render backend URL)
+6. Click **Deploy**. Vercel will build and assign your site URL (e.g. `https://saturn-rnd.vercel.app`).
+
+### C. Step 3: Configure GitHub Secrets for Auto-Deployment
+To trigger backend auto-deployments when pushing to `main`:
+1. Go to your GitHub Repository -> **Settings** -> **Secrets and variables** -> **Actions**.
+2. Click **New repository secret**.
+3. Add:
+   - **Name**: `RENDER_DEPLOY_HOOK_URL`
+   - **Value**: `https://api.render.com/deploy/srv-xxxxxxxxxxxx` (Your Render deploy hook URL)
+4. Now, every push to `main` runs CI tests in GitHub Actions and automatically deploys the latest code to Render and Vercel!
+
