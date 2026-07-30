@@ -176,3 +176,5 @@ export const teamDepartments: Department[] = [
     ],
   },
 ]
+
+export const engineeringTeamMembers: TeamMember[] = []

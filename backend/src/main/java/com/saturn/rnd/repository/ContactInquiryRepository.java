@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ContactInquiryRepository extends JpaRepository<ContactInquiry, Long> {
     Optional<ContactInquiry> findByInquiryId(String inquiryId);
+    Optional<ContactInquiry> findByVerificationToken(String verificationToken);
 }

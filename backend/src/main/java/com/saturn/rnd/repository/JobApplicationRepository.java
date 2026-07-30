@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
     Optional<JobApplication> findByApplicationId(String applicationId);
+    Optional<JobApplication> findByVerificationToken(String verificationToken);
 }

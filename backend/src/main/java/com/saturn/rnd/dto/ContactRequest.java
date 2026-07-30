@@ -30,4 +30,6 @@ public class ContactRequest {
     @NotBlank(message = "Message body is required.")
     @Size(max = 2000, message = "Message body must not exceed 2000 characters.")
     private String message;
+
+    private String honeypot;
 }

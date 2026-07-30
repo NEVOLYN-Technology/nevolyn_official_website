@@ -69,9 +69,25 @@ public class ContactController {
 
                 ApiResponse<ContactResponse> envelope = ApiResponse.success(
                                 HttpStatus.CREATED.value(),
-                                "Thank you for reaching out. The Saturn R&D team has received your message.",
+                                "Thank you for reaching out. Please check your email to verify your address and complete submission.",
                                 responseData);
 
                 return ResponseEntity.status(HttpStatus.CREATED).body(envelope);
+        }
+
+        /**
+         * Verifies a visitor's contact inquiry via email token.
+         */
+        @GetMapping("/verify")
+        public ResponseEntity<ApiResponse<ContactResponse>> verifyContactInquiry(@RequestParam("token") String token) {
+                log.info("Received GET /api/v1/contact/verify with token='{}'", token);
+                ContactResponse responseData = contactService.verifyInquiry(token);
+
+                ApiResponse<ContactResponse> envelope = ApiResponse.success(
+                                HttpStatus.OK.value(),
+                                "Your email address has been verified successfully. Our team has received your inquiry.",
+                                responseData);
+
+                return ResponseEntity.ok(envelope);
         }
 }

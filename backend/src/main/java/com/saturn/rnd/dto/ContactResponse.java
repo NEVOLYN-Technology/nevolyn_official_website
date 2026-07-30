@@ -14,4 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ContactResponse {
     private String inquiryId;
+    private String status;
+    private Boolean requiresVerification;
+    private Boolean isVerified;
 }

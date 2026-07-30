@@ -2,6 +2,7 @@ package com.saturn.rnd;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Main application entry point for the Saturn Textiles Limited R&D REST API backend.
@@ -9,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Saturn R&D Engineering
  * @version 0.1.0
  */
+@EnableAsync
 @SpringBootApplication
 public class SaturnRndApplication {
 

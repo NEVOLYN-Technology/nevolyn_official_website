@@ -1,6 +1,7 @@
 package com.saturn.rnd.service;
 
 import com.saturn.rnd.dto.ApplicationResponse;
+import com.saturn.rnd.exception.ResourceNotFoundException;
 import com.saturn.rnd.model.JobApplication;
 import com.saturn.rnd.repository.JobApplicationRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Random;
+import java.util.UUID;
 
 /**
- * Business logic service managing job application file uploads and DB storage.
+ * Business logic service managing job applications, document storage, and verification pipeline.
  */
 @Slf4j
 @Service
@@ -22,6 +25,7 @@ public class ApplicationService {
 
     private final JobApplicationRepository repository;
     private final FileStorageService fileStorageService;
+    private final EmailService emailService;
     private final Random random = new Random();
 
     @Transactional
@@ -34,9 +38,24 @@ public class ApplicationService {
             String linkedin,
             String github,
             String website,
+            String honeypot,
             MultipartFile resume
     ) {
+        // Honeypot Bot Trap Check
+        if (honeypot != null && !honeypot.trim().isEmpty()) {
+            log.warn("Honeypot bot trap triggered for job application submission from email: {}", email);
+            return ApplicationResponse.builder()
+                    .applicationId("APP-DISCARDED")
+                    .fileName(resume != null ? resume.getOriginalFilename() : "file.pdf")
+                    .status("DISCARDED")
+                    .requiresVerification(false)
+                    .isVerified(false)
+                    .build();
+        }
+
         String applicationId = String.format("APP-%d-%04d", Year.now().getValue(), random.nextInt(10000));
+        String verificationToken = UUID.randomUUID().toString();
+
         log.debug("Processing job application for '{}', generated ID: {}", name, applicationId);
 
         String storedPath = fileStorageService.storeFile(resume, applicationId + "_" + name.replaceAll("\\s+", "_").toLowerCase());
@@ -53,15 +72,77 @@ public class ApplicationService {
                 .github(github)
                 .website(website)
                 .resumePath(storedPath)
-                .originalFileName(resume.getOriginalFilename())
+                .originalFileName(resume != null ? resume.getOriginalFilename() : "resume.pdf")
+                .verificationToken(verificationToken)
+                .isVerified(false)
                 .build();
 
         JobApplication savedEntity = repository.save(entity);
         log.debug("Persisted JobApplication entity to database with PK ID: {}", savedEntity.getId());
 
+        // Step 1: Send Sender Verification Email
+        emailService.sendSenderVerificationEmail(
+                email,
+                name,
+                verificationToken,
+                "application"
+        );
+
         return ApplicationResponse.builder()
                 .applicationId(applicationId)
-                .fileName(resume.getOriginalFilename())
+                .fileName(resume != null ? resume.getOriginalFilename() : "resume.pdf")
+                .status("VERIFICATION_PENDING")
+                .requiresVerification(true)
+                .isVerified(false)
+                .build();
+    }
+
+    @Transactional
+    public ApplicationResponse verifyApplication(String token) {
+        log.info("Verifying job application with token: {}", token);
+        JobApplication app = repository.findByVerificationToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired verification token: " + token));
+
+        if (!app.getIsVerified()) {
+            app.setIsVerified(true);
+            app.setVerifiedAt(LocalDateTime.now());
+            repository.save(app);
+            log.info("Job application '{}' verified successfully.", app.getApplicationId());
+
+            StringBuilder links = new StringBuilder();
+            if (app.getLinkedin() != null && !app.getLinkedin().isBlank()) links.append("LinkedIn: ").append(app.getLinkedin()).append(" | ");
+            if (app.getGithub() != null && !app.getGithub().isBlank()) links.append("GitHub: ").append(app.getGithub()).append(" | ");
+            if (app.getWebsite() != null && !app.getWebsite().isBlank()) links.append("Website: ").append(app.getWebsite());
+
+            // Step 2: Send Admin Notification with CV attachment
+            emailService.sendAdminNotificationEmail(
+                    "Job Application",
+                    app.getApplicationId(),
+                    app.getName(),
+                    app.getEmail(),
+                    app.getPhone(),
+                    app.getAddress(),
+                    "Application for R&D Team",
+                    links.toString(),
+                    app.getReason(),
+                    app.getResumePath()
+            );
+
+            // Step 3: Send User Receipt Acknowledgement
+            emailService.sendUserAcknowledgementEmail(
+                    app.getEmail(),
+                    app.getName(),
+                    app.getApplicationId(),
+                    "Job Application"
+            );
+        }
+
+        return ApplicationResponse.builder()
+                .applicationId(app.getApplicationId())
+                .fileName(app.getOriginalFileName())
+                .status("VERIFIED")
+                .requiresVerification(false)
+                .isVerified(true)
                 .build();
     }
 }

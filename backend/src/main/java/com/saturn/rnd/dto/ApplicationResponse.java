@@ -15,4 +15,7 @@ import lombok.NoArgsConstructor;
 public class ApplicationResponse {
     private String applicationId;
     private String fileName;
+    private String status;
+    private Boolean requiresVerification;
+    private Boolean isVerified;
 }

@@ -54,6 +54,15 @@ public class JobApplication {
     @Column(nullable = false, length = 255)
     private String originalFileName;
 
+    @Column(length = 64)
+    private String verificationToken;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isVerified = false;
+
+    private LocalDateTime verifiedAt;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

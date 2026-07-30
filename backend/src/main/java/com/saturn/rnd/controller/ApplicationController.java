@@ -75,20 +75,37 @@ public class ApplicationController {
                         @RequestParam(value = "linkedin", required = false) String linkedin,
                         @RequestParam(value = "github", required = false) String github,
                         @RequestParam(value = "website", required = false) String website,
+                        @RequestParam(value = "honeypot", required = false) String honeypot,
                         @RequestParam("resume") MultipartFile resume) {
                 log.info("Received POST /api/v1/applications from applicant='{}', email='{}', file='{}' ({} bytes, content-type='{}')",
                                 name, email, resume.getOriginalFilename(), resume.getSize(), resume.getContentType());
 
                 ApplicationResponse responseData = applicationService.processApplication(
-                                name, email, phone, address, reason, linkedin, github, website, resume);
+                                name, email, phone, address, reason, linkedin, github, website, honeypot, resume);
 
                 log.debug("Successfully processed job application, assigned ID: {}", responseData.getApplicationId());
 
                 ApiResponse<ApplicationResponse> envelope = ApiResponse.success(
                                 HttpStatus.CREATED.value(),
-                                "Application submitted successfully. Our HR & Engineering leads will review your CV.",
+                                "Application received. Please check your email to verify your address and finalize your submission.",
                                 responseData);
 
                 return ResponseEntity.status(HttpStatus.CREATED).body(envelope);
+        }
+
+        /**
+         * Verifies a candidate's job application via email token.
+         */
+        @GetMapping("/verify")
+        public ResponseEntity<ApiResponse<ApplicationResponse>> verifyApplication(@RequestParam("token") String token) {
+                log.info("Received GET /api/v1/applications/verify with token='{}'", token);
+                ApplicationResponse responseData = applicationService.verifyApplication(token);
+
+                ApiResponse<ApplicationResponse> envelope = ApiResponse.success(
+                                HttpStatus.OK.value(),
+                                "Your application email has been verified! Our HR & R&D leadership team will review your application.",
+                                responseData);
+
+                return ResponseEntity.ok(envelope);
         }
 }
