@@ -1,14 +1,27 @@
 /**
- * LeadersSection — team member card grid shown under the About section.
+ * LeadersSection — leadership card grid, plus an expandable engineering roster.
  *
- * Reads from `lib/data/leaders.ts` (the single source of truth for all team
- * data) and renders a 3-column card grid with scroll-triggered entrance
- * animations.
+ * Renders a 3-column card grid with scroll-triggered entrance animations, and
+ * the full-profile popup handled by `components/ui/LeaderDetails.tsx`.
  *
- * The full-profile popup is handled by `components/ui/MemberModal.tsx`.
+ * ## Where the data comes from
+ * Two static files, both bundled at build time — there is no API call here:
+ *
+ * - **`lib/data/leaders.ts`** → `teamDepartments` — leadership profiles, always
+ *   visible.
+ * - **`lib/data/team.ts`** → `engineeringTeamMembers` — the engineering roster,
+ *   shown in the collapsible "R&D Engineering Team" subsection below. The toggle
+ *   button hides itself entirely while that array is empty.
+ *
+ * Both files share the `TeamMember` interface declared in `leaders.ts`, so an
+ * entry can be moved between them unchanged.
+ *
+ * Keep this section synchronous. The roster is static content, so rendering it
+ * from the bundle avoids a loading flash on every visit and an empty section
+ * whenever the backend is cold starting.
  *
  * ## How to add a team member
- * Edit `lib/data/leaders.ts` — do NOT hard-code member data here.
+ * Edit the relevant data file — do NOT hard-code member data here.
  * The first member of `teamDepartments[0].members` is visually distinguished
  * with an orange accent (instead of blue) to indicate their MD/director role.
  *
@@ -25,7 +38,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { ChevronDown, ChevronUp, User, Users } from 'lucide-react'
-import { teamDepartments, engineeringTeamMembers } from '@/lib/data/leaders'
+import { teamDepartments } from '@/lib/data/leaders'
+import { engineeringTeamMembers } from '@/lib/data/team'
 import { LeaderDetails } from '@/components/ui/LeaderDetails'
 import { fadeInUpVariants, staggerContainer, defaultViewport } from '@/lib/animations'
 import type { TeamMember } from '@/lib/data/leaders'
@@ -57,7 +71,7 @@ export function LeadersSection(): JSX.Element {
   const containerVariants = staggerContainer()
   const itemVariants = fadeInUpVariants
 
-  const renderCard = (member: TeamMember, idx: number) => {
+  const renderCard = (member: TeamMember) => {
     return (
       <div className="bg-white dark:bg-[#0a1526] border border-slate-200 dark:border-blue-950/40 rounded-[2rem] p-8 flex flex-col hover:border-orange-500/30 transition-colors shadow-xl dark:shadow-none h-full">
         {/* Avatar */}
@@ -160,9 +174,9 @@ export function LeadersSection(): JSX.Element {
           viewport={defaultViewport}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto"
         >
-          {leaders.map((leader, idx) => (
+          {leaders.map((leader) => (
             <motion.div key={leader.id} variants={itemVariants}>
-              {renderCard(leader, idx)}
+              {renderCard(leader)}
             </motion.div>
           ))}
         </motion.div>
@@ -212,7 +226,7 @@ export function LeadersSection(): JSX.Element {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: idx * 0.1 }}
                   >
-                    {renderCard(member, leaders.length + idx)}
+                    {renderCard(member)}
                   </motion.div>
                 ))}
               </div>

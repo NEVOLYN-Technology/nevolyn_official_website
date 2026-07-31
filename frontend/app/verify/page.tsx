@@ -5,10 +5,32 @@ import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { CheckCircle2, XCircle, ArrowLeft, Loader2, MailCheck } from 'lucide-react'
+import { CheckCircle2, XCircle, ArrowLeft, Loader2 } from 'lucide-react'
 import { PageShell } from '@/components/layout/PageShell'
-import { apiClient, ApiErrorResponse } from '@/lib/apiClient'
+import { apiClient, type ApiErrorResponse } from '@/lib/apiClient'
 
+/**
+ * Payload returned by both verification endpoints. Each carries only its own
+ * tracking field, so both are optional here.
+ */
+interface VerificationResult {
+  inquiryId?: string
+  applicationId?: string
+  status?: string
+  isVerified?: boolean
+}
+
+/**
+ * Landing page for the link in the step-1 verification email.
+ *
+ * Reads `token` and `type` from the query string and calls the matching verify
+ * endpoint. That call is what advances the pipeline: the backend marks the
+ * submission verified and only then emails the R&D team and the sender's
+ * receipt. Until this page is opened, a submission goes no further.
+ *
+ * Must be rendered inside `<Suspense>` — `useSearchParams` opts the subtree into
+ * client-side rendering, and Next.js fails the build without a boundary.
+ */
 function VerificationContent(): JSX.Element {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
@@ -27,16 +49,17 @@ function VerificationContent(): JSX.Element {
       return
     }
 
-    const endpoint = type === 'application' ? `/applications/verify?token=${token}` : `/contact/verify?token=${token}`
+    // encodeURIComponent guards the query string against a token containing
+    // characters that would otherwise terminate or extend the parameter.
+    const query = `?token=${encodeURIComponent(token)}`
+    const endpoint = type === 'application' ? `/applications/verify${query}` : `/contact/verify${query}`
 
     apiClient
-      .get(endpoint)
-      .then((res: any) => {
+      .get<VerificationResult>(endpoint)
+      .then((res) => {
         setSuccess(true)
         setMessage(res.message || 'Email verified successfully.')
-        if (res.data) {
-          setTrackingId(res.data.inquiryId || res.data.applicationId || null)
-        }
+        setTrackingId(res.data?.inquiryId ?? res.data?.applicationId ?? null)
       })
       .catch((err: ApiErrorResponse) => {
         setSuccess(false)

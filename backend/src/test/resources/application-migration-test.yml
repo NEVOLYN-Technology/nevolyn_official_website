@@ -1,0 +1,44 @@
+# ==============================================================================
+# Profile: migration-test
+# ==============================================================================
+# Used only by FlywayMigrationValidationTest.
+#
+# Runs the real db/migration files against H2 in PostgreSQL compatibility mode,
+# then has Hibernate validate the JPA entities against the resulting schema.
+# This catches the mistakes that actually happen when hand-writing migrations —
+# a column named inquiryId instead of inquiry_id, a missed NOT NULL, a table
+# absent altogether — without needing a live PostgreSQL server.
+#
+# LIMITATION: H2's PostgreSQL mode is a compatibility layer, not PostgreSQL.
+# It does not prove PostgreSQL-specific syntax is valid. The first deploy
+# against real PostgreSQL remains the authoritative check.
+# ==============================================================================
+
+spring:
+  datasource:
+    # MODE=PostgreSQL           accept PostgreSQL syntax and type names
+    # DATABASE_TO_LOWER=TRUE    fold identifiers to lower case as PostgreSQL does
+    url: jdbc:h2:mem:migration_test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  flyway:
+    # The whole point of this profile.
+    enabled: true
+    locations: classpath:db/migration
+
+  jpa:
+    hibernate:
+      # Hibernate issues no DDL here; it only compares the entity mappings
+      # against what Flyway built and fails the context on any mismatch.
+      ddl-auto: validate
+    open-in-view: false
+
+  # Keep the mail auto-configuration inert for this test.
+  mail:
+    password:
+
+logging:
+  level:
+    org.flywaydb: INFO

@@ -64,7 +64,7 @@ The browser (Client) and the server (Backend) communicate using **HTTP Requests*
 ```
 
 ### C. Core Web Terminology Explained
-- **REST API (Representational State Transfer)**: Standard format where URLs represent resources (`/api/v1/team/members`) and HTTP verbs define actions (`GET` = Read, `POST` = Create, `PUT` = Update, `DELETE` = Remove).
+- **REST API (Representational State Transfer)**: Standard format where URLs represent resources (`/api/v1/contact`) and HTTP verbs define actions (`GET` = Read, `POST` = Create, `PUT` = Update, `DELETE` = Remove).
 - **JSON (JavaScript Object Notation)**: Human-readable text format used for data exchange:
   ```json
   { "name": "John Doe", "email": "john@example.com" }
@@ -156,10 +156,18 @@ The backend exposes **3 core REST API endpoints**:
 - Generates application reference ID: `APP-2026-XXXX`.
 - Returns `HTTP 201 Created` with `ApiResponse<ApplicationResponse>`.
 
-### 3. `GET /api/v1/team/members` (Dynamic Engineering Staff)
-- Retrieves active engineering staff ordered by `displayOrder`.
-- Supports optional department filtering (`?department=Industrial%20AI`).
-- Returns `HTTP 200 OK` with `ApiResponse<List<TeamMemberDto>>`.
+### 3. Verification callbacks (`GET /api/v1/{contact,applications}/verify?token=`)
+- Resolves the single-use token from the step-1 email back to the pending submission.
+- Marks it verified, then dispatches the admin dossier and the sender's receipt.
+- Returns `HTTP 200 OK`, or `404` for an unknown, consumed or fabricated token.
+
+### Site content — static by design
+The team roster, innovations, milestones and news are static TypeScript files in `frontend/lib/data/`, bundled with the frontend at build time. The team roster specifically lives in `frontend/lib/data/team.ts` (engineers) and `leaders.ts` (leadership), and renders as the Leaders section — edit those files and redeploy the frontend to update them.
+
+This content is identical for every visitor and changes a few times a year, so serving it over the network buys nothing and adds a cold-start failure mode. **The API and its database handle only what visitors submit.**
+
+### `GET /actuator/health`
+Liveness probe for the hosting platform. Returns `{"status":"UP"}`, or `DOWN` when the datasource is unreachable. Actuator exposes this endpoint only, with `show-details: never`.
 
 ---
 
@@ -168,12 +176,13 @@ The backend exposes **3 core REST API endpoints**:
 ### Backend REST API Test Suite (`backend/src/test/java/com/saturn/rnd/controller/`)
 End-to-end integration tests written using Spring Boot `@SpringBootTest` and `MockMvc`:
 
-1. **`ContactControllerTest.java`**: Tests valid payload `201 CREATED` response and invalid email `400 BAD REQUEST` error handling.
+1. **`ContactControllerTest.java`**: Tests valid payload `201 CREATED` response, the verification-pending contract, and invalid email `400 BAD REQUEST` error handling.
 2. **`ApplicationControllerTest.java`**: Tests `MockMultipartFile` CV upload and application ID assignment.
-3. **`TeamControllerTest.java`**: Tests `200 OK` dynamic staff query.
+3. **`FileStorageServiceTest.java`**: Security tests pinning the upload allow-list and proving a crafted applicant name cannot write outside the storage root (path traversal).
+4. **`FlywayMigrationValidationTest.java`**: Applies the real migrations against H2 in PostgreSQL mode, then has Hibernate validate every entity against the result — so a mistyped column fails in CI rather than at deploy time.
 
-### GitHub Actions CI Pipeline (`.github/workflows/ci-cd.yml`)
-Automated quality pipeline that spins up an OpenJDK 21 LTS environment on GitHub and executes `./mvnw clean test` on every push to `main`.
+### GitHub Actions CI Pipeline (`.github/workflows/deploy-and-test.yml`)
+Automated quality pipeline that spins up an OpenJDK 21 LTS environment on GitHub and executes `./mvnw -B -ntp verify` on every push to `main`, alongside a Node 20 type-check and Next.js build. Once both pass on `main`, it triggers the Render and Vercel deploy hooks. See [`CICD_AND_DEPLOYMENT.md`](./CICD_AND_DEPLOYMENT.md) for the operational reference.
 
 ---
 

@@ -35,21 +35,25 @@ saturn_rnd_portfolio/               ← Git root (monorepo)
 │   └── package.json                # Node.js dependencies & scripts
 ├── backend/                        ← Spring Boot 3 (Java 21) REST API
 │   ├── src/main/java/com/saturn/rnd/
-│   │   ├── controller/             # ContactController, ApplicationController, TeamController
-│   │   ├── service/                # ContactService, ApplicationService, TeamService, FileStorageService
-│   │   ├── model/                  # ContactInquiry, JobApplication, TeamMemberEntity
-│   │   ├── dto/                    # ApiResponse<T>, ContactRequest, TeamMemberDto, ...
+│   │   ├── controller/             # ContactController, ApplicationController
+│   │   ├── service/                # ContactService, ApplicationService, EmailService, FileStorageService
+│   │   ├── model/                  # ContactInquiry, JobApplication
+│   │   ├── dto/                    # ApiResponse<T>, ContactRequest, ContactResponse, ...
 │   │   ├── repository/             # Spring Data JPA Repositories
-│   │   ├── config/                 # CorsConfig, DataSeeder
+│   │   ├── config/                 # CorsConfig, RateLimitFilter
 │   │   └── exception/              # GlobalExceptionHandler, custom exceptions
 │   ├── src/main/resources/
-│   │   └── application.yml         # Port 8080, H2/PostgreSQL config, file upload limits
+│   │   ├── application.yml         # Dev defaults — H2, verbose logging, no mail account needed
+│   │   ├── application-prod.yml    # Production — PostgreSQL, Flyway, SMTPS 465, Actuator
+│   │   ├── db/migration/           # Flyway schema migrations (own the production schema)
+│   │   └── templates/email/        # Thymeleaf HTML bodies for the 3-step email pipeline
 │   └── pom.xml                     # Maven build — Spring Boot 3.4.2
 ├── .github/workflows/              ← GitHub Actions CI/CD automation
-│   └── ci-cd.yml                   # Automated Next.js build, Spring Boot tests & Render trigger
+│   └── deploy-and-test.yml         # Automated Next.js build, Spring Boot tests & Render/Vercel triggers
 ├── render.yaml                     ← Render Blueprint spec for Spring Boot Docker + PostgreSQL DB
 ├── docs/                           ← Project documentation
 │   ├── report.md                   # Zero-to-hero master educational report & engineering audit
+│   ├── CICD_AND_DEPLOYMENT.md      # Operational deployment reference, gotchas & custom domain setup
 │   ├── CICD_GUIDE.md               # Beginner intuition guide for CI/CD, Docker & domain deployment
 │   ├── FRONTEND_GUIDE.md           # Next.js 16 architecture, component breakdown & content guide
 │   ├── BACKEND_GUIDE.md            # Spring Boot 3 package layout, DB & storage guide
@@ -119,18 +123,28 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
-| `POST /api/v1/contact` | POST | Contact form submission |
+| `POST /api/v1/contact` | POST | Contact form submission — emails a verification link |
+| `GET /api/v1/contact/verify?token=` | GET | Confirms the sender, then notifies the R&D team |
 | `POST /api/v1/applications` | POST | Job application + CV upload (`multipart/form-data`) |
-| `GET /api/v1/team/members` | GET | Dynamic engineering staff list |
+| `GET /api/v1/applications/verify?token=` | GET | Confirms the candidate, emails the CV to the team |
+| `GET /actuator/health` | GET | Liveness probe for Render — not part of the public API |
+
+> **The team roster is static content, not an API.** It lives in
+> [`frontend/lib/data/team.ts`](./frontend/lib/data/team.ts) and renders as a
+> subsection of the Leaders section. To update it, edit that file and redeploy
+> the frontend — no backend change and no migration. The API stores only what
+> visitors submit.
 
 For complete DTOs, Controller code, and CORS setup, see [docs/API_INTEGRATION.md](./docs/API_INTEGRATION.md).
+For deployment, migrations and abuse protection, see [docs/CICD_AND_DEPLOYMENT.md](./docs/CICD_AND_DEPLOYMENT.md).
 
 ---
 
 ## 📚 Documentation Links
 
 - 📖 **[Master Educational Report & Audit Handbook (`docs/report.md`)](./docs/report.md)** — Comprehensive zero-to-hero learning guide, architecture audit, API traces, testing suite, and domain deployment.
-- 🤖 **[CI/CD & Deployment Handbook (`docs/CICD_GUIDE.md`)](./docs/CICD_GUIDE.md)** — Beginner intuition guide for CI/CD pipelines, Docker container files, and step-by-step custom domain deployment.
+- 🚀 **[CI/CD & Deployment Reference (`docs/CICD_AND_DEPLOYMENT.md`)](./docs/CICD_AND_DEPLOYMENT.md)** — Operational guide: architecture topology, JDBC URL sanitization, SMTP port blocking, pipeline internals, custom domain + SPF/DKIM/DMARC setup, and a troubleshooting table.
+- 🤖 **[CI/CD Beginner Handbook (`docs/CICD_GUIDE.md`)](./docs/CICD_GUIDE.md)** — Beginner intuition guide for CI/CD pipelines, Docker container files, and step-by-step custom domain deployment.
 - 🔌 **[Spring Boot REST API Master Spec (`docs/API_INTEGRATION.md`)](./docs/API_INTEGRATION.md)** — Master API guide with 5-layer code traces, field constraints, cURL examples, CORS config, and tutorial on adding new APIs.
 - ⚛️ **[Frontend Developer Handbook (`docs/FRONTEND_GUIDE.md`)](./docs/FRONTEND_GUIDE.md)** — Next.js 16 architecture, component breakdown, content editing workflows, animations, and API integration.
 - 🍃 **[Backend Developer Handbook (`docs/BACKEND_GUIDE.md`)](./docs/BACKEND_GUIDE.md)** — Spring Boot 3 architecture, package layer responsibilities, JPA database setup, and file storage logic.

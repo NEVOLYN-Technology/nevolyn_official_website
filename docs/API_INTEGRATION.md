@@ -18,8 +18,16 @@ Managed directly in frontend code for zero database latency:
 ### Dynamic Backend APIs (Spring Boot REST Service)
 Handles dynamic database operations, visitor inquiries, and job candidate resume file uploads:
 1. `POST /api/v1/contact` ── Saves visitor contact form submissions & generates inquiry IDs.
-2. `POST /api/v1/applications` ── Saves candidate job applications + CV PDF/DOCX uploads.
-3. `GET /api/v1/team/members` ── Fetches dynamic R&D engineering staff ordered by display sequence.
+2. `GET /api/v1/contact/verify?token=` ── Confirms the sender, then notifies the R&D team.
+3. `POST /api/v1/applications` ── Saves candidate job applications + CV PDF/DOCX uploads.
+4. `GET /api/v1/applications/verify?token=` ── Confirms the candidate, emails the CV to the team.
+
+Plus `GET /actuator/health`, a liveness probe for the hosting platform that is
+not part of the public API.
+
+> **Site content is not served by the API.** The team roster, innovations,
+> milestones and news are static files under `frontend/lib/data/`, bundled at
+> build time — see Endpoint 3 and Integration 3 below.
 
 ---
 
@@ -156,40 +164,23 @@ Receives candidate job applications and resume document uploads.
 
 ---
 
-### Endpoint 3: `GET /api/v1/team/members` (Dynamic R&D Staff)
+### Endpoint 3: `GET /actuator/health` (Platform Liveness Probe)
 
-Retrieves active engineering team members from PostgreSQL/H2 database.
+Consumed by Render, not by the frontend.
 
 - **Method**: `GET`
 - **Authentication**: Public
-- **Query Parameters**: `department` *(Optional string filter)*
+- **Response**: `{"status":"UP"}`, or `DOWN` when the datasource is unreachable
 
-#### Response Payload (`200 OK`)
-```json
-{
-  "status": "success",
-  "code": 200,
-  "message": "Active team members fetched successfully.",
-  "data": [
-    {
-      "id": 1,
-      "name": "Tanvir Ahmed",
-      "title": "Computer Vision Engineer",
-      "department": "Industrial AI",
-      "bio": "Specializes in real-time defect segmentation models.",
-      "specializations": ["PyTorch", "OpenCV", "YOLOv8"],
-      "email": "tanvir@saturntextiles.com",
-      "image": "/tanvir-photo.png",
-      "social": {
-        "github": "https://github.com/tanvir",
-        "linkedin": "https://linkedin.com/in/tanvir"
-      },
-      "displayOrder": 1
-    }
-  ],
-  "timestamp": "2026-07-24T14:20:00Z"
-}
-```
+Actuator is configured to expose this endpoint only, with `show-details: never` —
+the detailed form names the database, driver and validation query, which a health
+probe has no reason to disclose.
+
+#### There is no team-roster endpoint
+
+The R&D team roster is static content, not application data. It lives in
+`frontend/lib/data/team.ts` and ships with the frontend build — see Integration 3
+below. The API persists only what visitors submit.
 
 ---
 
@@ -504,69 +495,48 @@ export default function JoinPage() {
 
 ---
 
-### Integration 3: Dynamic Staff Query (`GET /api/v1/team/members`)
+### Integration 3: Team roster — static, not fetched
 
-**Component File**: `frontend/components/sections/LeadersSection.tsx`
+**Data files**: `frontend/lib/data/leaders.ts`, `frontend/lib/data/team.ts`
+**Component file**: `frontend/components/sections/LeadersSection.tsx`
+
+The roster is plain TypeScript, bundled at build time. There is no fetch, no
+loading state and no error state, because the data is already present when the
+component renders:
 
 ```tsx
 'use client'
 
-import { useEffect, useState } from 'react'
-import { teamDepartments } from '@/lib/data/leaders' // Static fallback data
-
-interface TeamMemberApiDto {
-  id: number
-  name: string
-  title: string
-  department: string
-  bio: string
-  image?: string
-  social?: { github?: string; linkedin?: string }
-}
+import { teamDepartments } from '@/lib/data/leaders'   // leadership profiles
+import { engineeringTeamMembers } from '@/lib/data/team' // engineering roster
 
 export function LeadersSection() {
-  const [members, setMembers] = useState<TeamMemberApiDto[]>([])
-  const [loading, setLoading] = useState(true)
+  const leaders = teamDepartments[0].members
 
-  useEffect(() => {
-    async function fetchTeam() {
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
-        const res = await fetch(`${baseUrl}/api/v1/team/members`)
-        const json = await res.json()
-
-        if (res.ok && json.status === 'success' && json.data.length > 0) {
-          setMembers(json.data)
-        } else {
-          // Fallback to static lib/data/leaders.ts data if DB is empty
-          setMembers(teamDepartments[0].members as any)
-        }
-      } catch (err) {
-        // Fallback gracefully on network error
-        setMembers(teamDepartments[0].members as any)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchTeam()
-  }, [])
-
-  if (loading) return <div>Loading team members...</div>
-
+  // No fetch, no useEffect, no loading state, no error state — the data is
+  // already in the bundle by the time the component renders.
   return (
     <section id="leaders">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {members.map((member) => (
-          <div key={member.id} className="p-6 border rounded-2xl">
-            <h3>{member.name}</h3>
-            <p>{member.title}</p>
-            <p>{member.bio}</p>
-          </div>
-        ))}
-      </div>
+      {leaders.map((member) => (
+        <MemberCard key={member.id} member={member} />
+      ))}
+
+      {/* Expandable subsection; the toggle hides itself when the array is empty. */}
+      {engineeringTeamMembers.map((member) => (
+        <MemberCard key={member.id} member={member} />
+      ))}
     </section>
   )
 }
 ```
 
+**To update the roster**, edit `frontend/lib/data/team.ts` (engineers) or
+`frontend/lib/data/leaders.ts` (leadership) and redeploy the frontend. No backend
+change, no migration, no database access. See each file's header comment for the
+entry template and field reference.
+
+**Keep it static.** Serving this over the network buys nothing — it is identical
+for every visitor — and introduces two failure modes the static version does not
+have: a loading flash on every visit, and an empty team section whenever the
+free-tier backend is cold starting. The same reasoning applies to the other files
+in `frontend/lib/data/` (innovations, milestones, news).

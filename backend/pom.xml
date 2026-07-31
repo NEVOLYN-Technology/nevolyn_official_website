@@ -40,6 +40,31 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+        <!--
+            Exposes /actuator/health as a cheap, dedicated liveness probe.
+            Render polls the health check constantly; pointing it at a real API
+            route meant every poll ran a database query and served public data.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!--
+            Schema migrations. Hibernate's ddl-auto previously owned the
+            production schema, which silently rewrites live tables whenever an
+            entity changes. Flyway makes every change an explicit, ordered,
+            reviewable file, and prod runs ddl-auto: validate so a drift between
+            entities and schema fails at startup instead of corrupting data.
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
 
         <!-- Database Drivers -->
         <dependency>

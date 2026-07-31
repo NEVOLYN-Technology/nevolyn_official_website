@@ -13,7 +13,7 @@
 import type { JSX } from 'react'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Tag, Calendar, ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-react'
+import { Tag, Calendar, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
 import { Badge, type BadgeTone } from '@/components/ui/badge'
 import { projects, type Project } from '@/lib/data/innovations'
 import { fadeUpProps } from '@/lib/animations'

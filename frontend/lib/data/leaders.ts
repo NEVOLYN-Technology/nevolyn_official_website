@@ -1,8 +1,13 @@
 /**
  * Team & leadership content.
  *
- * This is the single source of truth for everyone shown in the
+ * Single source of truth for the **leadership profiles** shown in the
  * "Our Leaders" section on the homepage (`components/sections/LeadersSection.tsx`).
+ *
+ * The engineering team roster is a separate file, `lib/data/team.ts`, which
+ * reuses the {@link TeamMember} interface declared below — so an entry can be
+ * moved between the two files unchanged. Add leadership here; add engineers
+ * there.
  *
  * ## 📋 Standard Template for Adding a New Team Member
  *
@@ -176,5 +181,3 @@ export const teamDepartments: Department[] = [
     ],
   },
 ]
-
-export const engineeringTeamMembers: TeamMember[] = []

@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.*;
  * @see ContactResponse
  * @see ContactService
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/contact")
 @RequiredArgsConstructor

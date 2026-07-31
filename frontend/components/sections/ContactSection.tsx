@@ -23,6 +23,19 @@ export const ContactSection = (): JSX.Element => {
     honeypot: '',
   })
 
+  /**
+   * Posts the form and clears it only on success, so a failed attempt keeps
+   * what the visitor typed.
+   *
+   * COLD START: the API runs on Render's free tier, which suspends the instance
+   * after ~15 minutes idle. The first submission after a quiet period waits on a
+   * full container wake-up — commonly 30-50s — so `apiClient` allows a 60s
+   * window before giving up (see REQUEST_TIMEOUT_MS in lib/apiClient.ts).
+   * The button stays disabled with a spinner for that entire period; do not
+   * shorten the timeout without also giving the user a way to retry, or the
+   * first submission of the day will fail while the request was about to
+   * succeed.
+   */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const success = await submitContactForm(formData)

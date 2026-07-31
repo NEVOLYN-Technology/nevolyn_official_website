@@ -1,0 +1,52 @@
+# ==============================================================================
+# Profile: test
+# ==============================================================================
+# Active for the controller integration tests (@ActiveProfiles("test")).
+#
+# Every setting the tests depend on is pinned here rather than inherited, so
+# tuning application.yml for local convenience cannot change test behaviour.
+# Add a key here whenever a test starts relying on it.
+# ==============================================================================
+
+spring:
+  datasource:
+    # A distinct in-memory database per test run, isolated from the dev instance.
+    url: jdbc:h2:mem:saturn_rnd_test_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      # Hibernate builds the schema from the entities here. Flyway's migrations
+      # are verified separately by FlywayMigrationValidationTest, which keeps
+      # these tests fast and independent of migration state.
+      ddl-auto: create-drop
+    show-sql: false
+    open-in-view: false
+
+  flyway:
+    enabled: false
+
+  # No credential configured, so EmailService logs each message instead of
+  # sending it. Tests therefore exercise the full pipeline without network I/O.
+  mail:
+    password:
+
+app:
+  storage:
+    # Resume uploads land under target/, so `mvnw clean` disposes of them and
+    # test runs never litter the working tree.
+    upload-dir: ./target/test-uploads/resumes
+
+  rate-limit:
+    # Disabled so tests stay deterministic and order-independent. Several tests
+    # POST to the same endpoint from 127.0.0.1 and would otherwise contend for
+    # one shared bucket.
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.saturn.rnd: INFO
+    org.hibernate.SQL: WARN

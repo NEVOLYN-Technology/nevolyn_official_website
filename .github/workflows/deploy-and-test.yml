@@ -1,0 +1,197 @@
+# ==============================================================================
+# Saturn R&D Portfolio — Validate & Deploy
+# ==============================================================================
+# Validates both halves of the stack on every push and pull request, then
+# promotes main to production once both halves are green.
+#
+#   backend-test    Maven build + unit tests on Temurin JDK 21
+#   frontend-build  TypeScript type-check + Next.js production build on Node 20
+#   deploy-backend  Render deploy hook   (main, after both jobs pass)
+#   deploy-frontend Vercel deploy hook   (main, after both jobs pass)
+#
+# The two validation jobs run in parallel and are independently cached, which
+# keeps a warm run comfortably under two minutes.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   RENDER_DEPLOY_HOOK_URL  Render → service → Settings → Deploy Hook
+#   VERCEL_DEPLOY_HOOK_URL  Vercel → project → Settings → Git → Deploy Hooks
+# Both deploy jobs no-op with a notice when their secret is absent, so a fork or
+# a fresh clone still gets a fully working CI run.
+# ==============================================================================
+
+name: Validate & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows a manual re-deploy from the Actions tab without an empty commit.
+  workflow_dispatch:
+
+# A newer push to the same branch makes an in-flight run obsolete. Cancel it
+# rather than paying for it — except on main, where a cancelled run could leave
+# a half-finished deploy.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# Least privilege: nothing here writes back to the repository.
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: '21'
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+jobs:
+  # ============================================================================
+  # Spring Boot backend — compile and unit test
+  # ============================================================================
+  backend-test:
+    name: Backend (Java 21 / Maven)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          # Restores and saves ~/.m2/repository keyed on pom.xml. This is the
+          # single biggest win available here: it turns a ~90s cold dependency
+          # resolve into a few seconds.
+          cache: maven
+
+      - name: Make Maven wrapper executable
+        # The executable bit does not survive a Windows checkout, so ./mvnw
+        # would fail with "Permission denied" on the Linux runner.
+        run: chmod +x ./mvnw
+        working-directory: backend
+
+      - name: Build and run unit tests
+        # -B batch mode strips progress spam from the log.
+        # -ntp hides the transfer chatter, leaving real warnings visible.
+        run: ./mvnw -B -ntp verify
+        working-directory: backend
+
+      - name: Upload test reports
+        # Runs even on failure — the reports are the whole point when tests fail.
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-surefire-reports
+          path: backend/target/surefire-reports/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ============================================================================
+  # Next.js frontend — type-check and production build
+  # ============================================================================
+  frontend-build:
+    name: Frontend (Node 20 / Next.js)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm ${{ env.PNPM_VERSION }}
+        # Must precede setup-node: `cache: pnpm` needs the pnpm binary present
+        # to resolve the store path.
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        # --frozen-lockfile fails rather than silently rewriting the lockfile,
+        # so CI can never resolve a different dependency tree than a developer.
+        run: pnpm install --frozen-lockfile
+        working-directory: frontend
+
+      - name: Cache Next.js build output
+        uses: actions/cache@v4
+        with:
+          path: frontend/.next/cache
+          # Source-hashed key so an unchanged tree restores an exact match;
+          # restore-keys falls back to the newest sibling for a partial reuse of
+          # the compiler cache when sources did change.
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('frontend/pnpm-lock.yaml') }}-${{ hashFiles('frontend/**/*.ts', 'frontend/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('frontend/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-nextjs-
+
+      - name: Type-check
+        # `tsc --noEmit` across the project; fails the build on any type error.
+        run: pnpm run type-check
+        working-directory: frontend
+
+      - name: Build production bundle
+        run: pnpm run build
+        working-directory: frontend
+        env:
+          # Must include the /api/v1 prefix — apiClient appends bare paths such
+          # as "/contact" directly to this value.
+          #
+          # FUTURE CUSTOM DOMAIN: point this at https://api.saturn-rnd.com/api/v1
+          # once the Render custom domain is attached. This value only affects
+          # the CI smoke build; the deployed bundle uses the environment
+          # variable configured in the Vercel dashboard.
+          NEXT_PUBLIC_API_URL: https://saturn-rnd-backend.onrender.com/api/v1
+
+  # ============================================================================
+  # Deploy — main only, and only once both validation jobs are green
+  # ============================================================================
+  deploy-backend:
+    name: Deploy backend to Render
+    needs: [backend-test, frontend-build]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "::notice::RENDER_DEPLOY_HOOK_URL is not configured — skipping backend deploy."
+            exit 0
+          fi
+          # --fail turns an HTTP 4xx/5xx into a non-zero exit so a rejected hook
+          # fails the job instead of silently reporting success.
+          curl --fail --silent --show-error --max-time 30 -X POST "$DEPLOY_HOOK_URL" > /dev/null
+          echo "::notice::Render backend deploy triggered."
+
+  deploy-frontend:
+    name: Deploy frontend to Vercel
+    needs: [backend-test, frontend-build]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Trigger Vercel deploy hook
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "::notice::VERCEL_DEPLOY_HOOK_URL is not configured — skipping."
+            echo "::notice::If Vercel's Git integration is connected, it already deploys this push on its own."
+            exit 0
+          fi
+          curl --fail --silent --show-error --max-time 30 -X POST "$DEPLOY_HOOK_URL" > /dev/null
+          echo "::notice::Vercel frontend deploy triggered."

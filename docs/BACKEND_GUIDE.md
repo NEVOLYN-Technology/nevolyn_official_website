@@ -27,36 +27,35 @@ backend/
 ├── pom.xml                                  # Maven dependencies & Java 21 configuration
 ├── .mvn/wrapper/maven-wrapper.properties   # Maven Wrapper settings
 ├── src/main/resources/
-│   └── application.yml                      # Port 8080, DB connection, multipart file limits
+│   ├── application.yml                      # Dev defaults — H2, verbose logging, no mail account
+│   ├── application-prod.yml                 # Production — PostgreSQL, Flyway, SMTPS 465, Actuator
+│   ├── db/migration/                        # Flyway migrations — own the production schema
+│   └── templates/email/                     # Thymeleaf HTML bodies for the email pipeline
 └── src/main/java/com/saturn/rnd/
-    ├── SaturnRndApplication.java            # Main Spring Boot application entry point
-    ├── config/                              # Configuration Beans & Startup Initializers
+    ├── SaturnRndApplication.java            # Entry point + cloud DATABASE_URL sanitizer
+    ├── config/                              # Configuration Beans & Filters
     │   ├── CorsConfig.java                  # CORS policy permitting Next.js frontend origins
-    │   └── DataSeeder.java                  # Populates sample team members on dev startup
+    │   └── RateLimitFilter.java             # Per-IP throttle on the public write endpoints
     ├── controller/                          # REST Controllers (HTTP Requests -> Responses)
-    │   ├── ContactController.java           # POST /api/v1/contact
-    │   ├── ApplicationController.java       # POST /api/v1/applications (multipart CV upload)
-    │   └── TeamController.java              # GET /api/v1/team/members
+    │   ├── ContactController.java           # POST /api/v1/contact, GET /contact/verify
+    │   └── ApplicationController.java       # POST /api/v1/applications (multipart CV upload)
     ├── dto/                                 # Data Transfer Objects & JSON Envelopes
     │   ├── ApiResponse.java                 # Standard JSON response envelope wrapper <T>
     │   ├── FieldErrorDto.java               # Validation error detail DTO
     │   ├── ContactRequest.java              # Contact form incoming payload (JSR-380 validated)
     │   ├── ContactResponse.java             # Contact success response (inquiryId)
-    │   ├── ApplicationResponse.java         # Job application success response (applicationId)
-    │   └── TeamMemberDto.java               # Dynamic engineering staff response DTO
+    │   └── ApplicationResponse.java         # Job application success response (applicationId)
     ├── model/                               # JPA Entities (Database Tables)
     │   ├── ContactInquiry.java              # Table: contact_inquiries
-    │   ├── JobApplication.java              # Table: job_applications
-    │   └── TeamMemberEntity.java            # Table: team_members
+    │   └── JobApplication.java              # Table: job_applications
     ├── repository/                          # Spring Data JPA Repositories
     │   ├── ContactInquiryRepository.java    # DB interface for ContactInquiry
-    │   ├── JobApplicationRepository.java    # DB interface for JobApplication
-    │   └── TeamMemberRepository.java        # DB interface for TeamMemberEntity
+    │   └── JobApplicationRepository.java    # DB interface for JobApplication
     ├── service/                             # Business Logic & Storage Services
     │   ├── ContactService.java              # Inquiry processing & unique ID generation
     │   ├── ApplicationService.java          # Job application & file storage orchestration
-    │   ├── TeamService.java                 # Staff query & DTO conversion logic
-    │   └── FileStorageService.java          # Resume file validation & local file persistence
+    │   ├── EmailService.java                # 3-step pipeline; Brevo REST + SMTP fallback
+    │   └── FileStorageService.java          # Resume validation, path sanitization, persistence
     └── exception/                           # Exception Handlers & Interceptors
         ├── GlobalExceptionHandler.java      # @RestControllerAdvice transforming errors into ApiResponse
         ├── FileStorageException.java        # Custom file operation exception
@@ -140,11 +139,27 @@ Receives candidate job application forms + uploaded resume files from `/join_us`
 
 ---
 
-### 3. `GET /api/v1/team/members`
-Retrieves active R&D engineering staff ordered by `displayOrder`.
+### 3. `GET /actuator/health`
 
-- **Query Parameters**: `department` (Optional filter)
-- **Response Data**: List of `TeamMemberDto` objects.
+Liveness probe for the hosting platform. Returns `{"status":"UP"}`, or `DOWN`
+when the datasource is unreachable. Not part of the public API — Actuator is
+configured to expose this endpoint only, with `show-details: never`.
+
+---
+
+## 📄 What this backend does *not* serve
+
+Site content — the team roster, innovations, milestones and news — is static
+and lives in `frontend/lib/data/`. To change it, edit the relevant file there
+and redeploy the frontend. No backend change and no migration are involved.
+
+This is a deliberate boundary: that content changes a few times a year, is
+identical for every visitor, and is entirely public, so serving it over the
+network buys nothing and adds a failure mode. **The backend persists only what
+visitors submit** — contact inquiries and job applications.
+
+Keep it that way. If you find yourself about to add a table for editorial
+content, put it in `frontend/lib/data/` instead.
 
 ---
 

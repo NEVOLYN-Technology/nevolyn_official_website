@@ -1,37 +1,99 @@
+# ==============================================================================
+# Saturn R&D Backend — DEFAULT (local development) configuration
+# ==============================================================================
+# This profile is what runs when no SPRING_PROFILES_ACTIVE is set, i.e. on a
+# developer laptop. It is deliberately zero-setup: in-memory database, no mail
+# account required, verbose logging.
+#
+# Production overrides live in application-prod.yml and are activated with
+#   SPRING_PROFILES_ACTIVE=prod
+# Spring merges the two, with prod winning on any key it redefines.
+#
+# Placeholder syntax used throughout: ${ENV_VAR:fallback}
+#   - ENV_VAR is read from the OS environment (what Render/Docker inject).
+#   - fallback applies when the variable is absent, keeping local runs working.
+# ==============================================================================
+
 server:
   port: 8080
   servlet:
+    # Root context: endpoints are /api/v1/** with no extra prefix. Changing this
+    # also changes every URL the frontend calls — keep it in sync with
+    # NEXT_PUBLIC_API_URL on the Vercel side.
     context-path: /
 
 spring:
   application:
     name: saturn-rnd-backend
+
+  # --------------------------------------------------------------------------
+  # Datasource — in-memory H2
+  # --------------------------------------------------------------------------
+  # DB_CLOSE_DELAY=-1 keeps the schema alive for the whole JVM lifetime rather
+  # than dropping it when the last connection closes, which would otherwise wipe
+  # seeded data between requests.
+  #
+  # FUTURE CUSTOM DOMAIN / CLOUD DATABASE:
+  # Do not point this at a cloud Postgres instance. Production database settings
+  # belong in application-prod.yml, which reads DATABASE_URL. See
+  # SaturnRndApplication for how a postgres:// URL is converted to JDBC form.
   datasource:
     url: jdbc:h2:mem:saturn_rnd_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
-    password: 
+    password:
+
   h2:
     console:
+      # Browsable DB inspector at http://localhost:8080/h2-console
+      # (JDBC URL: jdbc:h2:mem:saturn_rnd_db, user: sa, empty password).
+      # Disabled in prod — see application-prod.yml.
       enabled: true
       path: /h2-console
+
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    # Dialect is intentionally NOT set: Hibernate detects it from the JDBC
+    # connection metadata, and naming it explicitly triggers HHH90000025.
+    #
+    # open-in-view=false closes the persistence context when the service layer
+    # returns, instead of holding a connection open through view rendering. On a
+    # 5-connection pool that difference is the gap between serving traffic and
+    # deadlocking on connection acquisition.
+    open-in-view: false
     hibernate:
+      # 'update' lets entity changes reshape the throwaway dev schema without a
+      # migration. The project has no migration tool wired up yet, so prod also
+      # runs 'update'; adopting Flyway and switching prod to 'validate' is the
+      # recommended next step before the data becomes irreplaceable.
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+
   servlet:
     multipart:
+      # Candidate CV uploads. max-request-size sits above max-file-size to leave
+      # room for the accompanying text fields in the same multipart body.
       enabled: true
       max-file-size: 10MB
       max-request-size: 12MB
+
+  # --------------------------------------------------------------------------
+  # Mail transport
+  # --------------------------------------------------------------------------
+  # With SPRING_MAIL_PASSWORD unset (the default), EmailService logs messages
+  # instead of sending them — no mail account needed to develop locally.
+  #
+  # Port 587 STARTTLS is fine from a laptop. It is NOT usable on Render or most
+  # AWS accounts, which block outbound 25/587; production uses SMTPS on 465 plus
+  # the Brevo HTTPS API. See application-prod.yml.
   mail:
     host: ${SPRING_MAIL_HOST:smtp.gmail.com}
     port: ${SPRING_MAIL_PORT:587}
     username: ${SPRING_MAIL_USERNAME:dev@saturn-rnd.com}
+    # Also doubles as the Brevo API key: a value starting with 'xsmtpsib-'
+    # switches EmailService to the HTTPS REST engine automatically.
     password: ${SPRING_MAIL_PASSWORD:}
     properties:
       mail:
@@ -39,11 +101,30 @@ spring:
           auth: true
           starttls:
             enable: true
+
+  # --------------------------------------------------------------------------
+  # Flyway — disabled for local development
+  # --------------------------------------------------------------------------
+  # The dev database is a throwaway in-memory H2 instance, and Hibernate's
+  # ddl-auto=update reshapes it from the entities on every boot. Running the
+  # PostgreSQL-flavoured migrations against it would add friction with no
+  # benefit.
+  #
+  # Production sets this to true and pins ddl-auto=validate — see
+  # application-prod.yml. The migrations themselves are exercised by
+  # FlywayMigrationValidationTest, which runs them against H2 in PostgreSQL
+  # compatibility mode and then asks Hibernate to validate the entity mappings
+  # against the result.
+  flyway:
+    enabled: false
+
   thymeleaf:
+    # Renders the HTML email bodies in src/main/resources/templates/email/.
     prefix: classpath:/templates/
     suffix: .html
     mode: HTML
     encoding: UTF-8
+    # Caching off so template edits show up on the next send without a restart.
     cache: false
 
 logging:
@@ -55,14 +136,59 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
+# ==============================================================================
+# Application-specific settings
+# ==============================================================================
 app:
   storage:
+    # Resume upload target. Relative to the process working directory, so it
+    # lands in backend/uploads/resumes during local runs. Production remaps this
+    # to an absolute container path.
     upload-dir: ./uploads/resumes
+
   email:
+    # Envelope sender. When using the Brevo REST engine this address must be a
+    # verified sender in the Brevo dashboard, or the API returns HTTP 400.
     from: ${APP_EMAIL_FROM:noreply@saturn-rnd.com}
+    # Destination for step-2 admin dossiers.
     admin: ${APP_EMAIL_ADMIN:admin@saturn-rnd.com}
+    # Friendly From display name shown in the recipient's inbox.
+    sender-name: ${APP_EMAIL_SENDER_NAME:Saturn Textiles R&D}
+    #
+    # FUTURE CUSTOM DOMAIN INSTRUCTIONS
+    # ---------------------------------
+    # This origin is used to build the step-1 verification link
+    # (<frontend-url>/verify?token=…). It MUST match wherever the Next.js app is
+    # actually served, or the link in the email 404s.
+    #   Vercel default : https://saturn-rnd.vercel.app
+    #   Custom domain  : https://saturn-rnd.com
+    # Set APP_FRONTEND_URL on Render; no code change is needed.
     frontend-url: ${APP_FRONTEND_URL:http://localhost:3000}
+
+  rate-limit:
+    # Per-IP fixed window over the public write endpoints (RateLimitFilter).
+    # Sized for a human filling in a form, not for load: five submissions in ten
+    # minutes is generous for a real visitor and cheap for an abuser to hit.
+    #
+    # Counters are per-instance and in-memory — see RateLimitFilter for why that
+    # is acceptable here and what to change before scaling out.
+    enabled: ${APP_RATE_LIMIT_ENABLED:true}
+    max-requests: ${APP_RATE_LIMIT_MAX:5}
+    window-minutes: ${APP_RATE_LIMIT_WINDOW_MINUTES:10}
+
   cors:
-    allowed-origins:
-      - http://localhost:3000
-      - https://saturn-rnd.vercel.app
+    #
+    # FUTURE CUSTOM DOMAIN INSTRUCTIONS
+    # ---------------------------------
+    # Browsers reject any cross-origin API response whose origin is not listed
+    # here, so this must include every host that serves the frontend.
+    #
+    # Entries are matched as PATTERNS (see CorsConfig), so a wildcard covers
+    # Vercel's per-deployment preview URLs:
+    #   https://saturn-rnd-*.vercel.app
+    #
+    # When moving to a custom domain, add BOTH the apex and www forms:
+    #   https://saturn-rnd.com,https://www.saturn-rnd.com
+    # Override in one place via the APP_CORS_ALLOWED_ORIGINS env var
+    # (comma-separated) rather than editing this file per environment.
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app}

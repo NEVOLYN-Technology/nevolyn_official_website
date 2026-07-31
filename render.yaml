@@ -1,11 +1,18 @@
 # ==============================================================================
-# Render Infrastructure Blueprint Schema for Saturn R&D Portfolio Backend
-# Docs: https://render.com/docs/blueprint-spec
+# Render Infrastructure Blueprint — Saturn R&D Portfolio Backend
+# Spec: https://render.com/docs/blueprint-spec
+# ==============================================================================
+# Applied from the Render dashboard (Blueprints → New Blueprint Instance).
+# Editing this file does not change a running service on its own — re-sync the
+# blueprint, or mirror the change in the dashboard.
+#
+# Values marked `sync: false` are secrets: Render prompts for them once and
+# never stores them in git. Never inline a password or API key here.
 # ==============================================================================
 
 services:
   # ----------------------------------------------------------------------------
-  # Spring Boot REST API Web Service (Docker Runtime)
+  # Spring Boot REST API (Docker runtime)
   # ----------------------------------------------------------------------------
   - type: web
     name: saturn-rnd-backend
@@ -14,40 +21,90 @@ services:
     dockerfilePath: backend/Dockerfile
     plan: free
     region: oregon
-    healthCheckPath: /api/v1/projects
+
+    # Render polls this path continuously and refuses to promote a deploy that
+    # never returns 2xx — a 404 here silently rolls every deploy back.
+    #
+    # Keep this pointed at Actuator: it is purpose-built, cheap, and reports DOWN
+    # when the datasource is unreachable, so a broken instance is pulled from
+    # rotation. Do not substitute a real API route — that runs a database query
+    # on every poll and serves public data as a side effect.
+    healthCheckPath: /actuator/health
+
     envVars:
+      # Binds the server to the port Render routes public 443 traffic to.
       - key: PORT
         value: 8080
-      - key: DB_HOST
+
+      # Activates application-prod.yml. WITHOUT THIS the service silently falls
+      # back to the in-memory H2 dev profile: forms appear to work, then every
+      # submission vanishes on the next restart.
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # ----------------------------------------------------------------------
+      # Database
+      # ----------------------------------------------------------------------
+      # `connectionString` yields libpq form: postgres://user:pass@host/dbname
+      # The PostgreSQL JDBC driver cannot parse that, so the
+      # ApplicationEnvironmentPreparedEvent listener in SaturnRndApplication
+      # rewrites it into jdbc:postgresql://host:5432/dbname and splits the
+      # credentials out — before HikariCP starts.
+      #
+      # Do NOT try to assemble a JDBC URL here from separate host/port/name
+      # vars: a blueprint `value:` is a literal, so "${DB_HOST}" is passed
+      # through verbatim and the driver receives a nonsense URL.
+      - key: DATABASE_URL
         fromDatabase:
           name: saturn-rnd-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: saturn-rnd-db
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: saturn-rnd-db
-          property: database
-      - key: SPRING_DATASOURCE_URL
-        value: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-      - key: SPRING_DATASOURCE_USERNAME
-        fromDatabase:
-          name: saturn-rnd-db
-          property: user
-      - key: SPRING_DATASOURCE_PASSWORD
-        fromDatabase:
-          name: saturn-rnd-db
-          property: password
-      - key: SPRING_JPA_DATABASE_PLATFORM
-        value: org.hibernate.dialect.PostgreSQLDialect
+          property: connectionString
+
+      # ----------------------------------------------------------------------
+      # CORS + links
+      # ----------------------------------------------------------------------
+      # FUTURE CUSTOM DOMAIN: append the apex and www forms, e.g.
+      #   https://saturn-rnd.com,https://www.saturn-rnd.com,https://saturn-rnd.vercel.app
+      # The wildcard entry keeps Vercel preview deployments working.
       - key: APP_CORS_ALLOWED_ORIGINS
-        value: https://saturn-rnd.vercel.app,http://localhost:3000
+        value: https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app,http://localhost:3000
+
+      # Origin used to build the email verification link. Must match where the
+      # frontend is actually served or every verification link 404s.
+      # FUTURE CUSTOM DOMAIN: change to https://saturn-rnd.com
+      - key: APP_FRONTEND_URL
+        value: https://saturn-rnd.vercel.app
+
+      # ----------------------------------------------------------------------
+      # Mail (Brevo)
+      # ----------------------------------------------------------------------
+      # SPRING_MAIL_PASSWORD doubles as the Brevo API key. A value starting with
+      # 'xsmtpsib-' switches EmailService to the HTTPS REST engine (port 443),
+      # which is immune to Render's outbound SMTP port block. Anything else
+      # falls back to SMTPS on 465.
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_HOST
+        value: smtp-relay.brevo.com
+      - key: SPRING_MAIL_PORT
+        value: 465
+
+      # Envelope sender — must be a Brevo-verified sender or the API returns 400.
+      - key: APP_EMAIL_FROM
+        sync: false
+      # Destination for verified-submission dossiers.
+      - key: APP_EMAIL_ADMIN
+        sync: false
 
 # ------------------------------------------------------------------------------
-# Managed PostgreSQL Database Instance
+# Managed PostgreSQL
 # ------------------------------------------------------------------------------
+# NOTE ON THE FREE TIER: Render allows one free database per account and expires
+# it after 30 days. If blueprint sync fails with a free-tier limit error, either
+# delete the existing free database or remove this block and attach an
+# already-provisioned database by setting DATABASE_URL as a `sync: false` secret
+# on the web service above.
 databases:
   - name: saturn-rnd-db
     databaseName: saturn_rnd_db

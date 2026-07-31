@@ -1,8 +1,22 @@
-version: '3.8'
+# ==============================================================================
+# Saturn R&D Portfolio — full local stack
+# ==============================================================================
+#   docker compose up --build
+#
+# Brings up Postgres + the Spring Boot API + the Next.js frontend, mirroring the
+# production topology closely enough to catch profile and wiring mistakes that
+# an H2-backed `mvnw spring-boot:run` cannot.
+#
+# Override any default by exporting the variable first, or with a .env file
+# alongside this file.
+#
+# NOTE: the `version:` key was intentionally dropped — Compose v2 ignores it and
+# warns that it is obsolete.
+# ==============================================================================
 
 services:
   # ----------------------------------------------------------------------------
-  # 1. PostgreSQL Database Service
+  # PostgreSQL
   # ----------------------------------------------------------------------------
   db:
     image: postgres:16-alpine
@@ -16,9 +30,17 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    # Gate the backend on real readiness. Postgres briefly accepts then drops
+    # connections during init, so `depends_on` alone races the API's first
+    # connection attempt.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-saturn_admin} -d ${DB_NAME:-saturn_rnd_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   # ----------------------------------------------------------------------------
-  # 2. Spring Boot REST API Service
+  # Spring Boot REST API
   # ----------------------------------------------------------------------------
   backend:
     build:
@@ -29,29 +51,60 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # REQUIRED. The default profile hardcodes driverClassName=org.h2.Driver,
+      # so pointing it at Postgres without activating 'prod' hands a
+      # jdbc:postgresql:// URL to the H2 driver and startup fails.
+      SPRING_PROFILES_ACTIVE: prod
+
+      # Already in JDBC form, so the sanitizer in SaturnRndApplication passes it
+      # through untouched. 'db' is the service name on the compose network.
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME:-saturn_rnd_db}
       SPRING_DATASOURCE_USERNAME: ${DB_USER:-saturn_admin}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASS:-Saturn_Secure_Pass_2026!}
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-      APP_CORS_ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,https://saturntextiles.com}
+
+      # Dialect is deliberately unset — Hibernate detects it from the live
+      # connection, and setting it explicitly triggers HHH90000025.
+
+      APP_CORS_ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+      # Origin used to build verification links in outgoing email.
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:3000}
+
+      # Mail stays unset by default: EmailService then logs each message instead
+      # of sending it. Export SPRING_MAIL_PASSWORD (a Brevo 'xsmtpsib-…' key) to
+      # exercise real delivery.
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
+      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-noreply@saturn-rnd.com}
+      APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-admin@saturn-rnd.com}
+
+      # Matches the named volume below so uploads survive a container restart.
+      APP_UPLOAD_DIR: /app/uploads/resumes
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - resume_uploads:/app/uploads
 
   # ----------------------------------------------------------------------------
-  # 3. Next.js Frontend Service
+  # Next.js frontend
   # ----------------------------------------------------------------------------
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* is inlined at BUILD time, so it has to reach the image
+        # as a build arg — setting it only at runtime leaves the bundle
+        # pointing at the compile-time default.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
     container_name: saturn_frontend
     restart: always
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+      # Must carry the /api/v1 suffix — apiClient appends bare paths like
+      # "/contact" straight onto it.
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
     depends_on:
       - backend
 

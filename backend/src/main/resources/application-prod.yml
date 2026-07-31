@@ -1,0 +1,209 @@
+# ==============================================================================
+# Saturn R&D Backend — PRODUCTION profile
+# ==============================================================================
+# Activated with SPRING_PROFILES_ACTIVE=prod (set in render.yaml).
+#
+# Spring loads application.yml FIRST, then merges this file over it. Only keys
+# that must differ in production appear below; everything else is inherited.
+#
+# Every value here is env-driven so the same image can be promoted between
+# environments without a rebuild.
+# ==============================================================================
+
+server:
+  # Render (and most PaaS) inject the port to bind as $PORT and route external
+  # 443 traffic to it. Binding to a hardcoded 8080 when $PORT differs makes the
+  # health check fail and the deploy roll back.
+  port: ${PORT:8080}
+
+spring:
+  # --------------------------------------------------------------------------
+  # PostgreSQL datasource
+  # --------------------------------------------------------------------------
+  # These three properties are normally supplied at runtime by the
+  # ApplicationEnvironmentPreparedEvent listener in SaturnRndApplication, which
+  # parses the provider's DATABASE_URL and injects clean JDBC values at highest
+  # precedence BEFORE HikariCP starts.
+  #
+  # Why that listener exists: Render/Heroku publish a libpq-style URL
+  #   postgres://user:password@host/dbname
+  # which the PostgreSQL JDBC driver cannot parse — it requires
+  #   jdbc:postgresql://host:5432/dbname
+  # with credentials passed separately. See docs/CICD_AND_DEPLOYMENT.md §2.
+  #
+  # The placeholders below are the fallback path for platforms that already hand
+  # over well-formed JDBC settings (and for the render.yaml wiring).
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DATABASE_USERNAME:}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DATABASE_PASSWORD:}}
+    driver-class-name: org.postgresql.Driver
+
+    # ------------------------------------------------------------------------
+    # HikariCP pool sizing
+    # ------------------------------------------------------------------------
+    # Render's free Postgres tier allows a small number of concurrent
+    # connections, and the free web service is a single small instance. A large
+    # pool would exhaust the server's connection slots long before it helped
+    # throughput, so this stays deliberately tight.
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:5}
+      minimum-idle: ${DB_POOL_MIN:1}
+      # Fail fast rather than letting a request hang for the default 30s.
+      connection-timeout: 10000
+      # Recycle below Postgres' own idle timeout so the pool never hands out a
+      # connection the server has already closed.
+      idle-timeout: 300000
+      max-lifetime: 900000
+
+  # --------------------------------------------------------------------------
+  # Flyway — owns the production schema
+  # --------------------------------------------------------------------------
+  # Migrations in classpath:db/migration run before Hibernate initialises.
+  # Each file is applied once, in version order, and recorded with a checksum in
+  # flyway_schema_history; editing an applied migration makes startup fail
+  # rather than silently diverge. To change the schema, add a new V<n>__ file.
+  flyway:
+    enabled: true
+    # Lets Flyway adopt a database that already contains tables — for example
+    # one whose schema was created outside Flyway — by recording a baseline
+    # instead of attempting to re-create those tables and failing.
+    baseline-on-migrate: true
+    baseline-version: 0
+
+  jpa:
+    # Dialect is detected from the live connection — see application.yml.
+    open-in-view: false
+    hibernate:
+      # 'validate' — Hibernate compares the entities against the schema Flyway
+      # produced and refuses to start on a mismatch. It issues no DDL, so a stray
+      # entity edit cannot rewrite a live table. Keep it at 'validate': the
+      # migrations are the only thing permitted to change the production schema.
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    # Never log SQL in production — it is noisy and leaks submission contents.
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  h2:
+    console:
+      # An open DB console on a public host would be a full data breach.
+      enabled: false
+
+  # --------------------------------------------------------------------------
+  # Mail transport — SMTPS on port 465
+  # --------------------------------------------------------------------------
+  # EmailService prefers the Brevo HTTPS REST API (port 443) whenever
+  # SPRING_MAIL_PASSWORD is a Brevo key ('xsmtpsib-…'). The settings below are
+  # the SMTP fallback used otherwise.
+  #
+  # Port 465 (implicit SSL) is used instead of 587 (STARTTLS) because Render,
+  # Heroku and most AWS accounts block outbound 25/587 to limit spam. On 587 the
+  # connection does not get refused — it hangs until the socket times out, which
+  # looks like "email silently not sending". See docs/CICD_AND_DEPLOYMENT.md §3.
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp-relay.brevo.com}
+    port: ${SPRING_MAIL_PORT:465}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          # ssl.enable = implicit TLS from the first byte (port 465).
+          # This is mutually exclusive with starttls, which must stay off.
+          ssl:
+            enable: true
+            trust: ${SPRING_MAIL_HOST:smtp-relay.brevo.com}
+          starttls:
+            enable: false
+          # Bound every phase of the SMTP conversation. Without these an
+          # unreachable relay pins an async worker thread indefinitely.
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+  thymeleaf:
+    # Compile each email template once and reuse it.
+    cache: true
+
+# ==============================================================================
+# Actuator — health probe for the platform, and nothing else
+# ==============================================================================
+# Only /actuator/health is exposed. The other endpoints (env, beans, mappings,
+# heapdump, loggers) describe the internals of a public, unauthenticated service
+# and must never be reachable.
+#
+# show-details=never keeps the response to a bare {"status":"UP"}: the detailed
+# form names the database, driver and validation query, which is more than a
+# health probe needs to disclose.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+  # Report DOWN when the datasource is unreachable, so Render pulls a broken
+  # instance out of rotation rather than serving 500s to visitors.
+  health:
+    db:
+      enabled: true
+
+# ==============================================================================
+# Logging
+# ==============================================================================
+# DEBUG/TRACE from the dev profile would flood Render's log quota and record
+# personal data from submissions. INFO keeps the deployment diagnostics that
+# matter (sanitized JDBC URL, mail engine chosen, delivery outcome).
+logging:
+  level:
+    root: WARN
+    com.saturn.rnd: ${LOG_LEVEL_APP:INFO}
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+
+app:
+  storage:
+    # Absolute path inside the container. NOTE: Render's free tier has an
+    # ephemeral filesystem — uploaded CVs are lost on every redeploy or cold
+    # start. Attach a Render Disk, or move storage to S3/Cloudinary, before
+    # treating resumes as durable. They are emailed to the admin on
+    # verification, which is currently the only lasting copy.
+    upload-dir: ${APP_UPLOAD_DIR:/app/uploads/resumes}
+
+  email:
+    from: ${APP_EMAIL_FROM:noreply@saturn-rnd.com}
+    admin: ${APP_EMAIL_ADMIN:admin@saturn-rnd.com}
+    sender-name: ${APP_EMAIL_SENDER_NAME:Saturn Textiles R&D}
+    #
+    # FUTURE CUSTOM DOMAIN INSTRUCTIONS
+    # ---------------------------------
+    # Must point at the live frontend origin, because verification links are
+    # built from it. Update APP_FRONTEND_URL in the Render dashboard the moment
+    # the custom domain goes live, otherwise every verification email keeps
+    # linking to the old vercel.app host.
+    frontend-url: ${APP_FRONTEND_URL:https://saturn-rnd.vercel.app}
+
+  rate-limit:
+    # Keep enabled in production — these endpoints are public, unauthenticated,
+    # and each accepted request writes a row and sends email.
+    enabled: ${APP_RATE_LIMIT_ENABLED:true}
+    max-requests: ${APP_RATE_LIMIT_MAX:5}
+    window-minutes: ${APP_RATE_LIMIT_WINDOW_MINUTES:10}
+
+  cors:
+    #
+    # FUTURE CUSTOM DOMAIN INSTRUCTIONS
+    # ---------------------------------
+    # Comma-separated; matched as patterns (see CorsConfig). The wildcard entry
+    # keeps Vercel preview deployments working against the production API.
+    #
+    # Adding a custom domain — set APP_CORS_ALLOWED_ORIGINS in Render to:
+    #   https://saturn-rnd.com,https://www.saturn-rnd.com,https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app
+    # Origins are scheme- and host-exact: https://saturn-rnd.com does NOT cover
+    # www., and must never be written with a trailing slash.
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app}

@@ -32,7 +32,7 @@ Here is every deployment file in your repository and exactly what it does:
 
 | File Location | Purpose | What it Does |
 | :--- | :--- | :--- |
-| **`.github/workflows/ci-cd.yml`** | GitHub Actions Pipeline Script | Tells GitHub's automated robot: *"Every time code is pushed, install pnpm, test Next.js compilation, and compile Spring Boot Java 21 code."* |
+| **`.github/workflows/deploy-and-test.yml`** | GitHub Actions Pipeline Script | Tells GitHub's automated robot: *"Every time code is pushed, install pnpm, test Next.js compilation, and compile Spring Boot Java 21 code."* |
 | **`docker-compose.yml`** | Container Orchestrator | Launches all 3 services together locally or on a server with 1 command (`docker compose up -d`): Frontend, Backend, and PostgreSQL database. |
 | **`backend/Dockerfile`** | Java Backend Container Builder | Builds an optimized, lightweight Linux container containing your Spring Boot Java 21 app. |
 | **`frontend/Dockerfile`** | Next.js Frontend Container Builder | Builds a standalone Node.js container for your Next.js 16 app. |
@@ -201,7 +201,7 @@ Here is the complete high-level lifecycle diagram from local coding to productio
                                        ▼ git push origin main
  ┌───────────────────────────────────────────────────────────────────────────┐
  │ Phase 2: GitHub Actions Automated CI Quality Check                        │
- │ - `.github/workflows/ci-cd.yml` triggers on push                          │
+ │ - `.github/workflows/deploy-and-test.yml` triggers on push                │
  │ - Runs `pnpm type-check` + Next.js build in frontend/                     │
  │ - Runs `./mvnw clean package` in backend/                                 │
  └─────────────────────────────────────┬─────────────────────────────────────┘

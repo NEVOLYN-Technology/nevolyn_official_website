@@ -1,34 +1,48 @@
 # ==============================================================================
-# Stage 1: Build Java 21 Spring Boot JAR
+# Stage 1: Build the Spring Boot fat JAR on a full JDK
 # ==============================================================================
 FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 
-# Copy Maven wrapper & pom.xml first for dependency caching
+# Copy the wrapper and pom first, on their own layer. Docker reuses this layer
+# — and the resolved dependencies below — on every rebuild where pom.xml has not
+# changed, which is what keeps source-only rebuilds fast.
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
+RUN chmod +x mvnw && ./mvnw -B -ntp dependency:go-offline
 
-# Copy Java source code and build executable package JAR
+# Source changes invalidate from here down only.
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw -B -ntp clean package -DskipTests
+
+# Normalise the artifact name so the runtime stage does not hard-code a version
+# that has to be edited in lockstep with pom.xml.
+RUN cp target/*.jar /app/app.jar
 
 # ==============================================================================
-# Stage 2: Production JRE Runtime Container
+# Stage 2: Minimal JRE runtime
 # ==============================================================================
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Create non-root system user for security
-RUN addgroup -S saturn && adduser -S saturn -G saturn
+# Create the unprivileged runtime user, and prepare every path it needs to
+# write to WHILE STILL ROOT. Doing the mkdir after USER fails outright:
+# /app is root-owned, so the non-root user cannot create anything inside it.
+RUN addgroup -S saturn \
+    && adduser -S saturn -G saturn \
+    && mkdir -p /app/uploads/resumes \
+    && chown -R saturn:saturn /app
+
+COPY --from=builder --chown=saturn:saturn /app/app.jar app.jar
+
+# Drop privileges for everything that follows.
 USER saturn:saturn
 
-# Create uploads directory for candidate resume files
-RUN mkdir -p /app/uploads/resumes
-
-# Copy built executable JAR from builder stage
-COPY --from=builder /app/target/saturn-rnd-backend-0.1.0.jar app.jar
-
+# Documentation only; Render routes public traffic to $PORT, which
+# application-prod.yml binds via server.port.
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "-Duser.timezone=UTC", "app.jar"]
+# NOTE: uploads/ lives on the container's ephemeral filesystem. On Render's free
+# tier it is wiped on every redeploy and cold start. Attach a Render Disk or move
+# to object storage before treating stored CVs as durable.
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-Duser.timezone=UTC", "-jar", "app.jar"]

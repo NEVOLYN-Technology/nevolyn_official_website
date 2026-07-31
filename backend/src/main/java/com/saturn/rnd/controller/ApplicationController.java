@@ -43,6 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @see ApplicationService
  * @see ApplicationResponse
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/applications")
 @RequiredArgsConstructor
