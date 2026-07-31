@@ -141,6 +141,10 @@
           <td class="label">Submitted Email</td>
           <td th:text="${userEmail}">john@example.com</td>
         </tr>
+        <tr th:if="${trackingId != null}">
+          <td class="label">Reference Code</td>
+          <td><strong th:text="${trackingId}" style="color: #ea580c;">APP-2026-0001</strong></td>
+        </tr>
         <tr>
           <td class="label">Application Type</td>
           <td>Job Application / Career Dossier</td>
@@ -177,6 +181,10 @@
         <tr>
           <td class="label">Submitted Email</td>
           <td th:text="${userEmail}">john@example.com</td>
+        </tr>
+        <tr th:if="${trackingId != null}">
+          <td class="label">Reference Code</td>
+          <td><strong th:text="${trackingId}" style="color: #ea580c;">INQ-2026-0001</strong></td>
         </tr>
         <tr>
           <td class="label">Inquiry Type</td>

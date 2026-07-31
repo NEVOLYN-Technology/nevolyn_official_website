@@ -16,6 +16,7 @@ import org.thymeleaf.context.Context;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -44,7 +45,8 @@ import java.util.Base64;
  * <ol>
  * <li><b>Primary — Brevo REST API v3 over HTTPS (port 443).</b> Selected
  * automatically when the configured credential is a Brevo API key (prefix
- * {@code xsmtpsib-}). Immune to SMTP port blocking; typical latency &lt;100ms.</li>
+ * {@code xsmtpsib-}). Immune to SMTP port blocking; typical latency
+ * &lt;100ms.</li>
  * <li><b>Fallback — JavaMail SMTP.</b> Used when the credential is not a Brevo
  * key, or when the REST call fails. Pair with SMTPS on port 465 in production
  * (see {@code application-prod.yml}); port 587 STARTTLS will time out on
@@ -83,7 +85,9 @@ public class EmailService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /** Envelope sender. Must be a Brevo-verified sender when using the REST engine. */
+    /**
+     * Envelope sender. Must be a Brevo-verified sender when using the REST engine.
+     */
     @Value("${app.email.from:noreply@saturn-rnd.com}")
     private String fromEmail;
 
@@ -177,8 +181,7 @@ public class EmailService {
             String subject,
             String links,
             String messageContent,
-            String attachmentFilePath
-    ) {
+            String attachmentFilePath) {
         log.info("Preparing Admin Notification Email for trackingId='{}', type='{}'", trackingId, formType);
 
         File attachment = resolveAttachment(attachmentFilePath);
@@ -200,7 +203,8 @@ public class EmailService {
         context.setVariable("acknowledgeUrl", acknowledgeUrl);
 
         String htmlContent = templateEngine.process("email/admin-notification", context);
-        String subjectTag = formType.toLowerCase().contains("application") ? "[NEW JOB APPLICATION]" : "[NEW CONTACT INQUIRY]";
+        String subjectTag = formType.toLowerCase().contains("application") ? "[NEW JOB APPLICATION]"
+                : "[NEW CONTACT INQUIRY]";
         String mailSubject = subjectTag + " " + trackingId + " - " + name;
 
         dispatch(adminEmail, mailSubject, htmlContent, userEmail, attachment);
@@ -229,8 +233,9 @@ public class EmailService {
         context.setVariable("trackingId", trackingId);
         context.setVariable("formType", formType.toLowerCase());
 
-        String htmlContent = templateEngine.process("email/user-acknowledgement", context);
-        String subjectPrefix = formType.toLowerCase().contains("application") ? "Job Application Receipt" : "Contact Inquiry Receipt";
+        String htmlContent = templateEngine.process("email/sender-verification", context);
+        String subjectPrefix = formType.toLowerCase().contains("application") ? "Job Application Receipt"
+                : "Contact Inquiry Receipt";
         String subject = subjectPrefix + " [" + trackingId + "] - Saturn R&D";
 
         dispatch(recipientEmail, subject, htmlContent, null, null);

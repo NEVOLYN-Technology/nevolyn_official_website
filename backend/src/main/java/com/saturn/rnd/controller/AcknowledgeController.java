@@ -9,11 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+
+import com.saturn.rnd.service.EmailService;
 
 /**
  * REST Controller for 1-click automatic email acknowledgment.
@@ -26,9 +30,10 @@ public class AcknowledgeController {
 
     private final ContactInquiryRepository contactRepository;
     private final JobApplicationRepository applicationRepository;
+    private final EmailService emailService;
 
-    @Transactional(readOnly = true)
-    @GetMapping(value = "/api/v1/acknowledge", produces = MediaType.TEXT_HTML_VALUE)
+    @Transactional
+    @RequestMapping(value = "/api/v1/acknowledge", method = { RequestMethod.GET, RequestMethod.POST }, produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> acknowledgeSubmission(@RequestParam(value = "trackingId", required = false) String trackingId) {
         String cleanId = trackingId != null ? trackingId.trim() : "";
         log.info("Processing 1-click automatic email acknowledgment for trackingId='{}'", cleanId);
@@ -82,6 +87,9 @@ public class AcknowledgeController {
 
         String html;
         if (found) {
+            log.info("Dispatching user acknowledgment email for trackingId='{}' ({}) to '{}'", cleanId, typeLabel, recipientEmail);
+            emailService.sendUserAcknowledgementEmail(recipientEmail, recipientName, cleanId, typeLabel);
+
             html = """
                 <!DOCTYPE html>
                 <html>
@@ -91,8 +99,8 @@ public class AcknowledgeController {
                   <title>Acknowledgement Email Sent — Saturn R&D</title>
                   <style>
                     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
-                    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px; text-align: center; max-width: 500px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-                    .icon-badge { width: 64px; height: 64px; background: #dcfce7; border: 1px solid #86efac; color: #15803d; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px; font-weight: bold; }
+                    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px; text-align: center; max-width: 500px; width: 100%%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+                    .icon-badge { width: 64px; height: 64px; background: #dcfce7; border: 1px solid #86efac; color: #15803d; border-radius: 50%%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px; font-weight: bold; }
                     h1 { color: #0f172a; font-size: 24px; font-weight: 800; margin: 0 0 12px 0; }
                     p { color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0; }
                     .details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; font-size: 14px; color: #334155; text-align: left; line-height: 1.8; }
@@ -124,8 +132,8 @@ public class AcknowledgeController {
                   <title>Submission Not Found — Saturn R&D</title>
                   <style>
                     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
-                    .card { background: #ffffff; border: 1px solid #fecaca; border-radius: 16px; padding: 40px; text-align: center; max-width: 480px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-                    .icon-badge { width: 64px; height: 64px; background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px; font-weight: bold; }
+                    .card { background: #ffffff; border: 1px solid #fecaca; border-radius: 16px; padding: 40px; text-align: center; max-width: 480px; width: 100%%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+                    .icon-badge { width: 64px; height: 64px; background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 50%%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px; font-weight: bold; }
                     h1 { color: #991b1b; font-size: 22px; margin: 0 0 12px 0; }
                     p { color: #475569; font-size: 14px; line-height: 1.6; }
                   </style>
@@ -141,6 +149,8 @@ public class AcknowledgeController {
                 """.formatted(cleanId);
         }
 
-        return ResponseEntity.ok(html);
+        return ResponseEntity.ok()
+                .contentType(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8))
+                .body(html);
     }
 }
