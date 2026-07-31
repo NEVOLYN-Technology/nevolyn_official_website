@@ -44,7 +44,7 @@ export const ContactSection = (): JSX.Element => {
       <SuccessModal
         isOpen={isModalOpen && isSuccess}
         onClose={() => setIsModalOpen(false)}
-        title="Verification Email Sent!"
+        title="Inquiry Received!"
         message={successMessage}
         email={submittedEmail}
         formType="contact"

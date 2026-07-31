@@ -79,7 +79,7 @@ export default function JoinPage(): JSX.Element {
       <SuccessModal
         isOpen={isModalOpen && isSuccess}
         onClose={() => setIsModalOpen(false)}
-        title="Application Verification Sent!"
+        title="Application Received!"
         message={successMessage}
         email={submittedEmail}
         formType="application"
