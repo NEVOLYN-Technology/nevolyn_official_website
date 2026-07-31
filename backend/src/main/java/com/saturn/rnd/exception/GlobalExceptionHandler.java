@@ -102,6 +102,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Unmapped endpoint or static resource requested by a client/bot — returns 404 quietly.
+     */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(org.springframework.web.servlet.resource.NoResourceFoundException ex) {
+        log.debug("Unmapped path requested: /{}", ex.getResourcePath());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(
+                HttpStatus.NOT_FOUND.value(),
+                "Resource not found: /" + ex.getResourcePath(),
+                null));
+    }
+
+    /**
      * Catch-all for genuinely unexpected failures.
      *
      * <p>
