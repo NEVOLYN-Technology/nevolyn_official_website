@@ -119,7 +119,7 @@ export function LeadersSection(): JSX.Element {
               href={member.social?.linkedin || '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-transparent bg-transparent text-slate-300 dark:text-slate-200 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] hover-blue-blink transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/40 hover:scale-105 active:scale-95 group cursor-pointer"
+              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-slate-200 dark:border-transparent bg-slate-50 dark:bg-transparent text-slate-800 dark:text-slate-200 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] hover-blue-blink transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/40 hover:scale-105 active:scale-95 group cursor-pointer"
               aria-label={`${member.name} LinkedIn`}
             >
               <LinkedinIcon className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
