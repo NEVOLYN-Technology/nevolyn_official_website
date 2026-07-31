@@ -3,11 +3,12 @@
 import type { JSX } from 'react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, UploadCloud, FileText, CheckCircle } from 'lucide-react'
+import { ArrowLeft, UploadCloud, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { PageShell } from '@/components/layout/PageShell'
 import { cn } from '@/lib/utils'
 import { SuccessModal } from '@/components/ui/SuccessModal'
+import { useJoinForm } from '@/lib/hooks/useJoinForm'
 
 /**
  * Job application form page component allowing candidate information and CV document upload.
@@ -107,19 +108,6 @@ export default function JoinPage(): JSX.Element {
               We're always looking for brilliant minds to help us pioneer the future of textile automation and industrial AI.
             </p>
           </div>
-
-          {isSuccess && (
-            <div className="mb-8 p-6 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-400">
-              <div className="flex items-center gap-3 font-bold text-lg mb-2">
-                <CheckCircle className="w-6 h-6 text-emerald-400" />
-                <span>Application Submitted Successfully!</span>
-              </div>
-              <p className="text-sm leading-relaxed">{successMessage}</p>
-              <p className="mt-3 text-xs text-emerald-500/80 font-medium">
-                📩 We sent a verification link to your email. Click the link in your inbox to confirm your address and notify our HR & R&D leadership team.
-              </p>
-            </div>
-          )}
 
           {errorMessage && (
             <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-sm">

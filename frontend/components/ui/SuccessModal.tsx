@@ -2,7 +2,7 @@
 
 import type { JSX } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle2, Mail, ExternalLink, X } from 'lucide-react'
+import { CheckCircle2, Mail, X } from 'lucide-react'
 
 interface SuccessModalProps {
   isOpen: boolean

@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUpProps } from '@/lib/animations'
 import { SuccessModal } from '@/components/ui/SuccessModal'
+import { useContactForm } from '@/lib/hooks/useContactForm'
 
 /**
  * Interactive visitor contact form section for R&D inquiries and partner proposals.
