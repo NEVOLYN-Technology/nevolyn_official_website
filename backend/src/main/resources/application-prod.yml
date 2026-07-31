@@ -147,9 +147,15 @@ management:
       show-components: never
   # Report DOWN when the datasource is unreachable, so Render pulls a broken
   # instance out of rotation rather than serving 500s to visitors.
+  # Mail health is disabled: the actuator tries to open an SMTP connection on
+  # every health poll, which fails with AuthenticationFailedException when
+  # SPRING_MAIL_PASSWORD is not set — returning DOWN and blocking every deploy.
+  # Email delivery is tested end-to-end when a form is actually submitted.
   health:
     db:
       enabled: true
+    mail:
+      enabled: false
 
 # ==============================================================================
 # Logging
