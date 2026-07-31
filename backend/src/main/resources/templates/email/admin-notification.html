@@ -206,10 +206,8 @@
 
       <!-- 1-Click Automatic Email Acknowledgment -->
       <div class="action-container" th:if="${#strings.containsIgnoreCase(formType, 'application')}">
-        <a th:href="${acknowledgeUrl}" target="_blank" style="text-decoration: none;">
-          <button class="btn-acknowledge" type="button">
-            Acknowledge Candidate
-          </button>
+        <a th:href="${acknowledgeUrl}" class="btn-acknowledge" target="_blank">
+          Acknowledge Candidate
         </a>
         <div style="margin-top: 12px; font-size: 14px; font-weight: 500; color: #475569;">
           Or <a
@@ -219,10 +217,8 @@
       </div>
 
       <div class="action-container" th:unless="${#strings.containsIgnoreCase(formType, 'application')}">
-        <a th:href="${acknowledgeUrl}" target="_blank" style="text-decoration: none;">
-          <button class="btn-acknowledge" type="button">
-            Acknowledge Inquiry
-          </button>
+        <a th:href="${acknowledgeUrl}" class="btn-acknowledge" target="_blank">
+          Acknowledge Inquiry
         </a>
         <div style="margin-top: 12px; font-size: 14px; font-weight: 500; color: #475569;">
           Or <a
