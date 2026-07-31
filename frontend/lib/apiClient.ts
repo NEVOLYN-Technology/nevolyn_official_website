@@ -45,7 +45,9 @@ export interface ApiMeta {
  * NEXT_PUBLIC_* values are inlined at build time, so changing it requires a
  * redeploy — editing the variable alone will not update a already-built bundle.
  */
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1').replace(/\/+$/, '')
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? 'https://saturn-rnd-backend.onrender.com/api/v1'
+).replace(/\/+$/, '')
 
 /**
  * Request timeout in milliseconds.
