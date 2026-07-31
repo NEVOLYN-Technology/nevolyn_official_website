@@ -1,6 +1,5 @@
 package com.saturn.rnd.controller;
 
-import com.saturn.rnd.dto.ApiResponse;
 import com.saturn.rnd.model.ContactInquiry;
 import com.saturn.rnd.model.JobApplication;
 import com.saturn.rnd.repository.ContactInquiryRepository;
