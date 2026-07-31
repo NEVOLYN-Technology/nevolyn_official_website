@@ -19,10 +19,10 @@
       max-width: 620px;
       margin: 0 auto;
       background: #ffffff;
-      border: 1px solid #d1fae5;
-      border-radius: 14px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.08), 0 8px 10px -6px rgba(5, 150, 105, 0.05);
+      box-shadow: 0 12px 30px -5px rgba(16, 185, 129, 0.12), 0 8px 10px -6px rgba(16, 185, 129, 0.06);
     }
 
     .header-bar {
@@ -31,7 +31,7 @@
     }
 
     .header {
-      background-color: #064e3b;
+      background-color: #07111e;
       padding: 28px 32px;
       text-align: left;
     }
@@ -55,7 +55,7 @@
     }
 
     .sub-brand {
-      color: #a7f3d0;
+      color: #94a3b8;
       font-size: 13px;
       font-weight: 500;
       letter-spacing: 0.5px;
@@ -68,17 +68,18 @@
       font-size: 15px;
     }
 
-    /* Differentiated Headings */
+    /* Status Banner matching SuccessModal */
     .status-banner {
-      background: #ecfdf5;
-      border-left: 5px solid #059669;
+      background: #f0fdf4;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-left: 5px solid #10b981;
       padding: 16px 20px;
-      border-radius: 8px;
+      border-radius: 12px;
       margin-bottom: 24px;
     }
 
     .status-title {
-      color: #064e3b;
+      color: #065f46;
       font-size: 20px;
       font-weight: 800;
       margin: 0;
@@ -88,14 +89,14 @@
     .section-header {
       display: inline-block;
       color: #065f46;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1.2px;
       background-color: #f0fdf4;
       border: 1px solid #a7f3d0;
       padding: 6px 14px;
-      border-radius: 6px;
+      border-radius: 8px;
       margin: 28px 0 14px 0;
     }
 
@@ -107,24 +108,17 @@
     }
 
     .name-highlight {
-      color: #059669;
+      color: #10b981;
       font-weight: 700;
     }
 
-    /* Hero Receipt Box - Green Theme */
+    /* Hero Receipt Box - SuccessModal Green Palette */
     .receipt-box {
       background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
       border: 1.5px solid #a7f3d0;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 20px 22px;
       margin: 24px 0;
-      position: relative;
-    }
-
-    .receipt-header-flex {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
     .receipt-label {
@@ -138,7 +132,7 @@
     .receipt-id {
       font-size: 24px;
       font-weight: 900;
-      color: #065f46;
+      color: #047857;
       margin-top: 4px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       letter-spacing: 0.5px;
@@ -156,14 +150,14 @@
       border-radius: 20px;
     }
 
-    /* Styled Information Grid */
+    /* Information Grid */
     .info-grid {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       margin: 16px 0;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
     }
 
@@ -185,33 +179,28 @@
       border-right: 1px solid #e2e8f0;
     }
 
-    /* Structured Next Steps Timeline / Cards */
+    /* Next Steps Timeline Cards matching SuccessModal */
     .timeline-card {
       background-color: #ffffff;
       border: 1px solid #a7f3d0;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 20px;
       margin-top: 16px;
-      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.04);
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.05);
     }
 
     .step-item {
       display: flex;
       align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .step-item:last-child {
-      margin-bottom: 0;
     }
 
     .step-badge {
-      background-color: #059669;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: #ffffff;
       font-size: 11px;
       font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
       margin-right: 12px;
       margin-top: 2px;
       white-space: nowrap;
@@ -232,16 +221,17 @@
     }
 
     .footer {
-      background-color: #064e3b;
+      background-color: #07111e;
       text-align: center;
       font-size: 12px;
-      color: #a7f3d0;
-      padding: 22px 32px;
+      color: #94a3b8;
+      padding: 24px 32px;
+      border-top: 1px solid rgba(16, 185, 129, 0.2);
     }
 
-    .footer a {
+    .footer-accent {
       color: #34d399;
-      text-decoration: none;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -276,14 +266,14 @@
       <table class="info-grid">
         <tr>
           <td class="label">Candidate Name</td>
-          <td><strong th:text="${name}" style="color: #064e3b;">John Doe</strong></td>
+          <td><strong th:text="${name}" style="color: #07111e;">John Doe</strong></td>
         </tr>
         <tr>
           <td class="label">Contact Email</td>
           <td th:text="${userEmail}">john@example.com</td>
         </tr>
         <tr>
-          <td class="label">Dossier Type</td>
+          <td class="label">Submission Type</td>
           <td>Job Application / Candidate Resume</td>
         </tr>
       </table>
@@ -294,7 +284,7 @@
         <div class="step-item">
           <span class="step-badge">STEP 1</span>
           <div class="step-text">
-            <strong>Initial Dossier Review:</strong> Our HR and R&amp;D technical leads will evaluate your profile
+            <strong>Initial Application Review:</strong> Our HR and R&amp;D technical leads will evaluate your profile
             within <strong>2–3 business days</strong>.
           </div>
         </div>
@@ -302,14 +292,14 @@
           <span class="step-badge">STEP 2</span>
           <div class="step-text">
             <strong>Direct Outreach:</strong> If your expertise matches active project roles, our team will contact you
-            directly to schedule an interview.
+            directly to schedule an introductory discussion.
           </div>
         </div>
       </div>
 
       <div class="signature-block">
         Warm regards,<br />
-        <strong style="color: #064e3b;">Saturn R&amp;D Talent Acquisition Team</strong>
+        <strong style="color: #07111e;">Saturn R&amp;D Talent Acquisition Team</strong>
       </div>
     </div>
 
@@ -335,7 +325,7 @@
       <table class="info-grid">
         <tr>
           <td class="label">Sender Name</td>
-          <td><strong th:text="${name}" style="color: #064e3b;">John Doe</strong></td>
+          <td><strong th:text="${name}" style="color: #07111e;">John Doe</strong></td>
         </tr>
         <tr>
           <td class="label">Sender Email</td>
@@ -361,14 +351,14 @@
 
       <div class="signature-block">
         Sincerely,<br />
-        <strong style="color: #064e3b;">Saturn R&amp;D Engineering Leadership Team</strong>
+        <strong style="color: #07111e;">Saturn R&amp;D Engineering Leadership Team</strong>
       </div>
     </div>
 
     <div class="footer">
-      © 2026 Saturn Textiles Limited · Department of Research &amp; Development
+      © 2026 <span class="footer-accent">Saturn Textiles Limited</span> · Department of Research &amp; Development
     </div>
   </div>
 </body>
 
-</html>
+</html>
