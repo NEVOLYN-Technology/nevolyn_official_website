@@ -83,16 +83,28 @@ public class SaturnRndApplication {
         return event -> {
             ConfigurableEnvironment environment = event.getEnvironment();
             String rawUrl = environment.getProperty("DATABASE_URL");
+            if (rawUrl == null || rawUrl.isBlank()) {
+                rawUrl = environment.getProperty("SPRING_DATASOURCE_URL");
+            }
 
             // Local development: nothing injected, keep the H2 defaults.
             if (rawUrl == null || rawUrl.isBlank()) {
                 return;
             }
 
-            // Already a JDBC URL (some providers do this) — leave it untouched
-            // rather than mangling a string that is known to work.
             String url = rawUrl.trim();
+            Map<String, Object> sanitized = new HashMap<>();
+
+            if (url.contains("postgres") || url.contains("5432")) {
+                sanitized.put("spring.datasource.driver-class-name", "org.postgresql.Driver");
+                sanitized.put("spring.datasource.driverClassName", "org.postgresql.Driver");
+            }
+
+            // Already a JDBC URL (some providers do this) — ensure postgres driver is set and return
             if (url.startsWith("jdbc:")) {
+                if (!sanitized.isEmpty()) {
+                    environment.getPropertySources().addFirst(new MapPropertySource("sanitizedCloudDatasource", sanitized));
+                }
                 return;
             }
 
@@ -105,8 +117,6 @@ public class SaturnRndApplication {
                 log.warn("DATABASE_URL has an unrecognised scheme; leaving datasource configuration untouched.");
                 return;
             }
-
-            Map<String, Object> sanitized = new HashMap<>();
 
             // Step 2 — split embedded credentials off the authority section.
             // JDBC will not accept user:password@host, so they move to their own

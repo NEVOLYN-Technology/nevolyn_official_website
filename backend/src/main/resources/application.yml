@@ -39,7 +39,6 @@ spring:
   # SaturnRndApplication for how a postgres:// URL is converted to JDBC form.
   datasource:
     url: jdbc:h2:mem:saturn_rnd_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driverClassName: org.h2.Driver
     username: sa
     password:
 
