@@ -7,7 +7,7 @@ import { ArrowLeft, UploadCloud, FileText, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { PageShell } from '@/components/layout/PageShell'
 import { cn } from '@/lib/utils'
-import { useJoinForm } from '@/lib/hooks/useJoinForm'
+import { SuccessModal } from '@/components/ui/SuccessModal'
 
 /**
  * Job application form page component allowing candidate information and CV document upload.
@@ -31,6 +31,8 @@ export default function JoinPage(): JSX.Element {
   })
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [submittedEmail, setSubmittedEmail] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const MAX_WORDS = 250
   const wordCount = formData.reason.trim() ? formData.reason.trim().split(/\s+/).length : 0
@@ -46,12 +48,15 @@ export default function JoinPage(): JSX.Element {
     e.preventDefault()
     if (isOverWordLimit) return
 
+    const emailToSave = formData.email
     const success = await submitJoinForm({
       ...formData,
       resume: selectedFile,
     })
 
     if (success) {
+      setSubmittedEmail(emailToSave)
+      setIsModalOpen(true)
       setFormData({
         name: '',
         email: '',
@@ -69,6 +74,16 @@ export default function JoinPage(): JSX.Element {
 
   return (
     <PageShell>
+      {/* Animated Success Popup Modal */}
+      <SuccessModal
+        isOpen={isModalOpen && isSuccess}
+        onClose={() => setIsModalOpen(false)}
+        title="Application Verification Sent!"
+        message={successMessage}
+        email={submittedEmail}
+        formType="application"
+      />
+
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           href="/"

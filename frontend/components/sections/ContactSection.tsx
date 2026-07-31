@@ -4,7 +4,7 @@ import type { JSX } from 'react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUpProps } from '@/lib/animations'
-import { useContactForm } from '@/lib/hooks/useContactForm'
+import { SuccessModal } from '@/components/ui/SuccessModal'
 
 /**
  * Interactive visitor contact form section for R&D inquiries and partner proposals.
@@ -23,29 +23,32 @@ export const ContactSection = (): JSX.Element => {
     honeypot: '',
   })
 
-  /**
-   * Posts the form and clears it only on success, so a failed attempt keeps
-   * what the visitor typed.
-   *
-   * COLD START: the API runs on Render's free tier, which suspends the instance
-   * after ~15 minutes idle. The first submission after a quiet period waits on a
-   * full container wake-up — commonly 30-50s — so `apiClient` allows a 60s
-   * window before giving up (see REQUEST_TIMEOUT_MS in lib/apiClient.ts).
-   * The button stays disabled with a spinner for that entire period; do not
-   * shorten the timeout without also giving the user a way to retry, or the
-   * first submission of the day will fail while the request was about to
-   * succeed.
-   */
+  const [submittedEmail, setSubmittedEmail] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const emailToSave = formData.email
     const success = await submitContactForm(formData)
     if (success) {
+      setSubmittedEmail(emailToSave)
+      setIsModalOpen(true)
       setFormData({ name: '', email: '', subject: '', message: '', honeypot: '' })
     }
   }
 
   return (
     <section id="contact" className="py-12 border-t border-slate-200 dark:border-blue-950/40 relative overflow-hidden">
+      {/* Animated Success Popup Modal */}
+      <SuccessModal
+        isOpen={isModalOpen && isSuccess}
+        onClose={() => setIsModalOpen(false)}
+        title="Verification Email Sent!"
+        message={successMessage}
+        email={submittedEmail}
+        formType="contact"
+      />
+
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -59,14 +62,6 @@ export const ContactSection = (): JSX.Element => {
         </div>
 
         <motion.div {...fadeUpProps(0.1)} className="bg-white dark:bg-[#0a1526]/60 border border-slate-200 dark:border-slate-800/60 p-8 md:p-10 rounded-2xl backdrop-blur-sm shadow-sm dark:shadow-none">
-          {isSuccess && (
-            <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-sm">
-              <div className="font-bold mb-1 text-base">✔ Message Received!</div>
-              <p>{successMessage}</p>
-              <p className="mt-2 text-xs text-emerald-500/80">Please check your email inbox to click the verification link and confirm your submission.</p>
-            </div>
-          )}
-
           {errorMessage && (
             <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-sm">
               {errorMessage}
