@@ -29,7 +29,7 @@ public class AcknowledgeController {
     private final EmailService emailService;
 
     @GetMapping(value = "/api/v1/acknowledge", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> acknowledgeSubmission(@RequestParam("trackingId") String trackingId) {
+    public ResponseEntity<String> acknowledgeSubmission(@RequestParam(value = "trackingId", required = false) String trackingId) {
         String cleanId = trackingId != null ? trackingId.trim() : "";
         log.info("Processing 1-click automatic email acknowledgment for trackingId='{}'", cleanId);
 
