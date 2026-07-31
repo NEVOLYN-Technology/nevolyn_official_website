@@ -240,6 +240,14 @@ public class EmailService {
      * @param replyTo    optional Reply-To address, may be {@code null}
      * @param attachment optional file to attach, may be {@code null}
      */
+    private boolean isBrevoApiKey(String key) {
+        if (key == null || key.isBlank()) {
+            return false;
+        }
+        String k = key.trim().toLowerCase();
+        return k.startsWith("xsmtpsib-") || k.startsWith("xkeysib-") || (k.length() > 20 && k.contains("-"));
+    }
+
     private void dispatch(String to, String subject, String html, String replyTo, File attachment) {
         if (mailCredential == null || mailCredential.isBlank()) {
             log.warn("=== DEV MOCK EMAIL DISPATCH (no mail credential configured) ===");
@@ -251,7 +259,7 @@ public class EmailService {
             return;
         }
 
-        if (mailCredential.startsWith(BREVO_KEY_PREFIX) && sendViaBrevoApi(to, subject, html, replyTo, attachment)) {
+        if (isBrevoApiKey(mailCredential) && sendViaBrevoApi(to, subject, html, replyTo, attachment)) {
             return;
         }
 
