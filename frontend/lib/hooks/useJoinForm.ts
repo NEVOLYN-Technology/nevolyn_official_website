@@ -88,7 +88,7 @@ export function useJoinForm() {
     try {
       const response = await apiClient.post<JoinResult>('/applications', formData)
 
-      if (response.success) {
+      if (response.success || response.status === 'success') {
         setIsSuccess(true)
         setSuccessMessage(
           response.message || 'Application received! Please check your email to verify your address.',

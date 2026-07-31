@@ -8,8 +8,10 @@
 
 /** Standard success envelope returned by every `/api/v1` endpoint. */
 export interface ApiResponse<T = unknown> {
-  success: boolean
-  statusCode: number
+  success?: boolean
+  status?: string
+  statusCode?: number
+  code?: number
   message: string
   data: T
   meta?: ApiMeta

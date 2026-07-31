@@ -56,7 +56,7 @@ export function useContactForm() {
     try {
       const response = await apiClient.post<ContactResult>('/contact', payload)
 
-      if (response.success) {
+      if (response.success || response.status === 'success') {
         setIsSuccess(true)
         setSuccessMessage(response.message || 'Please check your email to verify your address.')
         return true
