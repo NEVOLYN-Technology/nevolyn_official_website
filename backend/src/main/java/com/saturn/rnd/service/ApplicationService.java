@@ -101,12 +101,12 @@ public class ApplicationService {
                 storedPath
         );
 
-        // Dispatch Instant Confirmation Receipt Email to candidate
-        emailService.sendUserAcknowledgementEmail(
+        // Step 1: Dispatch Submission Confirmation Email to candidate
+        emailService.sendSenderVerificationEmail(
                 email,
                 name,
                 applicationId,
-                "Job Application"
+                "application"
         );
 
         return ApplicationResponse.builder()

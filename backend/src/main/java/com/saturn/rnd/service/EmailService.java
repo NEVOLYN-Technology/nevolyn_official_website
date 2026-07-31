@@ -28,13 +28,15 @@ import java.util.Base64;
 /**
  * Non-blocking asynchronous email delivery service for the Saturn R&D platform.
  *
- * <h2>Three-step verification pipeline</h2>
+ * <h2>Three-step email pipeline</h2>
  * <ol>
- * <li>{@link #sendSenderVerificationEmail} — double opt-in link proving the
- * submitter owns the address they typed.</li>
+ * <li>{@link #sendSenderVerificationEmail} — immediate "we received it"
+ * receipt sent to the submitter at the moment of form submission.</li>
  * <li>{@link #sendAdminNotificationEmail} — full submission dossier to the R&D
  * inbox, with the candidate CV attached for job applications.</li>
- * <li>{@link #sendUserAcknowledgementEmail} — receipt with tracking ID.</li>
+ * <li>{@link #sendUserAcknowledgementEmail} — "your submission is now being
+ * actively handled" email sent only after an administrator explicitly
+ * acknowledges the submission via the 1-click button in the admin email.</li>
  * </ol>
  *
  * <h2>Dual delivery engine</h2>
@@ -115,37 +117,44 @@ public class EmailService {
     private String mailCredential;
 
     // ------------------------------------------------------------------
-    // Step 1 — sender verification
+    // Step 1 — submission confirmation (immediate receipt on form submit)
     // ------------------------------------------------------------------
 
     /**
-     * Sends the double opt-in email carrying the secure verification link.
+     * Sends the immediate "we received your submission" receipt to the submitter.
      *
-     * @param recipientEmail address the visitor entered, and the one being proven
+     * <p>
+     * Renders {@code email/sender-verification}, which carries the blue-accented
+     * informational palette appropriate for a receipt event where nothing has
+     * been internally reviewed yet. The {@code trackingId} is passed so the
+     * template's Reference Code row is populated.
+     *
+     * @param recipientEmail address the visitor entered
      * @param name           display name used to personalise the greeting
-     * @param token          opaque single-use verification token
+     * @param trackingId     public reference code, e.g. {@code INQ-2026-0042}
      * @param type           {@code contact} or {@code application}; selects copy
-     *                       and is echoed back on the verify callback
      */
     @Async
-    public void sendSenderVerificationEmail(String recipientEmail, String name, String token, String type) {
-        String verifyUrl = resolveFrontendUrl() + "/verify?token=" + token + "&type=" + type;
+    public void sendSenderVerificationEmail(String recipientEmail, String name, String trackingId, String type) {
         String formTypeLabel = "contact".equalsIgnoreCase(type)
-                ? "Contact Inquiry Verification"
-                : "Job Application Verification";
+                ? "Contact Inquiry"
+                : "Job Application";
 
-        log.info("Preparing Sender Verification Email for '{}' (Type: {})", recipientEmail, type);
+        log.info("Preparing Submission Confirmation Email for '{}' (Tracking ID: {}, Type: {})", recipientEmail, trackingId, type);
 
         Context context = new Context();
         context.setVariable("name", name);
         context.setVariable("email", recipientEmail);
         context.setVariable("userEmail", recipientEmail);
         context.setVariable("formType", formTypeLabel);
-        context.setVariable("verifyUrl", verifyUrl);
+        context.setVariable("trackingId", trackingId);
 
         String htmlContent = templateEngine.process("email/sender-verification", context);
+        String subjectPrefix = "application".equalsIgnoreCase(type) ? "Application Received"
+                : "Inquiry Received";
+        String subject = subjectPrefix + " [" + trackingId + "] - Saturn R&D";
 
-        dispatch(recipientEmail, "Verify Your Email Address - Saturn R&D", htmlContent, null, null);
+        dispatch(recipientEmail, subject, htmlContent, null, null);
     }
 
     // ------------------------------------------------------------------
@@ -211,11 +220,18 @@ public class EmailService {
     }
 
     // ------------------------------------------------------------------
-    // Step 3 — user acknowledgement
+    // Step 3 — user acknowledgement (admin-triggered only)
     // ------------------------------------------------------------------
 
     /**
-     * Sends the closing receipt confirming the submission is now with the team.
+     * Sends the acknowledgement email confirming the submission is now actively
+     * being handled by the appropriate department.
+     *
+     * <p>
+     * Triggered exclusively when an administrator clicks the "Acknowledge"
+     * button in the admin notification email. By that point a real human has
+     * reviewed the submission and chosen to progress it — making this a
+     * fundamentally different business event from the Step 1 receipt.
      *
      * @param recipientEmail verified submitter address
      * @param name           display name used to personalise the greeting
@@ -234,8 +250,8 @@ public class EmailService {
         context.setVariable("formType", formType.toLowerCase());
 
         String htmlContent = templateEngine.process("email/user-acknowledgement", context);
-        String subjectPrefix = formType.toLowerCase().contains("application") ? "Job Application Receipt"
-                : "Contact Inquiry Receipt";
+        String subjectPrefix = formType.toLowerCase().contains("application") ? "Application Acknowledged"
+                : "Inquiry Acknowledged";
         String subject = subjectPrefix + " [" + trackingId + "] - Saturn R&D";
 
         dispatch(recipientEmail, subject, htmlContent, null, null);

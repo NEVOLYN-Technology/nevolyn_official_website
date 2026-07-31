@@ -73,12 +73,12 @@ public class ContactService {
                 null
         );
 
-        // Dispatch Instant Confirmation Receipt Email to visitor
-        emailService.sendUserAcknowledgementEmail(
+        // Step 1: Dispatch Submission Confirmation Email to visitor
+        emailService.sendSenderVerificationEmail(
                 request.getEmail(),
                 request.getName(),
                 inquiryId,
-                "Contact Inquiry"
+                "contact"
         );
 
         return ContactResponse.builder()

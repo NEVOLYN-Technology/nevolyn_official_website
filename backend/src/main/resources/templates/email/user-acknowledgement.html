@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Official Submission Receipt — Saturn R&D</title>
+  <title>Submission Acknowledged — Saturn R&D</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -68,7 +68,7 @@
       font-size: 15px;
     }
 
-    /* Status Banner matching SuccessModal */
+    /* Status Banner */
     .status-banner {
       background: #f0fdf4;
       border: 1px solid rgba(16, 185, 129, 0.25);
@@ -112,7 +112,7 @@
       font-weight: 700;
     }
 
-    /* Hero Receipt Box - SuccessModal Green Palette */
+    /* Hero Receipt Box */
     .receipt-box {
       background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
       border: 1.5px solid #a7f3d0;
@@ -179,7 +179,7 @@
       border-right: 1px solid #e2e8f0;
     }
 
-    /* Next Steps Timeline Cards matching SuccessModal */
+    /* Progress Timeline */
     .timeline-card {
       background-color: #ffffff;
       border: 1px solid #a7f3d0;
@@ -240,25 +240,26 @@
   <div class="container">
     <div class="header-bar"></div>
     <div class="header">
-      <div class="brand-subtitle">Official Submission Receipt</div>
+      <div class="brand-subtitle">Official Acknowledgement</div>
       <h1 class="brand-title">Saturn Textiles R&amp;D</h1>
       <div class="sub-brand">Department of Research &amp; Development · Industrial AI</div>
     </div>
 
-    <!-- Job Application Receipt -->
+    <!-- Job Application Acknowledgement -->
     <div class="content" th:if="${#strings.containsIgnoreCase(formType, 'application')}">
       <div class="status-banner">
-        <h2 class="status-title">✓ Job Application Received</h2>
+        <h2 class="status-title">✓ Application Now Under Active Review</h2>
       </div>
 
       <p class="greeting">Dear <span class="name-highlight" th:text="${name}">Valued Candidate</span>,</p>
-      <p>Thank you for submitting your application to the <strong>Saturn Textiles R&amp;D Department</strong>. We have
-        successfully received and logged your profile in our recruitment evaluation portal.</p>
+      <p>We are pleased to inform you that your application to the <strong>Saturn Textiles R&amp;D Department</strong>
+        has been personally reviewed and acknowledged by our team. Your profile has now progressed to the active
+        evaluation stage.</p>
 
       <div class="receipt-box">
         <div class="receipt-label">Candidate Reference Code</div>
         <div class="receipt-id" th:text="${trackingId}">APP-2026-0001</div>
-        <div class="status-tag">Status: Queued for HR &amp; Technical Lead Review</div>
+        <div class="status-tag">Status: Acknowledged — Active Evaluation In Progress</div>
       </div>
 
       <div class="section-header">📄 Application Details</div>
@@ -273,26 +274,26 @@
           <td th:text="${userEmail}">john@example.com</td>
         </tr>
         <tr>
-          <td class="label">Submission Type</td>
-          <td>Job Application / Candidate Resume</td>
+          <td class="label">Current Status</td>
+          <td>Acknowledged &amp; Assigned to Technical Lead</td>
         </tr>
       </table>
 
-      <div class="section-header">🚀 Next Steps &amp; Evaluation Timeline</div>
+      <div class="section-header">🚀 What This Means For You</div>
 
       <div class="timeline-card">
         <div class="step-item">
-          <span class="step-badge">STEP 1</span>
+          <span class="step-badge">NOW</span>
           <div class="step-text">
-            <strong>Initial Application Review:</strong> Our HR and R&amp;D technical leads will evaluate your profile
-            within <strong>2–3 business days</strong>.
+            <strong>Acknowledged:</strong> A member of our talent acquisition team has personally reviewed your
+            application and confirmed it is a strong candidate for further evaluation.
           </div>
         </div>
         <div class="step-item" style="margin-top: 14px;">
-          <span class="step-badge">STEP 2</span>
+          <span class="step-badge">NEXT</span>
           <div class="step-text">
-            <strong>Direct Outreach:</strong> If your expertise matches active project roles, our team will contact you
-            directly to schedule an introductory discussion.
+            <strong>Direct Outreach:</strong> If your expertise aligns with our active project roles, a member of
+            our team will contact you directly to schedule an introductory discussion.
           </div>
         </div>
       </div>
@@ -303,21 +304,21 @@
       </div>
     </div>
 
-    <!-- Contact Inquiry Receipt -->
+    <!-- Contact Inquiry Acknowledgement -->
     <div class="content" th:unless="${#strings.containsIgnoreCase(formType, 'application')}">
       <div class="status-banner">
-        <h2 class="status-title">✓ Contact Inquiry Received</h2>
+        <h2 class="status-title">✓ Inquiry Now Being Actively Handled</h2>
       </div>
 
       <p class="greeting">Dear <span class="name-highlight" th:text="${name}">Valued Guest</span>,</p>
-      <p>Thank you for contacting <strong>Saturn Textiles R&amp;D</strong>. We have received your inquiry and registered
-        it
-        in our engineering communications system.</p>
+      <p>We are pleased to inform you that your inquiry to <strong>Saturn Textiles R&amp;D</strong> has been
+        personally reviewed and acknowledged by our engineering team. Your submission has now been formally
+        assigned to the appropriate department for direct follow-up.</p>
 
       <div class="receipt-box">
         <div class="receipt-label">Inquiry Reference Code</div>
         <div class="receipt-id" th:text="${trackingId}">INQ-2026-0001</div>
-        <div class="status-tag">Status: Registered &amp; Assigned to Engineering Team</div>
+        <div class="status-tag">Status: Acknowledged — Assigned to Engineering Team</div>
       </div>
 
       <div class="section-header">📋 Inquiry Details</div>
@@ -332,19 +333,26 @@
           <td th:text="${userEmail}">john@example.com</td>
         </tr>
         <tr>
-          <td class="label">Inquiry Scope</td>
-          <td>Contact &amp; Project Collaboration Inquiry</td>
+          <td class="label">Current Status</td>
+          <td>Acknowledged &amp; Assigned to R&amp;D Engineer</td>
         </tr>
       </table>
 
-      <div class="section-header">📩 Response Time Guarantee</div>
+      <div class="section-header">📩 What Happens Next</div>
 
       <div class="timeline-card">
         <div class="step-item">
-          <span class="step-badge">TIMELINE</span>
+          <span class="step-badge">NOW</span>
           <div class="step-text">
-            An R&amp;D specialist or project engineer will review your proposal details and follow up with you directly
-            within <strong>24–48 business hours</strong>.
+            <strong>Acknowledged:</strong> Our engineering leadership has reviewed your proposal and formally
+            assigned it to an R&amp;D specialist for direct response.
+          </div>
+        </div>
+        <div class="step-item" style="margin-top: 14px;">
+          <span class="step-badge">NEXT</span>
+          <div class="step-text">
+            <strong>Direct Follow-up:</strong> An R&amp;D specialist or project engineer will contact you directly
+            to discuss your proposal in detail.
           </div>
         </div>
       </div>
@@ -361,4 +369,4 @@
   </div>
 </body>
 
-</html>
+</html>
