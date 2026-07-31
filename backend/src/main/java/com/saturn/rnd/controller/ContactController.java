@@ -70,7 +70,7 @@ public class ContactController {
 
                 ApiResponse<ContactResponse> envelope = ApiResponse.success(
                                 HttpStatus.CREATED.value(),
-                                "Thank you for reaching out. Please check your email to verify your address and complete submission.",
+                                "Thank you for reaching out! Your inquiry has been received and a confirmation receipt has been sent to your email.",
                                 responseData);
 
                 return ResponseEntity.status(HttpStatus.CREATED).body(envelope);

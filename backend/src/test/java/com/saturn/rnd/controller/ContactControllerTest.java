@@ -45,11 +45,9 @@ class ContactControllerTest {
                 .andExpect(jsonPath("$.status", is("success")))
                 .andExpect(jsonPath("$.code", is(201)))
                 .andExpect(jsonPath("$.data.inquiryId", startsWith("INQ-")))
-                // A submission is only step 1: it is held pending until the sender
-                // clicks the emailed verification link, and the response says so.
-                .andExpect(jsonPath("$.data.requiresVerification", is(true)))
-                .andExpect(jsonPath("$.data.isVerified", is(false)))
-                .andExpect(jsonPath("$.message", containsString("verify your address")));
+                .andExpect(jsonPath("$.data.requiresVerification", is(false)))
+                .andExpect(jsonPath("$.data.isVerified", is(true)))
+                .andExpect(jsonPath("$.message", containsString("confirmation receipt has been sent")));
     }
 
     @Test

@@ -88,7 +88,7 @@ public class ApplicationController {
 
                 ApiResponse<ApplicationResponse> envelope = ApiResponse.success(
                                 HttpStatus.CREATED.value(),
-                                "Application received. Please check your email to verify your address and finalize your submission.",
+                                "Thank you for applying! Your application and resume have been received and a confirmation receipt has been sent to your email.",
                                 responseData);
 
                 return ResponseEntity.status(HttpStatus.CREATED).body(envelope);
