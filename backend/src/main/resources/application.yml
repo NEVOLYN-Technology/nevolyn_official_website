@@ -148,9 +148,9 @@ app:
   email:
     # Envelope sender. When using the Brevo REST engine this address must be a
     # verified sender in the Brevo dashboard, or the API returns HTTP 400.
-    from: ${APP_EMAIL_FROM:noreply@saturn-rnd.com}
+    from: ${APP_EMAIL_FROM:saturn.rnd.innovation@gmail.com}
     # Destination for step-2 admin dossiers.
-    admin: ${APP_EMAIL_ADMIN:admin@saturn-rnd.com}
+    admin: ${APP_EMAIL_ADMIN:saturn.rnd.innovation@gmail.com}
     # Friendly From display name shown in the recipient's inbox.
     sender-name: ${APP_EMAIL_SENDER_NAME:Saturn Textiles R&D}
     #
