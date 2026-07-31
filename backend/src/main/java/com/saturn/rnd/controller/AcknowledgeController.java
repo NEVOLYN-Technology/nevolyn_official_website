@@ -4,11 +4,11 @@ import com.saturn.rnd.model.ContactInquiry;
 import com.saturn.rnd.model.JobApplication;
 import com.saturn.rnd.repository.ContactInquiryRepository;
 import com.saturn.rnd.repository.JobApplicationRepository;
-import com.saturn.rnd.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,8 +26,8 @@ public class AcknowledgeController {
 
     private final ContactInquiryRepository contactRepository;
     private final JobApplicationRepository applicationRepository;
-    private final EmailService emailService;
 
+    @Transactional(readOnly = true)
     @GetMapping(value = "/api/v1/acknowledge", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> acknowledgeSubmission(@RequestParam(value = "trackingId", required = false) String trackingId) {
         String cleanId = trackingId != null ? trackingId.trim() : "";
@@ -76,14 +76,6 @@ public class AcknowledgeController {
                     }
                 }
             }
-
-            if (found && recipientEmail != null && !recipientEmail.isBlank()) {
-                try {
-                    emailService.sendUserAcknowledgementEmail(recipientEmail, recipientName, cleanId, typeLabel);
-                } catch (Exception ex) {
-                    log.error("Failed to dispatch user acknowledgement email for trackingId='{}'", cleanId, ex);
-                }
-            }
         } catch (Exception e) {
             log.error("Error looking up submission record for trackingId='{}'", cleanId, e);
         }
@@ -113,6 +105,7 @@ public class AcknowledgeController {
                     <h1>Acknowledgement Sent!</h1>
                     <p>The official receipt email has been automatically transmitted to the submitter.</p>
                     <div class="details">
+                      • <strong>Submission Type:</strong> %s<br/>
                       • <strong>Reference Code:</strong> <span class="code">%s</span><br/>
                       • <strong>Recipient Name:</strong> %s<br/>
                       • <strong>Destination Email:</strong> %s
@@ -120,7 +113,7 @@ public class AcknowledgeController {
                   </div>
                 </body>
                 </html>
-                """.formatted(cleanId, recipientName, recipientEmail);
+                """.formatted(typeLabel, cleanId, recipientName, recipientEmail);
         } else {
             html = """
                 <!DOCTYPE html>
