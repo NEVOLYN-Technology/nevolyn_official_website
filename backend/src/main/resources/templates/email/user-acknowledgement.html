@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f8fafc;
+      background-color: #f0fdf4;
       color: #1e293b;
       margin: 0;
       padding: 30px 15px;
@@ -19,16 +19,30 @@
       max-width: 620px;
       margin: 0 auto;
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
+      border: 1px solid #d1fae5;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.08), 0 8px 10px -6px rgba(5, 150, 105, 0.05);
+    }
+
+    .header-bar {
+      height: 5px;
+      background: linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);
     }
 
     .header {
-      background-color: #0f172a;
+      background-color: #064e3b;
       padding: 28px 32px;
       text-align: left;
+    }
+
+    .brand-subtitle {
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      margin-bottom: 4px;
     }
 
     .brand-title {
@@ -36,16 +50,16 @@
       font-size: 22px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       margin: 0;
     }
 
     .sub-brand {
-      color: #94a3b8;
+      color: #a7f3d0;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 500;
       letter-spacing: 0.5px;
-      margin-top: 4px;
+      margin-top: 6px;
     }
 
     .content {
@@ -54,11 +68,35 @@
       font-size: 15px;
     }
 
+    /* Differentiated Headings */
+    .status-banner {
+      background: #ecfdf5;
+      border-left: 5px solid #059669;
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
     .status-title {
-      color: #0f172a;
-      font-size: 22px;
-      font-weight: 700;
-      margin: 0 0 16px 0;
+      color: #064e3b;
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.3px;
+    }
+
+    .section-header {
+      display: inline-block;
+      color: #065f46;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      background-color: #f0fdf4;
+      border: 1px solid #a7f3d0;
+      padding: 6px 14px;
+      border-radius: 6px;
+      margin: 28px 0 14px 0;
     }
 
     .greeting {
@@ -69,197 +107,266 @@
     }
 
     .name-highlight {
-      color: #0284c7;
+      color: #059669;
       font-weight: 700;
     }
 
+    /* Hero Receipt Box - Green Theme */
     .receipt-box {
-      background-color: #f0f9ff;
-      border: 1px solid #bae6fd;
-      border-left: 4px solid #0284c7;
-      border-radius: 8px;
-      padding: 18px 20px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1.5px solid #a7f3d0;
+      border-radius: 10px;
+      padding: 20px 22px;
       margin: 24px 0;
+      position: relative;
+    }
+
+    .receipt-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .receipt-label {
       font-size: 11px;
       font-weight: 800;
-      color: #0369a1;
+      color: #047857;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
     }
 
     .receipt-id {
       font-size: 24px;
-      font-weight: 800;
-      color: #0284c7;
+      font-weight: 900;
+      color: #065f46;
       margin-top: 4px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.5px;
     }
 
     .status-tag {
       display: inline-block;
-      margin-top: 10px;
+      margin-top: 12px;
       font-size: 12px;
       font-weight: 700;
-      color: #15803d;
-      background: #dcfce7;
-      border: 1px solid #86efac;
-      padding: 4px 12px;
-      border-radius: 6px;
+      color: #065f46;
+      background: #d1fae5;
+      border: 1px solid #6ee7b7;
+      padding: 5px 14px;
+      border-radius: 20px;
     }
 
+    /* Styled Information Grid */
     .info-grid {
       width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 16px 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .info-grid tr:not(:last-child) td {
+      border-bottom: 1px solid #f1f5f9;
     }
 
     .info-grid td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #f1f5f9;
+      padding: 12px 16px;
       font-size: 14px;
       color: #1e293b;
     }
 
     .info-grid td.label {
-      font-weight: 600;
-      color: #64748b;
-      width: 35%;
-      background-color: #f8fafc;
+      font-weight: 700;
+      color: #047857;
+      width: 38%;
+      background-color: #f0fdf4;
+      border-right: 1px solid #e2e8f0;
     }
 
-    .info-card {
-      background-color: #fff7ed;
-      border: 1px solid #ffedd5;
-      border-left: 4px solid #ea580c;
-      border-radius: 8px;
-      padding: 18px 20px;
-      margin-top: 24px;
+    /* Structured Next Steps Timeline / Cards */
+    .timeline-card {
+      background-color: #ffffff;
+      border: 1px solid #a7f3d0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 16px;
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.04);
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-badge {
+      background-color: #059669;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-right: 12px;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    .step-text {
       font-size: 14px;
-      color: #9a3412;
-      line-height: 1.6;
+      color: #334155;
+      line-height: 1.5;
     }
 
     .signature-block {
-      margin-top: 28px;
+      margin-top: 32px;
       padding-top: 20px;
-      border-top: 1px dashed #e2e8f0;
+      border-top: 1.5px dashed #cbd5e1;
       font-size: 14px;
       color: #475569;
     }
 
     .footer {
-      background-color: #f8fafc;
+      background-color: #064e3b;
       text-align: center;
       font-size: 12px;
-      color: #64748b;
-      border-top: 1px solid #e2e8f0;
-      padding: 20px 32px;
+      color: #a7f3d0;
+      padding: 22px 32px;
+    }
+
+    .footer a {
+      color: #34d399;
+      text-decoration: none;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
+    <div class="header-bar"></div>
     <div class="header">
-      <h1 class="brand-title">Saturn Textiles R&D</h1>
-      <div class="sub-brand">Department of Research & Development · Industrial AI</div>
+      <div class="brand-subtitle">Official Submission Receipt</div>
+      <h1 class="brand-title">Saturn Textiles R&amp;D</h1>
+      <div class="sub-brand">Department of Research &amp; Development · Industrial AI</div>
     </div>
 
     <!-- Job Application Receipt -->
     <div class="content" th:if="${#strings.containsIgnoreCase(formType, 'application')}">
-      <h2 class="status-title">Job Application Received</h2>
+      <div class="status-banner">
+        <h2 class="status-title">✓ Job Application Received</h2>
+      </div>
 
       <p class="greeting">Dear <span class="name-highlight" th:text="${name}">Valued Candidate</span>,</p>
-      <p>Thank you for submitting your application to the <strong>Saturn Textiles R&D Department</strong>. We have
-        successfully received your application and uploaded your profile to our evaluation portal.</p>
+      <p>Thank you for submitting your application to the <strong>Saturn Textiles R&amp;D Department</strong>. We have
+        successfully received and logged your profile in our recruitment evaluation portal.</p>
 
       <div class="receipt-box">
         <div class="receipt-label">Candidate Reference Code</div>
         <div class="receipt-id" th:text="${trackingId}">APP-2026-0001</div>
-        <div class="status-tag">Status: Queued for HR & Technical Lead Review</div>
+        <div class="status-tag">Status: Queued for HR &amp; Technical Lead Review</div>
       </div>
+
+      <div class="section-header">📄 Application Details</div>
 
       <table class="info-grid">
         <tr>
-          <td class="label">Full Name</td>
-          <td><strong th:text="${name}" style="color: #0f172a;">John Doe</strong></td>
+          <td class="label">Candidate Name</td>
+          <td><strong th:text="${name}" style="color: #064e3b;">John Doe</strong></td>
         </tr>
         <tr>
-          <td class="label">Submitted Email</td>
+          <td class="label">Contact Email</td>
           <td th:text="${userEmail}">john@example.com</td>
         </tr>
         <tr>
-          <td class="label">Application Type</td>
-          <td>Job Application / Career Dossier</td>
+          <td class="label">Dossier Type</td>
+          <td>Job Application / Candidate Resume</td>
         </tr>
       </table>
 
-      <p>Our talent acquisition team and engineering department will review your application carefully against our
-        current research and development projects.</p>
+      <div class="section-header">🚀 Next Steps &amp; Evaluation Timeline</div>
 
-      <div class="info-card">
-        📌 <strong>What happens next?</strong><br />
-        • <strong>Initial Screening:</strong> Our team will review your CV and qualification details within <strong>2–3
-          business days</strong>.<br />
-        • <strong>Direct Communication:</strong> If your background matches our technical focus areas, our recruitment
-        team will reach out directly to schedule an introductory discussion.
+      <div class="timeline-card">
+        <div class="step-item">
+          <span class="step-badge">STEP 1</span>
+          <div class="step-text">
+            <strong>Initial Dossier Review:</strong> Our HR and R&amp;D technical leads will evaluate your profile
+            within <strong>2–3 business days</strong>.
+          </div>
+        </div>
+        <div class="step-item" style="margin-top: 14px;">
+          <span class="step-badge">STEP 2</span>
+          <div class="step-text">
+            <strong>Direct Outreach:</strong> If your expertise matches active project roles, our team will contact you
+            directly to schedule an interview.
+          </div>
+        </div>
       </div>
 
       <div class="signature-block">
         Warm regards,<br />
-        <strong style="color: #0f172a;">Saturn R&D Talent Acquisition Team</strong>
+        <strong style="color: #064e3b;">Saturn R&amp;D Talent Acquisition Team</strong>
       </div>
     </div>
 
     <!-- Contact Inquiry Receipt -->
     <div class="content" th:unless="${#strings.containsIgnoreCase(formType, 'application')}">
-      <h2 class="status-title">Contact Inquiry Received</h2>
+      <div class="status-banner">
+        <h2 class="status-title">✓ Contact Inquiry Received</h2>
+      </div>
 
       <p class="greeting">Dear <span class="name-highlight" th:text="${name}">Valued Guest</span>,</p>
-      <p>Thank you for contacting <strong>Saturn Textiles R&D</strong>. We have received your inquiry and registered it
+      <p>Thank you for contacting <strong>Saturn Textiles R&amp;D</strong>. We have received your inquiry and registered
+        it
         in our engineering communications system.</p>
 
       <div class="receipt-box">
         <div class="receipt-label">Inquiry Reference Code</div>
         <div class="receipt-id" th:text="${trackingId}">INQ-2026-0001</div>
-        <div class="status-tag">Status: Registered & Assigned to Engineering Team</div>
+        <div class="status-tag">Status: Registered &amp; Assigned to Engineering Team</div>
       </div>
+
+      <div class="section-header">📋 Inquiry Details</div>
 
       <table class="info-grid">
         <tr>
-          <td class="label">Full Name</td>
-          <td><strong th:text="${name}" style="color: #0f172a;">John Doe</strong></td>
+          <td class="label">Sender Name</td>
+          <td><strong th:text="${name}" style="color: #064e3b;">John Doe</strong></td>
         </tr>
         <tr>
-          <td class="label">Submitted Email</td>
+          <td class="label">Sender Email</td>
           <td th:text="${userEmail}">john@example.com</td>
         </tr>
         <tr>
-          <td class="label">Inquiry Type</td>
-          <td>Contact &amp; Project Inquiry</td>
+          <td class="label">Inquiry Scope</td>
+          <td>Contact &amp; Project Collaboration Inquiry</td>
         </tr>
       </table>
 
-      <p>Our team is dedicated to advancing industrial automation, smart textile engineering, and AI integration. We
-        carefully review every incoming technical proposal and business collaboration inquiry.</p>
+      <div class="section-header">📩 Response Time Guarantee</div>
 
-      <div class="info-card">
-        📩 <strong>Expected Response Time:</strong><br />
-        A specialist or project engineer will analyze your request and follow up with you directly at this email
-        address within <strong>24–48 business hours</strong>.
+      <div class="timeline-card">
+        <div class="step-item">
+          <span class="step-badge">TIMELINE</span>
+          <div class="step-text">
+            An R&amp;D specialist or project engineer will review your proposal details and follow up with you directly
+            within <strong>24–48 business hours</strong>.
+          </div>
+        </div>
       </div>
 
       <div class="signature-block">
         Sincerely,<br />
-        <strong style="color: #0f172a;">Saturn R&D Engineering Leadership Team</strong>
+        <strong style="color: #064e3b;">Saturn R&amp;D Engineering Leadership Team</strong>
       </div>
     </div>
 
     <div class="footer">
-      © 2026 Saturn Textiles Limited · Department of Research & Development
+      © 2026 Saturn Textiles Limited · Department of Research &amp; Development
     </div>
   </div>
 </body>
