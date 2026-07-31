@@ -131,9 +131,9 @@ public class ApplicationService {
             log.info("Job application '{}' verified successfully.", app.getApplicationId());
 
             StringBuilder links = new StringBuilder();
-            if (app.getLinkedin() != null && !app.getLinkedin().isBlank()) links.append("LinkedIn: ").append(app.getLinkedin()).append(" | ");
-            if (app.getGithub() != null && !app.getGithub().isBlank()) links.append("GitHub: ").append(app.getGithub()).append(" | ");
-            if (app.getWebsite() != null && !app.getWebsite().isBlank()) links.append("Website: ").append(app.getWebsite());
+            if (app.getLinkedin() != null && !app.getLinkedin().isBlank()) links.append("LinkedIn: ").append(app.getLinkedin()).append("\n");
+            if (app.getGithub() != null && !app.getGithub().isBlank()) links.append("GitHub: ").append(app.getGithub()).append("\n");
+            if (app.getWebsite() != null && !app.getWebsite().isBlank()) links.append("Portfolio: ").append(app.getWebsite());
 
             // Step 2: Send Admin Notification with CV attachment
             emailService.sendAdminNotificationEmail(
