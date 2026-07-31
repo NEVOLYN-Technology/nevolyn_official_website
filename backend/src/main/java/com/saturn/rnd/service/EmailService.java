@@ -233,7 +233,7 @@ public class EmailService {
         context.setVariable("trackingId", trackingId);
         context.setVariable("formType", formType.toLowerCase());
 
-        String htmlContent = templateEngine.process("email/sender-verification", context);
+        String htmlContent = templateEngine.process("email/user-acknowledgement", context);
         String subjectPrefix = formType.toLowerCase().contains("application") ? "Job Application Receipt"
                 : "Contact Inquiry Receipt";
         String subject = subjectPrefix + " [" + trackingId + "] - Saturn R&D";
