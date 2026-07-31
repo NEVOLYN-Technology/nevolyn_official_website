@@ -119,6 +119,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       if (isApiErrorResponse(body)) {
         throw body
       }
+      if (body && typeof body === 'object' && 'message' in body && typeof (body as { message: unknown }).message === 'string') {
+        throw transportError(
+          response.status,
+          `HTTP_${response.status}`,
+          (body as { message: string }).message,
+        )
+      }
       throw transportError(
         response.status,
         `HTTP_${response.status}`,

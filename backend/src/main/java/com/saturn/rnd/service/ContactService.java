@@ -40,7 +40,7 @@ public class ContactService {
                     .build();
         }
 
-        String inquiryId = String.format("INQ-%d-%04d", Year.now().getValue(), random.nextInt(10000));
+        String inquiryId = String.format("INQ-%d-%06d", Year.now().getValue(), System.currentTimeMillis() % 1000000L);
         String verificationToken = UUID.randomUUID().toString();
 
         log.debug("Generating unique inquiry ID '{}' and verification token for email '{}'", inquiryId, request.getEmail());

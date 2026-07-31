@@ -53,7 +53,7 @@ public class ApplicationService {
                     .build();
         }
 
-        String applicationId = String.format("APP-%d-%04d", Year.now().getValue(), random.nextInt(10000));
+        String applicationId = String.format("APP-%d-%06d", Year.now().getValue(), System.currentTimeMillis() % 1000000L);
         String verificationToken = UUID.randomUUID().toString();
 
         log.debug("Processing job application for '{}', generated ID: {}", name, applicationId);
