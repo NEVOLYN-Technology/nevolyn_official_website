@@ -95,6 +95,10 @@ public class EmailService {
     @Value("${app.email.frontend-url:http://localhost:3000}")
     private String frontendUrl;
 
+    /** Public REST API backend URL used to handle 1-click acknowledge requests. */
+    @Value("${app.email.backend-url:http://localhost:8080}")
+    private String backendUrl;
+
     /** Friendly From display name, e.g. {@code Saturn Textiles R&D <noreply@…>}. */
     @Value("${app.email.sender-name:Saturn Textiles R&D}")
     private String senderName;
@@ -179,7 +183,7 @@ public class EmailService {
 
         File attachment = resolveAttachment(attachmentFilePath);
 
-        String acknowledgeUrl = resolveFrontendUrl() + "/api/v1/acknowledge?trackingId=" + trackingId;
+        String acknowledgeUrl = resolveBackendUrl() + "/api/v1/acknowledge?trackingId=" + trackingId;
 
         Context context = new Context();
         context.setVariable("formType", formType.toUpperCase());
@@ -386,6 +390,17 @@ public class EmailService {
         String url = (frontendUrl == null || frontendUrl.isBlank())
                 ? "http://localhost:3000"
                 : frontendUrl.trim();
+        return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+    }
+
+    /**
+     * Returns the public REST API backend origin without a trailing slash for
+     * 1-click acknowledge button endpoints.
+     */
+    private String resolveBackendUrl() {
+        String url = (backendUrl == null || backendUrl.isBlank())
+                ? "http://localhost:8080"
+                : backendUrl.trim();
         return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
     }
 

@@ -163,6 +163,7 @@ app:
     #   Custom domain  : https://saturn-rnd.com
     # Set APP_FRONTEND_URL on Render; no code change is needed.
     frontend-url: ${APP_FRONTEND_URL:http://localhost:3000}
+    backend-url: ${APP_BACKEND_URL:http://localhost:8080}
 
   rate-limit:
     # Per-IP fixed window over the public write endpoints (RateLimitFilter).

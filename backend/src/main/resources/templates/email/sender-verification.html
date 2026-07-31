@@ -8,30 +8,31 @@
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #030712;
-      color: #f1f5f9;
+      background-color: #f8fafc;
+      color: #1e293b;
       margin: 0;
-      padding: 24px;
+      padding: 30px 15px;
+      line-height: 1.6;
     }
 
     .container {
-      max-width: 600px;
+      max-width: 620px;
       margin: 0 auto;
-      background: linear-gradient(145deg, #0b172a 0%, #070f1e 100%);
-      border: 1px solid #1e3a8a;
-      border-radius: 20px;
-      padding: 36px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .header {
-      text-align: center;
-      padding-bottom: 24px;
-      border-bottom: 1px solid #1e293b;
+      background-color: #0f172a;
+      padding: 28px 32px;
+      text-align: left;
     }
 
     .brand-title {
-      color: #38bdf8;
+      color: #ffffff;
       font-size: 22px;
       font-weight: 800;
       text-transform: uppercase;
@@ -40,94 +41,78 @@
     }
 
     .sub-brand {
-      color: #64748b;
-      font-size: 12px;
+      color: #94a3b8;
+      font-size: 13px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 0.5px;
       margin-top: 4px;
     }
 
     .content {
-      padding: 28px 0;
-      line-height: 1.7;
-      color: #cbd5e1;
+      padding: 32px;
+      color: #334155;
       font-size: 15px;
     }
 
-    .badge {
-      background: rgba(30, 58, 138, 0.4);
-      color: #38bdf8;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: inline-block;
-      margin-bottom: 16px;
-    }
-
     .title {
-      color: #ffffff;
+      color: #0f172a;
       font-size: 22px;
       font-weight: 700;
       margin: 0 0 16px 0;
     }
 
     .name-highlight {
-      color: #38bdf8;
+      color: #0284c7;
       font-weight: 700;
     }
 
     .info-grid {
       width: 100%;
       border-collapse: collapse;
-      margin: 18px 0;
+      margin: 20px 0;
     }
 
     .info-grid td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #1e293b;
+      padding: 10px 12px;
+      border-bottom: 1px solid #f1f5f9;
       font-size: 14px;
-      color: #f8fafc;
+      color: #1e293b;
     }
 
     .info-grid td.label {
       font-weight: 600;
-      color: #94a3b8;
+      color: #64748b;
       width: 35%;
-      background-color: #030712;
+      background-color: #f8fafc;
     }
 
     .status-card {
-      background: #070e1c;
-      border: 1px solid #1e293b;
-      border-left: 4px solid #38bdf8;
-      border-radius: 12px;
-      padding: 18px;
+      background-color: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-left: 4px solid #0284c7;
+      border-radius: 8px;
+      padding: 18px 20px;
       margin: 24px 0;
       font-size: 14px;
-      color: #94a3b8;
+      color: #0369a1;
       line-height: 1.6;
     }
 
     .signature-block {
       margin-top: 28px;
       padding-top: 20px;
-      border-top: 1px dashed #1e293b;
+      border-top: 1px dashed #e2e8f0;
       font-size: 14px;
-      color: #cbd5e1;
+      color: #475569;
     }
 
     .footer {
+      background-color: #f8fafc;
       text-align: center;
       font-size: 12px;
-      color: #475569;
-      margin-top: 32px;
-      border-top: 1px solid #1e293b;
-      padding-top: 20px;
+      color: #64748b;
+      border-top: 1px solid #e2e8f0;
+      padding: 20px 32px;
     }
   </style>
 </head>
@@ -150,7 +135,7 @@
       <table class="info-grid">
         <tr>
           <td class="label">Full Name</td>
-          <td><strong th:text="${name}" style="color: #ffffff;">John Doe</strong></td>
+          <td><strong th:text="${name}" style="color: #0f172a;">John Doe</strong></td>
         </tr>
         <tr>
           <td class="label">Submitted Email</td>
@@ -172,7 +157,7 @@
 
       <div class="signature-block">
         Warm regards,<br />
-        <strong style="color: #f8fafc;">Saturn R&D Talent Acquisition Team</strong>
+        <strong style="color: #0f172a;">Saturn R&D Talent Acquisition Team</strong>
       </div>
     </div>
 
@@ -187,7 +172,7 @@
       <table class="info-grid">
         <tr>
           <td class="label">Full Name</td>
-          <td><strong th:text="${name}" style="color: #ffffff;">John Doe</strong></td>
+          <td><strong th:text="${name}" style="color: #0f172a;">John Doe</strong></td>
         </tr>
         <tr>
           <td class="label">Submitted Email</td>
@@ -207,7 +192,7 @@
 
       <div class="signature-block">
         Sincerely,<br />
-        <strong style="color: #f8fafc;">Saturn R&D Engineering Leadership Team</strong>
+        <strong style="color: #0f172a;">Saturn R&D Engineering Leadership Team</strong>
       </div>
     </div>
 

@@ -186,6 +186,7 @@ app:
     # the custom domain goes live, otherwise every verification email keeps
     # linking to the old vercel.app host.
     frontend-url: ${APP_FRONTEND_URL:https://saturn-rnd.vercel.app}
+    backend-url: ${APP_BACKEND_URL:https://saturn-rnd-backend.onrender.com}
 
   rate-limit:
     # Keep enabled in production — these endpoints are public, unauthenticated,
