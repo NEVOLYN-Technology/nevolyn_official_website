@@ -58,7 +58,7 @@ export function useContactForm() {
 
       if (response.success || response.status === 'success') {
         setIsSuccess(true)
-        setSuccessMessage(response.message || 'Please check your email to verify your address.')
+        setSuccessMessage(response.message || 'Thank you! Your message has been received and a confirmation receipt has been sent to your email.')
         return true
       }
 

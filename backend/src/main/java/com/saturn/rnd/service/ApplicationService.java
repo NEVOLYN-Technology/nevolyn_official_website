@@ -74,26 +74,47 @@ public class ApplicationService {
                 .resumePath(storedPath)
                 .originalFileName(resume != null ? resume.getOriginalFilename() : "resume.pdf")
                 .verificationToken(verificationToken)
-                .isVerified(false)
+                .isVerified(true)
+                .verifiedAt(LocalDateTime.now())
                 .build();
 
         JobApplication savedEntity = repository.save(entity);
         log.debug("Persisted JobApplication entity to database with PK ID: {}", savedEntity.getId());
 
-        // Step 1: Send Sender Verification Email
-        emailService.sendSenderVerificationEmail(
+        // Join pre-formatted social links for the admin notification email
+        StringBuilder links = new StringBuilder();
+        if (linkedin != null && !linkedin.isBlank()) links.append("LinkedIn: ").append(linkedin).append("\n");
+        if (github != null && !github.isBlank()) links.append("GitHub: ").append(github).append("\n");
+        if (website != null && !website.isBlank()) links.append("Portfolio: ").append(website);
+
+        // Dispatch Admin Alert Email directly to Saturn R&D team with candidate CV attached
+        emailService.sendAdminNotificationEmail(
+                "Job Application",
+                applicationId,
+                name,
+                email,
+                phone,
+                address,
+                "Job Application Submission",
+                links.toString(),
+                reason,
+                storedPath
+        );
+
+        // Dispatch Instant Confirmation Receipt Email to candidate
+        emailService.sendUserAcknowledgementEmail(
                 email,
                 name,
-                verificationToken,
-                "application"
+                applicationId,
+                "Job Application"
         );
 
         return ApplicationResponse.builder()
                 .applicationId(applicationId)
                 .fileName(resume != null ? resume.getOriginalFilename() : "resume.pdf")
-                .status("VERIFICATION_PENDING")
-                .requiresVerification(true)
-                .isVerified(false)
+                .status("SUBMITTED")
+                .requiresVerification(false)
+                .isVerified(true)
                 .build();
     }
 

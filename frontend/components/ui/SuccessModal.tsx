@@ -16,7 +16,7 @@ interface SuccessModalProps {
 export const SuccessModal = ({
   isOpen,
   onClose,
-  title = 'Verification Email Sent!',
+  title = 'Submission Received!',
   message,
   email,
   formType = 'contact',
@@ -83,12 +83,12 @@ export const SuccessModal = ({
                     <Mail className="w-5 h-5" />
                   </div>
                   <div className="truncate text-left">
-                    <p className="text-xs text-slate-400 font-medium">Sent to</p>
+                    <p className="text-xs text-slate-400 font-medium">Receipt Sent to</p>
                     <p className="text-sm font-semibold text-slate-200 truncate">{email}</p>
                   </div>
                 </div>
                 <span className="inline-flex items-center text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 shrink-0">
-                  Action Required
+                  Confirmation Sent
                 </span>
               </div>
             )}
@@ -96,7 +96,7 @@ export const SuccessModal = ({
             {/* Step-by-Step Instructions */}
             <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 mb-8 text-left space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                Next Steps to Complete Submission:
+                What happens next:
               </p>
               
               <div className="flex items-start gap-3">
@@ -104,7 +104,7 @@ export const SuccessModal = ({
                   1
                 </div>
                 <p className="text-sm text-slate-300">
-                  Open your email inbox (and check your Spam / Junk folder if needed).
+                  Check your email inbox for your submission receipt and tracking reference code.
                 </p>
               </div>
 
@@ -113,7 +113,7 @@ export const SuccessModal = ({
                   2
                 </div>
                 <p className="text-sm text-slate-300">
-                  Click the <strong className="text-white font-semibold">"Verify Your Email"</strong> link inside the message from <span className="text-emerald-400 font-medium">Saturn R&D</span>.
+                  Our engineering leadership team will review your {formType === 'contact' ? 'inquiry details' : 'application dossier & CV'}.
                 </p>
               </div>
 
@@ -122,7 +122,7 @@ export const SuccessModal = ({
                   3
                 </div>
                 <p className="text-sm text-slate-300">
-                  Once verified, your {formType === 'contact' ? 'inquiry' : 'application'} will be automatically delivered directly to our engineering leadership team.
+                  You will receive an acknowledgment or reply directly from our team.
                 </p>
               </div>
             </div>
@@ -133,7 +133,7 @@ export const SuccessModal = ({
                 onClick={onClose}
                 className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-bold text-base shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
               >
-                <span>Got It, I'll Check My Email</span>
+                <span>Got It, Thanks!</span>
               </button>
             </div>
           </motion.div>

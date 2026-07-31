@@ -52,25 +52,40 @@ public class ContactService {
                 .subject(request.getSubject())
                 .message(request.getMessage())
                 .verificationToken(verificationToken)
-                .isVerified(false)
+                .isVerified(true)
+                .verifiedAt(LocalDateTime.now())
                 .build();
 
         ContactInquiry savedEntity = repository.save(entity);
         log.debug("Persisted ContactInquiry entity with ID: {}", savedEntity.getId());
 
-        // Step 1 of Email Pipeline: Dispatch Sender Verification Email
-        emailService.sendSenderVerificationEmail(
+        // Dispatch Admin Alert Email directly to Saturn R&D team
+        emailService.sendAdminNotificationEmail(
+                "Contact Inquiry",
+                inquiryId,
+                request.getName(),
+                request.getEmail(),
+                null,
+                null,
+                request.getSubject(),
+                null,
+                request.getMessage(),
+                null
+        );
+
+        // Dispatch Instant Confirmation Receipt Email to visitor
+        emailService.sendUserAcknowledgementEmail(
                 request.getEmail(),
                 request.getName(),
-                verificationToken,
-                "contact"
+                inquiryId,
+                "Contact Inquiry"
         );
 
         return ContactResponse.builder()
                 .inquiryId(inquiryId)
-                .status("VERIFICATION_PENDING")
-                .requiresVerification(true)
-                .isVerified(false)
+                .status("SUBMITTED")
+                .requiresVerification(false)
+                .isVerified(true)
                 .build();
     }
 

@@ -52,7 +52,7 @@ export function useJoinForm() {
     // calling the API so the bot cannot detect the trap.
     if (payload.honeypot && payload.honeypot.trim() !== '') {
       setIsSuccess(true)
-      setSuccessMessage('Thank you for applying! Please check your email to verify your address.')
+      setSuccessMessage('Thank you for applying! A confirmation receipt has been sent to your email.')
       return true
     }
 
@@ -91,7 +91,7 @@ export function useJoinForm() {
       if (response.success || response.status === 'success') {
         setIsSuccess(true)
         setSuccessMessage(
-          response.message || 'Application received! Please check your email to verify your address.',
+          response.message || 'Application received! A confirmation receipt has been sent to your email.',
         )
         return true
       }

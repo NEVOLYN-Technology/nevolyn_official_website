@@ -190,7 +190,7 @@ public class EmailService {
         context.setVariable("hasAttachment", attachment != null);
 
         String htmlContent = templateEngine.process("email/admin-notification", context);
-        String mailSubject = "[VERIFIED ALERT] " + formType + ": " + trackingId + " - " + name;
+        String mailSubject = "[NEW SUBMISSION] " + formType + ": " + trackingId + " - " + name;
 
         dispatch(adminEmail, mailSubject, htmlContent, userEmail, attachment);
     }
