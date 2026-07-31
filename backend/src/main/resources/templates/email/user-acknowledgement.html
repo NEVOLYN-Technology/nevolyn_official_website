@@ -113,6 +113,26 @@
       border-radius: 6px;
     }
 
+    .info-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+    }
+
+    .info-grid td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e293b;
+      font-size: 14px;
+      color: #f8fafc;
+    }
+
+    .info-grid td.label {
+      font-weight: 600;
+      color: #94a3b8;
+      width: 35%;
+      background-color: #030712;
+    }
+
     .info-card {
       background: #081224;
       border: 1px solid #1e293b;
@@ -152,7 +172,6 @@
 
     <!-- Job Application Receipt -->
     <div class="content" th:if="${#strings.containsIgnoreCase(formType, 'application')}">
-      <span class="badge">CAREER APPLICATION DOSSIER</span>
       <h2 class="status-title">Job Application Received</h2>
 
       <p class="greeting">Dear <span class="name-highlight" th:text="${name}">Valued Candidate</span>,</p>
@@ -164,6 +183,21 @@
         <div class="receipt-id" th:text="${trackingId}">APP-2026-0001</div>
         <div class="status-tag">Status: Queued for HR & Technical Lead Review</div>
       </div>
+
+      <table class="info-grid">
+        <tr>
+          <td class="label">Full Name</td>
+          <td><strong th:text="${name}" style="color: #ffffff;">John Doe</strong></td>
+        </tr>
+        <tr>
+          <td class="label">Submitted Email</td>
+          <td th:text="${userEmail}">john@example.com</td>
+        </tr>
+        <tr>
+          <td class="label">Application Type</td>
+          <td>Job Application / Career Dossier</td>
+        </tr>
+      </table>
 
       <p>Our talent acquisition team and engineering department will review your application carefully against our
         current research and development projects.</p>
@@ -184,7 +218,7 @@
 
     <!-- Contact Inquiry Receipt -->
     <div class="content" th:unless="${#strings.containsIgnoreCase(formType, 'application')}">
-      <h2 class="status-title">Inquiry Acknowledgement</h2>
+      <h2 class="status-title">Contact Inquiry Received</h2>
 
       <p class="greeting">Dear <span class="name-highlight" th:text="${name}">Valued Guest</span>,</p>
       <p>Thank you for contacting <strong>Saturn Textiles R&D</strong>. We have received your inquiry and registered it
@@ -195,6 +229,21 @@
         <div class="receipt-id" th:text="${trackingId}">INQ-2026-0001</div>
         <div class="status-tag">Status: Registered & Assigned to Engineering Team</div>
       </div>
+
+      <table class="info-grid">
+        <tr>
+          <td class="label">Full Name</td>
+          <td><strong th:text="${name}" style="color: #ffffff;">John Doe</strong></td>
+        </tr>
+        <tr>
+          <td class="label">Submitted Email</td>
+          <td th:text="${userEmail}">john@example.com</td>
+        </tr>
+        <tr>
+          <td class="label">Inquiry Type</td>
+          <td>Contact &amp; Project Inquiry</td>
+        </tr>
+      </table>
 
       <p>Our team is dedicated to advancing industrial automation, smart textile engineering, and AI integration. We
         carefully review every incoming technical proposal and business collaboration inquiry.</p>

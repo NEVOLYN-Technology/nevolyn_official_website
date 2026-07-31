@@ -61,27 +61,36 @@
       font-weight: 700;
     }
 
-    .field {
-      margin-bottom: 18px;
-    }
-
-    .label {
+    .section-title {
+      font-size: 12px;
       font-weight: 700;
       color: #f97316;
-      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 6px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 6px;
     }
 
-    .value {
-      background: #030712;
-      border: 1px solid #1e293b;
-      padding: 14px 18px;
-      border-radius: 12px;
-      font-size: 15px;
+    .info-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .info-grid td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e293b;
+      font-size: 14px;
       color: #f8fafc;
-      word-break: break-word;
+    }
+
+    .info-grid td.label {
+      font-weight: 600;
+      color: #94a3b8;
+      width: 35%;
+      background-color: #030712;
     }
 
     .content-box {
@@ -142,65 +151,76 @@
   <div class="container">
     <div class="header">
       <span class="badge" th:text="${formType}">CONTACT INQUIRY</span>
-      <h2 class="title">New Inquiry Submission</h2>
+      <h2 class="title" th:if="${#strings.containsIgnoreCase(formType, 'application')}">New Job Application</h2>
+      <h2 class="title" th:unless="${#strings.containsIgnoreCase(formType, 'application')}">New Project Inquiry</h2>
       <p class="tracking-tag">Reference Code: <strong class="tracking-code"
           th:text="${trackingId}">INQ-2026-0001</strong>
       </p>
     </div>
 
-    <div class="field">
-      <div class="label">Sender Name & Email</div>
-      <div class="value">
-        <strong th:text="${name}" style="color: #ffffff;">John Doe</strong>
-        (&lt;<a th:href="'mailto:' + ${userEmail}" th:text="${userEmail}"
-          style="color: #38bdf8; text-decoration: none;">john@example.com</a>&gt;)
-      </div>
-    </div>
+    <div class="section-title">Submitted Credentials &amp; Submitter Info</div>
+    <table class="info-grid">
+      <tr>
+        <td class="label">Full Name</td>
+        <td><strong th:text="${name}" style="color: #ffffff;">John Doe</strong></td>
+      </tr>
+      <tr>
+        <td class="label">Direct Email</td>
+        <td><a th:href="'mailto:' + ${userEmail}" th:text="${userEmail}"
+            style="color: #38bdf8; text-decoration: none;">john@example.com</a></td>
+      </tr>
+      <tr th:if="${phone != null}">
+        <td class="label">Phone / Contact</td>
+        <td th:text="${phone}">+8801700000000</td>
+      </tr>
+      <tr th:if="${address != null}">
+        <td class="label">Location / Address</td>
+        <td th:text="${address}">Dhaka, Bangladesh</td>
+      </tr>
+      <tr th:if="${subject != null}">
+        <td class="label">Subject Line</td>
+        <td th:text="${subject}">Project Inquiry</td>
+      </tr>
+      <tr th:if="${links != null}">
+        <td class="label">Profiles &amp; Links</td>
+        <td th:text="${links}">LinkedIn / Portfolio Links</td>
+      </tr>
+    </table>
 
-    <div class="field" th:if="${phone != null}">
-      <div class="label">Contact & Location</div>
-      <div class="value"><span th:text="${phone}">+8801700000000</span> | <span th:text="${address}">Dhaka,
-          Bangladesh</span></div>
-    </div>
+    <div class="section-title">Submission Details / Message Body</div>
+    <div class="content-box" th:text="${messageContent}">Sample message body...</div>
 
-    <div class="field" th:if="${subject != null}">
-      <div class="label">Subject</div>
-      <div class="value" th:text="${subject}">Project Inquiry</div>
-    </div>
-
-    <div class="field" th:if="${links != null}">
-      <div class="label">Profiles & Portfolio Links</div>
-      <div class="value" th:text="${links}">LinkedIn: https://...</div>
-    </div>
-
-    <div class="field">
-      <div class="label">Submission Details / Message Body</div>
-      <div class="content-box" th:text="${messageContent}">Sample message body...</div>
-    </div>
-
-    <div class="field" th:if="${hasAttachment}">
+    <div class="field" th:if="${hasAttachment}" style="margin-top: 18px;">
       <div class="attachment-card">
         📎 Candidate Resume / CV Document attached to this notification email.
       </div>
     </div>
 
-    <!-- Interactive Action Button to Reply / Acknowledge -->
+    <!-- 1-Click Automatic Email Acknowledgment -->
     <div class="action-container" th:if="${#strings.containsIgnoreCase(formType, 'application')}">
-      <a th:href="'mailto:' + ${userEmail} + '?subject=Re:%20Saturn%20R%26D%20Job%20Application%20Acknowledgement%20[' + ${trackingId} + ']&body=Dear%20' + ${name} + ',%0A%0AThank%20you%20for%20applying%20to%20join%20the%20Saturn%20Textiles%20R%26D%20team!%0A%0AWe%20have%20received%20your%20Job%20Application%20and%20Candidate%20Dossier%20(Reference%20Code:%20' + ${trackingId} + ').%20Our%20talent%20acquisition%20and%20engineering%20leadership%20team%20has%20logged%20your%20profile%20for%20technical%20evaluation.%0A%0AIf%20your%20qualifications%20align%20with%20our%20current%20research%20and%20engineering%20requirements,%20a%20member%20of%20our%20recruitment%20team%20will%20reach%20out%20to%20schedule%20an%20initial%20interview.%0A%0ABest%20regards,%0ASaturn%20Textiles%20Limited%20-%20Department%20of%20Research%20%26%20Development%0AIndustrial%20Automation%20%26%20AI%20Laboratory'"
-        style="text-decoration: none;">
+      <a th:href="${acknowledgeUrl}" target="_blank" style="text-decoration: none;">
         <button class="btn-acknowledge" type="button">
           📧 Quick Reply: Acknowledge Candidate
         </button>
       </a>
+      <div style="margin-top: 10px; font-size: 12px; color: #64748b;">
+        Or <a
+          th:href="'mailto:' + ${userEmail} + '?subject=Re:%20Saturn%20R%26D%20Job%20Application%20Acknowledgement%20[' + ${trackingId} + ']&body=Dear%20' + ${name} + ',%0A%0AThank%20you%20for%20applying%20to%20join%20the%20Saturn%20Textiles%20R%26D%20team!%0A%0AWe%20have%20received%20your%20Job%20Application%20and%20Candidate%20Dossier%20(Reference%20Code:%20' + ${trackingId} + ').%20Our%20talent%20acquisition%20and%20engineering%20leadership%20team%20has%20logged%20your%20profile%20for%20technical%20evaluation.%0A%0AIf%20your%20qualifications%20align%20with%20our%20current%20research%20and%20engineering%20requirements,%20a%20member%20of%20our%20recruitment%20team%20will%20reach%20out%20to%20schedule%20an%20initial%20interview.%0A%0ABest%20regards,%0ASaturn%20Textiles%20Limited%20-%20Department%20of%20Research%20%26%20Development%0AIndustrial%20Automation%20%26%20AI%20Laboratory'"
+          style="color: #38bdf8; text-decoration: underline;">click here to open Gmail draft compose</a>.
+      </div>
     </div>
 
     <div class="action-container" th:unless="${#strings.containsIgnoreCase(formType, 'application')}">
-      <a th:href="'mailto:' + ${userEmail} + '?subject=Re:%20Saturn%20R%26D%20Inquiry%20Acknowledgement%20[' + ${trackingId} + ']&body=Dear%20' + ${name} + ',%0A%0AThank%20you%20for%20contacting%20Saturn%20Textiles%20Limited%20R%26D%20Department.%0A%0AWe%20have%20received%20your%20Inquiry%20(Reference%20Code:%20' + ${trackingId} + ').%20Our%20engineering%20leadership%20team%20is%20currently%20evaluating%20your%20technical%20proposal.%0A%0AAn%20R%26D%20engineer%20or%20project%20lead%20will%20follow%20up%20with%20you%20shortly.%0A%0ASincerely,%0ASaturn%20Textiles%20Limited%20-%20Department%20of%20Research%20%26%20Development%0AIndustrial%20Automation%20%26%20AI%20Laboratory'"
-        style="text-decoration: none;">
+      <a th:href="${acknowledgeUrl}" target="_blank" style="text-decoration: none;">
         <button class="btn-acknowledge" type="button">
           📧 Quick Reply: Acknowledge Submission
         </button>
       </a>
+      <div style="margin-top: 10px; font-size: 12px; color: #64748b;">
+        Or <a
+          th:href="'mailto:' + ${userEmail} + '?subject=Re:%20Saturn%20R%26D%20Inquiry%20Acknowledgement%20[' + ${trackingId} + ']&body=Dear%20' + ${name} + ',%0A%0AThank%20you%20for%20contacting%20Saturn%20Textiles%20Limited%20R%26D%20Department.%0A%0AWe%20have%20received%20your%20Inquiry%20(Reference%20Code:%20' + ${trackingId} + ').%20Our%20engineering%20leadership%20team%20is%20currently%20evaluating%20your%20technical%20proposal.%0A%0AAn%20R%26D%20engineer%20or%20project%20lead%20will%20follow%20up%20with%20you%20shortly.%0A%0ASincerely,%0ASaturn%20Textiles%20Limited%20-%20Department%20of%20Research%20%26%20Development%0AIndustrial%20Automation%20%26%20AI%20Laboratory'"
+          style="color: #38bdf8; text-decoration: underline;">click here to open Gmail draft compose</a>.
+      </div>
     </div>
 
     <div class="footer">

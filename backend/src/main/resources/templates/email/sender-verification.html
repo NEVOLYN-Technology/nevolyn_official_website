@@ -81,6 +81,26 @@
       font-weight: 700;
     }
 
+    .info-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+    }
+
+    .info-grid td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e293b;
+      font-size: 14px;
+      color: #f8fafc;
+    }
+
+    .info-grid td.label {
+      font-weight: 600;
+      color: #94a3b8;
+      width: 35%;
+      background-color: #030712;
+    }
+
     .status-card {
       background: #070e1c;
       border: 1px solid #1e293b;
@@ -127,6 +147,21 @@
       <p>Thank you for submitting your application to join the <strong>Saturn Textiles R&D Department</strong>. We have
         successfully received your candidate application and resume.</p>
 
+      <table class="info-grid">
+        <tr>
+          <td class="label">Full Name</td>
+          <td><strong th:text="${name}" style="color: #ffffff;">John Doe</strong></td>
+        </tr>
+        <tr>
+          <td class="label">Submitted Email</td>
+          <td th:text="${userEmail}">john@example.com</td>
+        </tr>
+        <tr>
+          <td class="label">Application Type</td>
+          <td>Job Application / Career Dossier</td>
+        </tr>
+      </table>
+
       <div class="status-card">
         📌 <strong>Next Steps:</strong><br />
         • <strong>Review Process:</strong> Our talent acquisition team and engineering heads will evaluate your CV
@@ -143,11 +178,26 @@
 
     <!-- Contact / Project Inquiry Form Notification -->
     <div class="content" th:unless="${#strings.containsIgnoreCase(formType, 'application')}">
-      <h2 class="title">Inquiry Submission Received</h2>
+      <h2 class="title">Contact Inquiry Received</h2>
 
       <p>Dear <span class="name-highlight" th:text="${name}">Valued Guest</span>,</p>
       <p>Thank you for reaching out to <strong>Saturn Textiles R&D Department</strong>. We have successfully received
         your inquiry.</p>
+
+      <table class="info-grid">
+        <tr>
+          <td class="label">Full Name</td>
+          <td><strong th:text="${name}" style="color: #ffffff;">John Doe</strong></td>
+        </tr>
+        <tr>
+          <td class="label">Submitted Email</td>
+          <td th:text="${userEmail}">john@example.com</td>
+        </tr>
+        <tr>
+          <td class="label">Inquiry Type</td>
+          <td>Contact &amp; Project Inquiry</td>
+        </tr>
+      </table>
 
       <div class="status-card">
         📩 <strong>Expected Response Time:</strong><br />

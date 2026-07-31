@@ -130,6 +130,8 @@ public class EmailService {
 
         Context context = new Context();
         context.setVariable("name", name);
+        context.setVariable("email", recipientEmail);
+        context.setVariable("userEmail", recipientEmail);
         context.setVariable("formType", formTypeLabel);
         context.setVariable("verifyUrl", verifyUrl);
 
@@ -177,20 +179,25 @@ public class EmailService {
 
         File attachment = resolveAttachment(attachmentFilePath);
 
+        String acknowledgeUrl = resolveFrontendUrl() + "/api/v1/acknowledge?trackingId=" + trackingId;
+
         Context context = new Context();
         context.setVariable("formType", formType.toUpperCase());
         context.setVariable("trackingId", trackingId);
         context.setVariable("name", name);
         context.setVariable("userEmail", userEmail);
+        context.setVariable("email", userEmail);
         context.setVariable("phone", phone);
         context.setVariable("address", address);
         context.setVariable("subject", subject);
         context.setVariable("links", links);
         context.setVariable("messageContent", messageContent);
         context.setVariable("hasAttachment", attachment != null);
+        context.setVariable("acknowledgeUrl", acknowledgeUrl);
 
         String htmlContent = templateEngine.process("email/admin-notification", context);
-        String mailSubject = "[NEW SUBMISSION] " + formType + ": " + trackingId + " - " + name;
+        String subjectTag = formType.toLowerCase().contains("application") ? "[NEW JOB APPLICATION]" : "[NEW CONTACT INQUIRY]";
+        String mailSubject = subjectTag + " " + trackingId + " - " + name;
 
         dispatch(adminEmail, mailSubject, htmlContent, userEmail, attachment);
     }
@@ -213,11 +220,14 @@ public class EmailService {
 
         Context context = new Context();
         context.setVariable("name", name);
+        context.setVariable("email", recipientEmail);
+        context.setVariable("userEmail", recipientEmail);
         context.setVariable("trackingId", trackingId);
         context.setVariable("formType", formType.toLowerCase());
 
         String htmlContent = templateEngine.process("email/user-acknowledgement", context);
-        String subject = "Submission Receipt Acknowledgement [" + trackingId + "] - Saturn R&D";
+        String subjectPrefix = formType.toLowerCase().contains("application") ? "Job Application Receipt" : "Contact Inquiry Receipt";
+        String subject = subjectPrefix + " [" + trackingId + "] - Saturn R&D";
 
         dispatch(recipientEmail, subject, htmlContent, null, null);
     }
