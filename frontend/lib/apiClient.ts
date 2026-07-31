@@ -46,19 +46,20 @@ export interface ApiMeta {
  * redeploy — editing the variable alone will not update a already-built bundle.
  */
 const getApiBaseUrl = (): string => {
-  const envUrl = process.env.NEXT_PUBLIC_API_URL
-  // If envUrl is provided and not pointing to localhost, use it
-  if (envUrl && !envUrl.includes('localhost')) {
-    return envUrl
+  let url = process.env.NEXT_PUBLIC_API_URL
+  if (!url || url.includes('localhost')) {
+    url = process.env.NODE_ENV === 'production'
+      ? 'https://saturn-rnd-backend.onrender.com/api/v1'
+      : (url ?? 'http://localhost:8080/api/v1')
   }
-  // In production builds (Vercel), always default to the live Render backend
-  if (process.env.NODE_ENV === 'production') {
-    return 'https://saturn-rnd-backend.onrender.com/api/v1'
+  url = url.replace(/\/+$/, '')
+  if (!url.endsWith('/api/v1')) {
+    url = `${url}/api/v1`
   }
-  return envUrl ?? 'http://localhost:8080/api/v1'
+  return url
 }
 
-const API_BASE_URL = getApiBaseUrl().replace(/\/+$/, '')
+const API_BASE_URL = getApiBaseUrl()
 
 /**
  * Request timeout in milliseconds.
