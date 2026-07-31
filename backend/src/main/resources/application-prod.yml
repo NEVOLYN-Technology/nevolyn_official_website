@@ -203,4 +203,4 @@ app:
     #   https://saturn-rnd.com,https://www.saturn-rnd.com,https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app
     # Origins are scheme- and host-exact: https://saturn-rnd.com does NOT cover
     # www., and must never be written with a trailing slash.
-    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app}
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:*}

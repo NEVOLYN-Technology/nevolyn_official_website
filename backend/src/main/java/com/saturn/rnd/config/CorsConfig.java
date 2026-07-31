@@ -32,7 +32,7 @@ public class CorsConfig {
      * and overridable per environment with {@code APP_CORS_ALLOWED_ORIGINS}.
      * Spring converts the comma-separated value into this list automatically.
      */
-    @Value("${app.cors.allowed-origins:http://localhost:3000,https://saturn-rnd.vercel.app}")
+    @Value("${app.cors.allowed-origins:*}")
     private List<String> allowedOrigins;
 
     /**

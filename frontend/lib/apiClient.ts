@@ -45,9 +45,20 @@ export interface ApiMeta {
  * NEXT_PUBLIC_* values are inlined at build time, so changing it requires a
  * redeploy — editing the variable alone will not update a already-built bundle.
  */
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? 'https://saturn-rnd-backend.onrender.com/api/v1'
-).replace(/\/+$/, '')
+const getApiBaseUrl = (): string => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL
+  // If envUrl is provided and not pointing to localhost, use it
+  if (envUrl && !envUrl.includes('localhost')) {
+    return envUrl
+  }
+  // In production builds (Vercel), always default to the live Render backend
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://saturn-rnd-backend.onrender.com/api/v1'
+  }
+  return envUrl ?? 'http://localhost:8080/api/v1'
+}
+
+const API_BASE_URL = getApiBaseUrl().replace(/\/+$/, '')
 
 /**
  * Request timeout in milliseconds.
