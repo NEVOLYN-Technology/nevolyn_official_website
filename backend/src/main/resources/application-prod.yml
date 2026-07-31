@@ -18,6 +18,28 @@ server:
 
 spring:
   # --------------------------------------------------------------------------
+  # Lazy initialisation — critical for Render free-tier cold starts
+  # --------------------------------------------------------------------------
+  # Spring Boot only binds the HTTP port AFTER the entire ApplicationContext
+  # has refreshed. On Render's free tier, the managed Postgres instance may be
+  # suspended and needs 50-60 s to wake up before HikariCP can connect. That
+  # pushes total startup past Render's port-detection timeout (~90 s), causing
+  # every deploy to be marked as Timed Out even though the app eventually starts.
+  #
+  # With lazy-initialization=true, Spring Boot binds the web server to $PORT
+  # in ~15 s (JVM + framework init only), then initialises database beans
+  # (HikariCP, Flyway, Hibernate) on the first request. Render detects the port
+  # quickly and starts polling /actuator/health. The health check returns DOWN
+  # while the DB is waking up and UP once HikariCP, Flyway and schema
+  # validation have completed. Render promotes the deploy only after it sees UP.
+  #
+  # Trade-off: the very first request after a cold start is slower because the
+  # DB connection pool and schema validation run inline. This is acceptable on a
+  # portfolio service where the PaaS platform itself sleeps the instance anyway.
+  main:
+    lazy-initialization: true
+
+  # --------------------------------------------------------------------------
   # PostgreSQL datasource
   # --------------------------------------------------------------------------
   # These three properties are normally supplied at runtime by the
@@ -49,12 +71,22 @@ spring:
     hikari:
       maximum-pool-size: ${DB_POOL_MAX:5}
       minimum-idle: ${DB_POOL_MIN:1}
-      # Fail fast rather than letting a request hang for the default 30s.
+      # How long a caller waits for a connection from the pool before throwing.
+      # 10 s is tight enough to surface real outages quickly yet generous enough
+      # to survive a single HikariCP retry cycle while Postgres wakes up.
       connection-timeout: 10000
+      # -1 means HikariCP does not require a successful connection during pool
+      # initialisation; it returns the pool immediately and connects on demand.
+      # Combined with lazy-initialization=true this lets the web server bind and
+      # serve health checks while the database is still waking up.
+      initialization-fail-timeout: -1
       # Recycle below Postgres' own idle timeout so the pool never hands out a
       # connection the server has already closed.
       idle-timeout: 300000
       max-lifetime: 900000
+      # Send a keep-alive ping every 60 s so the Render Postgres proxy does not
+      # silently drop idle connections between cold-start requests.
+      keepalive-time: 60000
 
   # --------------------------------------------------------------------------
   # Flyway — owns the production schema
@@ -72,7 +104,10 @@ spring:
     baseline-version: 0
 
   jpa:
-    # Dialect is detected from the live connection — see application.yml.
+    # Dialect is intentionally NOT set: Hibernate detects it from the live
+    # JDBC connection metadata. Setting it explicitly triggers HHH90000025.
+    # If the env var SPRING_JPA_DATABASE_PLATFORM is set in the Render
+    # dashboard, remove it — that is the only remaining source of the warning.
     open-in-view: false
     hibernate:
       # 'validate' — Hibernate compares the entities against the schema Flyway
