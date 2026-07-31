@@ -35,6 +35,9 @@ RUN addgroup -S saturn \
 
 COPY --from=builder --chown=saturn:saturn /app/app.jar app.jar
 
+# Set default active profile to prod for Docker containers
+ENV SPRING_PROFILES_ACTIVE=prod
+
 # Drop privileges for everything that follows.
 USER saturn:saturn
 
