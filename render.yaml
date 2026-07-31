@@ -74,6 +74,10 @@ services:
       - key: APP_FRONTEND_URL
         value: https://saturn-rnd.vercel.app
 
+      # Origin used to build 1-click acknowledge button links in admin emails.
+      - key: APP_BACKEND_URL
+        value: https://saturn-rnd-backend.onrender.com
+
       # ----------------------------------------------------------------------
       # Mail (Brevo)
       # ----------------------------------------------------------------------
