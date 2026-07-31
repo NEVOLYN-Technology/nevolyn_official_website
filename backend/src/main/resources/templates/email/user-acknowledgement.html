@@ -3,36 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Submission Receipt Acknowledgement — Saturn R&D</title>
+  <title>Submission Receipt — Saturn R&D</title>
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #030a15; color: #e2e8f0; margin: 0; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; background: #0a1526; border: 1px solid #1e293b; border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #1e293b; }
-    .logo { color: #f97316; font-size: 24px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-    .content { padding: 24px 0; line-height: 1.6; }
-    .receipt-card { background: #030a15; border: 1px border-slate-800; border-left: 4px solid #f97316; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .footer { text-align: center; font-size: 12px; color: #64748b; margin-top: 30px; border-top: 1px solid #1e293b; padding-top: 20px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #030712; color: #f1f5f9; margin: 0; padding: 24px; }
+    .container { max-width: 600px; margin: 0 auto; background: linear-gradient(145deg, #0b172a 0%, #070f1e 100%); border: 1px solid #1e3a8a; border-radius: 20px; padding: 36px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); }
+    .header { text-align: center; padding-bottom: 24px; border-bottom: 1px solid #1e293b; }
+    .brand-title { color: #38bdf8; font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; }
+    .sub-brand { color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
+    .content { padding: 28px 0; line-height: 1.6; color: #cbd5e1; font-size: 15px; }
+    .status-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .status-title { color: #38bdf8; font-size: 20px; font-weight: 700; margin: 0; }
+    .receipt-box { background: #0b1324; border: 1px solid #1d4ed8/40; border-left: 4px solid #3b82f6; border-radius: 12px; padding: 20px; margin: 24px 0; }
+    .receipt-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+    .receipt-id { font-size: 22px; font-weight: 800; color: #60a5fa; margin-top: 6px; letter-spacing: 0.5px; }
+    .info-card { background: #070e1c; border: 1px solid #1e293b; border-radius: 10px; padding: 16px; margin-top: 20px; font-size: 13px; color: #94a3b8; }
+    .footer { text-align: center; font-size: 12px; color: #475569; margin-top: 32px; border-top: 1px solid #1e293b; padding-top: 20px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">Saturn Textiles R&D</div>
+      <h1 class="brand-title">Saturn Textiles R&D</h1>
+      <div class="sub-brand">Industrial AI & Automation Laboratory</div>
     </div>
-    <div class="content">
-      <h2 style="color: #22c55e;">✔ Email Verified & Submission Received</h2>
-      <p>Dear <strong th:text="${name}">User</strong>,</p>
-      <p>Thank you for verifying your email address. Your <span th:text="${formType}">submission</span> has been successfully logged with our engineering & leadership team.</p>
 
-      <div class="receipt-card">
-        <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Official Tracking Reference</div>
-        <div style="font-size: 20px; font-weight: bold; color: #f97316; margin-top: 4px;" th:text="${trackingId}">INQ-2026-0001</div>
+    <div class="content">
+      <div class="status-header">
+        <h2 class="status-title">Submission Confirmed & Received</h2>
       </div>
 
-      <p>Our team reviews inquiries and applications regularly. If your submission requires a direct response, a representative will reach out to you directly at this email address.</p>
+      <p>Dear <strong th:text="${name}" style="color: #ffffff;">User</strong>,</p>
+      <p>Thank you for submitting your <span th:text="${formType}">inquiry</span> to Saturn Textiles R&D. Your dossier has been logged directly with our engineering leadership team.</p>
+
+      <div class="receipt-box">
+        <div class="receipt-label">Official Tracking Reference Code</div>
+        <div class="receipt-id" th:text="${trackingId}">INQ-2026-0001</div>
+      </div>
+
+      <div class="info-card">
+        📩 <strong>What happens next:</strong> Our R&D leadership team will review your submission. If your inquiry requires a follow-up, an engineering representative will reach out directly to this email address.
+      </div>
     </div>
+
     <div class="footer">
-      Saturn Textiles Limited R&D Department | Industrial AI & Automation
+      © Saturn Textiles Limited R&D Department | Industrial Automation & AI
     </div>
   </div>
 </body>

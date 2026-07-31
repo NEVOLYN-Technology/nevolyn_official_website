@@ -98,7 +98,7 @@ export const SuccessModal = ({
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
                 What happens next:
               </p>
-              
+
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                   1
