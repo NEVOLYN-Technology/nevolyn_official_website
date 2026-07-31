@@ -15,7 +15,7 @@
 # ==============================================================================
 
 server:
-  port: 8080
+  port: ${PORT:8080}
   servlet:
     # Root context: endpoints are /api/v1/** with no extra prefix. Changing this
     # also changes every URL the frontend calls — keep it in sync with
