@@ -1,46 +1,164 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Alert — New Submission</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #030712; color: #f1f5f9; margin: 0; padding: 24px; }
-    .container { max-width: 650px; margin: 0 auto; background: linear-gradient(145deg, #0f172a 0%, #0a1322 100%); border: 1px solid #1e293b; border-radius: 20px; padding: 36px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); }
-    .header { border-bottom: 2px solid #f97316; padding-bottom: 20px; margin-bottom: 24px; }
-    .badge { display: inline-block; background: linear-gradient(135deg, #ea580c 0%, #f97316 100%); color: #ffffff; font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
-    .title { margin: 14px 0 4px 0; color: #ffffff; font-size: 24px; font-weight: 800; }
-    .tracking-tag { color: #94a3b8; font-size: 14px; margin: 0; }
-    .tracking-code { color: #f97316; font-weight: 700; }
-    .field { margin-bottom: 18px; }
-    .label { font-weight: 700; color: #f97316; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .value { background: #030712; border: 1px solid #1e293b; padding: 14px 18px; border-radius: 12px; font-size: 15px; color: #f8fafc; word-break: break-word; }
-    .content-box { background: #030712; border-left: 4px solid #f97316; padding: 18px; border-radius: 8px; white-space: pre-wrap; font-size: 14px; color: #e2e8f0; line-height: 1.6; }
-    .attachment-card { background: #022c22; border: 1px solid #059669/40; border-radius: 12px; padding: 14px 18px; color: #34d399; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .action-container { margin: 28px 0 12px 0; text-align: center; }
-    .btn-acknowledge { display: inline-block; background: linear-gradient(135deg, #ea580c 0%, #f97316 100%); color: #ffffff !important; text-decoration: none; font-weight: 700; font-size: 15px; padding: 16px 32px; border-radius: 14px; box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35); transition: all 0.2s ease; }
-    .footer { text-align: center; font-size: 12px; color: #475569; margin-top: 32px; border-top: 1px solid #1e293b; padding-top: 20px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #030712;
+      color: #f1f5f9;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      background: linear-gradient(145deg, #0f172a 0%, #0a1322 100%);
+      border: 1px solid #1e293b;
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .header {
+      border-bottom: 2px solid #f97316;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+
+    .title {
+      margin: 14px 0 4px 0;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .tracking-tag {
+      color: #94a3b8;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .tracking-code {
+      color: #f97316;
+      font-weight: 700;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .label {
+      font-weight: 700;
+      color: #f97316;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .value {
+      background: #030712;
+      border: 1px solid #1e293b;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 15px;
+      color: #f8fafc;
+      word-break: break-word;
+    }
+
+    .content-box {
+      background: #030712;
+      border-left: 4px solid #f97316;
+      padding: 18px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    .attachment-card {
+      background: #022c22;
+      border: 1px solid #059669/40;
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #34d399;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-container {
+      margin: 28px 0 12px 0;
+      text-align: center;
+    }
+
+    .btn-acknowledge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 16px 32px;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #475569;
+      margin-top: 32px;
+      border-top: 1px solid #1e293b;
+      padding-top: 20px;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
       <span class="badge" th:text="${formType}">CONTACT INQUIRY</span>
       <h2 class="title">New Website Submission</h2>
-      <p class="tracking-tag">Tracking ID: <strong class="tracking-code" th:text="${trackingId}">INQ-2026-0001</strong></p>
+      <p class="tracking-tag">Tracking ID: <strong class="tracking-code" th:text="${trackingId}">INQ-2026-0001</strong>
+      </p>
     </div>
 
     <div class="field">
       <div class="label">Sender Name & Email</div>
       <div class="value">
-        <strong th:text="${name}" style="color: #ffffff;">John Doe</strong> 
-        (&lt;<a th:href="'mailto:' + ${userEmail}" th:text="${userEmail}" style="color: #38bdf8; text-decoration: none;">john@example.com</a>&gt;)
+        <strong th:text="${name}" style="color: #ffffff;">John Doe</strong>
+        (&lt;<a th:href="'mailto:' + ${userEmail}" th:text="${userEmail}"
+          style="color: #38bdf8; text-decoration: none;">john@example.com</a>&gt;)
       </div>
     </div>
 
     <div class="field" th:if="${phone != null}">
       <div class="label">Phone & Address</div>
-      <div class="value"><span th:text="${phone}">+8801700000000</span> | <span th:text="${address}">Dhaka, Bangladesh</span></div>
+      <div class="value"><span th:text="${phone}">+8801700000000</span> | <span th:text="${address}">Dhaka,
+          Bangladesh</span></div>
     </div>
 
     <div class="field" th:if="${subject != null}">
@@ -66,14 +184,19 @@
 
     <!-- Interactive Action Button to Reply / Acknowledge -->
     <div class="action-container">
-      <a th:href="'mailto:' + ${userEmail} + '?subject=Re:%20Saturn%20R%26D%20' + ${formType} + '%20[' + ${trackingId} + ']'" class="btn-acknowledge">
-        📧 Click to Acknowledge & Reply to Sender
+      <a
+        th:href="'mailto:' + ${userEmail} + '?subject=Re:%20Saturn%20R%26D%20' + ${formType} + '%20Submission%20Acknowledgement%20[' + ${trackingId} + ']&body=Dear%20' + ${name} + ',%0A%0AThank%20you%20for%20reaching%20out%20to%20Saturn%20Textiles%20Limited%20R%26D%20Department.%0A%0AWe%20have%20received%20your%20' + ${formType} + '%20(Tracking%20ID:%20' + ${trackingId} + ').%20Our%20engineering%20leadership%20team%20has%20logged%20your%20submission%20dossier%20and%20is%20currently%20evaluating%20it.%0A%0AIf%20you%20have%20any%20additional%20questions%20or%20updates,%20please%20reply%20directly%20to%20this%20email.%0A%0ABest%20regards,%0ASaturn%20Textiles%20Limited%20-%20Department%20of%20Research%20%26%20Development%0AIndustrial%20Automation%20%26%20AI%20Laboratory'"
+        style="text-decoration: none;">
+        <button class="btn-acknowledge" type="button">
+          📧 Click to Acknowledge &amp; Send Reply
+        </button>
       </a>
     </div>
 
     <div class="footer">
-      Saturn Textiles Limited R&D REST API Platform | Automated System Dispatch
+      Saturn Textiles Limited - Department of Research & Development
     </div>
   </div>
 </body>
+
 </html>
