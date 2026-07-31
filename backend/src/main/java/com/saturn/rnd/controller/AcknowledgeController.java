@@ -31,33 +31,62 @@ public class AcknowledgeController {
 
     @GetMapping(value = "/api/v1/acknowledge", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> acknowledgeSubmission(@RequestParam("trackingId") String trackingId) {
-        log.info("Processing 1-click automatic email acknowledgment for trackingId='{}'", trackingId);
+        String cleanId = trackingId != null ? trackingId.trim() : "";
+        log.info("Processing 1-click automatic email acknowledgment for trackingId='{}'", cleanId);
 
         String recipientName = "User";
         String recipientEmail = "";
         String typeLabel = "Submission";
         boolean found = false;
 
-        if (trackingId != null && trackingId.toUpperCase().startsWith("APP-")) {
-            Optional<JobApplication> appOpt = applicationRepository.findByApplicationId(trackingId);
-            if (appOpt.isPresent()) {
-                JobApplication app = appOpt.get();
-                recipientName = app.getName();
-                recipientEmail = app.getEmail();
-                typeLabel = "Job Application";
-                emailService.sendUserAcknowledgementEmail(recipientEmail, recipientName, trackingId, typeLabel);
-                found = true;
+        try {
+            if (!cleanId.isEmpty()) {
+                // Try JobApplication first if ID starts with APP or APP-
+                if (cleanId.toUpperCase().startsWith("APP")) {
+                    Optional<JobApplication> appOpt = applicationRepository.findByApplicationId(cleanId);
+                    if (appOpt.isPresent()) {
+                        JobApplication app = appOpt.get();
+                        recipientName = app.getName();
+                        recipientEmail = app.getEmail();
+                        typeLabel = "Job Application";
+                        found = true;
+                    }
+                }
+                
+                // Try ContactInquiry if not found yet
+                if (!found) {
+                    Optional<ContactInquiry> inquiryOpt = contactRepository.findByInquiryId(cleanId);
+                    if (inquiryOpt.isPresent()) {
+                        ContactInquiry inquiry = inquiryOpt.get();
+                        recipientName = inquiry.getName();
+                        recipientEmail = inquiry.getEmail();
+                        typeLabel = "Contact Inquiry";
+                        found = true;
+                    }
+                }
+
+                // Fallback attempt for JobApplication if not starting with APP
+                if (!found && !cleanId.toUpperCase().startsWith("APP")) {
+                    Optional<JobApplication> appOpt = applicationRepository.findByApplicationId(cleanId);
+                    if (appOpt.isPresent()) {
+                        JobApplication app = appOpt.get();
+                        recipientName = app.getName();
+                        recipientEmail = app.getEmail();
+                        typeLabel = "Job Application";
+                        found = true;
+                    }
+                }
             }
-        } else if (trackingId != null) {
-            Optional<ContactInquiry> inquiryOpt = contactRepository.findByInquiryId(trackingId);
-            if (inquiryOpt.isPresent()) {
-                ContactInquiry inquiry = inquiryOpt.get();
-                recipientName = inquiry.getName();
-                recipientEmail = inquiry.getEmail();
-                typeLabel = "Contact Inquiry";
-                emailService.sendUserAcknowledgementEmail(recipientEmail, recipientName, trackingId, typeLabel);
-                found = true;
+
+            if (found && recipientEmail != null && !recipientEmail.isBlank()) {
+                try {
+                    emailService.sendUserAcknowledgementEmail(recipientEmail, recipientName, cleanId, typeLabel);
+                } catch (Exception ex) {
+                    log.error("Failed to dispatch user acknowledgement email for trackingId='{}'", cleanId, ex);
+                }
             }
+        } catch (Exception e) {
+            log.error("Error looking up submission record for trackingId='{}'", cleanId, e);
         }
 
         String html;
@@ -70,13 +99,13 @@ public class AcknowledgeController {
                   <meta name="viewport" content="width=device-width, initial-scale=1.0">
                   <title>Acknowledgement Email Sent — Saturn R&D</title>
                   <style>
-                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #030712; color: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
-                    .card { background: linear-gradient(145deg, #0b172a 0%, #070f1e 100%); border: 1px solid #1e3a8a; border-radius: 24px; padding: 40px; text-align: center; max-width: 500px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-                    .icon-badge { width: 64px; h-64px; background: rgba(5, 150, 105, 0.2); border: 1px solid rgba(5, 150, 105, 0.4); color: #34d399; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px; }
-                    h1 { color: #38bdf8; font-size: 24px; font-weight: 800; margin: 0 0 12px 0; }
-                    p { color: #94a3b8; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0; }
-                    .details { background: #070e1c; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; font-size: 14px; color: #cbd5e1; text-align: left; }
-                    .code { color: #f97316; font-weight: 700; }
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
+                    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px; text-align: center; max-width: 500px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+                    .icon-badge { width: 64px; height: 64px; background: #dcfce7; border: 1px solid #86efac; color: #15803d; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px; font-weight: bold; }
+                    h1 { color: #0f172a; font-size: 24px; font-weight: 800; margin: 0 0 12px 0; }
+                    p { color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0; }
+                    .details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; font-size: 14px; color: #334155; text-align: left; line-height: 1.8; }
+                    .code { color: #ea580c; font-weight: 700; }
                   </style>
                 </head>
                 <body>
@@ -92,29 +121,32 @@ public class AcknowledgeController {
                   </div>
                 </body>
                 </html>
-                """.formatted(trackingId, recipientName, recipientEmail);
+                """.formatted(cleanId, recipientName, recipientEmail);
         } else {
             html = """
                 <!DOCTYPE html>
                 <html>
                 <head>
                   <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
                   <title>Submission Not Found — Saturn R&D</title>
                   <style>
-                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #030712; color: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
-                    .card { background: #0b172a; border: 1px solid #991b1b; border-radius: 24px; padding: 40px; text-align: center; max-width: 480px; }
-                    h1 { color: #f87171; font-size: 22px; }
-                    p { color: #94a3b8; font-size: 14px; }
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
+                    .card { background: #ffffff; border: 1px solid #fecaca; border-radius: 16px; padding: 40px; text-align: center; max-width: 480px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+                    .icon-badge { width: 64px; height: 64px; background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px; font-weight: bold; }
+                    h1 { color: #991b1b; font-size: 22px; margin: 0 0 12px 0; }
+                    p { color: #475569; font-size: 14px; line-height: 1.6; }
                   </style>
                 </head>
                 <body>
                   <div class="card">
+                    <div class="icon-badge">!</div>
                     <h1>Reference Code Not Found</h1>
-                    <p>Could not locate submission record for tracking code <strong>%s</strong>.</p>
+                    <p>Could not locate active submission record for reference code <strong>%s</strong>.</p>
                   </div>
                 </body>
                 </html>
-                """.formatted(trackingId);
+                """.formatted(cleanId);
         }
 
         return ResponseEntity.ok(html);
