@@ -102,22 +102,15 @@ spring:
   # looks like "email silently not sending". See docs/CICD_AND_DEPLOYMENT.md §3.
   mail:
     host: ${SPRING_MAIL_HOST:smtp-relay.brevo.com}
-    port: ${SPRING_MAIL_PORT:465}
-    username: ${SPRING_MAIL_USERNAME:}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:b3c905001@smtp-brevo.com}
     password: ${SPRING_MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
           auth: true
-          # ssl.enable = implicit TLS from the first byte (port 465).
-          # This is mutually exclusive with starttls, which must stay off.
-          ssl:
-            enable: true
-            trust: ${SPRING_MAIL_HOST:smtp-relay.brevo.com}
           starttls:
-            enable: false
-          # Bound every phase of the SMTP conversation. Without these an
-          # unreachable relay pins an async worker thread indefinitely.
+            enable: true
           connectiontimeout: 10000
           timeout: 10000
           writetimeout: 10000
@@ -180,8 +173,8 @@ app:
     upload-dir: ${APP_UPLOAD_DIR:/app/uploads/resumes}
 
   email:
-    from: ${APP_EMAIL_FROM:noreply@saturn-rnd.com}
-    admin: ${APP_EMAIL_ADMIN:admin@saturn-rnd.com}
+    from: ${APP_EMAIL_FROM:saturn.rnd.innovation@gmail.com}
+    admin: ${APP_EMAIL_ADMIN:saturn.rnd.innovation@gmail.com}
     sender-name: ${APP_EMAIL_SENDER_NAME:Saturn Textiles R&D}
     #
     # FUTURE CUSTOM DOMAIN INSTRUCTIONS

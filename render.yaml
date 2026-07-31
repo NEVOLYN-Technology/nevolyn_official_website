@@ -77,25 +77,18 @@ services:
       # ----------------------------------------------------------------------
       # Mail (Brevo)
       # ----------------------------------------------------------------------
-      # SPRING_MAIL_PASSWORD doubles as the Brevo API key. A value starting with
-      # 'xsmtpsib-' switches EmailService to the HTTPS REST engine (port 443),
-      # which is immune to Render's outbound SMTP port block. Anything else
-      # falls back to SMTPS on 465.
       - key: SPRING_MAIL_PASSWORD
         sync: false
       - key: SPRING_MAIL_USERNAME
-        sync: false
+        value: b3c905001@smtp-brevo.com
       - key: SPRING_MAIL_HOST
         value: smtp-relay.brevo.com
       - key: SPRING_MAIL_PORT
-        value: 465
-
-      # Envelope sender — must be a Brevo-verified sender or the API returns 400.
+        value: "587"
       - key: APP_EMAIL_FROM
-        sync: false
-      # Destination for verified-submission dossiers.
+        value: saturn.rnd.innovation@gmail.com
       - key: APP_EMAIL_ADMIN
-        sync: false
+        value: saturn.rnd.innovation@gmail.com
 
 # ------------------------------------------------------------------------------
 # Managed PostgreSQL
