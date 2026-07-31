@@ -16,6 +16,16 @@
 
     <properties>
         <java.version>21</java.version>
+        <!--
+            Render provisions PostgreSQL 18.x. The Flyway 10.x version that
+            Spring Boot 3.4.2 manages does not support PG 18: it emits a WARN
+            and may hang or throw BeanCreationException during migration, which
+            prevents the HTTP server from ever binding — Render sees "No open
+            ports" and kills the deploy. Flyway 11.x adds first-class PG 18
+            support; override the managed version here to unblock deployment.
+            Keep this pinned until Spring Boot itself upgrades its managed version.
+        -->
+        <flyway.version>11.10.0</flyway.version>
     </properties>
 
     <dependencies>
