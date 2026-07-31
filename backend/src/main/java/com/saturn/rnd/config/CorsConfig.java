@@ -75,15 +75,12 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/v1/**")
-                        .allowedOriginPatterns(allowedOrigins.toArray(new String[0]))
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                registry.addMapping("/**")
+                        .allowedOriginPatterns("https://saturn-rnd.vercel.app", "https://saturn-rnd-*.vercel.app", "https://*.vercel.app", "http://localhost:3000", "http://127.0.0.1:3000", "*")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
                         .allowedHeaders("*")
-                        .allowCredentials(true)
-                        // Cache the preflight result for an hour so the browser
-                        // stops sending an OPTIONS round-trip before every POST.
-                        // On a cold-starting free instance that preflight is the
-                        // request that pays the wake-up cost.
+                        .exposedHeaders("*")
+                        .allowCredentials(false)
                         .maxAge(3600);
             }
         };
