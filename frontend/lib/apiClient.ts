@@ -61,7 +61,7 @@ const API_BASE_URL = (
  *
  * Drop this to ~15s once the backend moves to an always-on paid instance.
  */
-const REQUEST_TIMEOUT_MS = 60_000
+const REQUEST_TIMEOUT_MS = 120_000
 
 /** Builds the rejection value used for transport-level failures. */
 function transportError(statusCode: number, errorCode: string, message: string): ApiErrorResponse {
