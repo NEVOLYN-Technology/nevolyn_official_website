@@ -1,4 +1,4 @@
-# Saturn Textiles R&D — Monorepo
+# Saturn Textiles R&D — Website
 
 > Official web platform for the **Research & Development Department of Saturn Textiles Limited**, showcasing innovations in smart textile automation, AI integration, and high-performance industrial solutions.
 
