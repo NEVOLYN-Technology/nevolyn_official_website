@@ -1,5 +1,5 @@
 /**
- * globals.css — global styles for saturn-rnd-portfolio.
+ * globals.css — global styles for NEVOLYN Technology official website.
  *
  * Structure:
  * 1. Tailwind CSS imports
@@ -66,55 +66,25 @@
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
   color-scheme: light;
-  --background: #ffffff;
-  --foreground: #0b1f3a;
-  --card: #f8fafc;
-  --card-foreground: #0b1f3a;
-  --primary: #0b1f3a;
+  --background: #ecf1f6;
+  --foreground: #0f172a;
+  --card: #f9fafb;
+  --card-foreground: #0f172a;
+  --primary: #0ea5e9;
   --primary-foreground: #ffffff;
-  --secondary: #2563eb;
+  --secondary: #06b6d4;
   --secondary-foreground: #ffffff;
-  --muted: #e2e8f0;
+  --muted: #f1f5f9;
   --muted-foreground: #64748b;
-  --accent: #2563eb;
+  --accent: #38bdf8;
   --accent-foreground: #ffffff;
-  --destructive: #dc2626;
+  --destructive: #ef4444;
   --border: #e2e8f0;
-  --input: #f1f5f9;
-  --ring: #2563eb;
+  --input: #ffffff;
+  --ring: #38bdf8;
   --chart-3: #10b981;
-  /* badge success (green)  */
   --chart-4: #f59e0b;
-  /* badge warning (amber)  */
-  --radius: 0.625rem;
-}
-
-/* ── Dark theme tokens (ACTIVE) ─────────────────────────────────────────────
-   Applied globally because <html> has className="dark" in app/layout.tsx.
-   ─────────────────────────────────────────────────────────────────────────── */
-.dark {
-  color-scheme: dark;
-  --background: #020914;
-  --foreground: #e8edf2;
-  --card: #2a3038;
-  --card-foreground: #e8edf2;
-  --primary: #edf1f5;
-  --primary-foreground: #20252b;
-  --secondary: #2563eb;
-  --secondary-foreground: #ffffff;
-  --muted: #3a424c;
-  --muted-foreground: #cbd5e1;
-  --accent: #60a5fa;
-  --accent-foreground: #20252b;
-  --destructive: #f87171;
-  --border: #334155;
-  --input: #1e3a5f;
-  --ring: #60a5fa;
-  --chart-3: #10b981;
-  /* badge success (green)  */
-  --chart-4: #fbbf24;
-  /* badge warning (amber)  */
-  --radius: 0.625rem;
+  --radius: 0.75rem;
 }
 
 @layer base {
@@ -123,25 +93,49 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
   }
 }
 
-/* Pulsing border animation on hover */
-@keyframes borderPulse {
+/* Subtle precision technical grid matching FABINS */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.09) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
 
-  0%,
-  100% {
-    border-color: rgba(249, 115, 22, 1);
-    box-shadow: 0 0 30px rgba(249, 115, 22, 0.45), 0 0 60px rgba(249, 115, 22, 0.2);
+/* Marquee infinite scroll animation */
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0);
   }
-
-  50% {
-    border-color: rgba(249, 115, 22, 0.25);
-    box-shadow: 0 0 8px rgba(249, 115, 22, 0.1);
+  to {
+    transform: translateX(-50%);
   }
 }
 
-.hover-border-blink:hover {
-  animation: borderPulse 1.2s infinite ease-in-out;
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Technical Checkered Divider Stripe to distinguish sections - Thinner & Refined */
+.tech-check-stripe {
+  position: relative;
+  width: 100%;
+  height: 5px;
+  background-image: repeating-conic-gradient(
+    rgba(100, 116, 139, 0.28) 0% 25%,
+    rgba(255, 255, 255, 0.6) 0% 50%
+  );
+  background-size: 6px 6px;
+  border-top: 1px solid rgba(203, 213, 225, 0.75);
+  border-bottom: 1px solid rgba(203, 213, 225, 0.75);
+  z-index: 10;
 }

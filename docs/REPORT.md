@@ -1,6 +1,6 @@
-# Saturn Textiles R&D Portfolio — Master Engineering Report & Zero-to-Hero Educational Handbook
+# NEVOLYN Technology Official Website — Master Engineering Report & Zero-to-Hero Educational Handbook
 
-> **Comprehensive Engineering Audit & Aspirants Guide** for the Saturn Textiles Limited Research & Development web platform.  
+> **Comprehensive Engineering Audit & Aspirants Guide** for the NEVOLYN Technology web platform.  
 > Built using **Next.js 16 (App Router)**, **TypeScript 5.7**, **Spring Boot 3.4 (Java 21 LTS)**, **PostgreSQL 16**, and **Docker**.
 
 ---
@@ -21,14 +21,14 @@
 
 ## 🎯 1. Executive Summary & Monorepo Overview
 
-The **Saturn Textiles R&D Portfolio** is an enterprise-grade web application engineered to showcase advanced industrial research, computer vision automation models (FABINS), and artificial intelligence innovations.
+The **NEVOLYN Technology Official Website** is an enterprise-grade web application engineered to showcase advanced industrial research, computer vision automation models (FABINS), and artificial intelligence innovations.
 
 ### Monorepo Structure
 
 The project uses a clean monorepo pattern:
 
 ```text
-saturn_rnd_portfolio/             ← Git repository root
+nevolyn_official_website/             ← Git repository root
 ├── frontend/                      ← Next.js 16 Web Application (Port 3000)
 ├── backend/                       ← Spring Boot 3 Java 21 REST API (Port 8080)
 ├── docs/                          ← Master Engineering Handbooks
@@ -80,7 +80,7 @@ The frontend is built inside `frontend/` using modern React standards:
 
 - **Framework**: Next.js 16 (App Router, Turbopack)
 - **Language**: TypeScript 5.7 (Strict Type Safety)
-- **Styling**: Tailwind CSS v4 with custom dark mode custom properties (`#020914` navy, `#3b82f6` electric blue, `#f97316` Saturn orange)
+- **Styling**: Tailwind CSS v4 with custom dark mode custom properties (`#020914` navy, `#3b82f6` electric blue, `#f97316` vibrant orange)
 - **Animations**: Framer Motion 12 (Scroll-triggered entrance animations)
 
 ### Single Source of Truth Content Management
@@ -103,20 +103,20 @@ Incoming HTTP Request
        │
        ▼
  1. DTO (Data Transfer Object)  ──> Validates JSON (@NotBlank, @Email)
-       │                            [backend/src/main/java/com/saturn/rnd/dto/]
+       │                            [backend/src/main/java/com/nevolyn/dto/]
        ▼
  2. Controller                  ──> Exposes REST Endpoints (@PostMapping, @GetMapping)
-       │                            [backend/src/main/java/com/saturn/rnd/controller/]
+       │                            [backend/src/main/java/com/nevolyn/controller/]
        ▼
  3. Service                     ──> Business Rules, Unique ID Generation & File Storage
-       │                            [backend/src/main/java/com/saturn/rnd/service/]
+       │                            [backend/src/main/java/com/nevolyn/service/]
        ▼
  4. Repository & Entity         ──> Database Persistence (Spring Data JPA / SQL)
-       │                            [backend/src/main/java/com/saturn/rnd/repository/]
-       │                            [backend/src/main/java/com/saturn/rnd/model/]
+       │                            [backend/src/main/java/com/nevolyn/repository/]
+       │                            [backend/src/main/java/com/nevolyn/model/]
        ▼
  5. ApiResponse Envelope        ──> Standardized JSON Response Envelope Wrapper <T>
-                                    [backend/src/main/java/com/saturn/rnd/dto/ApiResponse.java]
+                                    [backend/src/main/java/com/nevolyn/dto/ApiResponse.java]
 ```
 
 ---
@@ -129,14 +129,14 @@ Your backend supports two database execution modes:
 - **No Setup Needed**: Runs inside memory automatically when executing `./mvnw spring-boot:run`.
 - **Browser Web Console**: Accessible at **[http://localhost:8080/h2-console](http://localhost:8080/h2-console)**.
 - **Connection Settings**:
-  - JDBC URL: `jdbc:h2:mem:saturn_rnd_db`
+  - JDBC URL: `jdbc:h2:mem:nevolyn_db`
   - Username: `sa`
   - Password: *(blank)*
 
 ### B. Production & Container Mode (PostgreSQL 16)
 - **Container**: `postgres:16-alpine` configured in `docker-compose.yml`.
 - **Data Persistence**: Database records are safely written to Docker volume `postgres_data` so records survive container restarts.
-- **Production Credentials**: Username `saturn_admin`, password `Saturn_Secure_Pass_2026!` (overridable via `${DB_USER}` and `${DB_PASS}`).
+- **Production Credentials**: Username `nevolyn_admin`, password `Nevolyn_Secure_Pass_2026!` (overridable via `${DB_USER}` and `${DB_PASS}`).
 
 ---
 
@@ -173,7 +173,7 @@ Liveness probe for the hosting platform. Returns `{"status":"UP"}`, or `DOWN` wh
 
 ## 🧪 7. Quality Control, Integration Testing & CI/CD
 
-### Backend REST API Test Suite (`backend/src/test/java/com/saturn/rnd/controller/`)
+### Backend REST API Test Suite (`backend/src/test/java/com/nevolyn/controller/`)
 End-to-end integration tests written using Spring Boot `@SpringBootTest` and `MockMvc`:
 
 1. **`ContactControllerTest.java`**: Tests valid payload `201 CREATED` response, the verification-pending contract, and invalid email `400 BAD REQUEST` error handling.
@@ -188,19 +188,19 @@ Automated quality pipeline that spins up an OpenJDK 21 LTS environment on GitHub
 
 ## 🚀 8. DevOps, Docker & Custom Domain Deployment Guide
 
-When you acquire your custom domain name (e.g. `saturntextiles.com` for Frontend and `api.saturntextiles.com` for Backend), follow this 5-step checklist:
+When you acquire your custom domain name (e.g. `nevolyn.com` for Frontend and `api.nevolyn.com` for Backend), follow this 5-step checklist:
 
 ### 5-Step Custom Domain Deployment Checklist
 
 1. **Set Up Server**: Provision an Ubuntu Linux server and install Docker (`apt install docker.io docker-compose-v2`).
-2. **Configure DNS Records**: Create A Records pointing `saturntextiles.com` and `api.saturntextiles.com` to your server's IP address.
+2. **Configure DNS Records**: Create A Records pointing `nevolyn.com` and `api.nevolyn.com` to your server's IP address.
 3. **Configure Environment Variables**:
-   - `NEXT_PUBLIC_API_URL` = `https://api.saturntextiles.com`
-   - `APP_CORS_ALLOWED_ORIGINS` = `https://saturntextiles.com`
+   - `NEXT_PUBLIC_API_URL` = `https://api.nevolyn.com`
+   - `APP_CORS_ALLOWED_ORIGINS` = `https://nevolyn.com`
 4. **Launch Containers**: Run `docker compose up -d --build` on your server.
 5. **Enable HTTPS SSL**: Install Certbot and obtain free SSL certificates:
    ```bash
-   certbot --nginx -d saturntextiles.com -d api.saturntextiles.com
+   certbot --nginx -d nevolyn.com -d api.nevolyn.com
    ```
 
 ---

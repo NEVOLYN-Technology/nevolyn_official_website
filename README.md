@@ -1,6 +1,6 @@
-# Saturn Textiles R&D — Website
+# NEVOLYN Technology — Official Website
 
-> Official web platform for the **Research & Development Department of Saturn Textiles Limited**, showcasing innovations in smart textile automation, AI integration, and high-performance industrial solutions.
+> Official web platform for **NEVOLYN Technology**, showcasing deep-tech engineering, intelligent systems, artificial intelligence, next-generation automation, and commercial products including Fabins Automation.
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript 5.7](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -13,8 +13,8 @@
 ## 🗂️ Monorepo Structure
 
 ```text
-saturn_rnd_portfolio/               ← Git root (monorepo)
-├── frontend/                       ← Next.js 16 portfolio web application
+nevolyn_official_website/           ← Git root (monorepo)
+├── frontend/                       ← Next.js 16 corporate web application
 │   ├── vercel.json                 # Vercel deployment configuration
 │   ├── app/                        # App Router pages & layouts
 │   │   ├── page.tsx                # Single scrolling homepage
@@ -28,20 +28,23 @@ saturn_rnd_portfolio/               ← Git root (monorepo)
 │   │   ├── animations.ts           # Framer Motion animation presets
 │   │   ├── utils.ts                # cn() class merger & formatDate()
 │   │   └── data/                   # Static content (single source of truth)
-│   │       ├── innovations.ts      # R&D projects & status
+│   │       ├── innovations.ts      # Projects & product status
 │   │       ├── leaders.ts          # Leadership team profiles & bio
-│   │       └── latest-news.ts      # Milestones & news timeline
-│   ├── public/                     # Static assets (logos, photos)
+│   │       ├── featured-milestones.ts # High-impact milestone showcase
+│   │       ├── latest-news.ts      # Milestones & news timeline
+│   │       └── team.ts             # Engineering team roster
+│   ├── public/                     # Static assets (logos, photos, icons)
 │   └── package.json                # Node.js dependencies & scripts
 ├── backend/                        ← Spring Boot 3 (Java 21) REST API
-│   ├── src/main/java/com/saturn/rnd/
-│   │   ├── controller/             # ContactController, ApplicationController
+│   ├── src/main/java/com/nevolyn/
+│   │   ├── controller/             # ContactController, ApplicationController, AcknowledgeController, HomeController
 │   │   ├── service/                # ContactService, ApplicationService, EmailService, FileStorageService
 │   │   ├── model/                  # ContactInquiry, JobApplication
 │   │   ├── dto/                    # ApiResponse<T>, ContactRequest, ContactResponse, ...
 │   │   ├── repository/             # Spring Data JPA Repositories
 │   │   ├── config/                 # CorsConfig, RateLimitFilter
-│   │   └── exception/              # GlobalExceptionHandler, custom exceptions
+│   │   ├── exception/              # GlobalExceptionHandler, custom exceptions
+│   │   └── NevolynApplication.java # Spring Boot application entry point
 │   ├── src/main/resources/
 │   │   ├── application.yml         # Dev defaults — H2, verbose logging, no mail account needed
 │   │   ├── application-prod.yml    # Production — PostgreSQL, Flyway, SMTPS 465, Actuator
@@ -50,9 +53,10 @@ saturn_rnd_portfolio/               ← Git root (monorepo)
 │   └── pom.xml                     # Maven build — Spring Boot 3.4.2
 ├── .github/workflows/              ← GitHub Actions CI/CD automation
 │   └── deploy-and-test.yml         # Automated Next.js build, Spring Boot tests & Render/Vercel triggers
+├── docker-compose.yml              ← Full local stack (Postgres + Spring Boot + Next.js)
 ├── render.yaml                     ← Render Blueprint spec for Spring Boot Docker + PostgreSQL DB
 ├── docs/                           ← Project documentation
-│   ├── report.md                   # Zero-to-hero master educational report & engineering audit
+│   ├── REPORT.md                   # Zero-to-hero master educational report & engineering audit
 │   ├── CICD_AND_DEPLOYMENT.md      # Operational deployment reference, gotchas & custom domain setup
 │   ├── CICD_GUIDE.md               # Beginner intuition guide for CI/CD, Docker & domain deployment
 │   ├── FRONTEND_GUIDE.md           # Next.js 16 architecture, component breakdown & content guide
@@ -124,9 +128,9 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
 | `POST /api/v1/contact` | POST | Contact form submission — emails a verification link |
-| `GET /api/v1/contact/verify?token=` | GET | Confirms the sender, then notifies the R&D team |
+| `GET /api/v1/contact/verify?token=` | GET | Confirms the sender, then notifies the NEVOLYN team |
 | `POST /api/v1/applications` | POST | Job application + CV upload (`multipart/form-data`) |
-| `GET /api/v1/applications/verify?token=` | GET | Confirms the candidate, emails the CV to the team |
+| `GET /api/v1/applications/verify?token=` | GET | Confirms the candidate, emails the CV to the NEVOLYN team |
 | `GET /actuator/health` | GET | Liveness probe for Render — not part of the public API |
 
 > **The team roster is static content, not an API.** It lives in
@@ -142,7 +146,8 @@ For deployment, migrations and abuse protection, see [docs/CICD_AND_DEPLOYMENT.m
 
 ## 📚 Documentation Links
 
-- 📖 **[Master Educational Report & Audit Handbook (`docs/report.md`)](./docs/report.md)** — Comprehensive zero-to-hero learning guide, architecture audit, API traces, testing suite, and domain deployment.
+- 🌐 **[Custom Domain Setup Guide (`docs/DOMAIN_SETUP.md`)](./docs/DOMAIN_SETUP.md)** — Step-by-step checklist for pointing `nevolyn.com` and `api.nevolyn.com` via Vercel, Render, and DNS.
+- 📖 **[Master Educational Report & Audit Handbook (`docs/REPORT.md`)](./docs/REPORT.md)** — Comprehensive zero-to-hero learning guide, architecture audit, API traces, testing suite, and domain deployment.
 - 🚀 **[CI/CD & Deployment Reference (`docs/CICD_AND_DEPLOYMENT.md`)](./docs/CICD_AND_DEPLOYMENT.md)** — Operational guide: architecture topology, JDBC URL sanitization, SMTP port blocking, pipeline internals, custom domain + SPF/DKIM/DMARC setup, and a troubleshooting table.
 - 🤖 **[CI/CD Beginner Handbook (`docs/CICD_GUIDE.md`)](./docs/CICD_GUIDE.md)** — Beginner intuition guide for CI/CD pipelines, Docker container files, and step-by-step custom domain deployment.
 - 🔌 **[Spring Boot REST API Master Spec (`docs/API_INTEGRATION.md`)](./docs/API_INTEGRATION.md)** — Master API guide with 5-layer code traces, field constraints, cURL examples, CORS config, and tutorial on adding new APIs.

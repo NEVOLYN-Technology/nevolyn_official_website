@@ -1,5 +1,5 @@
 # ==============================================================================
-# Saturn R&D Portfolio — Validate & Deploy
+# NEVOLYN Technology — Validate & Deploy
 # ==============================================================================
 # Validates both halves of the stack on every push and pull request, then
 # promotes main to production once both halves are green.
@@ -146,11 +146,11 @@ jobs:
           # Must include the /api/v1 prefix — apiClient appends bare paths such
           # as "/contact" directly to this value.
           #
-          # FUTURE CUSTOM DOMAIN: point this at https://api.saturn-rnd.com/api/v1
+          # FUTURE CUSTOM DOMAIN: point this at https://api.nevolyn.com/api/v1
           # once the Render custom domain is attached. This value only affects
           # the CI smoke build; the deployed bundle uses the environment
           # variable configured in the Vercel dashboard.
-          NEXT_PUBLIC_API_URL: https://saturn-rnd-backend.onrender.com/api/v1
+          NEXT_PUBLIC_API_URL: https://nevolyn-backend.onrender.com/api/v1
 
   # ============================================================================
   # Deploy — main only, and only once both validation jobs are green

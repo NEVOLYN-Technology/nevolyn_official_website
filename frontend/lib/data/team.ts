@@ -1,8 +1,8 @@
 /**
- * R&D Engineering Team content.
+ * NEVOLYN Engineering Team content.
  *
  * Single source of truth for the **engineering team** shown in the expandable
- * "R&D Engineering Team" subsection of `components/sections/LeadersSection.tsx`.
+ * "Engineering Team" subsection of `components/sections/LeadersSection.tsx`.
  *
  * Leadership profiles live separately in `lib/data/leaders.ts`. The two files
  * share the same {@link TeamMember} shape, so a person can be moved between them
@@ -34,7 +34,7 @@
  *     'Jane leads the vision pipeline...',
  *     'She studied at BUET...',
  *   ],
- *   email: 'jane.doe@saturntextiles.com',   // optional
+ *   email: 'jane.doe@nevolyn.com',           // optional
  *   image: '/jane-photo.png',               // optional — file must exist in /public
  *   social: {                               // optional
  *     github: 'https://github.com/janedoe',

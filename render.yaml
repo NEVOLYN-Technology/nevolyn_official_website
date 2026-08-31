@@ -1,5 +1,5 @@
 # ==============================================================================
-# Render Infrastructure Blueprint — Saturn R&D Portfolio Backend
+# Render Infrastructure Blueprint — NEVOLYN Technology Backend
 # Spec: https://render.com/docs/blueprint-spec
 # ==============================================================================
 # Applied from the Render dashboard (Blueprints → New Blueprint Instance).
@@ -15,7 +15,7 @@ services:
   # Spring Boot REST API (Docker runtime)
   # ----------------------------------------------------------------------------
   - type: web
-    name: saturn-rnd-backend
+    name: nevolyn-backend
     runtime: docker
     dockerContext: backend
     dockerfilePath: backend/Dockerfile
@@ -47,7 +47,7 @@ services:
       # ----------------------------------------------------------------------
       # `connectionString` yields libpq form: postgres://user:pass@host/dbname
       # The PostgreSQL JDBC driver cannot parse that, so the
-      # ApplicationEnvironmentPreparedEvent listener in SaturnRndApplication
+      # ApplicationEnvironmentPreparedEvent listener in NevolynApplication
       # rewrites it into jdbc:postgresql://host:5432/dbname and splits the
       # credentials out — before HikariCP starts.
       #
@@ -56,27 +56,25 @@ services:
       # through verbatim and the driver receives a nonsense URL.
       - key: DATABASE_URL
         fromDatabase:
-          name: saturn-rnd-db
+          name: nevolyn-db
           property: connectionString
 
       # ----------------------------------------------------------------------
       # CORS + links
       # ----------------------------------------------------------------------
       # FUTURE CUSTOM DOMAIN: append the apex and www forms, e.g.
-      #   https://saturn-rnd.com,https://www.saturn-rnd.com,https://saturn-rnd.vercel.app
+      #   https://nevolyn.com,https://www.nevolyn.com,https://nevolyn.vercel.app
       # The wildcard entry keeps Vercel preview deployments working.
       - key: APP_CORS_ALLOWED_ORIGINS
-        value: https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app,http://localhost:3000
+        value: https://nevolyn.com,https://www.nevolyn.com,https://nevolyn.vercel.app,https://nevolyn-*.vercel.app,http://localhost:3000
 
-      # Origin used to build the email verification link. Must match where the
-      # frontend is actually served or every verification link 404s.
-      # FUTURE CUSTOM DOMAIN: change to https://saturn-rnd.com
+      # Origin used to build the email verification link.
       - key: APP_FRONTEND_URL
-        value: https://saturn-rnd.vercel.app
+        value: https://nevolyn.com
 
       # Origin used to build 1-click acknowledge button links in admin emails.
       - key: APP_BACKEND_URL
-        value: https://saturn-rnd-backend.onrender.com
+        value: https://api.nevolyn.com
 
       # ----------------------------------------------------------------------
       # Mail (Brevo)
@@ -90,9 +88,9 @@ services:
       - key: SPRING_MAIL_PORT
         value: "587"
       - key: APP_EMAIL_FROM
-        value: saturn.rnd.innovation@gmail.com
+        value: info@nevolyn.com
       - key: APP_EMAIL_ADMIN
-        value: saturn.rnd.innovation@gmail.com
+        value: admin@nevolyn.com
 
 # ------------------------------------------------------------------------------
 # Managed PostgreSQL
@@ -103,8 +101,8 @@ services:
 # already-provisioned database by setting DATABASE_URL as a `sync: false` secret
 # on the web service above.
 databases:
-  - name: saturn-rnd-db
-    databaseName: saturn_rnd_db
-    user: saturn_admin
+  - name: nevolyn-db
+    databaseName: nevolyn_db
+    user: nevolyn_admin
     plan: free
     region: oregon

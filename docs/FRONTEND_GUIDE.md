@@ -1,6 +1,6 @@
-# Saturn Textiles R&D — Frontend Developer Handbook
+# NEVOLYN Technology — Frontend Developer Handbook
 
-> Complete technical architecture, component breakdown, content editing workflows, animation presets, and API integration guide for the **Next.js 16 (App Router)** frontend application (`frontend/`).
+> Complete technical architecture, component breakdown, content editing workflows, animation presets, and API integration guide for the **Next.js 16 (App Router)** corporate frontend application (`frontend/`).
 
 ---
 
@@ -10,7 +10,7 @@ The frontend is a single-page scrolling web application engineered using modern 
 
 - **Core Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack, React 19)
 - **Language**: [TypeScript 5.7](https://www.typescriptlang.org/) (Strict Mode)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with a custom dark mode palette (`#020914` background, electric blue accents `#3b82f6`, and Saturn orange brand identity `#f97316`)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with a custom dark mode palette (`#020914` background, electric blue accents `#3b82f6`, and vibrant orange accents `#f97316`)
 - **Animation System**: [Framer Motion v12](https://www.framer.com/motion/) (Declarative scroll-triggered entrance animations)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Analytics**: [@vercel/analytics](https://vercel.com/analytics) (Injected in production builds)
@@ -82,7 +82,7 @@ Open `frontend/lib/data/leaders.ts` and modify or append an object to `teamDepar
     'Paragraph 2: Education and academic specialization (e.g. BUET CSE/EEE)...',
     'Paragraph 3: Published research papers and engineering accomplishments...'
   ],
-  email: 'jane@saturntextiles.com',   // Contact email address
+  email: 'jane@nevolyn.com',          // Contact email address
   responsibilities: [                 // 4-5 bullet points of ownership
     'Computer vision model optimization',
     'Industrial camera integration'
@@ -126,7 +126,7 @@ Open `frontend/lib/data/latest-news.ts` and append an object to `news`:
   content: 'Full news announcement body text.',
   category: 'Institutional Funding',  // Category tag
   date: '2026-07-24',                 // Publication ISO date string
-  author: 'Saturn Executive Board',   // Author entity
+  author: 'NEVOLYN Executive Board',  // Author entity
   featured: true                       // true promotes to top featured grid
 }
 ```

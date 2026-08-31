@@ -1,0 +1,94 @@
+package com.nevolyn.controller;
+
+import com.nevolyn.dto.ApiResponse;
+import com.nevolyn.dto.ContactRequest;
+import com.nevolyn.dto.ContactResponse;
+import com.nevolyn.service.ContactService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * REST Controller for processing website visitor contact inquiries.
+ *
+ * <p>
+ * <strong>Endpoint:</strong> {@code POST /api/v1/contact}
+ * </p>
+ * <p>
+ * <strong>Payload Type:</strong> {@code application/json}
+ * </p>
+ * <p>
+ * <strong>Access Control:</strong> Public
+ * </p>
+ *
+ * <h2>Processing Workflow</h2>
+ * <ol>
+ * <li>Intercepts JSON payload from frontend contact form
+ * ({@code ContactSection.tsx}).</li>
+ * <li>Enforces Bean Validation constraints ({@code @Valid}) via Spring
+ * Validation.</li>
+ * <li>Delegates entity persistence and unique ID generation to
+ * {@link ContactService}.</li>
+ * <li>Wraps result in a standardized {@link ApiResponse} JSON envelope
+ * returning HTTP 201 (Created).</li>
+ * </ol>
+ *
+ * @author NEVOLYN Technology Engineering
+ * @version 0.1.0
+ * @see ContactRequest
+ * @see ContactResponse
+ * @see ContactService
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/contact")
+@RequiredArgsConstructor
+public class ContactController {
+
+        private final ContactService contactService;
+
+        /**
+         * Handles incoming contact form submission requests.
+         *
+         * @param request Validated JSON body containing name, email, subject, and
+         *                message
+         * @return {@link ResponseEntity} containing standardized {@link ApiResponse}
+         *         envelope with generated inquiry ID
+         */
+        @PostMapping
+        public ResponseEntity<ApiResponse<ContactResponse>> submitContactInquiry(
+                        @Valid @RequestBody ContactRequest request) {
+                log.info("Received POST /api/v1/contact from name='{}', email='{}', subject='{}'",
+                                request.getName(), request.getEmail(), request.getSubject());
+
+                ContactResponse responseData = contactService.processInquiry(request);
+
+                log.debug("Successfully processed contact inquiry, generated ID: {}", responseData.getInquiryId());
+
+                ApiResponse<ContactResponse> envelope = ApiResponse.success(
+                                HttpStatus.CREATED.value(),
+                                "Thank you for reaching out! Your inquiry has been received and a confirmation receipt has been sent to your email.",
+                                responseData);
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(envelope);
+        }
+
+        /**
+         * Verifies a visitor's contact inquiry via email token.
+         */
+        @GetMapping("/verify")
+        public ResponseEntity<ApiResponse<ContactResponse>> verifyContactInquiry(@RequestParam("token") String token) {
+                log.info("Received GET /api/v1/contact/verify with token='{}'", token);
+                ContactResponse responseData = contactService.verifyInquiry(token);
+
+                ApiResponse<ContactResponse> envelope = ApiResponse.success(
+                                HttpStatus.OK.value(),
+                                "Your email address has been verified successfully. Our team has received your inquiry.",
+                                responseData);
+
+                return ResponseEntity.ok(envelope);
+        }
+}

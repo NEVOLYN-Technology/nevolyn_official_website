@@ -1,5 +1,5 @@
 # ==============================================================================
-# Saturn R&D Portfolio — full local stack
+# NEVOLYN Technology — full local stack
 # ==============================================================================
 #   docker compose up --build
 #
@@ -20,12 +20,12 @@ services:
   # ----------------------------------------------------------------------------
   db:
     image: postgres:16-alpine
-    container_name: saturn_db
+    container_name: nevolyn_db
     restart: always
     environment:
-      POSTGRES_DB: ${DB_NAME:-saturn_rnd_db}
-      POSTGRES_USER: ${DB_USER:-saturn_admin}
-      POSTGRES_PASSWORD: ${DB_PASS:-Saturn_Secure_Pass_2026!}
+      POSTGRES_DB: ${DB_NAME:-nevolyn_db}
+      POSTGRES_USER: ${DB_USER:-nevolyn_admin}
+      POSTGRES_PASSWORD: ${DB_PASS:-Nevolyn_Secure_Pass_2026!}
     ports:
       - "5432:5432"
     volumes:
@@ -34,7 +34,7 @@ services:
     # connections during init, so `depends_on` alone races the API's first
     # connection attempt.
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-saturn_admin} -d ${DB_NAME:-saturn_rnd_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-nevolyn_admin} -d ${DB_NAME:-nevolyn_db}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -46,7 +46,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: saturn_backend
+    container_name: nevolyn_backend
     restart: always
     ports:
       - "8080:8080"
@@ -56,11 +56,11 @@ services:
       # jdbc:postgresql:// URL to the H2 driver and startup fails.
       SPRING_PROFILES_ACTIVE: prod
 
-      # Already in JDBC form, so the sanitizer in SaturnRndApplication passes it
+      # Already in JDBC form, so the sanitizer in NevolynApplication passes it
       # through untouched. 'db' is the service name on the compose network.
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME:-saturn_rnd_db}
-      SPRING_DATASOURCE_USERNAME: ${DB_USER:-saturn_admin}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASS:-Saturn_Secure_Pass_2026!}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME:-nevolyn_db}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-nevolyn_admin}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASS:-Nevolyn_Secure_Pass_2026!}
 
       # Dialect is deliberately unset — Hibernate detects it from the live
       # connection, and setting it explicitly triggers HHH90000025.
@@ -74,8 +74,8 @@ services:
       # exercise real delivery.
       SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
       SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
-      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-noreply@saturn-rnd.com}
-      APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-admin@saturn-rnd.com}
+      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-noreply@nevolyn.com}
+      APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-admin@nevolyn.com}
 
       # Matches the named volume below so uploads survive a container restart.
       APP_UPLOAD_DIR: /app/uploads/resumes
@@ -97,7 +97,7 @@ services:
         # as a build arg — setting it only at runtime leaves the bundle
         # pointing at the compile-time default.
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
-    container_name: saturn_frontend
+    container_name: nevolyn_frontend
     restart: always
     ports:
       - "3000:3000"

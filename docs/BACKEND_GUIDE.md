@@ -1,4 +1,4 @@
-# Saturn Textiles R&D — Backend Developer Handbook
+# NEVOLYN Technology — Backend Developer Handbook
 
 > Complete technical architecture, package breakdown, API specs, database setup, file storage logic, and frontend integration guide for the **Spring Boot 3 (Java 21)** REST API backend service (`backend/`).
 
@@ -20,7 +20,7 @@ The backend is built as a production-ready RESTful service using enterprise Java
 
 ## 🗂️ 2. Package Structure & Architectural Layers
 
-All Java source files are organized cleanly inside `backend/src/main/java/com/saturn/rnd/`:
+All Java source files are organized cleanly inside `backend/src/main/java/com/nevolyn/`:
 
 ```text
 backend/
@@ -31,14 +31,16 @@ backend/
 │   ├── application-prod.yml                 # Production — PostgreSQL, Flyway, SMTPS 465, Actuator
 │   ├── db/migration/                        # Flyway migrations — own the production schema
 │   └── templates/email/                     # Thymeleaf HTML bodies for the email pipeline
-└── src/main/java/com/saturn/rnd/
-    ├── SaturnRndApplication.java            # Entry point + cloud DATABASE_URL sanitizer
+└── src/main/java/com/nevolyn/
+    ├── NevolynApplication.java              # Entry point + cloud DATABASE_URL sanitizer
     ├── config/                              # Configuration Beans & Filters
     │   ├── CorsConfig.java                  # CORS policy permitting Next.js frontend origins
     │   └── RateLimitFilter.java             # Per-IP throttle on the public write endpoints
     ├── controller/                          # REST Controllers (HTTP Requests -> Responses)
     │   ├── ContactController.java           # POST /api/v1/contact, GET /contact/verify
-    │   └── ApplicationController.java       # POST /api/v1/applications (multipart CV upload)
+    │   ├── ApplicationController.java       # POST /api/v1/applications (multipart CV upload)
+    │   ├── AcknowledgeController.java       # GET /api/v1/acknowledge (admin 1-click receipts)
+    │   └── HomeController.java              # GET / (health & status check)
     ├── dto/                                 # Data Transfer Objects & JSON Envelopes
     │   ├── ApiResponse.java                 # Standard JSON response envelope wrapper <T>
     │   ├── FieldErrorDto.java               # Validation error detail DTO
@@ -66,14 +68,14 @@ backend/
 
 ## 📦 3. Global Standard Response Format (`ApiResponse<T>`)
 
-Every API endpoint returns a uniform JSON envelope format (`com.saturn.rnd.dto.ApiResponse`):
+Every API endpoint returns a uniform JSON envelope format (`com.nevolyn.dto.ApiResponse`):
 
 ### Success Response Envelope (`HTTP 200 / 201`)
 ```json
 {
   "status": "success",
   "code": 201,
-  "message": "Thank you for reaching out. The Saturn R&D team has received your message.",
+  "message": "Thank you for reaching out. The NEVOLYN Technology team has received your message.",
   "data": {
     "inquiryId": "INQ-2026-8419"
   },
@@ -168,7 +170,7 @@ content, put it in `frontend/lib/data/` instead.
 ### Development Mode (H2 In-Memory DB)
 By default, `backend/src/main/resources/application.yml` uses H2:
 - **H2 Console**: Accessible at `http://localhost:8080/h2-console`
-- **JDBC URL**: `jdbc:h2:mem:saturn_rnd_db`
+- **JDBC URL**: `jdbc:h2:mem:nevolyn_db`
 - **User**: `sa` (no password)
 
 ### Production Mode (PostgreSQL)
@@ -177,7 +179,7 @@ To switch to PostgreSQL, set environment variables or edit `application.yml`:
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:saturn_rnd_db}
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:nevolyn_db}
     username: ${DB_USER:postgres}
     password: ${DB_PASS:secret}
   jpa:
@@ -195,7 +197,7 @@ Uploaded files are handled by `FileStorageService.java`:
 ## 🛠️ 6. How to Extend the Backend (Developer How-To)
 
 ### How to Add a New REST Endpoint
-1. **Define DTOs**: Create request/response record or class in `com.saturn.rnd.dto`.
+1. **Define DTOs**: Create request/response record or class in `com.nevolyn.dto`.
 2. **Define Entity & Repository**: Create JPA entity in `model/` and interface in `repository/`.
 3. **Add Business Logic**: Add transactional service method in `service/`.
 4. **Expose REST Endpoint**: Create controller method in `controller/` returning `ResponseEntity<ApiResponse<T>>`.

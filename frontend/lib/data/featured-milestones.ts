@@ -1,5 +1,5 @@
 /**
- * Featured Milestones Data Store — Saturn R&D Portfolio.
+ * Featured Milestones Data Store — NEVOLYN Technology.
  *
  * Single source of truth for high-impact institutional announcements and prototype milestones.
  * Rendered prominently in the 3D horizontal stage carousel within `LatestNewsSection.tsx`.
@@ -43,7 +43,7 @@ export const featuredMilestones: FeaturedMilestone[] = [
       'Selected for an exclusive week-long exhibition at IRAB BUET to demonstrate industrial AI vision and strengthen high-impact industry-academia collaboration.',
     category: 'Academic Showcase',
     date: '2026-07-21',
-    author: 'Saturn R&D Department',
+    author: 'NEVOLYN Technology',
   },
 
   {
@@ -53,6 +53,6 @@ export const featuredMilestones: FeaturedMilestone[] = [
       'Successfully validated real-time automated fabric flaw detection, camera hardware integration, and deep learning throughput for industrial deployment.',
     category: 'Prototype Demonstration',
     date: '2026-06-28',
-    author: 'Saturn R&D Department',
+    author: 'NEVOLYN Technology',
   },
 ]

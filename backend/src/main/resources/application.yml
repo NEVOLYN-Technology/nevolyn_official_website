@@ -1,5 +1,5 @@
 # ==============================================================================
-# Saturn R&D Backend — DEFAULT (local development) configuration
+# NEVOLYN Technology Backend — DEFAULT (local development) configuration
 # ==============================================================================
 # This profile is what runs when no SPRING_PROFILES_ACTIVE is set, i.e. on a
 # developer laptop. It is deliberately zero-setup: in-memory database, no mail
@@ -24,7 +24,7 @@ server:
 
 spring:
   application:
-    name: saturn-rnd-backend
+    name: nevolyn-backend
 
   # --------------------------------------------------------------------------
   # Datasource — in-memory H2
@@ -36,16 +36,16 @@ spring:
   # FUTURE CUSTOM DOMAIN / CLOUD DATABASE:
   # Do not point this at a cloud Postgres instance. Production database settings
   # belong in application-prod.yml, which reads DATABASE_URL. See
-  # SaturnRndApplication for how a postgres:// URL is converted to JDBC form.
+  # NevolynApplication for how a postgres:// URL is converted to JDBC form.
   datasource:
-    url: jdbc:h2:mem:saturn_rnd_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:nevolyn_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
 
   h2:
     console:
       # Browsable DB inspector at http://localhost:8080/h2-console
-      # (JDBC URL: jdbc:h2:mem:saturn_rnd_db, user: sa, empty password).
+      # (JDBC URL: jdbc:h2:mem:nevolyn_db, user: sa, empty password).
       # Disabled in prod — see application-prod.yml.
       enabled: true
       path: /h2-console
@@ -90,7 +90,7 @@ spring:
   mail:
     host: ${SPRING_MAIL_HOST:smtp.gmail.com}
     port: ${SPRING_MAIL_PORT:587}
-    username: ${SPRING_MAIL_USERNAME:dev@saturn-rnd.com}
+    username: ${SPRING_MAIL_USERNAME:dev@nevolyn.com}
     # Also doubles as the Brevo API key: a value starting with 'xsmtpsib-'
     # switches EmailService to the HTTPS REST engine automatically.
     password: ${SPRING_MAIL_PASSWORD:}
@@ -128,7 +128,7 @@ spring:
 
 logging:
   level:
-    com.saturn.rnd: DEBUG
+    com.nevolyn: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
@@ -148,20 +148,11 @@ app:
   email:
     # Envelope sender. When using the Brevo REST engine this address must be a
     # verified sender in the Brevo dashboard, or the API returns HTTP 400.
-    from: ${APP_EMAIL_FROM:saturn.rnd.innovation@gmail.com}
+    from: ${APP_EMAIL_FROM:info@nevolyn.com}
     # Destination for step-2 admin dossiers.
-    admin: ${APP_EMAIL_ADMIN:saturn.rnd.innovation@gmail.com}
+    admin: ${APP_EMAIL_ADMIN:admin@nevolyn.com}
     # Friendly From display name shown in the recipient's inbox.
-    sender-name: ${APP_EMAIL_SENDER_NAME:Saturn Textiles R&D}
-    #
-    # FUTURE CUSTOM DOMAIN INSTRUCTIONS
-    # ---------------------------------
-    # This origin is used to build the step-1 verification link
-    # (<frontend-url>/verify?token=…). It MUST match wherever the Next.js app is
-    # actually served, or the link in the email 404s.
-    #   Vercel default : https://saturn-rnd.vercel.app
-    #   Custom domain  : https://saturn-rnd.com
-    # Set APP_FRONTEND_URL on Render; no code change is needed.
+    sender-name: ${APP_EMAIL_SENDER_NAME:NEVOLYN Technology}
     frontend-url: ${APP_FRONTEND_URL:http://localhost:3000}
     backend-url: ${APP_BACKEND_URL:http://localhost:8080}
 
@@ -169,26 +160,10 @@ app:
     # Per-IP fixed window over the public write endpoints (RateLimitFilter).
     # Sized for a human filling in a form, not for load: five submissions in ten
     # minutes is generous for a real visitor and cheap for an abuser to hit.
-    #
-    # Counters are per-instance and in-memory — see RateLimitFilter for why that
-    # is acceptable here and what to change before scaling out.
     enabled: ${APP_RATE_LIMIT_ENABLED:true}
     max-requests: ${APP_RATE_LIMIT_MAX:5}
     window-minutes: ${APP_RATE_LIMIT_WINDOW_MINUTES:10}
 
   cors:
-    #
-    # FUTURE CUSTOM DOMAIN INSTRUCTIONS
-    # ---------------------------------
-    # Browsers reject any cross-origin API response whose origin is not listed
-    # here, so this must include every host that serves the frontend.
-    #
-    # Entries are matched as PATTERNS (see CorsConfig), so a wildcard covers
-    # Vercel's per-deployment preview URLs:
-    #   https://saturn-rnd-*.vercel.app
-    #
-    # When moving to a custom domain, add BOTH the apex and www forms:
-    #   https://saturn-rnd.com,https://www.saturn-rnd.com
-    # Override in one place via the APP_CORS_ALLOWED_ORIGINS env var
-    # (comma-separated) rather than editing this file per environment.
-    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app}
+    # Browsers reject any cross-origin API response whose origin is not listed here
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,https://nevolyn.com,https://www.nevolyn.com,https://*.nevolyn.com,https://nevolyn.vercel.app,https://nevolyn-*.vercel.app}

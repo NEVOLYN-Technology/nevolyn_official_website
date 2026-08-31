@@ -1,5 +1,5 @@
 # ==============================================================================
-# Saturn R&D Backend — PRODUCTION profile
+# NEVOLYN Technology Backend — PRODUCTION profile
 # ==============================================================================
 # Activated with SPRING_PROFILES_ACTIVE=prod (set in render.yaml).
 #
@@ -16,7 +16,7 @@ spring:
   # PostgreSQL datasource
   # --------------------------------------------------------------------------
   # These three properties are normally supplied at runtime by the
-  # ApplicationEnvironmentPreparedEvent listener in SaturnRndApplication, which
+  # ApplicationEnvironmentPreparedEvent listener in NevolynApplication, which
   # parses the provider's DATABASE_URL and injects clean JDBC values at highest
   # precedence BEFORE HikariCP starts.
   #
@@ -161,7 +161,7 @@ management:
 logging:
   level:
     root: WARN
-    com.saturn.rnd: ${LOG_LEVEL_APP:INFO}
+    com.nevolyn: ${LOG_LEVEL_APP:INFO}
     org.springframework.web: INFO
     org.hibernate.SQL: WARN
 
@@ -175,18 +175,15 @@ app:
     upload-dir: ${APP_UPLOAD_DIR:/app/uploads/resumes}
 
   email:
-    from: ${APP_EMAIL_FROM:saturn.rnd.innovation@gmail.com}
-    admin: ${APP_EMAIL_ADMIN:saturn.rnd.innovation@gmail.com}
-    sender-name: ${APP_EMAIL_SENDER_NAME:Saturn Textiles R&D}
+    from: ${APP_EMAIL_FROM:info@nevolyn.com}
+    admin: ${APP_EMAIL_ADMIN:admin@nevolyn.com}
+    sender-name: ${APP_EMAIL_SENDER_NAME:NEVOLYN Technology}
     #
-    # FUTURE CUSTOM DOMAIN INSTRUCTIONS
+    # Production custom domain settings
     # ---------------------------------
-    # Must point at the live frontend origin, because verification links are
-    # built from it. Update APP_FRONTEND_URL in the Render dashboard the moment
-    # the custom domain goes live, otherwise every verification email keeps
-    # linking to the old vercel.app host.
-    frontend-url: ${APP_FRONTEND_URL:https://saturn-rnd.vercel.app}
-    backend-url: ${APP_BACKEND_URL:https://saturn-rnd-backend.onrender.com}
+    # Verification links and admin links point to nevolyn.com / api.nevolyn.com
+    frontend-url: ${APP_FRONTEND_URL:https://nevolyn.com}
+    backend-url: ${APP_BACKEND_URL:https://api.nevolyn.com}
 
   rate-limit:
     # Keep enabled in production — these endpoints are public, unauthenticated,
@@ -196,14 +193,5 @@ app:
     window-minutes: ${APP_RATE_LIMIT_WINDOW_MINUTES:10}
 
   cors:
-    #
-    # FUTURE CUSTOM DOMAIN INSTRUCTIONS
-    # ---------------------------------
-    # Comma-separated; matched as patterns (see CorsConfig). The wildcard entry
-    # keeps Vercel preview deployments working against the production API.
-    #
-    # Adding a custom domain — set APP_CORS_ALLOWED_ORIGINS in Render to:
-    #   https://saturn-rnd.com,https://www.saturn-rnd.com,https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app
-    # Origins are scheme- and host-exact: https://saturn-rnd.com does NOT cover
-    # www., and must never be written with a trailing slash.
-    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:*}
+    # Allowed origins for browser fetch calls
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:https://nevolyn.com,https://www.nevolyn.com,https://*.nevolyn.com,https://nevolyn.vercel.app,https://nevolyn-*.vercel.app,http://localhost:3000}

@@ -35,7 +35,7 @@ export default function JoinPage(): JSX.Element {
   const [submittedEmail, setSubmittedEmail] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const MAX_WORDS = 250
+  const MAX_WORDS = 500
   const wordCount = formData.reason.trim() ? formData.reason.trim().split(/\s+/).length : 0
   const isOverWordLimit = wordCount > MAX_WORDS
 
@@ -88,7 +88,7 @@ export default function JoinPage(): JSX.Element {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           href="/"
-          className="inline-flex items-center text-sm font-medium text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 mb-8 transition-colors"
+          className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-sky-500 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
@@ -98,19 +98,19 @@ export default function JoinPage(): JSX.Element {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white dark:bg-[#0a1526] p-8 md:p-12 rounded-3xl shadow-xl dark:shadow-none border border-slate-200 dark:border-slate-800/80"
+          className="bg-white p-6 sm:p-10 md:p-12 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200"
         >
           <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight uppercase">
-              Join <span className="text-orange-500">Our Team</span>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight uppercase text-slate-900">
+              Join <span className="text-blue-600">Our Team</span>
             </h1>
-            <p className="text-slate-600 dark:text-slate-400">
-              We're always looking for brilliant minds to help us pioneer the future of textile automation and industrial AI.
+            <p className="text-slate-600">
+              We're always looking for brilliant minds to help us pioneer the future of AI, intelligent systems, and next-generation engineering.
             </p>
           </div>
 
           {errorMessage && (
-            <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-sm">
+            <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-500 text-sm">
               {errorMessage}
             </div>
           )}
@@ -294,7 +294,7 @@ export default function JoinPage(): JSX.Element {
                     ? 'border-rose-500'
                     : 'border-slate-200 dark:border-slate-800/80 focus:ring-orange-500/50'
                 )}
-                placeholder="Tell us about your passion for textile innovation and automation (Max 250 words)..."
+                placeholder="Tell us about your passion for technology innovation and engineering (Max 250 words)..."
               />
               {isOverWordLimit && <p className="text-xs text-rose-500 font-semibold mt-1">Please shorten your response to 250 words or less.</p>}
               {fieldErrors.reason && <p className="text-xs text-rose-500 mt-1">{fieldErrors.reason}</p>}
@@ -302,29 +302,29 @@ export default function JoinPage(): JSX.Element {
 
             {/* CV Upload */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Resume / CV <span className="text-orange-500">*</span>
+              <label className="text-sm font-medium text-slate-700">
+                Resume / CV <span className="text-blue-600">*</span>
               </label>
               <div
                 className={cn(
-                  'mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-xl hover:border-orange-500/50 transition-colors cursor-pointer bg-slate-50 dark:bg-[#030812]',
-                  fieldErrors.resume ? 'border-rose-500' : 'border-slate-300 dark:border-slate-700'
+                  'mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-2xl hover:border-blue-500/60 transition-colors cursor-pointer bg-slate-50',
+                  fieldErrors.resume ? 'border-rose-500' : 'border-slate-300'
                 )}
               >
                 <div className="space-y-2 text-center">
                   {selectedFile ? (
                     <div className="flex flex-col items-center">
-                      <FileText className="h-10 w-10 text-orange-500 mb-2" />
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{selectedFile.name}</p>
+                      <FileText className="h-10 w-10 text-blue-600 mb-2" />
+                      <p className="text-sm font-semibold text-slate-800">{selectedFile.name}</p>
                       <p className="text-xs text-slate-400">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
                     </div>
                   ) : (
                     <>
-                      <UploadCloud className="mx-auto h-10 w-10 text-slate-400 dark:text-slate-500" />
-                      <div className="flex text-sm text-slate-600 dark:text-slate-400 justify-center">
+                      <UploadCloud className="mx-auto h-10 w-10 text-slate-400" />
+                      <div className="flex text-sm text-slate-600 justify-center">
                         <label
                           htmlFor="join-file-upload"
-                          className="relative cursor-pointer rounded-md font-medium text-orange-500 hover:text-orange-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-500"
+                          className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-sky-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500"
                         >
                           <span>Upload a file</span>
                           <input
@@ -353,10 +353,10 @@ export default function JoinPage(): JSX.Element {
                 type="submit"
                 disabled={isLoading || isOverWordLimit}
                 className={cn(
-                  'w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+                  'w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-full shadow-md text-sm font-bold text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
                   isOverWordLimit
-                    ? 'bg-slate-400 dark:bg-slate-700 cursor-not-allowed opacity-60'
-                    : 'bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 shadow-orange-500/25 hover:shadow-orange-500/40'
+                    ? 'bg-slate-400 cursor-not-allowed opacity-60'
+                    : 'bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 hover:brightness-105 shadow-blue-700/20 active:scale-95'
                 )}
               >
                 {isLoading ? (

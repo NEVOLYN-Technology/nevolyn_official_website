@@ -1,5 +1,5 @@
 /**
- * Active/completed R&D projects shown on the Projects page.
+ * Active/completed NEVOLYN Technology projects shown on the Projects page.
  *
  * ## How to add a new project
  *
@@ -13,7 +13,7 @@
  *   status: 'planning',       // 'active' | 'planning' | 'completed'
  *   technologies: ['Chemistry', 'AI/ML'],
  *   startDate: '2024-01-15',  // ISO date string
- *   category: 'Smart Textiles',
+ *   category: 'Industrial Automation',
  * }
  * ```
  */
@@ -67,9 +67,9 @@ export const projects: Project[] = [
 
   {
     id: 'rnd-website',
-    title: 'Saturn Textiles R&D Department Website',
+    title: 'NEVOLYN Technology Official Website',
     description:
-      'Official digital portal for Saturn Textiles R&D, highlighting active research projects, innovation showcases, engineering team profiles, and technical publications.',
+      'Official corporate website for NEVOLYN Technology, showcasing active projects, AI innovation portfolios, engineering team profiles, and company capabilities.',
     status: 'completed',
     technologies: [
       'Next.js',
@@ -105,21 +105,5 @@ export const projects: Project[] = [
     startDate: '2026-07-01',
     endDate: '2026-07-31',
     category: 'Product Development',
-  },
-  {
-    id: 'ai-meeting-minutes',
-    title: 'AI Meeting Minutes Generator',
-    description:
-      'Automated meeting intelligence platform that transcribes discussions, extracts key action items, and delivers instant structured summaries across departments.',
-    status: 'planning',
-    technologies: [
-      'OpenAI Whisper',
-      'GPT API',
-      'Python',
-      'Streamlit',
-      'WhatsApp Integration',
-    ],
-    category: 'Artificial Intelligence',
-    startDate: '2026-08-01',
   },
 ]

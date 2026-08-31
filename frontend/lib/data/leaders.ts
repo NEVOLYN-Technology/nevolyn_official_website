@@ -17,7 +17,7 @@
  * 2. `name` & `title` — Full display name and official job title.
  * 3. `bio` — 1 concise sentence summary for the homepage leadership card.
  * 4. `extendedBio` (3-Paragraph Narrative Flow):
- *    - Paragraph 1: Role & Saturn R&D Impact (FABINS, web ecosystem, engineering focus).
+ *    - Paragraph 1: Role & NEVOLYN Impact (FABINS, web ecosystem, engineering focus).
  *    - Paragraph 2: Education & Specialization (BUET, EEE/CSE, core theoretical background).
  *    - Paragraph 3: Academic Research & Applied Engineering Accomplishments.
  * 5. `responsibilities` — 4 to 5 bullet points of concrete areas of ownership.
@@ -28,9 +28,9 @@
  *   id: 'jane-doe',
  *   name: 'Dr. Jane Doe',
  *   title: 'Senior AI Engineer',
- *   bio: 'Leads computer vision and edge deployment for Saturn R&D.',
+ *   bio: 'Leads computer vision and edge deployment for NEVOLYN Technology.',
  *   extendedBio: [
- *     'Jane leads AI vision systems development at Saturn R&D...',
+ *     'Jane leads AI vision systems development at NEVOLYN Technology...',
  *     'She graduated from BUET with a specialization in signal processing...',
  *     'Her academic research focused on autonomous vision systems...'
  *   ],
@@ -97,32 +97,32 @@ export interface Department {
 export const teamDepartments: Department[] = [
   {
     id: 'leadership',
-    name: 'Leadership & Research Team',
+    name: 'Leadership & Engineering Team',
     description:
-      'World-class innovators driving textile technology into the future through AI, materials science, and engineering excellence.',
+      'World-class innovators driving technology and intelligent systems into the future through AI, deep-tech engineering, and applied science.',
     members: [
       {
         id: 'chagla',
         name: 'Chagla Amanullah',
         title: 'Managing Director',
-        bio: 'Providing strategic leadership,driving innovation and industrial excellence.',
+        bio: 'Providing strategic leadership, driving innovation and engineering excellence at NEVOLYN Technology.',
 
         extendedBio: [
-          'Amanullah Chagla provides the strategic leadership for Saturn Textiles Limited, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and manufacturing excellence work together to create lasting industrial value.',
+          'Amanullah Chagla provides the strategic leadership for NEVOLYN Technology, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and engineering excellence work together to create lasting industrial value.',
 
-          'With decades of experience in the global textile and apparel industry, he has led the development and expansion of manufacturing operations while building strong partnerships with internationally recognized brands and organizations. His leadership philosophy combines business excellence with continuous innovation, responsible manufacturing, and long-term value creation for customers and stakeholders alike.',
+          'With decades of experience in industry and entrepreneurship, he has led the development and expansion of operations while building strong partnerships with globally recognized organizations and institutions. His leadership philosophy combines business excellence with continuous innovation, responsible engineering, and long-term value creation for customers and stakeholders alike.',
 
-          'Recognizing research and development as a key driver of future competitiveness, he actively supports the Saturn Textiles R&D Department in advancing AI-powered automation, intelligent manufacturing, computer vision, and next-generation textile technologies. His vision is to establish Saturn Textiles as a future-ready organization where innovation continuously transforms ideas into practical industrial solutions.'
+          'Recognizing research and development as a key driver of future competitiveness, he actively supports the NEVOLYN Technology team in advancing AI-powered automation, intelligent systems, computer vision, and next-generation engineering technologies. His vision is to establish NEVOLYN as a future-ready organization where innovation continuously transforms ideas into practical, high-impact technology solutions.'
         ],
 
         email: '',
 
         responsibilities: [
-          'Define the long-term strategic vision and innovation roadmap for Saturn Textiles Limited',
-          'Lead business growth through operational excellence, digital transformation, and advanced manufacturing',
+          'Define the long-term strategic vision and innovation roadmap for NEVOLYN Technology',
+          'Lead business growth through operational excellence, digital transformation, and advanced engineering',
           'Oversee and support Research & Development initiatives across the organization',
-          'Build strategic partnerships with global buyers, technology partners, and academic institutions',
-          'Promote sustainable manufacturing, responsible innovation, and continuous improvement',
+          'Build strategic partnerships with global clients, technology partners, and academic institutions',
+          'Promote responsible innovation, continuous improvement, and engineering-led growth',
           'Mentor leadership teams while fostering a culture of collaboration, integrity, and innovation'
         ]
       },
@@ -130,18 +130,18 @@ export const teamDepartments: Department[] = [
         id: 'rahin',
         name: 'Md Rahinur Rahman',
         title: 'Lead AI Systems Engineer',
-        bio: 'Leads the design and development of industrial automation for Saturn R&D platforms.',
+        bio: 'Leads the design and development of industrial AI and automation platforms at NEVOLYN Technology.',
         extendedBio: [
-          'Rahin leads the design and development of AI-powered industrial automation solutions for the R&D Department, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
+          'Rahin leads the design and development of AI-powered industrial automation solutions at NEVOLYN Technology, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
           'He graduated in Electrical and Electronic Engineering (EEE) from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools, with a specialization in Communication and Signal Processing (CSP). His academic foundation provided a solid basis in digital signal processing, mathematical modeling, and pattern recognition, bridging deep engineering theory with practical AI systems.',
           'Throughout his academic and research work, he explored advanced signal analysis, embedded systems, and computer vision algorithms for real-world problems. His hands-on research in hardware-software co-design and intelligent imaging built the technical foundation for his current work in industrial automation, edge AI, and real-time inspection systems.'
         ],
         email: 'rahin.rahman11@gmail.com',
         responsibilities: [
-          'Lead AI architecture and industrial automation initiatives',
+          'Lead AI architecture and industrial automation initiatives at NEVOLYN',
           'Computer vision and deep learning model development for FABINS',
           'Industrial camera integration & zero-latency trigger pipelines',
-          'Industrial imaging systems and R&D digital transformation'
+          'Industrial imaging systems and digital transformation'
         ],
         social: {
           github: 'https://github.com/rahin11',
@@ -155,15 +155,15 @@ export const teamDepartments: Department[] = [
         id: 'ninad',
         name: 'Mohammad Ninad Mahmud Nobo',
         title: 'Lead AI Software Engineer',
-        bio: 'Leads full-stack web development and machine learning model integration for Saturn R&D platforms.',
+        bio: 'Leads full-stack web development and machine learning model integration for NEVOLYN Technology platforms.',
         extendedBio: [
-          'Ninad leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and Saturn R&D platforms. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures to modernize textile manufacturing.',
+          'Ninad leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN Technology platforms. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
           'He graduated in Computer Science and Engineering from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools. There, he explored how AI could tackle complex, real-world challenges, from automated software testing to medical image analysis to Bangla speech processing. That foundation of rigorous research and hands-on building led him to industrial AI, where the software challenges are just as demanding, but the impact is immediate and visible on the factory floor.',
           'His research includes AutoTestGenX, a multi-agent system that writes and executes software tests autonomously, and MedCAR, which resolves conflicting AI readings of chest X-rays. Beyond FABINS, he has built impactful AI applications including MindTrace, providing caregivers simple tools for dementia support, and GemmaVetCare, delivering edge AI livestock health guidance for low-connectivity environments.'
         ],
         email: 'mninadmnobo@gmail.com',
         responsibilities: [
-          'Full-stack development of R&D Department Portfolio & FABINS web applications',
+          'Full-stack development of NEVOLYN Technology portfolio & FABINS web applications',
           'Image processing, computer vision model training for FABINS',
           'ML pipeline architecture & production deployment',
           'API design, software quality standards, & DevOps automation'

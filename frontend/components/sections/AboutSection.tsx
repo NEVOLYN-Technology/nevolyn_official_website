@@ -1,20 +1,8 @@
 /**
- * AboutSection — mission, vision, what-we-do, and focus-area pillars,
- * followed immediately by the `LeadershipTeam` section.
+ * AboutSection — Core overview of NEVOLYN Technology.
  *
- * Rendered as `id="about"` on the homepage so the Navbar's "About" link
- * can scroll directly to it.
- *
- * ## Layout
- * Four icon cards arranged in a 4-column grid (stacked on mobile) with a
- * decorative gradient line connecting the icon circles on desktop.
- * The `LeadershipTeam` component is embedded at the bottom — it has its own
- * `id="leadership"` anchor so both nav links work correctly.
- *
- * ## How to update the mission/vision copy
- * Edit the paragraph text directly in the JSX below. There is no data file
- * for this section — the copy is intentionally inline because it rarely
- * changes and is tightly coupled to the layout.
+ * Articulates the company's operating principles ("Innovate. Automate. Elevate."),
+ * engineering methodology, mission, vision, and core technical competencies.
  *
  * @module components/sections/AboutSection
  */
@@ -22,110 +10,278 @@
 
 import type { JSX } from 'react'
 import { motion } from 'framer-motion'
-import { Target, Globe, Cpu, Layers, CheckCircle2 } from 'lucide-react'
+import {
+  Cpu,
+  Bot,
+  Layers,
+  Target,
+  Globe,
+  CheckCircle2,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react'
 import { fadeUpProps } from '@/lib/animations'
 
 /**
- * About section presenting Saturn R&D mission, vision, core engineering activities, and focus pillars.
+ * About section presenting NEVOLYN Technology's mission, engineering pillars, and technical capabilities.
  *
  * @returns Rendered About section component
  */
 export const AboutSection = (): JSX.Element => {
   return (
-    <section id="about" className="pt-12 pb-6 border-t border-slate-200 dark:border-blue-950/40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div {...fadeUpProps(0.1)} className="text-center mb-12 sm:mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-orange-500 tracking-tight uppercase">About Us</h2>
+    <section id="about" className="py-20 sm:py-24 border-t border-slate-300/70 bg-[#f5f8fb] relative overflow-hidden">
+      {/* Anchor alias so any legacy references to #capabilities resolve smoothly */}
+      <div id="capabilities" className="absolute -top-24 left-0" />
 
-          {/* Decorative Divider */}
-          <div className="relative max-w-xl mx-auto h-[1px] mb-8 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_2px_rgba(249,115,22,0.6)]" />
+      {/* Subtle colorful ambient mesh */}
+      <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-sky-400/10 blur-[130px] pointer-events-none" />
+      <div className="absolute top-2/3 -right-32 w-96 h-96 rounded-full bg-emerald-400/10 blur-[130px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+        {/* ── Section Header ────────────────────────────────────────── */}
+        <motion.div {...fadeUpProps(0.1)} className="text-center mb-16 sm:mb-20">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-emerald-50/80 px-4 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm mb-4 backdrop-blur-sm">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <span className="tracking-wide uppercase">ABOUT NEVOLYN TECHNOLOGY</span>
           </div>
 
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-            The R&D Department of Saturn Textiles Limited is committed to advancing the textile industry through smart automation and sustainable technology
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
+            Innovate.{' '}
+            <span className="bg-gradient-to-r from-sky-400 to-sky-500 bg-clip-text text-transparent">
+              Automate.
+            </span>{' '}
+            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+              Elevate.
+            </span>
+          </h2>
+
+          <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed font-normal">
+            NEVOLYN Technology is an advanced engineering company. We research, build, and deploy production-read industrial automation systems built to solve manufacturing challenges.
           </p>
         </motion.div>
 
-        {/* Mission, Vision, What We Do, Focus Areas */}
-        <div className="relative mb-8 sm:mb-12">
-          {/* Decorative horizontal connector line (desktop only) */}
-          <div className="absolute top-12 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-orange-500/20 to-transparent hidden lg:block" />
+        {/* ── 3 Action Pillars: Innovate · Automate · Elevate ───────── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16 sm:mb-20">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
-
-            {/* Our Mission */}
-            <motion.div {...fadeUpProps(0.1)} className="relative flex flex-col items-center lg:items-start text-center lg:text-left group">
-              <div className="relative mb-6">
-                <div className="absolute top-1/2 -left-12 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_2px_rgba(249,115,22,0.4)] dark:shadow-[0_0_8px_2px_rgba(249,115,22,0.6)] hidden lg:block" />
-                <div className="w-24 h-24 rounded-full border border-orange-500/20 dark:border-orange-500/30 flex items-center justify-center bg-white dark:bg-[#071526]/80 group-hover:border-orange-500/60 transition-colors relative z-10 shadow-[inset_0_0_20px_rgba(249,115,22,0.05)] group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.15)]">
-                  <Target className="w-10 h-10 text-orange-500" strokeWidth={1.5} />
+          {/* Pillar 1: Innovate */}
+          <motion.div
+            {...fadeUpProps(0.15)}
+            className="group relative rounded-3xl border border-slate-200/90 bg-gradient-to-b from-white via-sky-50/20 to-white p-7 sm:p-8 shadow-sm transition-all duration-300 hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/10 hover:-translate-y-1 flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-13 h-13 rounded-2xl border border-sky-200 bg-sky-50 flex items-center justify-center text-sky-600 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-sky-400/20">
+                  <Cpu className="w-6 h-6" strokeWidth={1.8} />
                 </div>
+                <span className="font-mono text-xs font-bold text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200 uppercase tracking-wider">
+                  01 / Innovate
+                </span>
               </div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 tracking-wider uppercase">OUR MISSION</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pr-0 lg:pr-4">
-                To develop intelligent, sustainable, and automated textile solutions through advanced research and innovation that drive efficiency, quality, and value.
+
+              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-sky-600 transition-colors">
+                Applied AI &amp; Edge Vision
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">
+                Translating computer vision and deep learning models into optimized, real-time edge algorithms. We emphasize field accuracy, low latency, and efficient computation on embedded hardware.
               </p>
-            </motion.div>
+            </div>
 
-            {/* Our Vision */}
-            <motion.div {...fadeUpProps(0.2)} className="relative flex flex-col items-center lg:items-start text-center lg:text-left group">
-              <div className="relative mb-6">
-                <div className="absolute top-1/2 -left-12 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_2px_rgba(59,130,246,0.4)] dark:shadow-[0_0_8px_2px_rgba(59,130,246,0.6)] hidden lg:block" />
-                <div className="w-24 h-24 rounded-full border border-blue-500/20 dark:border-blue-500/30 flex items-center justify-center bg-white dark:bg-[#071526]/80 group-hover:border-blue-500/60 transition-colors relative z-10 shadow-[inset_0_0_20px_rgba(59,130,246,0.05)] group-hover:shadow-[inset_0_0_30px_rgba(59,130,246,0.15)]">
-                  <Globe className="w-10 h-10 text-blue-500" strokeWidth={1.5} />
-                </div>
+            <div className="pt-5 border-t border-slate-100 space-y-2.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0" />
+                <span>Custom optical defect classification (FABINS)</span>
               </div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 tracking-wider uppercase">OUR VISION</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pr-0 lg:pr-4">
-                To be a global leader in textile innovation, recognized for transforming challenges into sustainable technologies that empower the industry.
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0" />
+                <span>Sub-second inference on embedded GPU accelerators</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Pillar 2: Automate */}
+          <motion.div
+            {...fadeUpProps(0.25)}
+            className="group relative rounded-3xl border border-slate-200/90 bg-gradient-to-b from-white via-emerald-50/20 to-white p-7 sm:p-8 shadow-sm transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-13 h-13 rounded-2xl border border-emerald-200 bg-emerald-50 flex items-center justify-center text-emerald-600 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-emerald-400/20">
+                  <Bot className="w-6 h-6" strokeWidth={1.8} />
+                </div>
+                <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 uppercase tracking-wider">
+                  02 / Automate
+                </span>
+              </div>
+
+              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-600 transition-colors">
+                Industrial Automation &amp; Robotics
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">
+                Designing automated inspection machinery, sensor telemetry, and embedded control hardware that replace manual bottleneck processes with continuous, reliable industrial operation.
               </p>
-            </motion.div>
+            </div>
 
-            {/* What We Do */}
-            <motion.div {...fadeUpProps(0.3)} className="relative flex flex-col items-center lg:items-start text-center lg:text-left group">
-              <div className="relative mb-6">
-                <div className="absolute top-1/2 -left-12 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_2px_rgba(249,115,22,0.4)] dark:shadow-[0_0_8px_2px_rgba(249,115,22,0.6)] hidden lg:block" />
-                <div className="w-24 h-24 rounded-full border border-orange-500/20 dark:border-orange-500/30 flex items-center justify-center bg-white dark:bg-[#071526]/80 group-hover:border-orange-500/60 transition-colors relative z-10 shadow-[inset_0_0_20px_rgba(249,115,22,0.05)] group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.15)]">
-                  <Cpu className="w-10 h-10 text-orange-500" strokeWidth={1.5} />
-                </div>
+            <div className="pt-5 border-t border-slate-100 space-y-2.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Automated quality control &amp; industrial sorting</span>
               </div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 tracking-wider uppercase">WHAT WE DO</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pr-0 lg:pr-4">
-                We research, design, and develop smart systems, advanced materials, and automation solutions that enhance performance, productivity, and sustainability.
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Microcontroller, PLC, and sensor-rig integration</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Pillar 3: Elevate */}
+          <motion.div
+            {...fadeUpProps(0.35)}
+            className="group relative rounded-3xl border border-slate-200/90 bg-gradient-to-b from-white via-indigo-50/20 to-white p-7 sm:p-8 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1 flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-13 h-13 rounded-2xl border border-indigo-200 bg-indigo-50 flex items-center justify-center text-indigo-600 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-indigo-400/20">
+                  <Layers className="w-6 h-6" strokeWidth={1.8} />
+                </div>
+                <span className="font-mono text-xs font-bold text-indigo-800 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 uppercase tracking-wider">
+                  03 / Elevate
+                </span>
+              </div>
+
+              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                Enterprise Digital Systems
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">
+                Architecting resilient full-stack platforms, distributed backend services, and real-time operational telemetry dashboards that turn shop-floor sensor signals into strategic decision-making.
               </p>
-            </motion.div>
+            </div>
 
-            {/* Our Focus Areas */}
-            <motion.div {...fadeUpProps(0.4)} className="relative flex flex-col items-center lg:items-start text-center lg:text-left group">
-              <div className="relative mb-6">
-                <div className="absolute top-1/2 -left-12 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_2px_rgba(59,130,246,0.4)] dark:shadow-[0_0_8px_2px_rgba(59,130,246,0.6)] hidden lg:block" />
-                <div className="w-24 h-24 rounded-full border border-blue-500/20 dark:border-blue-500/30 flex items-center justify-center bg-white dark:bg-[#071526]/80 group-hover:border-blue-500/60 transition-colors relative z-10 shadow-[inset_0_0_20px_rgba(59,130,246,0.05)] group-hover:shadow-[inset_0_0_30px_rgba(59,130,246,0.15)]">
-                  <Layers className="w-10 h-10 text-blue-500" strokeWidth={1.5} />
-                </div>
+            <div className="pt-5 border-t border-slate-100 space-y-2.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0" />
+                <span>Scalable Spring Boot &amp; TypeScript architectures</span>
               </div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 tracking-wider uppercase">OUR FOCUS AREAS</h3>
-              <ul className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed space-y-2 w-full text-left lg:pr-4">
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                  <span>Smart Textile Automation</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                  <span>Advanced Materials & Finishing</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                  <span>Data Intelligence & Analytics</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                  <span>Sustainability & Circularity</span>
-                </li>
-              </ul>
-            </motion.div>
-          </div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0" />
+                <span>Auditable industrial data pipelines &amp; live dashboards</span>
+              </div>
+            </div>
+          </motion.div>
+
         </div>
+
+        {/* ── Mission, Vision & Core Technical Competencies ───────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+          {/* Left Column: Purpose & Operating Principles */}
+          <motion.div
+            {...fadeUpProps(0.2)}
+            className="lg:col-span-6 rounded-3xl border border-slate-200/90 bg-slate-50/60 p-7 sm:p-9 flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-700">
+                  <Target className="w-4 h-4" />
+                </div>
+                <h4 className="text-lg font-bold text-slate-900">Our Purpose &amp; Operating Standards</h4>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1.5">
+                    Our Mission
+                  </span>
+                  <p className="text-sm text-slate-700 leading-relaxed font-normal">
+                    To build intelligent, dependable technology through rigorous engineering and applied AI research that solves physical manufacturing bottlenecks, improves throughput, and creates verifiable industrial value.
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-xs font-bold text-sky-800 uppercase tracking-wider block mb-1.5">
+                    Our Vision
+                  </span>
+                  <p className="text-sm text-slate-700 leading-relaxed font-normal">
+                    To establish NEVOLYN Technology as a premier deep-tech powerhouse recognized for transforming complex industrial problems into scalable, high-precision automated systems.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold text-slate-600">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>100% In-House Hardware &amp; Software Design</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-sky-600 shrink-0" />
+                <span>Engineered for Production Environments</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Column: Core Technical Competencies */}
+          <motion.div
+            {...fadeUpProps(0.3)}
+            className="lg:col-span-6 rounded-3xl border border-slate-200/90 bg-white p-7 sm:p-9 shadow-sm flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="w-8 h-8 rounded-full bg-sky-500/15 flex items-center justify-center text-sky-700">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <h4 className="text-lg font-bold text-slate-900">Core Engineering Disciplines</h4>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-sky-50/40 hover:border-sky-200 transition-colors">
+                  <span className="font-mono text-[11px] font-bold text-sky-600 block mb-1">01 / VISION</span>
+                  <h5 className="text-sm font-bold text-slate-900 mb-1">Computer Vision</h5>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Custom optical inspection rigs, defect classification, and real-time inference.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-emerald-50/40 hover:border-emerald-200 transition-colors">
+                  <span className="font-mono text-[11px] font-bold text-emerald-600 block mb-1">02 / ROBOTICS</span>
+                  <h5 className="text-sm font-bold text-slate-900 mb-1">Automation Systems</h5>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Microcontroller controls, motor synchronization, and automated sorting hardware.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-indigo-50/40 hover:border-indigo-200 transition-colors">
+                  <span className="font-mono text-[11px] font-bold text-indigo-600 block mb-1">03 / SOFTWARE</span>
+                  <h5 className="text-sm font-bold text-slate-900 mb-1">Digital Platforms</h5>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Java Spring Boot APIs, Next.js web applications, and live telemetry databases.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-purple-50/40 hover:border-purple-200 transition-colors">
+                  <span className="font-mono text-[11px] font-bold text-purple-600 block mb-1">04 / R&amp;D</span>
+                  <h5 className="text-sm font-bold text-slate-900 mb-1">Deep-Tech Products</h5>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Original intellectual property, proprietary industrial machinery, and edge AI.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span className="font-medium text-slate-600">Engineered for enterprise production &amp; scale</span>
+              <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Continuous R&amp;D
+              </span>
+            </div>
+          </motion.div>
+
+        </div>
+
       </div>
     </section>
   )

@@ -27,7 +27,7 @@ const STATUS_TONE: Record<Project['status'], BadgeTone> = {
 }
 
 /** UI filter labels and the project status they correspond to. */
-const FILTERS = ['All', 'Ongoing', 'Upcoming', 'Completed'] as const
+const FILTERS = ['All', 'Ongoing', 'Completed'] as const
 type FilterLabel = typeof FILTERS[number]
 
 /**
@@ -43,7 +43,6 @@ export const InnovationsSection = (): JSX.Element => {
   const filteredProjects = projects.filter((project) => {
     if (activeFilter === 'All') return true
     if (activeFilter === 'Ongoing') return project.status === 'active'
-    if (activeFilter === 'Upcoming') return project.status === 'planning'
     if (activeFilter === 'Completed') return project.status === 'completed'
     return true
   })
@@ -121,18 +120,30 @@ export const InnovationsSection = (): JSX.Element => {
   const currentCenteredProject = filteredProjects[safeCenteredIndex]
 
   return (
-    <section id="innovations" className="relative py-12 sm:py-16 overflow-hidden border-t border-slate-200 dark:border-blue-950/40">
-      {/* Background Ambient Glow Orbs - Perfectly Balanced Vibrancy */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-gradient-to-tr from-orange-500/14 via-amber-500/8 to-blue-600/8 rounded-full blur-[130px] pointer-events-none z-0" />
+    <section id="innovations" className="relative py-14 sm:py-20 overflow-hidden border-t border-slate-200/90 bg-[#ecf1f6]">
+      {/* Background Ambient Glow Orbs - Multi-chromatic Soft Aura */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] bg-gradient-to-tr from-sky-400/20 via-indigo-400/15 to-emerald-400/15 rounded-full blur-[140px] pointer-events-none z-0" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <motion.div {...fadeUpProps(0.1)} className="text-center mb-8 sm:mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-3 text-orange-500 uppercase tracking-tight drop-shadow-sm">
-            Our Innovations
+        <motion.div {...fadeUpProps(0.1)} className="text-center mb-10 sm:mb-12">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-emerald-50/80 px-4 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm mb-4 backdrop-blur-sm">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <span className="tracking-wide uppercase">RESEARCH &amp; COMMERCIAL PRODUCTS</span>
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
+            Research.{' '}
+            <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">
+              Develop.
+            </span>{' '}
+            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+              Deploy.
+            </span>
           </h2>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal">
-            Pioneering The Next Generation of Intelligent Systems and Textile Solutions
+
+          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal">
+            Pioneering next-generation intelligent systems, automated computer vision, and scalable software platforms engineered for real-world execution.
           </p>
         </motion.div>
 
@@ -142,9 +153,8 @@ export const InnovationsSection = (): JSX.Element => {
             const isSelected = activeFilter === filter
             const isMatchingCenteredStatus =
               currentCenteredProject &&
-              ((filter === 'Completed' && currentCenteredProject.status === 'completed') ||
-               (filter === 'Ongoing' && currentCenteredProject.status === 'active') ||
-               (filter === 'Upcoming' && currentCenteredProject.status === 'planning'))
+              ((filter === 'Ongoing' && currentCenteredProject.status === 'active') ||
+                (filter === 'Completed' && currentCenteredProject.status === 'completed'))
 
             return (
               <button
@@ -152,12 +162,12 @@ export const InnovationsSection = (): JSX.Element => {
                 onClick={() => setActiveFilter(filter)}
                 className={cn(
                   "px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 border transform cursor-pointer",
-                  "hover:-translate-y-1 hover:scale-105 active:translate-y-0 active:scale-95",
+                  "hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95",
                   isSelected
-                    ? "bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white border-orange-400 shadow-md shadow-orange-500/30 -translate-y-1 scale-105 font-extrabold"
+                    ? "bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 text-white border-transparent shadow-lg shadow-sky-500/30 -translate-y-0.5 scale-105 font-extrabold"
                     : isMatchingCenteredStatus
-                    ? "bg-orange-500/15 text-orange-400 border-orange-500/60 shadow-[0_0_15px_rgba(249,115,22,0.25)] -translate-y-1 scale-105 font-bold"
-                    : "bg-white/80 text-slate-600 border-slate-300 hover:border-orange-500/80 hover:text-orange-500 hover:shadow-[0_0_12px_rgba(249,115,22,0.2)] backdrop-blur-md dark:bg-slate-900/80 dark:text-slate-300 dark:border-slate-700/80 dark:hover:text-orange-400"
+                      ? "bg-sky-50 text-sky-700 border-sky-300 shadow-[0_0_15px_rgba(56,189,248,0.25)] -translate-y-0.5 scale-105 font-bold"
+                      : "bg-white text-slate-600 border-slate-300 hover:border-sky-400 hover:text-sky-600 hover:shadow-[0_0_12px_rgba(56,189,248,0.2)] shadow-sm"
                 )}
               >
                 {filter}
@@ -174,14 +184,14 @@ export const InnovationsSection = (): JSX.Element => {
               <button
                 onClick={handlePrev}
                 aria-label="Previous project"
-                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-white/90 border border-slate-300 backdrop-blur-xl text-slate-700 hover:bg-orange-500 hover:border-orange-400 hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg shadow-slate-400/25 dark:bg-slate-900/90 dark:border-slate-700/80 dark:text-slate-200 dark:shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer group"
+                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-white/95 border border-slate-200 backdrop-blur-xl text-slate-700 hover:bg-gradient-to-r hover:from-sky-400 hover:to-blue-500 hover:border-transparent hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg shadow-slate-400/20 cursor-pointer group"
               >
                 <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
               </button>
               <button
                 onClick={handleNext}
                 aria-label="Next project"
-                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-white/90 border border-slate-300 backdrop-blur-xl text-slate-700 hover:bg-orange-500 hover:border-orange-400 hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg shadow-slate-400/25 dark:bg-slate-900/90 dark:border-slate-700/80 dark:text-slate-200 dark:shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer group"
+                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-white/95 border border-slate-200 backdrop-blur-xl text-slate-700 hover:bg-gradient-to-r hover:from-sky-400 hover:to-blue-500 hover:border-transparent hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg shadow-slate-400/20 cursor-pointer group"
               >
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
               </button>
@@ -206,43 +216,59 @@ export const InnovationsSection = (): JSX.Element => {
                     "snap-center shrink-0 w-[320px] sm:w-[460px] lg:w-[500px]",
                     "p-[1.5px] rounded-[28px] transition-all duration-500 ease-out cursor-pointer group transform",
                     isCenter
-                      ? "bg-gradient-to-b from-orange-500/70 via-amber-500/40 to-orange-500/30 shadow-[0_20px_50px_rgba(249,115,22,0.22),0_0_25px_rgba(249,115,22,0.15)] -translate-y-4 scale-105 filter blur-0 opacity-100 z-20"
-                      : "bg-slate-300/70 shadow-lg shadow-slate-400/20 dark:bg-slate-800/60 dark:shadow-black/20 translate-y-2 scale-90 filter blur-[3.5px] opacity-50 z-10 hover:opacity-80 hover:blur-[1px]"
+                      ? "bg-gradient-to-b from-sky-400 via-blue-500 to-indigo-500 shadow-[0_20px_50px_rgba(56,189,248,0.25),0_0_25px_rgba(99,102,241,0.15)] -translate-y-4 scale-105 filter blur-0 opacity-100 z-20"
+                      : "bg-slate-300/70 shadow-lg shadow-slate-400/20 translate-y-2 scale-90 filter blur-[3.5px] opacity-50 z-10 hover:opacity-80 hover:blur-[1px]"
                   )}
                 >
                   {/* Inner Card Content Container */}
-                  <div className="relative w-full h-full p-6 sm:p-7 rounded-[26px] bg-white/95 text-slate-900 dark:bg-[#070f1e]/95 dark:text-slate-100 backdrop-blur-2xl flex flex-col justify-between overflow-hidden">
+                  <div className="relative w-full h-full p-6 sm:p-7 rounded-[26px] bg-white text-slate-900 shadow-sm backdrop-blur-2xl flex flex-col justify-between overflow-hidden">
                     {/* Inner Ambient Glow Background */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.08),transparent_55%)] pointer-events-none" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_55%)] pointer-events-none" />
 
-                    {/* Top Neon Accent Beam */}
+                    {/* Top Multi-Chromatic Accent Beam */}
                     <div className={cn(
                       "absolute top-0 left-0 right-0 h-1.5 rounded-t-3xl transition-all duration-500",
                       isCenter
-                        ? "bg-gradient-to-r from-orange-500 via-amber-400 to-cyan-400 shadow-[0_0_12px_rgba(249,115,22,0.4)]"
-                        : "bg-slate-300 dark:bg-slate-800"
+                        ? "bg-gradient-to-r from-sky-400 via-indigo-400 to-emerald-400 shadow-[0_0_12px_rgba(56,189,248,0.4)]"
+                        : "bg-slate-200"
                     )} />
 
                     {/* Optional Image Banner if provided */}
                     {project.image && (
-                      <div className="mb-5 -mx-6 -mt-6 sm:-mx-7 sm:-mt-7 overflow-hidden relative h-40 rounded-t-[24px] border-b border-slate-200 dark:border-slate-800/80">
+                      <div className="mb-5 -mx-6 -mt-6 sm:-mx-7 sm:-mt-7 overflow-hidden relative h-40 rounded-t-[24px] border-b border-slate-200">
                         <img
                           src={project.image}
                           alt={project.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#070f1e] via-white/40 dark:via-slate-950/40 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
                       </div>
                     )}
 
                     <div>
                       {/* Category & Status Header Row */}
                       <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pt-1">
-                        {/* Glowing Category Chip */}
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-gradient-to-r from-orange-500/18 via-amber-500/12 to-transparent text-orange-400 border border-orange-500/30 shadow-[0_0_10px_rgba(249,115,22,0.15)]">
-                          <Tag className="w-3.5 h-3.5 text-orange-400" />
-                          <span>{project.category}</span>
-                        </div>
+                        {/* Dynamic Colorful Category Chip */}
+                        {(() => {
+                          const cat = project.category.toLowerCase()
+                          const isGreen = cat.includes('auto') || cat.includes('system') || cat.includes('clean')
+                          const isRed = cat.includes('vision') || cat.includes('optic') || cat.includes('robot')
+                          const colorClasses = isGreen
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : isRed
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : 'bg-sky-50 text-sky-700 border-sky-200'
+
+                          return (
+                            <div className={cn(
+                              "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider border shadow-sm",
+                              colorClasses
+                            )}>
+                              <Tag className="w-3.5 h-3.5" />
+                              <span>{project.category}</span>
+                            </div>
+                          )
+                        })()}
 
                         {/* Status Badge */}
                         <div className="flex items-center gap-2">
@@ -258,13 +284,13 @@ export const InnovationsSection = (): JSX.Element => {
                         </div>
                       </div>
 
-                      {/* Gradient Project Title */}
-                      <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-950 via-slate-700 to-slate-600 dark:from-white dark:via-slate-100 dark:to-slate-200 group-hover:from-orange-500 group-hover:to-amber-600 dark:group-hover:from-orange-400 dark:group-hover:to-amber-300 transition-all duration-300 tracking-tight leading-snug mb-3 drop-shadow-sm">
+                      {/* Project Title */}
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-sky-600 transition-all duration-300 tracking-tight leading-snug mb-3">
                         {project.title}
                       </h3>
 
                       {/* Description */}
-                      <p className="text-slate-600 dark:text-slate-300/90 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[44px]">
+                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[44px]">
                         {project.description}
                       </p>
                     </div>
@@ -273,14 +299,14 @@ export const InnovationsSection = (): JSX.Element => {
                       {/* Technology Stack Badges */}
                       <div className="mb-5">
                         <div className="flex items-center gap-1.5 mb-2.5">
-                          <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-                          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Tech Stack & Frameworks</span>
+                          <Sparkles className="w-3.5 h-3.5 text-sky-500" />
+                          <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">Tech Stack & Frameworks</span>
                         </div>
                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
                           {project.technologies.map((tech) => (
                             <span
                               key={tech}
-                              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300 group-hover:border-orange-400/60 hover:text-orange-600 hover:bg-orange-50 hover:shadow-[0_0_10px_rgba(249,115,22,0.2)] dark:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700/80 dark:hover:text-orange-300 dark:hover:bg-orange-950/40 transition-all duration-200 shadow-sm"
+                              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-sm"
                             >
                               {tech}
                             </span>
@@ -289,20 +315,20 @@ export const InnovationsSection = (): JSX.Element => {
                       </div>
 
                       {/* Date & Interactive CTA Footer */}
-                      <div className="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-orange-400 shrink-0" />
+                          <Calendar className="w-4 h-4 text-sky-500 shrink-0" />
                           <span>
                             {project.status === 'completed' && project.endDate
                               ? `Completed ${formatDate(project.endDate)}`
                               : project.status === 'planning'
-                              ? 'Upcoming R&D Initiative'
-                              : `Started ${formatDate(project.startDate)}`}
+                                ? 'Upcoming R&D Initiative'
+                                : `Started ${formatDate(project.startDate)}`}
                           </span>
                         </div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-900/90 dark:text-slate-300 dark:border-slate-800 text-xs font-semibold group-hover:border-orange-500/40 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300">
-                          <img src="/saturn-icon.png" alt="Saturn R&D" className="w-3.5 h-3.5 object-contain shrink-0" />
-                          <span>Saturn R&D</span>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold group-hover:border-sky-400 group-hover:text-sky-600 transition-all duration-300">
+                          <img src="/nevolyn-icon.png" alt="NEVOLYN Technology" className="w-3.5 h-3.5 object-contain shrink-0" />
+                          <span>NEVOLYN</span>
                         </div>
                       </div>
                     </div>
@@ -312,24 +338,24 @@ export const InnovationsSection = (): JSX.Element => {
             })}
           </div>
 
-        {/* Horizontal Navigation Dots */}
-        {filteredProjects.length > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-4">
-            {filteredProjects.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => scrollToCard(i)}
-                className={cn(
-                  "h-2.5 rounded-full transition-all duration-300 cursor-pointer hover:scale-125",
-                  i === safeCenteredIndex
-                    ? "w-8 bg-gradient-to-r from-orange-500 to-amber-500 shadow-[0_0_12px_rgba(249,115,22,0.6)]"
-                    : "w-2.5 bg-slate-400 dark:bg-slate-700 hover:bg-orange-400/60"
-                )}
-                aria-label={`Go to project ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
+          {/* Horizontal Navigation Dots */}
+          {filteredProjects.length > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-4">
+              {filteredProjects.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => scrollToCard(i)}
+                  className={cn(
+                    "h-2.5 rounded-full transition-all duration-300 cursor-pointer hover:scale-125",
+                    i === safeCenteredIndex
+                      ? "w-8 bg-gradient-to-r from-sky-400 to-blue-500 shadow-[0_0_12px_rgba(56,189,248,0.45)]"
+                      : "w-2.5 bg-slate-300 hover:bg-sky-400"
+                  )}
+                  aria-label={`Go to project ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </motion.div>
       </div>
     </section>

@@ -20,12 +20,11 @@
  */
 import type { JSX } from 'react'
 import { Navbar } from '@/components/layout/Navbar'
-import { WelcomeBanner } from '@/components/ui/WelcomeBanner'
 import { Hero } from '@/components/sections/Hero'
-import { CapabilitiesSection } from '@/components/sections/CapabilitiesSection'
+import { MarqueeTicker } from '@/components/sections/MarqueeTicker'
 import { AboutSection } from '@/components/sections/AboutSection'
-import { LeadersSection } from '@/components/sections/LeadersSection'
 import { InnovationsSection } from '@/components/sections/InnovationsSection'
+import { LeadersSection } from '@/components/sections/LeadersSection'
 import { LatestNewsSection } from '@/components/sections/LatestNewsSection'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { Footer } from '@/components/layout/Footer'
@@ -37,20 +36,26 @@ import { Footer } from '@/components/layout/Footer'
  */
 export default function Home(): JSX.Element {
   return (
-    <main className="w-full">
+    <main className="w-full min-h-screen bg-[#ecf1f6]">
       <Navbar />
-      {/* pt-[5.5rem] offsets the fixed navbar height (5.5rem = 88px) */}
-      <div className="pt-[5.5rem]">
-        <WelcomeBanner />
+      {/* Offsets the floating capsule navbar cleanly without excess dead space */}
+      <div className="pt-16 sm:pt-20">
         <div id="home">
           <Hero />
-          <CapabilitiesSection />
         </div>
+        <div className="tech-check-stripe" />
+        <MarqueeTicker />
+        <div className="tech-check-stripe" />
         <AboutSection />
-        <LeadersSection />
+        <div className="tech-check-stripe" />
         <InnovationsSection />
+        <div className="tech-check-stripe" />
+        <LeadersSection />
+        <div className="tech-check-stripe" />
         <LatestNewsSection />
+        <div className="tech-check-stripe" />
         <ContactSection />
+        <div className="tech-check-stripe" />
       </div>
       <Footer />
     </main>

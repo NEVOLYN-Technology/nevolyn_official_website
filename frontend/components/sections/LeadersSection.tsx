@@ -47,9 +47,9 @@ import type { TeamMember } from '@/lib/data/leaders'
 /** High-contrast official LinkedIn SVG logo badge */
 const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }): JSX.Element => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect width="24" height="24" rx="5" fill="#0A66C2"/>
-    <path d="M19 19H15.8202V13.8407C15.8202 12.5199 15.3408 11.6163 14.1565 11.6163C13.2505 11.6163 12.716 12.2217 12.4795 12.808C12.3929 13.0182 12.3708 13.3108 12.3708 13.6046V19H9.18972C9.18972 19 9.2323 10.3709 9.18972 9.46736H12.3708V10.8202C12.7937 10.1659 13.5517 9.2323 15.2492 9.2323C17.3392 9.2323 18.9189 10.5975 18.9189 13.5414V19H19Z" fill="white"/>
-    <path d="M5.53906 8.01633C6.65089 8.01633 7.34509 7.28308 7.32454 6.36875C7.30399 5.43317 6.65089 4.7207 5.56116 4.7207C4.47143 4.7207 3.75488 5.43317 3.75488 6.36875C3.75488 7.28308 4.45088 8.01633 5.53906 8.01633ZM3.94824 19H7.12933V9.46736H3.94824V19Z" fill="white"/>
+    <rect width="24" height="24" rx="5" fill="#0A66C2" />
+    <path d="M19 19H15.8202V13.8407C15.8202 12.5199 15.3408 11.6163 14.1565 11.6163C13.2505 11.6163 12.716 12.2217 12.4795 12.808C12.3929 13.0182 12.3708 13.3108 12.3708 13.6046V19H9.18972C9.18972 19 9.2323 10.3709 9.18972 9.46736H12.3708V10.8202C12.7937 10.1659 13.5517 9.2323 15.2492 9.2323C17.3392 9.2323 18.9189 10.5975 18.9189 13.5414V19H19Z" fill="white" />
+    <path d="M5.53906 8.01633C6.65089 8.01633 7.34509 7.28308 7.32454 6.36875C7.30399 5.43317 6.65089 4.7207 5.56116 4.7207C4.47143 4.7207 3.75488 5.43317 3.75488 6.36875C3.75488 7.28308 4.45088 8.01633 5.53906 8.01633ZM3.94824 19H7.12933V9.46736H3.94824V19Z" fill="white" />
   </svg>
 )
 
@@ -71,12 +71,18 @@ export function LeadersSection(): JSX.Element {
   const containerVariants = staggerContainer()
   const itemVariants = fadeInUpVariants
 
-  const renderCard = (member: TeamMember) => {
+  const renderCard = (member: TeamMember, _idx: number = 0) => {
+    const ringBorder = 'border-2 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
+    const titleColor = 'text-emerald-700'
+    const dividerBg = 'bg-emerald-500'
+    const btnStyle = 'border-emerald-200 hover:border-emerald-400 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-700 hover:shadow-sm'
+    const hoverBorder = 'hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/10'
+
     return (
-      <div className="bg-white dark:bg-[#0a1526] border border-slate-200 dark:border-blue-950/40 rounded-[2rem] p-8 flex flex-col hover:border-orange-500/30 transition-colors shadow-xl dark:shadow-none h-full">
+      <div className={`bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-[2rem] p-8 flex flex-col transition-all duration-300 shadow-sm hover:-translate-y-1 h-full ${hoverBorder}`}>
         {/* Avatar */}
         <div className="flex justify-center mb-6">
-          <div className="w-40 h-40 rounded-full p-1 border-2 border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)] bg-white dark:bg-[#0a1526]">
+          <div className={`w-40 h-40 rounded-full p-1 bg-white ${ringBorder}`}>
             {member.image ? (
               <img
                 src={member.image}
@@ -84,8 +90,8 @@ export function LeadersSection(): JSX.Element {
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-              <div className="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
-                <User className="w-20 h-20 text-orange-500/80" />
+              <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                <User className={`w-20 h-20 ${titleColor}`} />
               </div>
             )}
           </div>
@@ -94,18 +100,18 @@ export function LeadersSection(): JSX.Element {
         {/* Name · Title · CTA */}
         <div className="text-center flex-1 flex flex-col">
           <div>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 min-h-[3.5rem] flex items-center justify-center leading-tight">
+            <h3 className="text-2xl font-bold text-slate-900 mb-2 min-h-[3.5rem] flex items-center justify-center leading-tight">
               {member.name}
             </h3>
-            <p className="text-sm font-semibold text-blue-500 dark:text-blue-400">{member.title}</p>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 line-clamp-2 max-w-xs mx-auto">{member.bio}</p>
+            <p className={`text-sm font-semibold ${titleColor}`}>{member.title}</p>
+            <p className="text-xs text-slate-600 mt-2 line-clamp-2 max-w-xs mx-auto">{member.bio}</p>
           </div>
 
           <div className="mt-auto">
-            <div className="w-8 h-[2px] mx-auto mt-5 mb-6 rounded-full bg-blue-500" />
+            <div className={`w-8 h-[2px] mx-auto mt-5 mb-6 rounded-full ${dividerBg}`} />
             <button
               onClick={() => setSelectedMember(member)}
-              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-transparent hover:border-orange-500/80 bg-transparent hover:bg-orange-500 text-orange-500 hover:text-white text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/40 hover:scale-105 active:scale-95 mb-2 cursor-pointer"
+              className={`group inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:shadow-md hover:scale-105 active:scale-95 mb-2 cursor-pointer ${btnStyle}`}
             >
               View Details <ChevronDown className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" />
             </button>
@@ -113,13 +119,13 @@ export function LeadersSection(): JSX.Element {
         </div>
 
         {/* Social footer */}
-        <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800/80">
+        <div className="mt-6 pt-6 border-t border-slate-100">
           <div className="flex items-center justify-center">
             <Link
               href={member.social?.linkedin || '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-transparent bg-transparent text-slate-800 dark:text-slate-200 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] hover-blue-blink transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/40 hover:scale-105 active:scale-95 group cursor-pointer"
+              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-transparent bg-transparent text-slate-800 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/40 hover:scale-105 active:scale-95 group cursor-pointer"
               aria-label={`${member.name} LinkedIn`}
             >
               <LinkedinIcon className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
@@ -132,7 +138,7 @@ export function LeadersSection(): JSX.Element {
   }
 
   return (
-    <section id="leaders" className="relative pt-6 pb-12 px-4 md:px-8 overflow-hidden">
+    <section id="leaders" className="relative pt-12 pb-16 px-4 md:px-8 overflow-hidden bg-[#f5f8fb] border-t border-slate-300/70">
       <div className="max-w-7xl mx-auto">
 
         {/* ── Section Header ─────────────────────────────────── */}
@@ -141,28 +147,31 @@ export function LeadersSection(): JSX.Element {
           initial="hidden"
           whileInView="visible"
           viewport={defaultViewport}
-          className="text-center mb-10"
+          className="text-center mb-12 sm:mb-16"
         >
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-emerald-50/80 px-4 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm mb-4 backdrop-blur-sm">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <span className="tracking-wide uppercase">EXECUTIVE &amp; RESEARCH LEADERSHIP</span>
+          </div>
+
           <motion.h2
             variants={itemVariants}
-            className="text-3xl md:text-4xl font-bold text-orange-500 mb-6 uppercase tracking-tight"
+            className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-4"
           >
-            Our Leaders
+            Vision.{' '}
+            <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">
+              Integrity.
+            </span>{' '}
+            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+              Execution.
+            </span>
           </motion.h2>
-
-          <motion.div
-            variants={itemVariants}
-            className="relative max-w-xl mx-auto h-[1px] mb-8 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"
-          >
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_2px_rgba(249,115,22,0.6)]" />
-          </motion.div>
 
           <motion.p
             variants={itemVariants}
-            className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed"
+            className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal"
           >
-            Meet the leadership and engineering professionals driving Artificial Intelligence, Industrial Automation,
-            and next-generation Textile Innovation
+            Meet the leaders and engineering specialists driving NEVOLYN Technology from deep-tech research to high-precision industrial reality.
           </motion.p>
         </motion.div>
 
@@ -174,9 +183,9 @@ export function LeadersSection(): JSX.Element {
           viewport={defaultViewport}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto"
         >
-          {leaders.map((leader) => (
+          {leaders.map((leader, idx) => (
             <motion.div key={leader.id} variants={itemVariants}>
-              {renderCard(leader)}
+              {renderCard(leader, idx)}
             </motion.div>
           ))}
         </motion.div>
@@ -186,7 +195,7 @@ export function LeadersSection(): JSX.Element {
           <div className="flex justify-center pt-10">
             <button
               onClick={() => setShowTeam(!showTeam)}
-              className="group inline-flex items-center gap-3 px-8 py-3.5 rounded-full border border-orange-500/40 hover:border-orange-500 bg-orange-500/10 hover:bg-orange-500 text-orange-500 hover:text-white text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95 cursor-pointer"
+              className="group inline-flex items-center gap-3 px-8 py-3.5 rounded-full border border-sky-300 bg-gradient-to-r from-sky-50 to-blue-50/70 hover:from-sky-400 hover:via-blue-500 hover:to-indigo-500 text-sky-700 hover:text-white hover:border-transparent text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-sky-400/30 hover:scale-105 active:scale-95 cursor-pointer"
             >
               <Users className="w-4 h-4 transition-transform group-hover:scale-110" />
               <span>{showTeam ? 'Hide Team Members' : 'Show Team Members'}</span>
@@ -226,7 +235,7 @@ export function LeadersSection(): JSX.Element {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: idx * 0.1 }}
                   >
-                    {renderCard(member)}
+                    {renderCard(member, idx)}
                   </motion.div>
                 ))}
               </div>

@@ -1,8 +1,8 @@
 {
-  "name": "saturn-rnd-portfolio",
-  "version": "0.1.0",
-  "description": "Official portfolio web application for the Saturn Textiles Limited - Research and Development (R&D) — showcasing innovations and the leadership team.",
-  "homepage": "https://saturn-rnd.vercel.app",
+  "name": "nevolyn-technology-website",
+  "version": "0.3.0",
+  "description": "Official website for NEVOLYN Technology — showcasing deep-tech engineering, intelligent systems, AI innovations, and leadership team.",
+  "homepage": "https://nevolyn.com",
   "private": true,
   "scripts": {
     "dev": "next dev",

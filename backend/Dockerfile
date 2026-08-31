@@ -28,19 +28,19 @@ WORKDIR /app
 # Create the unprivileged runtime user, and prepare every path it needs to
 # write to WHILE STILL ROOT. Doing the mkdir after USER fails outright:
 # /app is root-owned, so the non-root user cannot create anything inside it.
-RUN addgroup -S saturn \
-    && adduser -S saturn -G saturn \
+RUN addgroup -S nevolyn \
+    && adduser -S nevolyn -G nevolyn \
     && mkdir -p /app/uploads/resumes \
-    && chown -R saturn:saturn /app
+    && chown -R nevolyn:nevolyn /app
 
-COPY --from=builder --chown=saturn:saturn /app/app.jar app.jar
+COPY --from=builder --chown=nevolyn:nevolyn /app/app.jar app.jar
 
 # Set default active profile to prod for Docker containers
 ENV JAVA_OPTS="-Xms256m -Xmx512m -Djava.security.egd=file:/dev/./urandom"
 ENV SPRING_PROFILES_ACTIVE=prod
 
 # Drop privileges for everything that follows.
-USER saturn:saturn
+USER nevolyn:nevolyn
 
 EXPOSE 8080
 

@@ -71,7 +71,7 @@ export const SuccessModal = ({
                 {title}
               </h3>
               <p className="text-emerald-400 font-medium text-sm sm:text-base">
-                {message || 'Thank you for reaching out to Saturn Textiles R&D.'}
+                {message || 'Thank you for reaching out to NEVOLYN Technology.'}
               </p>
             </div>
 

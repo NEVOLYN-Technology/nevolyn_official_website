@@ -1,8 +1,8 @@
 -- =============================================================================
 -- V1 — Initial schema
 -- =============================================================================
--- Baseline for the Saturn R&D backend. Mirrors the JPA entities in
--- com.saturn.rnd.model exactly; production runs with
+-- Baseline for the NEVOLYN Technology backend. Mirrors the JPA entities in
+-- com.nevolyn.model exactly; production runs with
 -- spring.jpa.hibernate.ddl-auto=validate, so any drift between these tables and
 -- those entities fails the application at startup rather than silently
 -- corrupting live data.

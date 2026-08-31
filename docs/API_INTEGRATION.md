@@ -1,6 +1,6 @@
 # Spring Boot 3 REST API Master Specification & Integration Guide
 
-> **Official REST API Documentation & Backend Integration Handbook** for the **Saturn Textiles Limited R&D Department** backend platform.  
+> **Official REST API Documentation & Backend Integration Handbook** for the **NEVOLYN Technology** backend platform.  
 > Built with **Spring Boot 3 (Java 21)**, **Spring Data JPA**, **PostgreSQL / H2**, and **Spring Validation**.
 
 ---
@@ -40,34 +40,34 @@ Next.js Frontend (JSON Request)
        │
        ▼
  1. DTO (Data Transfer Object)  ──> Input Validation (@NotBlank, @Email)
-       │                            [backend/src/main/java/com/saturn/rnd/dto/]
+       │                            [backend/src/main/java/com/nevolyn/dto/]
        ▼
  2. Controller                  ──> Web Doorway (@RestController, @PostMapping)
-       │                            [backend/src/main/java/com/saturn/rnd/controller/]
+       │                            [backend/src/main/java/com/nevolyn/controller/]
        ▼
  3. Service                     ──> Business Rules & Logic Processing
-       │                            [backend/src/main/java/com/saturn/rnd/service/]
+       │                            [backend/src/main/java/com/nevolyn/service/]
        ▼
  4. Repository & Entity         ──> Database Operations (Spring Data JPA / SQL)
-       │                            [backend/src/main/java/com/saturn/rnd/repository/]
-       │                            [backend/src/main/java/com/saturn/rnd/model/]
+       │                            [backend/src/main/java/com/nevolyn/repository/]
+       │                            [backend/src/main/java/com/nevolyn/model/]
        ▼
  5. ApiResponse Envelope        ──> Standard JSON Envelope Output (HTTP 200/201/400)
-                                    [backend/src/main/java/com/saturn/rnd/dto/ApiResponse.java]
+                                    [backend/src/main/java/com/nevolyn/dto/ApiResponse.java]
 ```
 
 ---
 
 ## 📦 3. Global Standard Response Format (`ApiResponse<T>`)
 
-All REST API endpoints return a standardized JSON envelope (`com.saturn.rnd.dto.ApiResponse`):
+All REST API endpoints return a standardized JSON envelope (`com.nevolyn.dto.ApiResponse`):
 
 ### Success Response Envelope (`HTTP 200 / 201`)
 ```json
 {
   "status": "success",
   "code": 201,
-  "message": "Thank you for reaching out. The Saturn R&D team has received your message.",
+  "message": "Thank you for reaching out. The NEVOLYN Technology team has received your message.",
   "data": {
     "inquiryId": "INQ-2026-8419"
   },
@@ -189,7 +189,7 @@ below. The API persists only what visitors submit.
 Add a WebMvcConfigurer bean to permit Next.js origins (`http://localhost:3000`):
 
 ```java
-package com.saturn.rnd.config;
+package com.nevolyn.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -205,7 +205,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/v1/**")
-                        .allowedOrigins("http://localhost:3000", "https://saturn-rnd.vercel.app")
+                        .allowedOrigins("http://localhost:3000", "https://nevolyn.vercel.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
@@ -221,12 +221,12 @@ public class CorsConfig {
 
 Suppose you want to add a new **Visitor Feedback API** (`POST /api/v1/feedback`). Follow these 5 steps:
 
-### Step 1: Create the DTOs (`backend/src/main/java/com/saturn/rnd/dto/`)
+### Step 1: Create the DTOs (`backend/src/main/java/com/nevolyn/dto/`)
 Create `FeedbackRequest.java` and `FeedbackResponse.java`:
 
 ```java
 // dto/FeedbackRequest.java
-package com.saturn.rnd.dto;
+package com.nevolyn.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -239,12 +239,12 @@ public class FeedbackRequest {
 }
 ```
 
-### Step 2: Create the Entity (`backend/src/main/java/com/saturn/rnd/model/`)
+### Step 2: Create the Entity (`backend/src/main/java/com/nevolyn/model/`)
 Create `Feedback.java` (defines database table columns):
 
 ```java
 // model/Feedback.java
-package com.saturn.rnd.model;
+package com.nevolyn.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -266,14 +266,14 @@ public class Feedback {
 }
 ```
 
-### Step 3: Create the Repository (`backend/src/main/java/com/saturn/rnd/repository/`)
+### Step 3: Create the Repository (`backend/src/main/java/com/nevolyn/repository/`)
 Create `FeedbackRepository.java`:
 
 ```java
 // repository/FeedbackRepository.java
-package com.saturn.rnd.repository;
+package com.nevolyn.repository;
 
-import com.saturn.rnd.model.Feedback;
+import com.nevolyn.model.Feedback;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -283,17 +283,17 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 }
 ```
 
-### Step 4: Create the Service (`backend/src/main/java/com/saturn/rnd/service/`)
+### Step 4: Create the Service (`backend/src/main/java/com/nevolyn/service/`)
 Create `FeedbackService.java` to handle business logic:
 
 ```java
 // service/FeedbackService.java
-package com.saturn.rnd.service;
+package com.nevolyn.service;
 
-import com.saturn.rnd.dto.FeedbackRequest;
-import com.saturn.rnd.dto.FeedbackResponse;
-import com.saturn.rnd.model.Feedback;
-import com.saturn.rnd.repository.FeedbackRepository;
+import com.nevolyn.dto.FeedbackRequest;
+import com.nevolyn.dto.FeedbackResponse;
+import com.nevolyn.model.Feedback;
+import com.nevolyn.repository.FeedbackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -320,17 +320,17 @@ public class FeedbackService {
 }
 ```
 
-### Step 5: Create the Controller (`backend/src/main/java/com/saturn/rnd/controller/`)
+### Step 5: Create the Controller (`backend/src/main/java/com/nevolyn/controller/`)
 Create `FeedbackController.java` to expose the URL:
 
 ```java
 // controller/FeedbackController.java
-package com.saturn.rnd.controller;
+package com.nevolyn.controller;
 
-import com.saturn.rnd.dto.ApiResponse;
-import com.saturn.rnd.dto.FeedbackRequest;
-import com.saturn.rnd.dto.FeedbackResponse;
-import com.saturn.rnd.service.FeedbackService;
+import com.nevolyn.dto.ApiResponse;
+import com.nevolyn.dto.FeedbackRequest;
+import com.nevolyn.dto.FeedbackResponse;
+import com.nevolyn.service.FeedbackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

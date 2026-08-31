@@ -1,5 +1,5 @@
 /**
- * Navbar — site-wide top navigation bar.
+ * Navbar — site-wide floating pill navigation bar matching the modern FABINS aesthetic.
  *
  * ## Behavior
  * - **Fixed positioning**: always visible at the top of the viewport.
@@ -29,220 +29,217 @@ import type { JSX } from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useTheme } from 'next-themes'
-import { Menu, Moon, Sun, X } from 'lucide-react'
+import { Mail, Menu, X } from 'lucide-react'
 
 /** Static link definitions. Defined outside the component to avoid re-creating the array on every render. */
 const NAV_LINKS = [
   { href: '/', sectionId: 'home', label: 'HOME' },
   { href: '/#about', sectionId: 'about', label: 'ABOUT' },
-  { href: '/#leaders', sectionId: 'leaders', label: 'LEADERS' },
   { href: '/#innovations', sectionId: 'innovations', label: 'INNOVATIONS' },
+  { href: '/#leaders', sectionId: 'leaders', label: 'LEADERS' },
   { href: '/#latest-news', sectionId: 'latest-news', label: 'LATEST NEWS' },
 ] as const
 
-/**
- * Site-wide navigation bar component supporting scroll tracking and mobile drawer navigation.
- *
- * @returns Rendered site navigation bar element
- */
 export const Navbar = (): JSX.Element => {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
-  const { resolvedTheme, setTheme } = useTheme()
 
   const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState(isHomePage ? 'home' : '')
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => setMounted(true), [])
+  // Immediately strip #home if present on page load
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#home') {
+      window.history.replaceState(null, '', window.location.pathname)
+    }
+  }, [])
 
   useEffect(() => {
     if (!isHomePage) {
       setActiveSection('')
-      const handleOtherScroll = () => setScrolled(window.scrollY > 50)
-      window.addEventListener('scroll', handleOtherScroll)
-      handleOtherScroll()
-      return () => window.removeEventListener('scroll', handleOtherScroll)
+      return
     }
 
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-
-      // Walk through each nav section and find the last one whose top edge
-      // has passed the 200 px threshold — that's the "current" section.
-      let current = ''
+      let current = 'home'
       for (const link of NAV_LINKS) {
+        if (link.sectionId === 'home') continue
         const element = document.getElementById(link.sectionId)
-        if (element && element.getBoundingClientRect().top <= 200) {
+        if (element && element.getBoundingClientRect().top <= 220) {
           current = link.sectionId
         }
       }
 
-      // Also check the contact section (it isn't in NAV_LINKS but has a button)
       const contactElement = document.getElementById('contact')
-      if (contactElement && contactElement.getBoundingClientRect().top <= 200) {
+      if (contactElement && contactElement.getBoundingClientRect().top <= 220) {
         current = 'contact'
       }
 
-      // Snap back to "home" when near the very top of the page and clear URL hash
       if (window.scrollY < 100) {
         current = 'home'
-        if (window.location.hash) {
-          window.history.replaceState(null, '', window.location.pathname + window.location.search)
-        }
       }
 
-      if (current) {
-        setActiveSection(current)
+      setActiveSection(current)
+
+      // Sync browser URL bar: no hash when at top (home), dynamic section hash everywhere else
+      if (current === 'home') {
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname)
+        }
+      } else {
+        const targetHash = `#${current}`
+        if (window.location.hash !== targetHash) {
+          window.history.replaceState(null, '', `/#${current}`)
+        }
       }
     }
 
-    window.addEventListener('scroll', handleScroll)
-    handleScroll() // Sync on mount without waiting for a scroll event
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isHomePage, pathname])
 
-  /** Smooth scroll handler for nav clicks when on the home page */
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     sectionId: string
   ) => {
     if (isHomePage) {
+      e.preventDefault()
+      setIsOpen(false)
       if (sectionId === 'home') {
-        e.preventDefault()
         window.scrollTo({ top: 0, behavior: 'smooth' })
         if (window.location.hash) {
-          window.history.pushState(null, '', '/')
+          window.history.replaceState(null, '', '/')
         }
         setActiveSection('home')
       } else {
         const element = document.getElementById(sectionId)
         if (element) {
-          e.preventDefault()
-          const yOffset = -90 // Offset for fixed navbar height
+          const yOffset = -90
           const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
           window.scrollTo({ top: y, behavior: 'smooth' })
-          window.history.pushState(null, '', `/#${sectionId}`)
+          window.history.replaceState(null, '', `/#${sectionId}`)
           setActiveSection(sectionId)
         }
       }
+    } else {
+      setIsOpen(false)
     }
   }
 
-  // `next-themes` can resolve a saved preference before the first client render.
-  // Keep theme-dependent markup stable until mount to avoid SSR hydration mismatches.
-  const isDark = mounted && resolvedTheme === 'dark'
-  const themeLabel = mounted
-    ? isDark ? 'Switch to light mode' : 'Switch to dark mode'
-    : 'Toggle color theme'
-  const themeToggle = (
-    <button
-      type="button"
-      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      className="group relative inline-flex h-11 w-[4.75rem] items-center rounded-full border border-orange-400/35 bg-slate-100/90 p-1 shadow-inner shadow-slate-400/20 transition-all duration-500 hover:border-orange-400/70 hover:shadow-lg hover:shadow-orange-500/20 dark:bg-slate-900/90 dark:shadow-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      aria-label={themeLabel}
-      title={themeLabel}
-    >
-      <Sun className="absolute left-2.5 h-4 w-4 text-amber-500 transition-opacity duration-300 dark:text-amber-300" aria-hidden="true" />
-      <Moon className="absolute right-2.5 h-4 w-4 text-slate-400 transition-opacity duration-300 dark:text-slate-300" aria-hidden="true" />
-      <span
-        className={`relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-amber-500 shadow-md transition-transform duration-500 ease-out dark:bg-[#17253b] dark:text-orange-300 ${mounted && isDark ? 'translate-x-9' : 'translate-x-0'}`}
-      >
-        {mounted && isDark ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
-      </span>
-    </button>
-  )
-
   return (
-    <nav className={`fixed w-full z-50 border-b border-orange-950/40 transition-all duration-300 ${scrolled
-      ? 'bg-background/95 shadow-lg shadow-black/30 backdrop-blur'
-      : 'bg-background/85 backdrop-blur-sm'
-      }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex h-[5.5rem] items-center">
-          {/* Logo */}
-          <Link
-            href="/"
-            onClick={(e) => handleNavClick(e, 'home')}
-            className="flex items-center group transition-all duration-300 hover:-translate-y-1 hover:scale-105"
-          >
-            <img
-              src="/saturn-logo.png"
-              alt="Saturn Textiles Limited — Research and Development Department"
-              className="h-24 w-auto object-contain drop-shadow-lg"
-            />
-          </Link>
+    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4 pointer-events-none">
+      {/* Floating Pill Navbar Container */}
+      <div className="pointer-events-auto mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full border border-slate-200/85 bg-white/85 px-3 py-1.5 sm:px-4 sm:py-2 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-blue-300 hover:shadow-md">
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2 absolute left-1/2 -translate-x-1/2">
+        {/* Brand Logo & Wordmark */}
+        <Link
+          href="/"
+          onClick={(e) => handleNavClick(e, 'home')}
+          className="group flex shrink-0 items-center gap-2.5 rounded-full py-1 pl-1 pr-2 transition-all duration-200 hover:-translate-y-0.5"
+        >
+          <img
+            src="/nevolyn-icon.png"
+            alt="NEVOLYN Technology"
+            className="block h-9 w-9 sm:h-10 sm:w-10 object-contain rounded-full drop-shadow-sm"
+          />
+          <span className="flex flex-col justify-center leading-none">
+            <span className="block font-extrabold tracking-[-0.02em] text-[16px] text-slate-900">
+              NEVOLYN
+            </span>
+            <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-[0.14em] text-slate-400 font-semibold">
+              Technology
+            </span>
+          </span>
+        </Link>
+
+        {/* Desktop Links (Pill Style) */}
+        <nav className="hidden items-center gap-1 lg:flex">
+          {NAV_LINKS.map((link) => {
+            const isActive = activeSection === link.sectionId
+            return (
+              <a
+                key={link.sectionId}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.sectionId)}
+                className={`relative rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 ${isActive
+                  ? 'text-white'
+                  : 'text-slate-600 hover:bg-sky-50/80 hover:text-sky-600'
+                  }`}
+              >
+                {isActive && (
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-blue-400 shadow-[0_4px_16px_rgba(56,189,248,0.35)]" />
+                )}
+                <span className="relative z-10">{link.label}</span>
+              </a>
+            )
+          })}
+        </nav>
+
+        {/* Right CTA & Mobile Toggle */}
+        <div className="flex items-center gap-2">
+          <a
+            href="/#contact"
+            onClick={(e) => handleNavClick(e, 'contact')}
+            className="relative hidden !px-5 !py-2 text-[13px] sm:inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5 border border-sky-300/90 bg-gradient-to-r from-sky-50/80 to-blue-50/60 text-sky-700 hover:bg-gradient-to-r hover:from-sky-400 hover:to-sky-500 hover:text-white hover:border-transparent shadow-sm hover:shadow-sky-400/25"
+          >
+            <Mail className="h-3.5 w-3.5" />
+            <span>Let's Connect</span>
+          </a>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={isOpen}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition-colors hover:border-sky-400 hover:text-sky-600 lg:hidden shadow-sm active:scale-95"
+          >
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Drawer (Optimized for Android and iPhone) */}
+      {isOpen && (
+        <div className="pointer-events-auto mx-auto mt-2 max-w-md w-full px-1 lg:hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-xl backdrop-blur-2xl flex flex-col gap-1">
             {NAV_LINKS.map((link) => {
               const isActive = activeSection === link.sectionId
               return (
-                <Link
-                  key={link.label}
+                <a
+                  key={link.sectionId}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.sectionId)}
-                  className={`px-4 py-2 text-sm font-bold tracking-wider rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:scale-95 ${isActive
-                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/40 -translate-y-1 scale-105'
-                    : 'text-slate-700 hover:text-orange-500 hover:bg-orange-500/15 hover:shadow-md hover:shadow-orange-500/20 dark:text-slate-200 dark:hover:text-orange-400 dark:hover:bg-orange-500/20'
+                  className={`flex items-center justify-between px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all ${isActive
+                    ? 'bg-gradient-to-r from-sky-400 via-sky-500 to-blue-400 text-white shadow-sm shadow-sky-400/25'
+                    : 'text-slate-700 hover:bg-sky-50 hover:text-sky-600'
                     }`}
                 >
-                  {link.label}
-                </Link>
+                  <span>{link.label}</span>
+                </a>
               )
             })}
-          </div>
-
-          {/* Right Section */}
-          <div className="ml-auto flex items-center space-x-3">
-            {themeToggle}
-            <Link
-              href="/#contact"
-              onClick={(e) => handleNavClick(e, 'contact')}
-              className={`hidden rounded-xl border px-5 py-2.5 text-sm font-bold tracking-wide transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:scale-95 lg:inline-flex ${activeSection === 'contact'
-                ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/40 -translate-y-1 scale-105'
-                : 'border-orange-500/60 text-orange-400 hover:bg-orange-500/20 hover:text-orange-300 hover:border-orange-500/80 hover:shadow-md hover:shadow-orange-500/20'
-                }`}
-            >
-              Let's Connect
-            </Link>
-
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="rounded-lg p-2 text-slate-700 transition-colors hover:bg-slate-200 dark:text-slate-100 dark:hover:bg-slate-800 md:hidden"
-              aria-label="Toggle menu"
-              aria-expanded={isOpen}
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            <div className="pt-2 mt-1 border-t border-slate-100 flex flex-col gap-2">
+              <a
+                href="/#contact"
+                onClick={(e) => handleNavClick(e, 'contact')}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-400 to-sky-500 py-2.5 text-sm font-semibold text-white hover:brightness-105 transition-all shadow-sm"
+              >
+                <Mail className="h-4 w-4" />
+                <span>Let's Connect</span>
+              </a>
+              <Link
+                href="/join_us"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+              >
+                <span>Careers & Join Us</span>
+              </Link>
+            </div>
           </div>
         </div>
-
-        {/* Mobile Navigation Drawer */}
-        {isOpen && (
-          <div className="md:hidden pb-4 space-y-2 animate-in fade-in slide-in-from-top-2">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={`block rounded-md px-3 py-2 text-base font-medium transition-colors ${activeSection === link.sectionId
-                  ? 'bg-orange-500 text-white'
-                  : 'text-slate-700 hover:bg-orange-100 hover:text-orange-600 dark:text-slate-100 dark:hover:bg-orange-950/40 dark:hover:text-orange-300'
-                  }`}
-                onClick={(e) => {
-                  setIsOpen(false)
-                  handleNavClick(e, link.sectionId)
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    </nav>
+      )}
+    </header>
   )
 }

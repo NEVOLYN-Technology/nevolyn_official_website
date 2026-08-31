@@ -1,5 +1,5 @@
 /**
- * Typed fetch wrapper for the Saturn R&D Spring Boot API.
+ * Typed fetch wrapper for the NEVOLYN Technology Spring Boot API.
  *
  * Every backend route answers with the same envelope, so callers can rely on
  * `success`, `message` and `data` being present on any resolved response, and on
@@ -43,7 +43,7 @@ export interface ApiMeta {
  * bare paths such as `/contact`.
  *
  * FUTURE CUSTOM DOMAIN: set `NEXT_PUBLIC_API_URL` in the Vercel project settings
- * (Settings → Environment Variables) to e.g. `https://api.saturn-rnd.com/api/v1`.
+ * (Settings → Environment Variables) to e.g. `https://api.nevolyn.com/api/v1`.
  * NEXT_PUBLIC_* values are inlined at build time, so changing it requires a
  * redeploy — editing the variable alone will not update a already-built bundle.
  */
@@ -51,7 +51,7 @@ const getApiBaseUrl = (): string => {
   let url = process.env.NEXT_PUBLIC_API_URL
   if (!url || url.includes('localhost')) {
     url = process.env.NODE_ENV === 'production'
-      ? 'https://saturn-rnd-backend.onrender.com/api/v1'
+      ? 'https://api.nevolyn.com/api/v1'
       : (url ?? 'http://localhost:8080/api/v1')
   }
   url = url.replace(/\/+$/, '')
@@ -153,7 +153,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     throw transportError(
       503,
       'NETWORK_ERROR',
-      'Unable to connect to the Saturn R&D API server. Please check your network connection.',
+      'Unable to connect to the NEVOLYN Technology API server. Please check your network connection.',
     )
   } finally {
     clearTimeout(timeoutId)

@@ -1,5 +1,5 @@
 /**
- * Shared utility functions for saturn-rnd-portfolio.
+ * Shared utility functions for the NEVOLYN Technology website.
  *
  * Provides conditional class merging (cn) and locale-pinned date formatting (formatDate).
  *

@@ -22,82 +22,104 @@ import { Bot, Sparkles, Activity, Leaf } from 'lucide-react'
 import { fadeUpProps } from '@/lib/animations'
 import type { LucideIcon } from 'lucide-react'
 
-/** Feature card data — defined outside the component so it's not re-created on every render. */
-const FEATURES: { title: string; description: string; icon: LucideIcon }[] = [
+const FEATURES: {
+  title: string
+  description: string
+  icon: LucideIcon
+  colorClass: string
+  badgeBg: string
+  hoverBorder: string
+  tag: string
+  accentColor: string
+}[] = [
   {
-    title: 'INTELLIGENT AUTOMATION',
-    description: 'Automating textile processes to enhance precision, quality, and productivity.',
+    title: 'ARTIFICIAL INTELLIGENCE',
+    description: 'Designing and deploying production-ready AI systems, from deep learning models to end-to-end intelligent automation pipelines.',
     icon: Bot,
+    colorClass: 'bg-sky-50 text-sky-600 border-sky-200 group-hover:bg-gradient-to-r group-hover:from-sky-400 group-hover:to-blue-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-sky-400/30',
+    badgeBg: 'bg-sky-50 text-sky-700 border-sky-200 shadow-sm',
+    hoverBorder: 'hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/15',
+    tag: 'Core Intelligence',
+    accentColor: 'text-sky-600',
   },
   {
-    title: 'SMART TEXTILE INNOVATION',
-    description: 'Developing advanced materials and intelligent solutions for performance and sustainability.',
+    title: 'INDUSTRIAL AUTOMATION',
+    description: 'Engineering intelligent automation platforms that transform complex industrial operations with precision, reliability, and scale.',
     icon: Sparkles,
+    colorClass: 'bg-emerald-50 text-emerald-600 border-emerald-200 group-hover:bg-gradient-to-r group-hover:from-emerald-400 group-hover:to-teal-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-400/30',
+    badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm',
+    hoverBorder: 'hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/15',
+    tag: 'Smart Robotics',
+    accentColor: 'text-emerald-600',
   },
   {
-    title: 'QUALITY & EFFICIENCY',
-    description: 'Data-driven insights and real-time monitoring to ensure superior quality and operational excellence.',
+    title: 'COMPUTER VISION',
+    description: 'Real-time visual intelligence systems using advanced imaging hardware, deep learning, and edge AI for critical inspection and analysis.',
     icon: Activity,
+    colorClass: 'bg-rose-50 text-rose-600 border-rose-200 group-hover:bg-gradient-to-r group-hover:from-rose-400 group-hover:to-pink-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-rose-400/30',
+    badgeBg: 'bg-rose-50 text-rose-700 border-rose-200 shadow-sm',
+    hoverBorder: 'hover:border-rose-300 hover:shadow-xl hover:shadow-rose-500/15',
+    tag: 'Edge Optical',
+    accentColor: 'text-rose-600',
   },
   {
-    title: 'SUSTAINABLE FUTURE',
-    description: 'Building eco-friendly and responsible solutions for a better tomorrow.',
+    title: 'SOFTWARE ENGINEERING',
+    description: 'Full-stack digital systems, scalable REST APIs, and modern web platforms engineered to production-ready quality standards.',
     icon: Leaf,
+    colorClass: 'bg-purple-50 text-purple-600 border-purple-200 group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-indigo-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-purple-400/30',
+    badgeBg: 'bg-purple-50 text-purple-700 border-purple-200 shadow-sm',
+    hoverBorder: 'hover:border-purple-300 hover:shadow-xl hover:shadow-purple-500/15',
+    tag: 'Cloud & Systems',
+    accentColor: 'text-purple-600',
   },
 ]
 
-/**
- * Capabilities section highlighting core pillars of industrial research and technology development.
- *
- * @returns Rendered capabilities component element
- */
 export const CapabilitiesSection = (): JSX.Element => {
   return (
-    <section className="pt-4 pb-12 relative overflow-hidden">
+    <section id="capabilities" className="py-20 sm:py-24 relative overflow-hidden bg-gradient-to-b from-slate-50/50 via-white to-slate-50/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900 dark:text-white tracking-tight uppercase">
-            Innovate. <span className="text-orange-500">Automate.</span> <span className="text-blue-500">Elevate.</span>
+        {/* Header — Soft colorful typography */}
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 text-slate-900 tracking-tight uppercase">
+            Innovate. <span className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 bg-clip-text text-transparent">Automate.</span> <span className="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">Elevate.</span>
           </h2>
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Discover how we use research and develop technologies to build better solutions
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+            Discover how we build advanced AI, automation, and intelligent systems to engineer solutions that matter
           </p>
         </div>
 
-        {/* Feature Cards */}
-        <div className="relative">
-          {/* Decorative horizontal connector line (desktop only) */}
-          <div className="absolute top-12 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-orange-500/20 to-transparent hidden lg:block" />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
-            {FEATURES.map((feature, idx) => (
-              <motion.div
-                key={idx}
-                {...fadeUpProps(idx * 0.1)}
-                className="relative flex flex-col items-center lg:items-start text-center lg:text-left group"
-              >
-                {/* Icon Container */}
-                <div className="relative mb-6">
-                  {/* Glowing dot on the connector line (desktop only) */}
-                  <div className="absolute top-1/2 -left-12 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_2px_rgba(249,115,22,0.4)] dark:shadow-[0_0_8px_2px_rgba(249,115,22,0.6)] hidden lg:block" />
-
-                  {/* Icon Circle */}
-                  <div className="w-24 h-24 rounded-full border border-orange-500/20 dark:border-orange-500/30 flex items-center justify-center bg-white dark:bg-[#071526]/80 group-hover:border-orange-500/60 transition-colors relative z-10 shadow-[inset_0_0_20px_rgba(249,115,22,0.05)] group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.15)]">
-                    <feature.icon className="w-10 h-10 text-orange-500" strokeWidth={1.5} />
+        {/* Feature Cards — Classy Porcelain Cards with Emerald, Ruby, Sapphire, and Indigo Accents */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {FEATURES.map((feature, idx) => (
+            <motion.div
+              key={idx}
+              {...fadeUpProps(idx * 0.08)}
+              className={`group relative rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${feature.hoverBorder} flex flex-col justify-between`}
+            >
+              <div>
+                {/* Header row with Icon and Colorful Badge */}
+                <div className="mb-6 flex items-start justify-between">
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-300 ${feature.colorClass}`}>
+                    <feature.icon className="h-7 w-7" strokeWidth={1.6} />
                   </div>
+                  <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${feature.badgeBg}`}>
+                    {feature.tag}
+                  </span>
                 </div>
 
                 {/* Text */}
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 tracking-wider">{feature.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pr-0 lg:pr-4">
+                <h3 className={`text-sm font-bold text-slate-900 mb-3 tracking-wider uppercase transition-colors group-hover:${feature.accentColor}`}>
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
                   {feature.description}
                 </p>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
+
       </div>
     </section>
   )

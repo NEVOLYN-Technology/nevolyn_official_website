@@ -1,5 +1,5 @@
 /**
- * Next.js configuration for saturn-rnd-portfolio.
+ * Next.js configuration for NEVOLYN Technology official website.
  *
  * @see https://nextjs.org/docs/app/api-reference/next-config-js
  */

@@ -1,6 +1,6 @@
 # CI/CD & Deployment Guide
 
-Operational reference for the Saturn Textiles R&D Portfolio — architecture,
+Operational reference for the NEVOLYN Technology Official Website — architecture,
 deployment procedure, the failure modes we actually hit, and the exact steps to
 move onto a custom domain.
 
@@ -26,8 +26,8 @@ Brevo · Render · Vercel
 ```mermaid
 flowchart LR
     V["Visitor browser"]
-    F["Frontend — Next.js 16<br/>Vercel edge CDN<br/>saturn-rnd.vercel.app"]
-    B["Backend — Spring Boot 3<br/>Render web service (Docker)<br/>saturn-rnd-backend.onrender.com"]
+    F["Frontend — Next.js 16<br/>Vercel edge CDN<br/>nevolyn.vercel.app"]
+    B["Backend — Spring Boot 3<br/>Render web service (Docker)<br/>nevolyn-backend.onrender.com"]
     D[("PostgreSQL<br/>Render managed")]
     M["Brevo<br/>transactional email"]
     I["Admin + visitor inboxes"]
@@ -88,13 +88,13 @@ Render, Heroku and Railway publish the database connection string in **libpq**
 format:
 
 ```
-postgres://saturn_admin:Xq7…@dpg-abc123-a.oregon-postgres.render.com/saturn_rnd_db
+postgres://nevolyn_admin:Xq7…@dpg-abc123-a.oregon-postgres.render.com/nevolyn_db
 ```
 
 The PostgreSQL **JDBC** driver cannot consume that. It requires:
 
 ```
-jdbc:postgresql://dpg-abc123-a.oregon-postgres.render.com:5432/saturn_rnd_db
+jdbc:postgresql://dpg-abc123-a.oregon-postgres.render.com:5432/nevolyn_db
 ```
 
 Three incompatibilities, each fatal on its own:
@@ -110,7 +110,7 @@ Handed the raw value, startup dies with `No suitable driver` or
 
 ### The fix: rewrite the property before any bean exists
 
-[`SaturnRndApplication.java`](../backend/src/main/java/com/saturn/rnd/SaturnRndApplication.java)
+[`NevolynApplication.java`](../backend/src/main/java/com/nevolyn/NevolynApplication.java)
 registers an `ApplicationEnvironmentPreparedEvent` listener.
 
 **Why that specific event.** It fires after Spring has read `application.yml`
@@ -152,7 +152,7 @@ a no-op when `DATABASE_URL` is absent — so local runs keep using H2 untouched.
 A value already in `jdbc:` form is passed through unmodified.
 
 > **Verify it worked.** On a healthy boot the Render log shows:
-> `Sanitized cloud DATABASE_URL into JDBC form: jdbc:postgresql://dpg-…:5432/saturn_rnd_db`
+> `Sanitized cloud DATABASE_URL into JDBC form: jdbc:postgresql://dpg-…:5432/nevolyn_db`
 > Credentials are deliberately never logged.
 
 ### Blueprint gotcha
@@ -170,7 +170,7 @@ Take the provider's own connection string and let the listener normalise it:
 ```yaml
 - key: DATABASE_URL
   fromDatabase:
-    name: saturn-rnd-db
+    name: nevolyn-db
     property: connectionString
 ```
 
@@ -298,7 +298,7 @@ secret unset is correct.
 
 1. **Blueprint** → New Blueprint Instance → select the repo. Render reads
    [`render.yaml`](../render.yaml) and provisions the web service plus
-   `saturn-rnd-db`.
+   `nevolyn-db`.
 2. Supply the secrets it prompts for (`sync: false` entries):
 
    | Variable | Value |
@@ -333,7 +333,7 @@ secret unset is correct.
 
    | Variable | Value |
    |---|---|
-   | `NEXT_PUBLIC_API_URL` | `https://saturn-rnd-backend.onrender.com/api/v1` |
+   | `NEXT_PUBLIC_API_URL` | `https://nevolyn-backend.onrender.com/api/v1` |
 
 > **Include the `/api/v1` suffix.** `apiClient` appends bare paths like
 > `/contact` directly to this value. Omitting the prefix produces requests to
@@ -362,12 +362,12 @@ secret unset is correct.
 
 ## 6. Custom domain setup
 
-Worked example using `saturn-rnd.com`. Substitute your own.
+Worked example using `nevolyn.com`. Substitute your own.
 
 ### 6.1 Frontend — Vercel
 
-Project → Settings → Domains → add both `saturn-rnd.com` and
-`www.saturn-rnd.com`, then create the DNS records Vercel shows:
+Project → Settings → Domains → add both `nevolyn.com` and
+`www.nevolyn.com`, then create the DNS records Vercel shows:
 
 | Record | Name | Value |
 |---|---|---|
@@ -380,11 +380,11 @@ resolve. Confirm the exact values in the dashboard — they change over time.
 
 ### 6.2 Backend — Render
 
-Service → Settings → Custom Domains → add `api.saturn-rnd.com`:
+Service → Settings → Custom Domains → add `api.nevolyn.com`:
 
 | Record | Name | Value |
 |---|---|---|
-| `CNAME` | `api` | `saturn-rnd-backend.onrender.com` |
+| `CNAME` | `api` | `nevolyn-backend.onrender.com` |
 
 ### 6.3 Update the environment
 
@@ -393,17 +393,17 @@ all three, then redeploy both halves:
 
 | Where | Variable | New value |
 |---|---|---|
-| Render | `APP_CORS_ALLOWED_ORIGINS` | `https://saturn-rnd.com,https://www.saturn-rnd.com,https://saturn-rnd.vercel.app,https://saturn-rnd-*.vercel.app` |
-| Render | `APP_FRONTEND_URL` | `https://saturn-rnd.com` |
-| Vercel | `NEXT_PUBLIC_API_URL` | `https://api.saturn-rnd.com/api/v1` |
+| Render | `APP_CORS_ALLOWED_ORIGINS` | `https://nevolyn.com,https://www.nevolyn.com,https://nevolyn.vercel.app,https://nevolyn-*.vercel.app` |
+| Render | `APP_FRONTEND_URL` | `https://nevolyn.com` |
+| Vercel | `NEXT_PUBLIC_API_URL` | `https://api.nevolyn.com/api/v1` |
 
 Notes:
 
 - **Keep the `vercel.app` entries.** Dropping them breaks preview deployments.
-- CORS origins are **scheme- and host-exact**. `https://saturn-rnd.com` does not
+- CORS origins are **scheme- and host-exact**. `https://nevolyn.com` does not
   cover `www.`, `http://`, or a trailing slash — list every form you serve.
 - The wildcard entry works because
-  [`CorsConfig`](../backend/src/main/java/com/saturn/rnd/config/CorsConfig.java)
+  [`CorsConfig`](../backend/src/main/java/com/nevolyn/config/CorsConfig.java)
   uses `setAllowedOriginPatterns`, not `setAllowedOrigins`. The latter compares
   literally and cannot express a wildcard; it also cannot be combined with
   `allowCredentials(true)`, which Spring rejects at startup.
@@ -415,14 +415,14 @@ Notes:
 ### 6.4 Brevo domain authentication (SPF, DKIM, DMARC)
 
 Without these, mail from a custom domain lands in spam. Brevo → Senders,
-Domains & Dedicated IPs → Domains → authenticate `saturn-rnd.com`, then add:
+Domains & Dedicated IPs → Domains → authenticate `nevolyn.com`, then add:
 
 | Purpose | Type | Name | Value |
 |---|---|---|---|
 | SPF | `TXT` | `@` | `v=spf1 include:spf.brevo.com mx ~all` |
 | DKIM | `TXT` | `mail._domainkey` | *(the key Brevo generates)* |
 | Brevo verification | `TXT` | `@` | `brevo-code:…` *(from the dashboard)* |
-| DMARC | `TXT` | `_dmarc` | `v=DMARC1; p=none; rua=mailto:dmarc@saturn-rnd.com` |
+| DMARC | `TXT` | `_dmarc` | `v=DMARC1; p=none; rua=mailto:dmarc@nevolyn.com` |
 
 What each does:
 
@@ -438,8 +438,8 @@ What each does:
   `p=reject` will silently destroy legitimate mail from any sender you forgot.
 
 Then update `APP_EMAIL_FROM` to the authenticated domain (e.g.
-`noreply@saturn-rnd.com`) and re-verify it under Senders. Allow up to 48 hours
-for DNS propagation; verify with `dig TXT saturn-rnd.com` or MXToolbox.
+`noreply@nevolyn.com`) and re-verify it under Senders. Allow up to 48 hours
+for DNS propagation; verify with `dig TXT nevolyn.com` or MXToolbox.
 
 ---
 
