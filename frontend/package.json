@@ -5,7 +5,7 @@
   "homepage": "https://nevolyn.com",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
