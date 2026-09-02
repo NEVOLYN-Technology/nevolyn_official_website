@@ -13,6 +13,7 @@
  */
 'use client'
 
+import React from 'react'
 import type { JSX } from 'react'
 import Link from 'next/link'
 import { Mail, MapPin, Phone } from 'lucide-react'
@@ -79,9 +80,8 @@ export const Footer = (): JSX.Element => {
                 <Phone className="w-4 h-4 mt-0.5 shrink-0 text-sky-500" />
                 <div className="flex flex-wrap gap-x-3 gap-y-1">
                   {CONTACT.phones.map((phone, idx) => (
-                    <>
+                    <React.Fragment key={phone.href}>
                       <a
-                        key={phone.href}
                         href={phone.href}
                         aria-label={phone.ariaLabel}
                         className="hover:text-sky-600 transition-colors"
@@ -92,7 +92,7 @@ export const Footer = (): JSX.Element => {
                       {idx < CONTACT.phones.length - 1 && (
                         <span className="text-slate-300 hidden sm:inline">•</span>
                       )}
-                    </>
+                    </React.Fragment>
                   ))}
                 </div>
               </li>

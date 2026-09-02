@@ -43,6 +43,8 @@ import { engineeringTeamMembers } from '@/lib/data/team'
 import { LeaderDetails } from '@/components/ui/LeaderDetails'
 import { fadeInUpVariants, staggerContainer, defaultViewport } from '@/lib/animations'
 import type { TeamMember } from '@/lib/data/leaders'
+import { StatusPill } from '@/components/ui/StatusPill'
+import { GradText } from '@/components/ui/SectionHeader'
 
 /** High-contrast official LinkedIn SVG logo badge */
 const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }): JSX.Element => (
@@ -149,22 +151,16 @@ export function LeadersSection(): JSX.Element {
           viewport={defaultViewport}
           className="text-center mb-12 sm:mb-16"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-emerald-50/80 px-4 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm mb-4 backdrop-blur-sm">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            <span className="tracking-wide uppercase">EXECUTIVE &amp; RESEARCH LEADERSHIP</span>
-          </div>
+          {/* Status pill — uses shared StatusPill component */}
+          <StatusPill label="EXECUTIVE & RESEARCH LEADERSHIP" />
 
           <motion.h2
             variants={itemVariants}
             className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-4"
           >
             Vision.{' '}
-            <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">
-              Integrity.
-            </span>{' '}
-            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
-              Execution.
-            </span>
+            <GradText variant="sky">Integrity.</GradText>{' '}
+            <GradText variant="emerald">Execution.</GradText>
           </motion.h2>
 
           <motion.p
