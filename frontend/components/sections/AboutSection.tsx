@@ -29,7 +29,7 @@ import { fadeUpProps } from '@/lib/animations'
  */
 export const AboutSection = (): JSX.Element => {
   return (
-    <section id="about" className="py-20 sm:py-24 border-t border-slate-300/70 bg-[#f5f8fb] relative overflow-hidden">
+    <section id="about" className="py-20 sm:py-24 border-t border-sky-300/60 bg-[#deebf9] relative overflow-hidden">
       {/* Anchor alias so any legacy references to #capabilities resolve smoothly */}
       <div id="capabilities" className="absolute -top-24 left-0" />
 

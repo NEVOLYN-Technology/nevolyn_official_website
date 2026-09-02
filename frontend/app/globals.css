@@ -24,10 +24,19 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+@font-face {
+  font-family: 'Ethnocentric';
+  font-style: normal;
+  font-weight: 400 900;
+  src: url('/fonts/ethnocentric.woff') format('woff');
+  font-display: swap;
+}
+
 /* Dark mode activates when an ancestor has class="dark" (set globally on <html>). */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-brand: 'Ethnocentric', sans-serif;
   /* Color utilities */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -66,7 +75,7 @@
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
   color-scheme: light;
-  --background: #ecf1f6;
+  --background: #d5e4f6;
   --foreground: #0f172a;
   --card: #f9fafb;
   --card-foreground: #0f172a;
@@ -97,6 +106,10 @@
   }
 }
 
+.font-brand {
+  font-family: 'Ethnocentric', sans-serif;
+}
+
 /* Subtle precision technical grid matching FABINS */
 .grid-bg {
   background-image:
@@ -123,19 +136,4 @@
 
 .animate-marquee:hover {
   animation-play-state: paused;
-}
-
-/* Technical Checkered Divider Stripe to distinguish sections - Thinner & Refined */
-.tech-check-stripe {
-  position: relative;
-  width: 100%;
-  height: 5px;
-  background-image: repeating-conic-gradient(
-    rgba(100, 116, 139, 0.28) 0% 25%,
-    rgba(255, 255, 255, 0.6) 0% 50%
-  );
-  background-size: 6px 6px;
-  border-top: 1px solid rgba(203, 213, 225, 0.75);
-  border-bottom: 1px solid rgba(203, 213, 225, 0.75);
-  z-index: 10;
 }

@@ -129,8 +129,8 @@ export const Navbar = (): JSX.Element => {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4 pointer-events-none">
-      {/* Floating Pill Navbar Container */}
-      <div className="pointer-events-auto mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full border border-slate-200/85 bg-white/85 px-3 py-1.5 sm:px-4 sm:py-2 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-blue-300 hover:shadow-md">
+      {/* Floating Pill Navbar Container with Cool Blue Frosted Glass Shade */}
+      <div className="pointer-events-auto mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full border border-sky-300/65 bg-gradient-to-r from-white/90 via-[#e6f0fb]/85 to-[#dceaf8]/85 px-3 py-1.5 sm:px-4 sm:py-2 shadow-[0_8px_28px_rgba(14,165,233,0.12)] backdrop-blur-xl transition-all duration-300 hover:border-emerald-400 hover:shadow-[0_8px_32px_rgba(16,185,129,0.16)]">
 
         {/* Brand Logo & Wordmark */}
         <Link
@@ -144,10 +144,10 @@ export const Navbar = (): JSX.Element => {
             className="block h-9 w-9 sm:h-10 sm:w-10 object-contain rounded-full drop-shadow-sm"
           />
           <span className="flex flex-col justify-center leading-none">
-            <span className="block font-extrabold tracking-[-0.02em] text-[16px] text-slate-900">
+            <span className="block font-brand text-[15px] sm:text-[16px] tracking-[0.16em] text-slate-900">
               NEVOLYN
             </span>
-            <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-[0.14em] text-slate-400 font-semibold">
+            <span className="mt-1 block font-brand text-[8.8px] sm:text-[9.2px] uppercase tracking-[0.09em] text-slate-600">
               Technology
             </span>
           </span>
@@ -164,11 +164,11 @@ export const Navbar = (): JSX.Element => {
                 onClick={(e) => handleNavClick(e, link.sectionId)}
                 className={`relative rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 ${isActive
                   ? 'text-white'
-                  : 'text-slate-600 hover:bg-sky-50/80 hover:text-sky-600'
+                  : 'text-slate-600 hover:bg-emerald-50/80 hover:text-emerald-700'
                   }`}
               >
                 {isActive && (
-                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-blue-400 shadow-[0_4px_16px_rgba(56,189,248,0.35)]" />
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 shadow-[0_4px_16px_rgba(16,185,129,0.35)]" />
                 )}
                 <span className="relative z-10">{link.label}</span>
               </a>
@@ -181,7 +181,7 @@ export const Navbar = (): JSX.Element => {
           <a
             href="/#contact"
             onClick={(e) => handleNavClick(e, 'contact')}
-            className="relative hidden !px-5 !py-2 text-[13px] sm:inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5 border border-sky-300/90 bg-gradient-to-r from-sky-50/80 to-blue-50/60 text-sky-700 hover:bg-gradient-to-r hover:from-sky-400 hover:to-sky-500 hover:text-white hover:border-transparent shadow-sm hover:shadow-sky-400/25"
+            className="relative hidden !px-5 !py-2 text-[13px] sm:inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5 border border-emerald-300/90 bg-gradient-to-r from-emerald-50/90 to-teal-50/80 text-emerald-800 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-teal-600 hover:text-white hover:border-transparent shadow-sm hover:shadow-emerald-500/25"
           >
             <Mail className="h-3.5 w-3.5" />
             <span>Let's Connect</span>
@@ -193,7 +193,7 @@ export const Navbar = (): JSX.Element => {
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
             aria-expanded={isOpen}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition-colors hover:border-sky-400 hover:text-sky-600 lg:hidden shadow-sm active:scale-95"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-300/60 bg-gradient-to-b from-white via-sky-50/70 to-[#dceaf8]/80 text-slate-700 transition-colors hover:border-emerald-400 hover:text-emerald-600 lg:hidden shadow-sm active:scale-95"
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -203,7 +203,7 @@ export const Navbar = (): JSX.Element => {
       {/* Mobile Drawer (Optimized for Android and iPhone) */}
       {isOpen && (
         <div className="pointer-events-auto mx-auto mt-2 max-w-md w-full px-1 lg:hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-xl backdrop-blur-2xl flex flex-col gap-1">
+          <div className="rounded-3xl border border-sky-300/65 bg-gradient-to-b from-white/95 via-[#e6f0fb]/95 to-[#dceaf8]/95 p-4 shadow-xl shadow-sky-500/10 backdrop-blur-2xl flex flex-col gap-1">
             {NAV_LINKS.map((link) => {
               const isActive = activeSection === link.sectionId
               return (
@@ -212,8 +212,8 @@ export const Navbar = (): JSX.Element => {
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.sectionId)}
                   className={`flex items-center justify-between px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all ${isActive
-                    ? 'bg-gradient-to-r from-sky-400 via-sky-500 to-blue-400 text-white shadow-sm shadow-sky-400/25'
-                    : 'text-slate-700 hover:bg-sky-50 hover:text-sky-600'
+                    ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-white shadow-sm shadow-emerald-500/25'
+                    : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
                     }`}
                 >
                   <span>{link.label}</span>
@@ -224,7 +224,7 @@ export const Navbar = (): JSX.Element => {
               <a
                 href="/#contact"
                 onClick={(e) => handleNavClick(e, 'contact')}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-400 to-sky-500 py-2.5 text-sm font-semibold text-white hover:brightness-105 transition-all shadow-sm"
+                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 py-2.5 text-sm font-semibold text-white hover:brightness-105 transition-all shadow-sm shadow-emerald-500/20"
               >
                 <Mail className="h-4 w-4" />
                 <span>Let's Connect</span>

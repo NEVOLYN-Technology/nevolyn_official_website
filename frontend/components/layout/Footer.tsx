@@ -34,7 +34,7 @@ export const Footer = (): JSX.Element => {
   }
 
   return (
-    <footer className="text-slate-600 border-t border-slate-300/80 bg-[#e8edf3]">
+    <footer className="text-slate-700 border-t border-sky-300/70 bg-[#c6dbf2]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-8">
         {/* Main Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -52,10 +52,10 @@ export const Footer = (): JSX.Element => {
                 className="h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-full drop-shadow-sm"
               />
               <span className="flex flex-col justify-center leading-none">
-                <span className="block font-extrabold tracking-[-0.02em] text-xl sm:text-2xl text-slate-900">
+                <span className="block font-brand text-lg sm:text-xl tracking-[0.16em] text-slate-900">
                   NEVOLYN
                 </span>
-                <span className="mt-0.5 block font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold">
+                <span className="mt-1.5 block font-brand text-[10.5px] sm:text-[11.5px] uppercase tracking-[0.14em] text-slate-600">
                   Technology
                 </span>
               </span>

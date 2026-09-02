@@ -45,7 +45,7 @@ export const ContactSection = (): JSX.Element => {
   }
 
   return (
-    <section id="contact" className="py-16 sm:py-20 border-t border-slate-300/70 bg-[#f5f8fb] relative overflow-hidden">
+    <section id="contact" className="py-16 sm:py-20 border-t border-sky-300/60 bg-[#deebf9] relative overflow-hidden">
       {/* Animated Success Popup Modal */}
       <SuccessModal
         isOpen={isModalOpen && isSuccess}

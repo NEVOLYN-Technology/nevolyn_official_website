@@ -92,7 +92,7 @@ export const LatestNewsSection = (): JSX.Element => {
   }
 
   return (
-    <section id="latest-news" className="relative py-16 sm:py-20 bg-[#ecf1f6] border-t border-slate-200/90 overflow-hidden">
+    <section id="latest-news" className="relative py-16 sm:py-20 bg-[#d5e4f6] border-t border-sky-300/60 overflow-hidden">
       {/* Background Ambient Glow Orbs - Multi-chromatic Soft Aura */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] bg-gradient-to-tr from-sky-400/20 via-indigo-400/15 to-emerald-400/15 rounded-full blur-[140px] pointer-events-none z-0" />
 
@@ -246,10 +246,10 @@ export const LatestNewsSection = (): JSX.Element => {
                             <img src="/nevolyn-icon.png" alt="NEVOLYN Technology" className="w-4 h-4 object-contain shrink-0" />
                             <span>{item.author}</span>
                           </div>
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold group-hover:border-sky-400 group-hover:text-sky-600 transition-all duration-300">
-                            <img src="/nevolyn-icon.png" alt="NEVOLYN Technology" className="w-3.5 h-3.5 object-contain shrink-0" />
-                            <span>NEVOLYN</span>
-                          </div>
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold group-hover:border-sky-400 group-hover:text-sky-600 transition-all duration-300">
+                          <img src="/nevolyn-icon.png" alt="NEVOLYN Technology" className="w-3.5 h-3.5 object-contain shrink-0" />
+                          <span className="font-brand tracking-wider text-[10px]">NEVOLYN</span>
+                        </div>
                         </div>
                       </div>
                     </div>

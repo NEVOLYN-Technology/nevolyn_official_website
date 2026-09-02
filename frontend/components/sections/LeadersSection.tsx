@@ -138,7 +138,7 @@ export function LeadersSection(): JSX.Element {
   }
 
   return (
-    <section id="leaders" className="relative pt-12 pb-16 px-4 md:px-8 overflow-hidden bg-[#f5f8fb] border-t border-slate-300/70">
+    <section id="leaders" className="relative pt-12 pb-16 px-4 md:px-8 overflow-hidden bg-[#deebf9] border-t border-sky-300/60">
       <div className="max-w-7xl mx-auto">
 
         {/* ── Section Header ─────────────────────────────────── */}

@@ -34,10 +34,9 @@ export interface PageShellProps {
  */
 export function PageShell({ children }: PageShellProps): JSX.Element {
   return (
-    <main className="bg-[#ecf1f6] min-h-screen">
+    <main className="bg-[#d5e4f6] min-h-screen">
       <Navbar />
       <div className="pt-28 min-h-screen">{children}</div>
-      <div className="tech-check-stripe" />
       <Footer />
     </main>
   )
