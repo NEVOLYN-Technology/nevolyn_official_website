@@ -1,3 +1,12 @@
+/**
+ * ContactSection — Interactive visitor inquiry form for R&D and partner proposals.
+ *
+ * Integrates with the Spring Boot API client (`lib/apiClient.ts`) and triggers
+ * a 3-step email verification flow on successful submission.
+ * The SuccessModal is shown when the backend confirms message delivery.
+ *
+ * @module components/sections/ContactSection
+ */
 'use client'
 
 import type { JSX } from 'react'
@@ -7,6 +16,7 @@ import Link from 'next/link'
 import { fadeUpProps } from '@/lib/animations'
 import { SuccessModal } from '@/components/ui/SuccessModal'
 import { useContactForm } from '@/lib/hooks/useContactForm'
+import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 
 /**
  * Interactive visitor contact form section for R&D inquiries and partner proposals.
@@ -57,36 +67,28 @@ export const ContactSection = (): JSX.Element => {
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header */}
-        <div className="text-center mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-emerald-50/80 px-4 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm mb-4 backdrop-blur-sm">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            <span className="tracking-wide uppercase">CONNECT &amp; COLLABORATE</span>
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
-            Partnership.{' '}
-            <span className="bg-gradient-to-r from-sky-400 to-sky-500 bg-clip-text text-transparent">
-              Collaboration.
-            </span>{' '}
-            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
-              Innovation.
-            </span>
-          </h2>
-
-          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal">
-            Have an industrial challenge, pilot inquiry, or partnership proposal? Send us a message below.
-          </p>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-2xl mx-auto mt-2.5 font-normal">
-            Looking to shape the future of AI &amp; industrial automation with us?{' '}
-            <Link
-              href="/join_us"
-              className="font-medium text-emerald-600 hover:text-emerald-700 underline underline-offset-4 transition-colors whitespace-nowrap"
-            >
-              Join our team &rarr;
-            </Link>
-          </p>
-        </div>
+        {/* ── Section Header ──────────────────────────────────────── */}
+        <SectionHeader
+          pillLabel="CONNECT & COLLABORATE"
+          title={
+            <>
+              Partnership.{' '}
+              <GradText variant="sky">Collaboration.</GradText>{' '}
+              <GradText variant="emerald">Innovation.</GradText>
+            </>
+          }
+          description="Have an industrial challenge, pilot inquiry, or partnership proposal? Send us a message below."
+        />
+        {/* Secondary sub-note with Careers link */}
+        <p className="text-xs sm:text-sm text-slate-500 max-w-2xl mx-auto mt-2.5 font-normal text-center -mt-6 mb-6">
+          Looking to shape the future of AI &amp; industrial automation with us?{' '}
+          <Link
+            href="/join_us"
+            className="font-medium text-emerald-600 hover:text-emerald-700 underline underline-offset-4 transition-colors whitespace-nowrap"
+          >
+            Join our team &rarr;
+          </Link>
+        </p>
 
         <motion.div {...fadeUpProps(0.1)} className="bg-white border border-slate-200/90 rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden">
           {/* Top Multi-Chromatic Accent Beam */}

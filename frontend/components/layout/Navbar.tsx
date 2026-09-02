@@ -30,6 +30,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Mail, Menu, X } from 'lucide-react'
+import { BrandWordmark } from '@/components/ui/BrandWordmark'
 
 /** Static link definitions. Defined outside the component to avoid re-creating the array on every render. */
 const NAV_LINKS = [
@@ -138,19 +139,8 @@ export const Navbar = (): JSX.Element => {
           onClick={(e) => handleNavClick(e, 'home')}
           className="group flex shrink-0 items-center gap-2.5 rounded-full py-1 pl-1 pr-2 transition-all duration-200 hover:-translate-y-0.5"
         >
-          <img
-            src="/nevolyn-icon.png"
-            alt="NEVOLYN Technology"
-            className="block h-9 w-9 sm:h-10 sm:w-10 object-contain rounded-full drop-shadow-sm"
-          />
-          <span className="flex flex-col justify-center leading-none">
-            <span className="block font-brand text-[15px] sm:text-[16px] tracking-[0.16em] text-slate-900">
-              NEVOLYN
-            </span>
-            <span className="mt-1 block font-brand text-[8.8px] sm:text-[9.2px] uppercase tracking-[0.09em] text-slate-600">
-              Technology
-            </span>
-          </span>
+          {/* Reusable brand icon + NEVOLYN / Technology wordmark (sm = navbar size) */}
+          <BrandWordmark size="sm" />
         </Link>
 
         {/* Desktop Links (Pill Style) */}

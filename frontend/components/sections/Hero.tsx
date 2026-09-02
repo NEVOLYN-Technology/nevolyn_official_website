@@ -1,8 +1,11 @@
 /**
  * Hero section component — the primary landing view for NEVOLYN Technology.
  *
- * Cleanly proportioned layout with balanced typography and an empty
- * presentation card ready for /nevolyn-image.png.
+ * Cleanly proportioned two-column layout:
+ * - **Left**: status pill, 3-color headline, subtitle paragraph, CTA buttons, trust badge
+ * - **Right**: floating 3D presentation frame with the hero showcase image
+ *
+ * No data fetching — all content is static. To update copy, edit this file directly.
  *
  * @module components/sections/Hero
  */
@@ -12,6 +15,7 @@ import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, ShieldCheck } from 'lucide-react'
+import { StatusPill } from '@/components/ui/StatusPill'
 
 export const Hero = (): JSX.Element => {
   return (
@@ -26,11 +30,8 @@ export const Hero = (): JSX.Element => {
             transition={{ duration: 0.55 }}
             className="lg:col-span-6 text-left"
           >
-            {/* Status Pill with Emerald Accent - Bigger & Classy */}
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-emerald-200/90 bg-emerald-50/90 px-5 py-2 text-sm font-semibold text-emerald-800 shadow-sm backdrop-blur-sm mb-5">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-              <span className="tracking-wide">ENGINEERING WHAT&apos;S NEXT</span>
-            </div>
+            {/* Status Pill — "ENGINEERING WHAT'S NEXT" live badge */}
+            <StatusPill label="ENGINEERING WHAT'S NEXT" className="mb-5 px-5 py-2 text-sm font-semibold gap-2.5" />
 
             {/* Headline with Balanced 3-Line, 3-Color Signature Structure */}
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] xl:text-[44px] font-extrabold leading-[1.16] tracking-tight text-slate-900">

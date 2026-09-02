@@ -16,6 +16,8 @@
 import type { JSX } from 'react'
 import Link from 'next/link'
 import { Mail, MapPin, Phone } from 'lucide-react'
+import { BrandWordmark } from '@/components/ui/BrandWordmark'
+import { CONTACT } from '@/lib/constants/contact'
 
 /**
  * Site-wide bottom footer component with organization info and contact channels.
@@ -46,59 +48,64 @@ export const Footer = (): JSX.Element => {
               aria-label="Go to top of Home page"
               className="inline-flex items-center gap-3 group transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
             >
-              <img
-                src="/nevolyn-icon.png"
-                alt="NEVOLYN Technology"
-                className="h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-full drop-shadow-sm"
-              />
-              <span className="flex flex-col justify-center leading-none">
-                <span className="block font-brand text-lg sm:text-xl tracking-[0.16em] text-slate-900">
-                  NEVOLYN
-                </span>
-                <span className="mt-1.5 block font-brand text-[10.5px] sm:text-[11.5px] uppercase tracking-[0.14em] text-slate-600">
-                  Technology
-                </span>
-              </span>
+              {/* Reusable brand icon + NEVOLYN / Technology wordmark (md = footer size) */}
+              <BrandWordmark size="md" />
             </Link>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-md">
               Building the future through Automation &amp; Advanced Engineering Solutions.
             </p>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Info — sourced from lib/constants/contact.ts */}
           <div className="space-y-2.5 md:justify-self-end">
             <h3 className="font-bold text-base sm:text-lg text-slate-900">Contact</h3>
             <ul className="space-y-2.5 text-sm text-slate-600">
+              {/* Address */}
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-emerald-600" />
-                <a href="https://maps.app.goo.gl/rTMDffWdKmaRdSth6?g_st=ac" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-700 transition-colors" aria-label="Location Map Link">
-                  13/2, Abdus Sattar Master Road, Tongi, Gazipur
+                <a
+                  href={CONTACT.address.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-emerald-700 transition-colors"
+                  aria-label="Location Map Link"
+                >
+                  {CONTACT.address.label}
                 </a>
               </li>
+
+              {/* Phone numbers */}
               <li className="flex items-start gap-2.5">
                 <Phone className="w-4 h-4 mt-0.5 shrink-0 text-sky-500" />
                 <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <a
-                    href="tel:+8801679248064"
-                    aria-label="Call +880 1679-248064"
-                    className="hover:text-sky-600 transition-colors"
-                  >
-                    +880 1679-248064
-                  </a>
-                  <span className="text-slate-300 hidden sm:inline">•</span>
-                  <a
-                    href="tel:+8801939444451"
-                    aria-label="Call +880 1939-444451"
-                    className="hover:text-sky-600 transition-colors"
-                  >
-                    +880 1939-444451
-                  </a>
+                  {CONTACT.phones.map((phone, idx) => (
+                    <>
+                      <a
+                        key={phone.href}
+                        href={phone.href}
+                        aria-label={phone.ariaLabel}
+                        className="hover:text-sky-600 transition-colors"
+                      >
+                        {phone.label}
+                      </a>
+                      {/* Bullet separator between numbers — hidden on mobile */}
+                      {idx < CONTACT.phones.length - 1 && (
+                        <span className="text-slate-300 hidden sm:inline">•</span>
+                      )}
+                    </>
+                  ))}
                 </div>
               </li>
+
+              {/* Email */}
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 shrink-0 text-rose-500" />
-                <a href="mailto:info@nevolyn.com" aria-label="Email info@nevolyn.com" className="hover:text-rose-600 transition-colors">
-                  info@nevolyn.com
+                <a
+                  href={`mailto:${CONTACT.email}`}
+                  aria-label={`Email ${CONTACT.email}`}
+                  className="hover:text-rose-600 transition-colors"
+                >
+                  {CONTACT.email}
                 </a>
               </li>
             </ul>

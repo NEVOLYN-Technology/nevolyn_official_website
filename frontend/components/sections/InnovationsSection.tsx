@@ -5,19 +5,24 @@
  * gradient border frames, glowing neon accent beams, and interactive CTA buttons.
  *
  * Reads from `lib/data/innovations.ts` (the single source of truth for project data).
+ * Carousel state (scroll detection, nav, index) is managed by the `useCarousel` hook.
  *
  * @module components/sections/InnovationsSection
  */
 'use client'
 
 import type { JSX } from 'react'
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Tag, Calendar, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
+import { Tag, Calendar, Sparkles } from 'lucide-react'
 import { Badge, type BadgeTone } from '@/components/ui/badge'
 import { projects, type Project } from '@/lib/data/innovations'
 import { fadeUpProps } from '@/lib/animations'
 import { formatDate, cn } from '@/lib/utils'
+import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
+import { CarouselCard } from '@/components/ui/CarouselCard'
+import { CarouselArrows, CarouselDots } from '@/components/ui/CarouselControls'
+import { useCarousel } from '@/lib/hooks/useCarousel'
 
 /** Maps each project status to the appropriate Badge tone (color). */
 const STATUS_TONE: Record<Project['status'], BadgeTone> = {
@@ -37,9 +42,8 @@ type FilterLabel = typeof FILTERS[number]
  */
 export const InnovationsSection = (): JSX.Element => {
   const [activeFilter, setActiveFilter] = useState<FilterLabel>('All')
-  const [centeredIndex, setCenteredIndex] = useState<number>(0)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
+  // ── Filtered project list ─────────────────────────────────────────────────
   const filteredProjects = projects.filter((project) => {
     if (activeFilter === 'All') return true
     if (activeFilter === 'Ongoing') return project.status === 'active'
@@ -47,75 +51,16 @@ export const InnovationsSection = (): JSX.Element => {
     return true
   })
 
-  // Detect which card is closest to the middle of the scroll container
-  const handleScroll = useCallback(() => {
-    if (!scrollContainerRef.current) return
-    const container = scrollContainerRef.current
-    const containerCenter = container.scrollLeft + container.clientWidth / 2
+  // ── Carousel state managed by shared hook — no duplicate scroll logic ─────
+  const { scrollContainerRef, safeCenteredIndex, handlePrev, handleNext, scrollToCard } =
+    useCarousel(filteredProjects.length, 'data-card-index')
 
-    let minDistance = Infinity
-    let closestIndex = 0
-
-    const cards = container.querySelectorAll<HTMLElement>('[data-card-index]')
-    cards.forEach((card) => {
-      const cardIndex = Number(card.getAttribute('data-card-index'))
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2
-      const distance = Math.abs(containerCenter - cardCenter)
-
-      if (distance < minDistance) {
-        minDistance = distance
-        closestIndex = cardIndex
-      }
-    })
-
-    setCenteredIndex(closestIndex)
-  }, [])
-
-  // Smooth scroll to card by index
-  const scrollToCard = useCallback((index: number) => {
-    if (!scrollContainerRef.current) return
-    const container = scrollContainerRef.current
-    const cards = container.querySelectorAll<HTMLElement>('[data-card-index]')
-    const targetCard = cards[index]
-
-    if (targetCard) {
-      const targetLeft = targetCard.offsetLeft - container.clientWidth / 2 + targetCard.offsetWidth / 2
-      container.scrollTo({ left: targetLeft, behavior: 'smooth' })
-    }
-  }, [])
-
-  // Reset scroll position when filter changes
+  // ── Reset carousel to first card when active filter changes ──────────────
   useEffect(() => {
-    setCenteredIndex(0)
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ left: 0, behavior: 'smooth' })
     }
-  }, [activeFilter])
-
-  // Attach scroll listener
-  useEffect(() => {
-    const container = scrollContainerRef.current
-    if (!container) return
-
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-
-    return () => {
-      container.removeEventListener('scroll', handleScroll)
-    }
-  }, [handleScroll, filteredProjects.length])
-
-  const safeCenteredIndex = Math.min(Math.max(0, centeredIndex), Math.max(0, filteredProjects.length - 1))
-
-  const handlePrev = () => {
-    const prevIndex = safeCenteredIndex > 0 ? safeCenteredIndex - 1 : filteredProjects.length - 1
-    scrollToCard(prevIndex)
-  }
-
-  const handleNext = () => {
-    const nextIndex = safeCenteredIndex < filteredProjects.length - 1 ? safeCenteredIndex + 1 : 0
-    scrollToCard(nextIndex)
-  }
+  }, [activeFilter, scrollContainerRef])
 
   const currentCenteredProject = filteredProjects[safeCenteredIndex]
 
@@ -125,27 +70,18 @@ export const InnovationsSection = (): JSX.Element => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] bg-gradient-to-tr from-sky-400/20 via-indigo-400/15 to-emerald-400/15 rounded-full blur-[140px] pointer-events-none z-0" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <motion.div {...fadeUpProps(0.1)} className="text-center mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-emerald-50/80 px-4 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm mb-4 backdrop-blur-sm">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            <span className="tracking-wide uppercase">RESEARCH &amp; COMMERCIAL PRODUCTS</span>
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
-            Research.{' '}
-            <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">
-              Develop.
-            </span>{' '}
-            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
-              Deploy.
-            </span>
-          </h2>
-
-          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal">
-            Pioneering next-generation intelligent systems, automated computer vision, and scalable software platforms engineered for real-world execution.
-          </p>
-        </motion.div>
+        {/* ── Section Header ────────────────────────────────────────── */}
+        <SectionHeader
+          pillLabel="RESEARCH & COMMERCIAL PRODUCTS"
+          title={
+            <>
+              Research.{' '}
+              <GradText variant="sky">Develop.</GradText>{' '}
+              <GradText variant="emerald">Deploy.</GradText>
+            </>
+          }
+          description="Pioneering next-generation intelligent systems, automated computer vision, and scalable software platforms engineered for real-world execution."
+        />
 
         {/* Filter Tabs */}
         <motion.div {...fadeUpProps(0.15)} className="flex flex-wrap justify-center gap-3 mb-8 sm:mb-10">
@@ -176,29 +112,19 @@ export const InnovationsSection = (): JSX.Element => {
           })}
         </motion.div>
 
-        {/* 3D Horizontal Carousel Stage with Native Smooth Scrolling */}
+        {/* ── 3D Horizontal Carousel Stage ─────────────────────────────── */}
         <motion.div {...fadeUpProps(0.25)} className="relative w-full py-4">
-          {/* Previous / Next Arrow Controls */}
+          {/* Prev / Next arrow buttons (shared CarouselArrows component) */}
           {filteredProjects.length > 1 && (
-            <>
-              <button
-                onClick={handlePrev}
-                aria-label="Previous project"
-                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-white/95 border border-slate-200 backdrop-blur-xl text-slate-700 hover:bg-gradient-to-r hover:from-sky-400 hover:to-blue-500 hover:border-transparent hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg shadow-slate-400/20 cursor-pointer group"
-              >
-                <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
-              </button>
-              <button
-                onClick={handleNext}
-                aria-label="Next project"
-                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-40 p-3.5 rounded-full bg-white/95 border border-slate-200 backdrop-blur-xl text-slate-700 hover:bg-gradient-to-r hover:from-sky-400 hover:to-blue-500 hover:border-transparent hover:text-white hover:-translate-y-1/2 hover:scale-110 active:scale-95 transition-all duration-300 shadow-lg shadow-slate-400/20 cursor-pointer group"
-              >
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </>
+            <CarouselArrows
+              onPrev={handlePrev}
+              onNext={handleNext}
+              prevLabel="Previous project"
+              nextLabel="Next project"
+            />
           )}
 
-          {/* Native Smooth Scroll Track */}
+          {/* Native smooth scroll track */}
           <div
             ref={scrollContainerRef}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -208,42 +134,16 @@ export const InnovationsSection = (): JSX.Element => {
               const isCenter = idx === safeCenteredIndex
 
               return (
-                <div
+                // ── CarouselCard handles the gradient border, inner glow, beam, and image ──
+                <CarouselCard
                   key={project.id}
-                  data-card-index={idx}
+                  isCenter={isCenter}
+                  image={project.image}
+                  imageAlt={project.title}
                   onClick={() => scrollToCard(idx)}
-                  className={cn(
-                    "snap-center shrink-0 w-[320px] sm:w-[460px] lg:w-[500px]",
-                    "p-[1.5px] rounded-[28px] transition-all duration-500 ease-out cursor-pointer group transform",
-                    isCenter
-                      ? "bg-gradient-to-b from-sky-400 via-blue-500 to-indigo-500 shadow-[0_20px_50px_rgba(56,189,248,0.25),0_0_25px_rgba(99,102,241,0.15)] -translate-y-4 scale-105 filter blur-0 opacity-100 z-20"
-                      : "bg-slate-300/70 shadow-lg shadow-slate-400/20 translate-y-2 scale-90 filter blur-[3.5px] opacity-50 z-10 hover:opacity-80 hover:blur-[1px]"
-                  )}
+                  dataIndex={idx}
+                  dataAttr="data-card-index"
                 >
-                  {/* Inner Card Content Container */}
-                  <div className="relative w-full h-full p-6 sm:p-7 rounded-[26px] bg-white text-slate-900 shadow-sm backdrop-blur-2xl flex flex-col justify-between overflow-hidden">
-                    {/* Inner Ambient Glow Background */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_55%)] pointer-events-none" />
-
-                    {/* Top Multi-Chromatic Accent Beam */}
-                    <div className={cn(
-                      "absolute top-0 left-0 right-0 h-1.5 rounded-t-3xl transition-all duration-500",
-                      isCenter
-                        ? "bg-gradient-to-r from-sky-400 via-indigo-400 to-emerald-400 shadow-[0_0_12px_rgba(56,189,248,0.4)]"
-                        : "bg-slate-200"
-                    )} />
-
-                    {/* Optional Image Banner if provided */}
-                    {project.image && (
-                      <div className="mb-5 -mx-6 -mt-6 sm:-mx-7 sm:-mt-7 overflow-hidden relative h-40 rounded-t-[24px] border-b border-slate-200">
-                        <img
-                          src={project.image}
-                          alt={project.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
-                      </div>
-                    )}
 
                     <div>
                       {/* Category & Status Header Row */}
@@ -332,29 +232,19 @@ export const InnovationsSection = (): JSX.Element => {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                </CarouselCard>
               )
             })}
           </div>
 
-          {/* Horizontal Navigation Dots */}
+          {/* Dot indicators (shared CarouselDots component) */}
           {filteredProjects.length > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-4">
-              {filteredProjects.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => scrollToCard(i)}
-                  className={cn(
-                    "h-2.5 rounded-full transition-all duration-300 cursor-pointer hover:scale-125",
-                    i === safeCenteredIndex
-                      ? "w-8 bg-gradient-to-r from-sky-400 to-blue-500 shadow-[0_0_12px_rgba(56,189,248,0.45)]"
-                      : "w-2.5 bg-slate-300 hover:bg-sky-400"
-                  )}
-                  aria-label={`Go to project ${i + 1}`}
-                />
-              ))}
-            </div>
+            <CarouselDots
+              count={filteredProjects.length}
+              activeIndex={safeCenteredIndex}
+              onDotClick={scrollToCard}
+              itemLabel="project"
+            />
           )}
         </motion.div>
       </div>
