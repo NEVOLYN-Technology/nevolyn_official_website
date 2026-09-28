@@ -41,34 +41,36 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
   const bioParagraphs: string[] = member.extendedBio ?? [member.bio]
 
   return (
-    <>
+    <motion.div
+      key="leader-modal-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 lg:p-8 overscroll-contain"
+    >
       {/* Backdrop Overlay — dims the page and closes on tap */}
-      <motion.div
-        key="backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0, transition: { duration: 0.15 } }}
+      <div
         onClick={handleClose}
-        className="fixed inset-0 z-50 bg-slate-950/70 sm:backdrop-blur-md"
+        className="fixed inset-0 bg-slate-950/70 sm:backdrop-blur-md cursor-pointer"
         aria-hidden="true"
       />
 
       {/* Dialog panel — mobile-first full sheet or centered desktop dialog */}
       <motion.div
-        key="panel"
+        key="leader-modal-panel"
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
-        initial={{ opacity: 0, scale: 0.96, y: 15 }}
+        initial={{ opacity: 0, scale: 0.95, y: 24 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.98, y: 10, transition: { duration: 0.15, ease: 'easeOut' } }}
-        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-        className="fixed inset-0 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50
-                   w-full h-[100dvh] sm:h-auto sm:w-[94%] sm:max-w-3xl sm:max-h-[85vh] flex flex-col
+        exit={{ opacity: 0, scale: 0.96, y: 16 }}
+        transition={{ duration: 0.26, ease: [0.21, 0.47, 0.32, 0.98] }}
+        className="relative sm:relative w-full h-[100dvh] sm:h-auto sm:w-[94%] sm:max-w-3xl sm:max-h-[85vh] flex flex-col
                    bg-white rounded-none sm:rounded-[28px] shadow-2xl
                    border-0 sm:border-2 border-emerald-500/70 sm:ring-4 ring-emerald-500/10
-                   overflow-hidden overscroll-contain"
+                   overflow-hidden overscroll-contain z-10"
       >
         {/* Top Decorative Gradient Line */}
         <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-sky-400 shrink-0" />
@@ -213,7 +215,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
           </div>
         </div>
       </motion.div>
-    </>
+    </motion.div>
   )
 }
 

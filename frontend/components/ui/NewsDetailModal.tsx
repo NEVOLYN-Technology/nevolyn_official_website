@@ -119,13 +119,16 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 lg:p-8 overscroll-contain">
+        <motion.div
+          key="news-detail-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 lg:p-8 overscroll-contain"
+        >
           {/* Backdrop Overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+          <div
             onClick={handleClose}
             className="fixed inset-0 bg-slate-950/70 sm:backdrop-blur-md cursor-pointer"
             aria-hidden="true"
@@ -133,13 +136,14 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
 
           {/* Modal Container */}
           <motion.div
+            key="news-detail-dialog"
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
-            initial={{ opacity: 0, scale: 0.96, y: 15 }}
+            initial={{ opacity: 0, scale: 0.95, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 10, transition: { duration: 0.15, ease: 'easeOut' } }}
-            transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+            exit={{ opacity: 0, scale: 0.96, y: 16 }}
+            transition={{ duration: 0.26, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="relative w-full h-[100dvh] sm:h-auto sm:max-w-2xl sm:max-h-[92vh] flex flex-col rounded-none sm:rounded-3xl bg-white shadow-2xl border-0 sm:border border-slate-200/90 overflow-hidden z-10 overscroll-contain"
           >
             {/* ── Sticky Top Navigation Bar ────────────────────────── */}
@@ -312,7 +316,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
               </div>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   )
