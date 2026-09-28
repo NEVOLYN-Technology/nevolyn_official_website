@@ -14,7 +14,7 @@
 import type { JSX } from 'react'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Tag, Calendar, Sparkles } from 'lucide-react'
+import { Tag, Calendar, Sparkles, ExternalLink } from 'lucide-react'
 import { Badge, type BadgeTone } from '@/components/ui/badge'
 import { projects, type Project } from '@/lib/data/innovations'
 import { fadeUpProps } from '@/lib/animations'
@@ -227,10 +227,24 @@ export const InnovationsSection = (): JSX.Element => {
                                 : `Started ${formatDate(project.startDate)}`}
                           </span>
                         </div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold group-hover:border-sky-400 group-hover:text-sky-600 transition-all duration-300">
-                          <img src="/nevolyn-icon.png" alt="NEVOLYN Technology" className="w-3.5 h-3.5 object-contain shrink-0" />
-                          <span className="font-brand tracking-wider text-[10px]">NEVOLYN</span>
-                        </div>
+                        {project.url ? (
+                          <a
+                            href={project.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 text-sky-700 hover:bg-sky-100 hover:text-sky-900 border border-sky-200 text-xs font-semibold transition-all duration-200 shadow-sm hover:scale-105 active:scale-95 cursor-pointer"
+                            title={project.actionLabel ? `${project.actionLabel} (${project.title})` : `Visit ${project.title}`}
+                          >
+                            <span>{project.actionLabel || 'Visit Platform'}</span>
+                            <ExternalLink className="w-3 h-3 text-sky-600" />
+                          </a>
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold group-hover:border-sky-400 group-hover:text-sky-600 transition-all duration-300">
+                            <img src="/nevolyn-icon.png" alt="NEVOLYN Technology" className="w-3.5 h-3.5 object-contain shrink-0" />
+                            <span className="font-brand tracking-wider text-[10px]">NEVOLYN</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                 </CarouselCard>

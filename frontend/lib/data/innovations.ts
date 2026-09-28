@@ -44,6 +44,12 @@ export interface Project {
 
   /** Category grouping tag for UI filtering (e.g. 'Industrial AI'). */
   category: string
+
+  /** Optional external link to live product / website. */
+  url?: string
+
+  /** Optional descriptive CTA button label. */
+  actionLabel?: string
 }
 
 export const projects: Project[] = [
@@ -63,6 +69,8 @@ export const projects: Project[] = [
     ],
     startDate: '2026-01-15',
     category: 'Industrial AI',
+    url: 'https://fabins.nevolyn.com/',
+    actionLabel: 'FABINS Automation',
   },
 
   {
@@ -84,6 +92,8 @@ export const projects: Project[] = [
     startDate: '2026-07-01',
     endDate: '2026-07-31',
     category: 'Software Development',
+    url: 'https://nevolyn.com/',
+    actionLabel: 'NEVOLYN Technology',
   },
 
   {
@@ -105,5 +115,7 @@ export const projects: Project[] = [
     startDate: '2026-07-01',
     endDate: '2026-07-31',
     category: 'Product Development',
+    url: 'https://fabins.nevolyn.com/',
+    actionLabel: 'AI-Powered Fabric Inspection',
   },
 ]

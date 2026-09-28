@@ -15,25 +15,18 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Providers } from '@/components/providers/ThemeProvider'
+import { NEVOLYN_SEO_CONFIG, nevolynJsonLd } from '@/lib/seo/config'
 import './globals.css'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://nevolyn.com'),
-  title: 'NEVOLYN Technology',
-  description: 'NEVOLYN Technology — Building the future through advanced AI, computer vision, and industrial automation.',
-  keywords: [
-    'NEVOLYN',
-    'NEVOLYN Technology',
-    'deep tech',
-    'artificial intelligence',
-    'intelligent systems',
-    'industrial automation',
-    'computer vision',
-    'software engineering',
-    'FABINS',
-    'high performance systems',
-  ],
-  authors: [{ name: 'NEVOLYN Technology' }],
+  metadataBase: new URL(NEVOLYN_SEO_CONFIG.siteUrl),
+  title: {
+    default: NEVOLYN_SEO_CONFIG.title,
+    template: '%s | NEVOLYN Technology',
+  },
+  description: NEVOLYN_SEO_CONFIG.description,
+  keywords: [...NEVOLYN_SEO_CONFIG.keywords],
+  authors: [{ name: 'NEVOLYN Technology', url: NEVOLYN_SEO_CONFIG.siteUrl }],
   creator: 'NEVOLYN Technology',
   publisher: 'NEVOLYN Technology',
   alternates: {
@@ -42,10 +35,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://nevolyn.com',
+    url: NEVOLYN_SEO_CONFIG.siteUrl,
     siteName: 'NEVOLYN Technology',
-    title: 'NEVOLYN Technology',
-    description: 'Automation and next-generation engineering solutions.',
+    title: NEVOLYN_SEO_CONFIG.title,
+    description: NEVOLYN_SEO_CONFIG.description,
     images: [
       {
         url: '/nevolyn-logo.png',
@@ -57,8 +50,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NEVOLYN Technology',
-    description: 'Automation and next-generation engineering solutions.',
+    title: NEVOLYN_SEO_CONFIG.title,
+    description: NEVOLYN_SEO_CONFIG.description,
     images: ['/nevolyn-logo.png'],
   },
   icons: {
@@ -71,21 +64,6 @@ export const viewport: Viewport = {
   colorScheme: 'light',
   themeColor: '#eef1f5',
   userScalable: true,
-}
-
-/** Schema.org structured data JSON-LD for rich search engine knowledge graphs. */
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'NEVOLYN Technology',
-  url: 'https://nevolyn.com',
-  logo: 'https://nevolyn.com/nevolyn-logo.png',
-  description: 'NEVOLYN Technology is an advanced engineering and deep-tech company building intelligent systems, applied AI, computer vision, and industrial automation platforms.',
-  contactPoint: {
-    '@type': 'ContactPoint',
-    email: 'info@nevolyn.com',
-    contactType: 'customer support',
-  },
 }
 
 export default function RootLayout({
@@ -113,10 +91,10 @@ export default function RootLayout({
         </div>
 
         <Providers>
-          {/* Schema.org Organization Rich Snippet */}
+          {/* Schema.org Organization & Product Rich Snippet Graph */}
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(nevolynJsonLd) }}
           />
           {children}
           {/* Analytics are only injected in production builds */}
