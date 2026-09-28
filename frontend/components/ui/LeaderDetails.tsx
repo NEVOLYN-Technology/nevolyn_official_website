@@ -47,9 +47,9 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
         key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        exit={{ opacity: 0, transition: { duration: 0.15 } }}
         onClick={handleClose}
-        className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-sm sm:backdrop-blur-md"
+        className="fixed inset-0 z-50 bg-slate-950/70 sm:backdrop-blur-md"
         aria-hidden="true"
       />
 
@@ -62,7 +62,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
         aria-labelledby={headingId}
         initial={{ opacity: 0, scale: 0.96, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 15 }}
+        exit={{ opacity: 0, scale: 0.98, y: 10, transition: { duration: 0.15, ease: 'easeOut' } }}
         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
         className="fixed inset-0 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50
                    w-full h-[100dvh] sm:h-auto sm:w-[94%] sm:max-w-3xl sm:max-h-[85vh] flex flex-col
@@ -113,7 +113,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
               aria-label="Close profile"
               className="p-2 sm:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation active:scale-95"
             >
-              <X className="w-6 h-6 sm:w-7 sm:h-7" />
+              <X className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2]" />
             </button>
           </div>
         </div>
@@ -205,9 +205,9 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
             <button
               onClick={handleClose}
               type="button"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 font-bold text-sm transition-all active:scale-95 cursor-pointer shadow-xs touch-manipulation"
+              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-slate-200 text-slate-700 border border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 active:bg-black active:scale-95 font-bold text-sm transition-all duration-200 cursor-pointer shadow-xs touch-manipulation"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" />
               <span>Back to Leadership Team</span>
             </button>
           </div>

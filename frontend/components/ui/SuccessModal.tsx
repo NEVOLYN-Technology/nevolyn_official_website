@@ -52,7 +52,7 @@ export const SuccessModal = ({
               className="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 p-2 sm:p-2.5 rounded-full transition-all cursor-pointer active:scale-95"
               aria-label="Close modal"
             >
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2]" />
             </button>
 
             {/* Glowing Icon Header */}

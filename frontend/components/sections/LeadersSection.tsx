@@ -121,20 +121,22 @@ export function LeadersSection(): JSX.Element {
           </div>
         </div>
 
-        {/* Social footer */}
-        <div className="mt-6 pt-6 border-t border-slate-100">
-          <div className="flex items-center justify-center">
+        {/* Social footer slot — consistent height across cards to align View Details buttons */}
+        <div className={`mt-6 pt-6 border-t ${member.social?.linkedin ? 'border-slate-100' : 'border-transparent'} min-h-[4.25rem] flex items-center justify-center`}>
+          {member.social?.linkedin ? (
             <Link
-              href={member.social?.linkedin || '#'}
+              href={member.social.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-transparent bg-transparent text-slate-800 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/40 hover:scale-105 active:scale-95 group cursor-pointer"
+              className="inline-flex items-center gap-2 text-slate-700 hover:text-[#0a66c2] bg-transparent transition-colors duration-200 active:scale-95 group cursor-pointer"
               aria-label={`${member.name} LinkedIn`}
             >
               <LinkedinIcon className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-semibold tracking-wide">LinkedIn</span>
+              <span className="text-sm font-semibold tracking-wide group-hover:underline">LinkedIn</span>
             </Link>
-          </div>
+          ) : (
+            <div className="h-5" aria-hidden="true" />
+          )}
         </div>
       </div>
     )

@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { fadeUpProps } from '@/lib/animations'
+import { Sparkles, ArrowRight } from 'lucide-react'
 import { SuccessModal } from '@/components/ui/SuccessModal'
 import { useContactForm } from '@/lib/hooks/useContactForm'
 import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
@@ -80,16 +81,36 @@ export const ContactSection = (): JSX.Element => {
           }
           description="Have an industrial challenge, pilot inquiry, or partnership proposal? Send us a message below."
         />
-        {/* Secondary sub-note with Careers link */}
-        <p className="text-xs sm:text-sm text-slate-500 max-w-2xl mx-auto mt-2.5 font-normal text-center -mt-6 mb-6">
-          Looking to shape the future of AI &amp; industrial automation with us?{' '}
-          <Link
-            href="/join_us"
-            className="font-medium text-emerald-600 hover:text-emerald-700 underline underline-offset-4 transition-colors whitespace-nowrap"
-          >
-            Join our team &rarr;
-          </Link>
-        </p>
+        {/* Prominent Visual Careers & Hiring Callout Banner */}
+        <motion.div
+          {...fadeUpProps(0.05)}
+          className="mx-auto -mt-3 mb-8 max-w-2xl rounded-2xl sm:rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-sky-50/80 p-4 sm:p-5 backdrop-blur-md shadow-lg shadow-emerald-950/5 transition-all duration-300 hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10"
+        >
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-600 ring-1 ring-emerald-500/30 shadow-xs">
+                <Sparkles className="h-5 w-5 animate-pulse" />
+              </div>
+              <div>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-emerald-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  We are Hiring
+                </span>
+                <p className="text-sm sm:text-base font-bold text-slate-800 tracking-tight leading-snug">
+                  Looking to shape the future of AI &amp; industrial automation with us?
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/join_us"
+              className="group inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-600/25 hover:shadow-lg hover:shadow-emerald-600/35 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0"
+            >
+              <span>Join our team</span>
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
+          </div>
+        </motion.div>
 
         <motion.div {...fadeUpProps(0.1)} className="bg-white border border-slate-200/90 rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden">
           {/* Top Multi-Chromatic Accent Beam */}
