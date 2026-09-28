@@ -63,16 +63,26 @@ export const MarqueeTicker = (): JSX.Element => {
     ...TICKER_ITEMS,
   ]
 
-  // Continuous auto-scroll loop with requestAnimationFrame
+  // Continuous auto-scroll loop with requestAnimationFrame (paused when off-screen)
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
 
     let animId: number
+    let isVisible = true
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting
+      },
+      { threshold: 0 }
+    )
+
+    observer.observe(el)
 
     const tick = () => {
-      if (!isHoveredRef.current && !isDraggingRef.current && el) {
-        el.scrollLeft += 1.4 // Balanced, brisk glide speed
+      if (isVisible && !isHoveredRef.current && !isDraggingRef.current && el) {
+        el.scrollLeft += 1.3 // Balanced, brisk glide speed
 
         // Seamless wrap-around when scrolled past half of duplicated content
         const halfWidth = el.scrollWidth / 2
@@ -84,7 +94,10 @@ export const MarqueeTicker = (): JSX.Element => {
     }
 
     animId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(animId)
+    return () => {
+      cancelAnimationFrame(animId)
+      observer.disconnect()
+    }
   }, [])
 
   // Mouse Drag Handlers

@@ -61,51 +61,54 @@ export const Navbar = (): JSX.Element => {
       return
     }
 
+    let isRafPending = false
+    let rafId: number | null = null
+
     const handleScroll = () => {
-      let current = 'home'
-      for (const link of NAV_LINKS) {
-        if (link.sectionId === 'home') continue
-        const element = document.getElementById(link.sectionId)
-        if (element && element.getBoundingClientRect().top <= 240) {
-          current = link.sectionId
+      if (isRafPending) return
+      isRafPending = true
+
+      rafId = requestAnimationFrame(() => {
+        isRafPending = false
+
+        let current = 'home'
+        for (const link of NAV_LINKS) {
+          if (link.sectionId === 'home') continue
+          const element = document.getElementById(link.sectionId)
+          if (element && element.getBoundingClientRect().top <= 240) {
+            current = link.sectionId
+          }
         }
-      }
 
-      const contactElement = document.getElementById('contact')
-      if (contactElement && contactElement.getBoundingClientRect().top <= 280) {
-        current = 'contact'
-      }
-
-      // Check if user is scrolled near bottom of page (where Contact section resides)
-      const isAtBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 80
-      if (isAtBottom) {
-        current = 'contact'
-      }
-
-      if (window.scrollY < 100) {
-        current = 'home'
-      }
-
-      setActiveSection(current)
-
-      // Sync browser URL bar: no hash when at top (home), dynamic section hash everywhere else
-      if (current === 'home') {
-        if (window.location.hash) {
-          window.history.replaceState(null, '', window.location.pathname)
+        const contactElement = document.getElementById('contact')
+        if (contactElement && contactElement.getBoundingClientRect().top <= 280) {
+          current = 'contact'
         }
-      } else {
-        const targetHash = `#${current}`
-        if (window.location.hash !== targetHash) {
-          window.history.replaceState(null, '', `/#${current}`)
+
+        // Check if user is scrolled near bottom of page (where Contact section resides)
+        const isAtBottom =
+          window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 80
+        if (isAtBottom) {
+          current = 'contact'
         }
-      }
+
+        if (window.scrollY < 100) {
+          current = 'home'
+        }
+
+        setActiveSection((prev) => (prev !== current ? current : prev))
+      })
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId)
+      }
+    }
   }, [isHomePage, pathname])
 
   const handleNavClick = (

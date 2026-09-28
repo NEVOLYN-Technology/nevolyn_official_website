@@ -60,28 +60,37 @@ export interface UseCarouselReturn {
 export function useCarousel(itemCount: number, dataAttribute: string): UseCarouselReturn {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const [centeredIndex, setCenteredIndex] = useState(0)
+  const isRafPendingRef = useRef(false)
+  const rafIdRef = useRef<number | null>(null)
 
-  // ── Scroll detection: find the card closest to the container center ──────
+  // ── Scroll detection: find the card closest to the container center with RAF throttle ──────
   const handleScroll = useCallback(() => {
-    const container = scrollContainerRef.current
-    if (!container) return
+    if (isRafPendingRef.current) return
+    isRafPendingRef.current = true
 
-    const containerCenter = container.scrollLeft + container.clientWidth / 2
-    let minDistance = Infinity
-    let closestIndex = 0
+    rafIdRef.current = requestAnimationFrame(() => {
+      isRafPendingRef.current = false
+      const container = scrollContainerRef.current
+      if (!container) return
 
-    const cards = container.querySelectorAll<HTMLElement>(`[${dataAttribute}]`)
-    cards.forEach((card) => {
-      const cardIndex = Number(card.getAttribute(dataAttribute))
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2
-      const distance = Math.abs(containerCenter - cardCenter)
-      if (distance < minDistance) {
-        minDistance = distance
-        closestIndex = cardIndex
-      }
+      const containerCenter = container.scrollLeft + container.clientWidth / 2
+      let minDistance = Infinity
+      let closestIndex = 0
+
+      const cards = container.querySelectorAll<HTMLElement>(`[${dataAttribute}]`)
+      cards.forEach((card) => {
+        const cardIndex = Number(card.getAttribute(dataAttribute))
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2
+        const distance = Math.abs(containerCenter - cardCenter)
+        if (distance < minDistance) {
+          minDistance = distance
+          closestIndex = cardIndex
+        }
+      })
+
+      // Only re-render when centered card index actually changed
+      setCenteredIndex((prev) => (prev !== closestIndex ? closestIndex : prev))
     })
-
-    setCenteredIndex(closestIndex)
   }, [dataAttribute])
 
   // ── Smooth scroll a specific card into the center ────────────────────────
@@ -106,7 +115,12 @@ export function useCarousel(itemCount: number, dataAttribute: string): UseCarous
     if (!container) return
     container.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll() // Compute initial centered index on mount
-    return () => container.removeEventListener('scroll', handleScroll)
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+      }
+    }
   }, [handleScroll, itemCount])
 
   // ── Clamp: guard against stale index after filtering ─────────────────────

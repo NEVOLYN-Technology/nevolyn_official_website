@@ -49,28 +49,36 @@ export const LatestNewsSection = (): JSX.Element => {
   // ── Featured Milestones Carousel (SystemSection scroll behavior) ──────────
   const [centeredIndex, setCenteredIndex] = useState(0)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const isRafPendingRef = useRef(false)
+  const rafIdRef = useRef<number | null>(null)
 
-  /** Finds the milestone card closest to the container's horizontal centre */
+  /** Finds the milestone card closest to the container's horizontal centre with RAF throttle */
   const handleScroll = useCallback(() => {
-    const container = scrollContainerRef.current
-    if (!container) return
+    if (isRafPendingRef.current) return
+    isRafPendingRef.current = true
 
-    const containerCenter = container.scrollLeft + container.clientWidth / 2
+    rafIdRef.current = requestAnimationFrame(() => {
+      isRafPendingRef.current = false
+      const container = scrollContainerRef.current
+      if (!container) return
 
-    let minDistance = Infinity
-    let closestIndex = 0
+      const containerCenter = container.scrollLeft + container.clientWidth / 2
 
-    container.querySelectorAll<HTMLElement>('[data-milestone-index]').forEach((card) => {
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2
-      const distance = Math.abs(containerCenter - cardCenter)
+      let minDistance = Infinity
+      let closestIndex = 0
 
-      if (distance < minDistance) {
-        minDistance = distance
-        closestIndex = Number(card.getAttribute('data-milestone-index'))
-      }
+      container.querySelectorAll<HTMLElement>('[data-milestone-index]').forEach((card) => {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2
+        const distance = Math.abs(containerCenter - cardCenter)
+
+        if (distance < minDistance) {
+          minDistance = distance
+          closestIndex = Number(card.getAttribute('data-milestone-index'))
+        }
+      })
+
+      setCenteredIndex((prev) => (prev !== closestIndex ? closestIndex : prev))
     })
-
-    setCenteredIndex(closestIndex)
   }, [])
 
   /** Scrolls the milestone card at `index` to the centre of the track */
@@ -92,7 +100,12 @@ export const LatestNewsSection = (): JSX.Element => {
     container.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll() // Set initial centred card
 
-    return () => container.removeEventListener('scroll', handleScroll)
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+      }
+    }
   }, [handleScroll])
 
   const activeIndex = Math.min(Math.max(0, centeredIndex), Math.max(0, sortedFeatured.length - 1))
@@ -195,7 +208,7 @@ export const LatestNewsSection = (): JSX.Element => {
               <div
                 ref={scrollContainerRef}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                className="flex snap-x snap-mandatory select-none gap-6 overflow-x-auto scroll-smooth px-[calc(50%-150px)] py-6 sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
+                className="flex snap-x snap-mandatory select-none gap-6 overflow-x-auto scroll-smooth px-[calc(50%-145px)] py-6 sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
               >
                 {sortedFeatured.map((item, index) => {
                   const isCentered = index === activeIndex
@@ -206,14 +219,14 @@ export const LatestNewsSection = (): JSX.Element => {
                       data-milestone-index={index}
                       onClick={() => scrollToCard(index)}
                       className={cn(
-                        'w-[300px] shrink-0 snap-center sm:w-[420px] lg:w-[460px]',
-                        'group transform cursor-pointer rounded-[28px] p-[1.5px] transition-all duration-500 ease-out',
+                        'w-[290px] shrink-0 snap-center sm:w-[420px] lg:w-[460px]',
+                        'group transform-gpu cursor-pointer rounded-[26px] sm:rounded-[28px] p-[1.5px] transition-all duration-400 ease-out will-change-transform',
                         isCentered
-                          ? 'z-20 -translate-y-3 scale-105 bg-gradient-to-b from-sky-400/80 via-sky-500/50 to-blue-600/30 opacity-100 filter blur-0 shadow-[0_20px_50px_rgba(14,165,233,0.35),0_0_25px_rgba(14,165,233,0.2)]'
-                          : 'z-10 translate-y-2 scale-95 bg-slate-200/50 opacity-60 shadow-lg filter blur-[1.5px] hover:opacity-90 hover:blur-0'
+                          ? 'z-20 -translate-y-2 sm:-translate-y-3 scale-[1.02] sm:scale-105 bg-gradient-to-b from-sky-400/80 via-sky-500/50 to-blue-600/30 opacity-100 shadow-[0_12px_30px_rgba(14,165,233,0.25)] sm:shadow-[0_20px_50px_rgba(14,165,233,0.35),0_0_25px_rgba(14,165,233,0.2)]'
+                          : 'z-10 translate-y-1 sm:translate-y-2 scale-95 bg-slate-200/50 opacity-60 shadow-md sm:shadow-lg sm:filter sm:blur-[1.5px] blur-none hover:opacity-90 hover:blur-0'
                       )}
                     >
-                      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[26px] bg-white/95 backdrop-blur-2xl">
+                      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[24px] sm:rounded-[26px] bg-white">
                         {/* Accent beam across top edge */}
                         <div
                           className={cn(
@@ -393,7 +406,7 @@ export const LatestNewsSection = (): JSX.Element => {
             <div
               ref={verticalScrollRef}
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              className="h-[460px] sm:h-[490px] overflow-y-auto scroll-smooth snap-y snap-mandatory select-none no-scrollbar p-2 sm:p-3 pb-16 sm:pb-16"
+              className="h-[460px] sm:h-[490px] overflow-y-auto scroll-smooth overscroll-contain snap-y snap-mandatory select-none no-scrollbar p-2 sm:p-3 pb-16 sm:pb-16"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
                 {sortedNews.map((item: NewsItem, idx: number) => {

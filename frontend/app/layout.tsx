@@ -78,19 +78,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="scroll-smooth bg-background" data-scroll-behavior="smooth">
       <body className="antialiased bg-background text-slate-900 overflow-x-hidden selection:bg-sky-500 selection:text-white">
         {/* Ambient colorful atmospheric background — fixed, behind all content */}
-        <div className="fixed inset-0 -z-50 pointer-events-none overflow-hidden">
+        <div className="fixed inset-0 -z-50 pointer-events-none overflow-hidden [contain:paint]">
           {/* Technical precision grid overlay */}
           <div className="absolute inset-0 grid-bg opacity-40" />
           {/* Top ambient soft sky-blue & cyan glow */}
-          <div className="absolute -top-28 left-1/2 -translate-x-1/2 h-[520px] w-[950px] max-w-[100vw] rounded-full bg-gradient-to-b from-sky-400/25 via-blue-400/18 via-indigo-300/12 to-transparent blur-[150px]" />
-          {/* Vibrant mint/emerald ambient glow on left */}
-          <div className="absolute top-[22%] -left-28 h-[460px] w-[460px] rounded-full bg-gradient-to-tr from-emerald-400/16 to-teal-300/12 blur-[140px]" />
-          {/* Warm radiant violet/rose glow on right */}
-          <div className="absolute top-[48%] -right-28 h-[480px] w-[480px] rounded-full bg-gradient-to-br from-purple-400/15 via-pink-400/12 to-rose-400/10 blur-[150px]" />
-          {/* Soft warm amber highlight */}
-          <div className="absolute top-[70%] left-[10%] h-[380px] w-[380px] rounded-full bg-amber-400/10 blur-[140px]" />
+          <div className="absolute -top-28 left-1/2 -translate-x-1/2 h-[380px] w-[540px] sm:h-[520px] sm:w-[950px] max-w-[100vw] rounded-full bg-gradient-to-b from-sky-400/25 via-blue-400/18 via-indigo-300/12 to-transparent blur-3xl sm:blur-[140px] transform-gpu will-change-transform" />
+          {/* Vibrant mint/emerald ambient glow on left (desktop) */}
+          <div className="hidden sm:block absolute top-[22%] -left-28 h-[460px] w-[460px] rounded-full bg-gradient-to-tr from-emerald-400/16 to-teal-300/12 blur-[140px] transform-gpu" />
+          {/* Warm radiant violet/rose glow on right (desktop) */}
+          <div className="hidden sm:block absolute top-[48%] -right-28 h-[480px] w-[480px] rounded-full bg-gradient-to-br from-purple-400/15 via-pink-400/12 to-rose-400/10 blur-[150px] transform-gpu" />
+          {/* Soft warm amber highlight (desktop) */}
+          <div className="hidden sm:block absolute top-[70%] left-[10%] h-[380px] w-[380px] rounded-full bg-amber-400/10 blur-[140px] transform-gpu" />
           {/* Bottom soft cyan & ocean azure glow */}
-          <div className="absolute -bottom-24 right-1/4 h-[440px] w-[540px] max-w-[100vw] rounded-full bg-gradient-to-t from-sky-400/20 via-cyan-400/14 to-transparent blur-[150px]" />
+          <div className="absolute -bottom-24 right-1/4 h-[320px] w-[380px] sm:h-[440px] sm:w-[540px] max-w-[100vw] rounded-full bg-gradient-to-t from-sky-400/20 via-cyan-400/14 to-transparent blur-3xl sm:blur-[150px] transform-gpu" />
         </div>
 
         <Providers>

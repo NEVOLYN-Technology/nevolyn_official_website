@@ -132,9 +132,31 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-background text-foreground overflow-x-hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
+
+  /* Eliminate 300ms mobile tap delay and optimize responsiveness */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+}
+
+/* Touch momentum scrolling optimizations */
+.custom-scrollbar,
+.no-scrollbar {
+  -webkit-overflow-scrolling: touch;
 }
 
 .font-brand {

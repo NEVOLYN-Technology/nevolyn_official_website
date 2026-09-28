@@ -206,7 +206,7 @@ export const NEVOLYN_LEGITIMATE_ALIASES = [
 export const NEVOLYN_SEO_CONFIG = {
   siteUrl: 'https://nevolyn.com',
   fabinsUrl: 'https://fabins.nevolyn.com',
-  title: 'NEVOLYN Technology | Industrial AI & Automation Solutions',
+  title: 'NEVOLYN',
   description:
     'NEVOLYN Technology is an advanced engineering and deep-tech company building intelligent systems, applied AI, computer vision, and industrial automation platforms.',
   brandName: 'NEVOLYN Technology',
