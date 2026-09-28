@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { fadeUpProps } from '@/lib/animations'
 import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
+import { SECTION_BG } from '@/lib/constants/theme'
 
 /**
  * About section presenting NEVOLYN Technology's mission, engineering pillars, and technical capabilities.
@@ -30,7 +31,7 @@ import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
  */
 export const AboutSection = (): JSX.Element => {
   return (
-    <section id="about" className="py-20 sm:py-24 border-t border-sky-300/60 bg-[#deebf9] relative overflow-hidden">
+    <section id="about" className={`py-20 sm:py-24 ${SECTION_BG.border} ${SECTION_BG.alternate} relative overflow-hidden`}>
       {/* Anchor alias so any legacy references to #capabilities resolve smoothly */}
       <div id="capabilities" className="absolute -top-24 left-0" />
 

@@ -17,6 +17,7 @@ import { fadeUpProps } from '@/lib/animations'
 import { SuccessModal } from '@/components/ui/SuccessModal'
 import { useContactForm } from '@/lib/hooks/useContactForm'
 import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
+import { SECTION_BG } from '@/lib/constants/theme'
 
 /**
  * Interactive visitor contact form section for R&D inquiries and partner proposals.
@@ -55,7 +56,7 @@ export const ContactSection = (): JSX.Element => {
   }
 
   return (
-    <section id="contact" className="py-16 sm:py-20 border-t border-sky-300/60 bg-[#deebf9] relative overflow-hidden">
+    <section id="contact" className={`py-16 sm:py-20 ${SECTION_BG.border} ${SECTION_BG.alternate} relative overflow-hidden`}>
       {/* Animated Success Popup Modal */}
       <SuccessModal
         isOpen={isModalOpen && isSuccess}

@@ -11,6 +11,7 @@
 
 import type { JSX } from 'react'
 import { useRef, useEffect, useState } from 'react'
+import { SECTION_BG } from '@/lib/constants/theme'
 
 interface TickerItem {
   tag: string
@@ -137,7 +138,7 @@ export const MarqueeTicker = (): JSX.Element => {
 
   return (
     <div
-      className="relative w-full border-y border-sky-300/70 bg-[#c9ddf3]/95 backdrop-blur-md overflow-hidden py-3.5 sm:py-4 select-none"
+      className={`relative w-full border-y border-sky-300/70 ${SECTION_BG.ticker}/95 backdrop-blur-md overflow-hidden py-3.5 sm:py-4 select-none`}
       onMouseEnter={() => {
         isHoveredRef.current = true
       }}

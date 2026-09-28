@@ -10,7 +10,11 @@
  * 6. @layer base — global element defaults
  *
  * Token groups in use:
- * - background / foreground — body + page background
+ * - background / foreground — body + page background (primary page bg)
+ * - section-alt — alternate section background (About, Leaders, Contact)
+ * - bg-footer — footer background
+ * - bg-ticker — marquee ticker band background
+ * - bg-hero-card — hero presentation card background
  * - card / card-foreground — card surfaces
  * - secondary / secondary-foreground — the electric-blue accent (nav active, progress bars)
  * - muted / muted-foreground — subdued text, placeholders
@@ -37,7 +41,7 @@
 
 @theme inline {
   --font-brand: 'Ethnocentric', sans-serif;
-  /* Color utilities */
+  /* Color utilities — all resolved from CSS vars; never hardcode hex here */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -58,6 +62,16 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
 
+  /*
+   * Section-tier background tokens.
+   * Usage: className="bg-section-alt" | "bg-footer" | "bg-ticker" | "bg-hero-card"
+   * Change a shade once in :root and every section updates automatically.
+   */
+  --color-section-alt: var(--section-alt);
+  --color-footer: var(--footer-bg);
+  --color-ticker: var(--ticker-bg);
+  --color-hero-card: var(--hero-card-bg);
+
   /* Border-radius scale */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -75,8 +89,25 @@
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
   color-scheme: light;
-  --background: #d5e4f6;
+
+  /* ── Primary page background ────────────────────────────────────────────────
+     This is THE single source of truth for the overall page background.
+     Update this one value and every section that uses bg-background updates. */
+  --background: #eef1f5;
   --foreground: #0f172a;
+
+  /* ── Section-tier backgrounds ───────────────────────────────────────────────
+     Three distinct tiers create visual rhythm across the page:
+       background  → primary  (Hero, Innovations, Latest News, PageShell, body)
+       section-alt → alternate (About, Leaders, Contact) — slightly cooler
+       footer-bg   → footer — anchoring the bottom
+     Change a hex here; every component using the semantic class updates.     */
+  --section-alt:  #e8edf2;
+  --footer-bg:    #dde3ea;
+  --ticker-bg:    #dde5ef;
+  --hero-card-bg: #e2eaf4;
+
+  /* ── Component tokens ───────────────────────────────────────────────────── */
   --card: #f9fafb;
   --card-foreground: #0f172a;
   --primary: #0ea5e9;

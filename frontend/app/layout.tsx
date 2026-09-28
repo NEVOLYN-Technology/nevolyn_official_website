@@ -69,7 +69,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#d5e4f6',
+  themeColor: '#eef1f5',
   userScalable: true,
 }
 
@@ -94,8 +94,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="scroll-smooth bg-[#d5e4f6]" data-scroll-behavior="smooth">
-      <body className="antialiased bg-[#d5e4f6] text-slate-900 overflow-x-hidden selection:bg-sky-500 selection:text-white">
+    <html lang="en" suppressHydrationWarning className="scroll-smooth bg-background" data-scroll-behavior="smooth">
+      <body className="antialiased bg-background text-slate-900 overflow-x-hidden selection:bg-sky-500 selection:text-white">
         {/* Ambient colorful atmospheric background — fixed, behind all content */}
         <div className="fixed inset-0 -z-50 pointer-events-none overflow-hidden">
           {/* Technical precision grid overlay */}

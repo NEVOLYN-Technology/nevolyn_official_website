@@ -16,6 +16,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, ShieldCheck } from 'lucide-react'
 import { StatusPill } from '@/components/ui/StatusPill'
+import { SECTION_BG } from '@/lib/constants/theme'
 
 export const Hero = (): JSX.Element => {
   return (
@@ -95,7 +96,7 @@ export const Hero = (): JSX.Element => {
             <motion.div
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-              className="relative w-full max-w-[580px] sm:max-w-[620px] lg:max-w-[640px] aspect-[850/644] rounded-[2rem] border border-sky-300/60 bg-[#cde0fa] shadow-2xl shadow-sky-600/15 overflow-hidden flex items-center justify-center group"
+              className={`relative w-full max-w-[580px] sm:max-w-[620px] lg:max-w-[640px] aspect-[850/644] rounded-[2rem] border border-sky-300/60 ${SECTION_BG.heroCard} shadow-2xl shadow-sky-600/15 overflow-hidden flex items-center justify-center group`}
             >
               {/* Top Colorful Accent Beam */}
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-400 via-emerald-400 to-indigo-400 z-10" />

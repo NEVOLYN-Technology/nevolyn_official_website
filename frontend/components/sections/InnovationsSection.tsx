@@ -23,6 +23,7 @@ import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 import { CarouselCard } from '@/components/ui/CarouselCard'
 import { CarouselArrows, CarouselDots } from '@/components/ui/CarouselControls'
 import { useCarousel } from '@/lib/hooks/useCarousel'
+import { SECTION_BG } from '@/lib/constants/theme'
 
 /** Maps each project status to the appropriate Badge tone (color). */
 const STATUS_TONE: Record<Project['status'], BadgeTone> = {
@@ -65,7 +66,7 @@ export const InnovationsSection = (): JSX.Element => {
   const currentCenteredProject = filteredProjects[safeCenteredIndex]
 
   return (
-    <section id="innovations" className="relative py-14 sm:py-20 overflow-hidden border-t border-sky-300/60 bg-[#d5e4f6]">
+    <section id="innovations" className={`relative py-14 sm:py-20 overflow-hidden ${SECTION_BG.border} ${SECTION_BG.primary}`}>
       {/* Background Ambient Glow Orbs - Multi-chromatic Soft Aura */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] bg-gradient-to-tr from-sky-400/20 via-indigo-400/15 to-emerald-400/15 rounded-full blur-[140px] pointer-events-none z-0" />
 

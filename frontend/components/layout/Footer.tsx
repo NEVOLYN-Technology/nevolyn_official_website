@@ -18,6 +18,7 @@ import type { JSX } from 'react'
 import Link from 'next/link'
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
+import { SECTION_BG } from '@/lib/constants/theme'
 import { CONTACT } from '@/lib/constants/contact'
 
 /**
@@ -37,7 +38,7 @@ export const Footer = (): JSX.Element => {
   }
 
   return (
-    <footer className="text-slate-700 border-t border-sky-300/70 bg-[#c6dbf2]">
+    <footer className={`text-slate-700 border-t border-sky-300/70 ${SECTION_BG.footer}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-8">
         {/* Main Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">

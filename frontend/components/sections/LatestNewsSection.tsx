@@ -20,6 +20,7 @@ import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 import { CarouselCard } from '@/components/ui/CarouselCard'
 import { CarouselArrows, CarouselDots } from '@/components/ui/CarouselControls'
 import { useCarousel } from '@/lib/hooks/useCarousel'
+import { SECTION_BG } from '@/lib/constants/theme'
 
 /**
  * News timeline section rendering featured project announcements in a 3D carousel and recent updates.
@@ -40,7 +41,7 @@ export const LatestNewsSection = (): JSX.Element => {
     useCarousel(sortedFeatured.length, 'data-news-index')
 
   return (
-    <section id="latest-news" className="relative py-16 sm:py-20 bg-[#d5e4f6] border-t border-sky-300/60 overflow-hidden">
+    <section id="latest-news" className={`relative py-16 sm:py-20 ${SECTION_BG.primary} ${SECTION_BG.border} overflow-hidden`}>
       {/* Background Ambient Glow Orbs - Multi-chromatic Soft Aura */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] bg-gradient-to-tr from-sky-400/20 via-indigo-400/15 to-emerald-400/15 rounded-full blur-[140px] pointer-events-none z-0" />
 

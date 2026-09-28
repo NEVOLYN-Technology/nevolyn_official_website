@@ -36,7 +36,7 @@ import { Footer } from '@/components/layout/Footer'
  */
 export default function Home(): JSX.Element {
   return (
-    <main className="w-full min-h-screen bg-[#d5e4f6]">
+    <main className="w-full min-h-screen bg-background">
       <Navbar />
       {/* Offsets the floating capsule navbar cleanly without excess dead space */}
       <div className="pt-16 sm:pt-20">

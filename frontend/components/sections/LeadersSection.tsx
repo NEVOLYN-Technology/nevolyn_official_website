@@ -43,6 +43,7 @@ import { engineeringTeamMembers } from '@/lib/data/team'
 import { LeaderDetails } from '@/components/ui/LeaderDetails'
 import { fadeInUpVariants, staggerContainer, defaultViewport } from '@/lib/animations'
 import type { TeamMember } from '@/lib/data/leaders'
+import { SECTION_BG } from '@/lib/constants/theme'
 import { StatusPill } from '@/components/ui/StatusPill'
 import { GradText } from '@/components/ui/SectionHeader'
 
@@ -140,7 +141,7 @@ export function LeadersSection(): JSX.Element {
   }
 
   return (
-    <section id="leaders" className="relative pt-12 pb-16 px-4 md:px-8 overflow-hidden bg-[#deebf9] border-t border-sky-300/60">
+    <section id="leaders" className={`relative pt-12 pb-16 px-4 md:px-8 overflow-hidden ${SECTION_BG.alternate} ${SECTION_BG.border}`}>
       <div className="max-w-7xl mx-auto">
 
         {/* ── Section Header ─────────────────────────────────── */}
