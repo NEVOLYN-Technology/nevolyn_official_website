@@ -58,6 +58,9 @@ export const metadata: Metadata = {
     icon: '/nevolyn-icon.png',
     apple: '/nevolyn-icon.png',
   },
+  verification: {
+    google: 'vzbTJSa6lso2s74DPf_itEshA7SPnSNE2As5Jg4N2iM',
+  },
 }
 
 export const viewport: Viewport = {
