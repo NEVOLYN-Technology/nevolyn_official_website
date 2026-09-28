@@ -335,8 +335,18 @@ export const nevolynJsonLd = {
       description:
         'AI-powered fabric inspection automation retrofit system developed by NEVOLYN for automated defect detection in textile and RMG mills.',
       url: `${NEVOLYN_SEO_CONFIG.fabinsUrl}/`,
+      image: `${NEVOLYN_SEO_CONFIG.siteUrl}/nevolyn-image.png`,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Linux, Windows, Web',
       manufacturer: {
         '@id': `${NEVOLYN_SEO_CONFIG.siteUrl}/#organization`,
+      },
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        url: `${NEVOLYN_SEO_CONFIG.fabinsUrl}/`,
       },
     },
     {
