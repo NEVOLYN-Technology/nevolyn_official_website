@@ -49,10 +49,10 @@ export const SuccessModal = ({
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-5 right-5 text-slate-400 hover:text-slate-200 bg-slate-800/50 hover:bg-slate-800 p-2 rounded-full transition-colors cursor-pointer"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 p-2 sm:p-2.5 rounded-full transition-all cursor-pointer active:scale-95"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </button>
 
             {/* Glowing Icon Header */}

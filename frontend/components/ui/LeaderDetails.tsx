@@ -73,19 +73,9 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
         {/* Top Decorative Gradient Line */}
         <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-sky-400 shrink-0" />
 
-        {/* ── Fixed Header: portrait, name, title, Back & close buttons ── */}
+        {/* ── Fixed Header: portrait, name, title, & close button ── */}
         <div className="flex shrink-0 items-center justify-between gap-3 sm:gap-4 border-b border-slate-100 bg-white p-3.5 sm:p-6 md:px-8 z-10">
           <div className="flex items-center gap-3 sm:gap-6 min-w-0">
-            {/* Quick Back Button on Mobile */}
-            <button
-              onClick={handleClose}
-              type="button"
-              aria-label="Back to leadership team"
-              className="inline-flex sm:hidden items-center justify-center p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 cursor-pointer shrink-0 touch-manipulation"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-
             {/* Avatar */}
             <div className={`relative flex h-12 w-12 sm:h-20 sm:w-20 shrink-0 items-center justify-center rounded-full bg-white p-0.5 sm:p-1 ring-2 ${accentRing}`}>
               {member.image ? (
@@ -115,24 +105,15 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
             </div>
           </div>
 
-          {/* Top Right Actions */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={handleClose}
-              type="button"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer touch-manipulation"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back</span>
-            </button>
-
+          {/* Top Right Close Button */}
+          <div className="flex items-center shrink-0">
             <button
               onClick={handleClose}
               type="button"
               aria-label="Close profile"
-              className="p-2 sm:p-2.5 rounded-full text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation"
+              className="p-2 sm:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation active:scale-95"
             >
-              <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              <X className="w-6 h-6 sm:w-7 sm:h-7" />
             </button>
           </div>
         </div>
