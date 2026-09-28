@@ -38,7 +38,7 @@ const NAV_LINKS = [
   { href: '/#about', sectionId: 'about', label: 'ABOUT' },
   { href: '/#innovations', sectionId: 'innovations', label: 'INNOVATIONS' },
   { href: '/#leaders', sectionId: 'leaders', label: 'LEADERS' },
-  { href: '/#latest-news', sectionId: 'latest-news', label: 'LATEST NEWS' },
+  { href: '/#latest-news', sectionId: 'latest-news', label: 'NEWS' },
 ] as const
 
 export const Navbar = (): JSX.Element => {
@@ -66,13 +66,21 @@ export const Navbar = (): JSX.Element => {
       for (const link of NAV_LINKS) {
         if (link.sectionId === 'home') continue
         const element = document.getElementById(link.sectionId)
-        if (element && element.getBoundingClientRect().top <= 220) {
+        if (element && element.getBoundingClientRect().top <= 240) {
           current = link.sectionId
         }
       }
 
       const contactElement = document.getElementById('contact')
-      if (contactElement && contactElement.getBoundingClientRect().top <= 220) {
+      if (contactElement && contactElement.getBoundingClientRect().top <= 280) {
+        current = 'contact'
+      }
+
+      // Check if user is scrolled near bottom of page (where Contact section resides)
+      const isAtBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 80
+      if (isAtBottom) {
         current = 'contact'
       }
 
@@ -171,7 +179,11 @@ export const Navbar = (): JSX.Element => {
           <a
             href="/#contact"
             onClick={(e) => handleNavClick(e, 'contact')}
-            className="relative hidden !px-5 !py-2 text-[13px] sm:inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5 border border-emerald-300/90 bg-gradient-to-r from-emerald-50/90 to-teal-50/80 text-emerald-800 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-teal-600 hover:text-white hover:border-transparent shadow-sm hover:shadow-emerald-500/25"
+            className={`relative hidden !px-5 !py-2 text-[13px] sm:inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5 shadow-sm ${
+              activeSection === 'contact'
+                ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-white shadow-[0_4px_16px_rgba(16,185,129,0.35)] border border-transparent scale-105'
+                : 'border border-emerald-300/90 bg-gradient-to-r from-emerald-50/90 to-teal-50/80 text-emerald-800 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-teal-600 hover:text-white hover:border-transparent hover:shadow-emerald-500/25'
+            }`}
           >
             <Mail className="h-3.5 w-3.5" />
             <span>Let's Connect</span>
@@ -214,7 +226,11 @@ export const Navbar = (): JSX.Element => {
               <a
                 href="/#contact"
                 onClick={(e) => handleNavClick(e, 'contact')}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 py-2.5 text-sm font-semibold text-white hover:brightness-105 transition-all shadow-sm shadow-emerald-500/20"
+                className={`w-full flex items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-semibold transition-all ${
+                  activeSection === 'contact'
+                    ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/35 ring-2 ring-emerald-300'
+                    : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:brightness-105 shadow-sm shadow-emerald-500/20'
+                }`}
               >
                 <Mail className="h-4 w-4" />
                 <span>Let's Connect</span>
