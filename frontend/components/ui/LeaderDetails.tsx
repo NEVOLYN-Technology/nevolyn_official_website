@@ -81,7 +81,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
               onClick={handleClose}
               type="button"
               aria-label="Back to leadership team"
-              className="inline-flex sm:hidden items-center justify-center p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 cursor-pointer shrink-0"
+              className="inline-flex sm:hidden items-center justify-center p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 cursor-pointer shrink-0 touch-manipulation"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -120,7 +120,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
             <button
               onClick={handleClose}
               type="button"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer touch-manipulation"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back</span>
@@ -130,7 +130,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
               onClick={handleClose}
               type="button"
               aria-label="Close profile"
-              className="p-2 sm:p-2.5 rounded-full text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer"
+              className="p-2 sm:p-2.5 rounded-full text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation"
             >
               <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
@@ -224,7 +224,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
             <button
               onClick={handleClose}
               type="button"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 font-bold text-sm transition-all active:scale-95 cursor-pointer shadow-xs"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 font-bold text-sm transition-all active:scale-95 cursor-pointer shadow-xs touch-manipulation"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Leadership Team</span>

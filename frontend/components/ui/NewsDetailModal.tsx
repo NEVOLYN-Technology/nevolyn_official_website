@@ -1,6 +1,6 @@
 'use client'
 
-import type { JSX } from 'react'
+import { useRef, type JSX } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Calendar, ExternalLink, Globe, Mail, ArrowLeft } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
@@ -98,17 +98,23 @@ function parseContactBlock(text: string) {
  * Includes mobile-first back navigation (physical back button, swipe back, and prominent on-screen buttons).
  */
 export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps): JSX.Element | null {
+  const activeItemRef = useRef<NewsModalItem | null>(item)
+  if (item) {
+    activeItemRef.current = item
+  }
+  const currentItem = item || activeItemRef.current
+
   // Integrates browser history so phone back button / edge swipe closes the modal smoothly
   const { handleClose } = useModalHistory({
-    isOpen: Boolean(isOpen && item),
+    isOpen: Boolean(isOpen && currentItem),
     onClose,
     modalId: 'news-detail',
   })
 
-  if (!item) return null
+  if (!currentItem) return null
 
   // Check if image is a portrait photo to style container appropriately
-  const isPortrait = item.image?.includes('photo')
+  const isPortrait = currentItem.image?.includes('photo')
 
   return (
     <AnimatePresence>
@@ -119,9 +125,9 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
             onClick={handleClose}
-            className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm sm:backdrop-blur-md"
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm sm:backdrop-blur-md cursor-pointer"
             aria-hidden="true"
           />
 
@@ -142,7 +148,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                 onClick={handleClose}
                 type="button"
                 aria-label="Back to news"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm transition-all duration-200 active:scale-95 cursor-pointer shadow-xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm transition-all duration-150 active:scale-95 cursor-pointer shadow-xs touch-manipulation"
               >
                 <ArrowLeft size={16} className="text-sky-600" />
                 <span>Back</span>
@@ -151,14 +157,14 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
               {/* Centered category pill */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-black tracking-wider uppercase bg-sky-50 text-sky-700 border border-sky-200/80">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
-                <span className="truncate max-w-[150px] sm:max-w-xs">{item.category}</span>
+                <span className="truncate max-w-[150px] sm:max-w-xs">{currentItem.category}</span>
               </span>
 
               <button
                 onClick={handleClose}
                 type="button"
                 aria-label="Close dialog"
-                className="p-2 rounded-full text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer touch-manipulation"
               >
                 <X size={20} />
               </button>
@@ -167,12 +173,12 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
             {/* Scrollable Content Container */}
             <div className="overflow-y-auto no-scrollbar flex-1 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
               {/* Hero Banner Header */}
-              {item.image && (
+              {currentItem.image && (
                 <div className={`relative w-full overflow-hidden ${isPortrait ? 'h-60 sm:h-72 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950' : 'h-52 sm:h-72 bg-slate-900'}`}>
                   {/* Ambient background blur for portraits */}
                   {isPortrait && (
                     <img
-                      src={item.image}
+                      src={currentItem.image}
                       alt=""
                       aria-hidden="true"
                       className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-125 pointer-events-none"
@@ -180,8 +186,8 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                   )}
 
                   <img
-                    src={item.image}
-                    alt={item.title}
+                    src={currentItem.image}
+                    alt={currentItem.title}
                     className={`relative z-10 w-full h-full transition-transform duration-700 hover:scale-105 ${
                       isPortrait ? 'object-contain py-3' : 'object-cover object-center'
                     }`}
@@ -198,7 +204,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-semibold mb-3">
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                     <Calendar size={14} className="text-sky-500" />
-                    <span>{formatDate(item.date)}</span>
+                    <span>{formatDate(currentItem.date)}</span>
                   </div>
                 </div>
 
@@ -207,19 +213,19 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                   id="modal-title"
                   className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug mb-4"
                 >
-                  {item.title}
+                  {currentItem.title}
                 </h3>
 
                 {/* Short preview highlight box */}
-                {item.description && (
+                {currentItem.description && (
                   <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-sky-50/90 to-indigo-50/60 border border-sky-100/90 text-slate-800 text-sm sm:text-base font-semibold leading-relaxed mb-6 shadow-xs">
-                    {item.description}
+                    {currentItem.description}
                   </div>
                 )}
 
                 {/* Full Detailed Content with Hyperlinked Portals & Contact Cards */}
                 <div className="text-slate-600 text-sm sm:text-base leading-relaxed space-y-4 mb-8">
-                  {item.content.split('\n\n').map((paragraph, index) => {
+                  {currentItem.content.split('\n\n').map((paragraph, index) => {
                     const contact = parseContactBlock(paragraph)
                     if (contact && (contact.website || contact.email)) {
                       return (
@@ -272,9 +278,9 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                 {/* Bottom Action Toolbar: Back Button & Social Links */}
                 <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2.5">
-                    {item.linkedinUrl && (
+                    {currentItem.linkedinUrl && (
                       <a
-                        href={item.linkedinUrl}
+                        href={currentItem.linkedinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0a66c2] text-white hover:bg-[#084e96] hover:shadow-md hover:shadow-sky-600/20 transition-all duration-200 active:scale-95"
@@ -287,9 +293,9 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                       </a>
                     )}
 
-                    {item.facebookUrl && (
+                    {currentItem.facebookUrl && (
                       <a
-                        href={item.facebookUrl}
+                        href={currentItem.facebookUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#1877f2] text-white hover:bg-[#0c63d4] hover:shadow-md hover:shadow-blue-600/20 transition-all duration-200 active:scale-95"
@@ -303,11 +309,11 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                     )}
                   </div>
 
-                  {/* Prominent Back Button at bottom */}
+                  {/* Prominent Back Button at bottom with instant touch-manipulation */}
                   <button
                     onClick={handleClose}
                     type="button"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors active:scale-95 cursor-pointer shadow-xs"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors active:scale-95 cursor-pointer shadow-xs touch-manipulation"
                   >
                     <ArrowLeft size={16} />
                     <span>Back to Updates</span>

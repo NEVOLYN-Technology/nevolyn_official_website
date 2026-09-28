@@ -32,6 +32,9 @@ import { NewsDetailModal, type NewsModalItem } from '@/components/ui/NewsDetailM
 export const LatestNewsSection = (): JSX.Element => {
   // Active selected item for the "View Details" pop-up modal
   const [selectedNews, setSelectedNews] = useState<NewsModalItem | null>(null)
+  const handleCloseNews = useCallback(() => {
+    setSelectedNews(null)
+  }, [])
 
   // Ref for the vertical scroll feed
   const verticalScrollRef = useRef<HTMLDivElement>(null)
@@ -572,7 +575,7 @@ export const LatestNewsSection = (): JSX.Element => {
       <NewsDetailModal
         item={selectedNews}
         isOpen={Boolean(selectedNews)}
-        onClose={() => setSelectedNews(null)}
+        onClose={handleCloseNews}
       />
     </section>
   )

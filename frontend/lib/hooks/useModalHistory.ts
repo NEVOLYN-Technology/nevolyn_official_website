@@ -26,27 +26,35 @@ interface UseModalHistoryOptions {
 export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModalHistoryOptions) {
   const hasPushedStateRef = useRef(false)
   const isClosingRef = useRef(false)
+  const onCloseRef = useRef(onClose)
 
-  // Unified close handler for on-screen buttons and backdrop clicks
+  // Keep latest onClose callback without re-triggering effects
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
+
+  // Unified instantaneous close handler for on-screen buttons and backdrop clicks
   const handleClose = useCallback(() => {
     if (isClosingRef.current) return
     isClosingRef.current = true
 
-    // 1. Immediately invoke onClose with 0ms delay so the UI responds instantaneously
-    onClose()
+    // 1. Immediately trigger UI close with 0ms delay so modal exits instantly
+    onCloseRef.current()
 
-    // 2. Safely pop the pushed history entry in background if present
+    // 2. Pop pushed history entry after next tick so React paints closed state without thread blocking
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
-      if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
-        try {
-          window.history.back()
-        } catch {
-          // ignore error if history.back fails
+      setTimeout(() => {
+        if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
+          try {
+            window.history.back()
+          } catch {
+            // ignore
+          }
         }
-      }
+      }, 40)
     }
-  }, [onClose, modalId])
+  }, [modalId])
 
   useEffect(() => {
     if (!isOpen) {
@@ -55,24 +63,25 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       return
     }
 
-    isClosingRef.current = false
-
-    // Push history entry for mobile back-button handling
-    try {
-      const currentState = window.history.state || {}
-      window.history.pushState({ ...currentState, [modalId]: true }, '')
-      hasPushedStateRef.current = true
-    } catch {
-      // Fallback if pushState is restricted
-      hasPushedStateRef.current = false
+    // Guard against duplicate history pushes during parent re-renders
+    if (!hasPushedStateRef.current) {
+      isClosingRef.current = false
+      try {
+        const currentState = window.history.state || {}
+        window.history.pushState({ ...currentState, [modalId]: true }, '')
+        hasPushedStateRef.current = true
+      } catch {
+        hasPushedStateRef.current = false
+      }
     }
 
     const handlePopState = () => {
-      // User tapped phone back button or swiped back
-      if (isClosingRef.current) return
-      isClosingRef.current = true
-      hasPushedStateRef.current = false
-      onClose()
+      // User tapped phone physical back button or swiped back
+      if (hasPushedStateRef.current) {
+        hasPushedStateRef.current = false
+        isClosingRef.current = true
+        onCloseRef.current()
+      }
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -95,7 +104,7 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       document.body.style.overflow = originalOverflow
       document.body.style.touchAction = originalTouchAction
     }
-  }, [isOpen, modalId, onClose, handleClose])
+  }, [isOpen, modalId, handleClose])
 
   return { handleClose }
 }
