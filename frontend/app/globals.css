@@ -133,8 +133,10 @@
   }
 
   html {
+    scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    scroll-padding-top: 6rem;
   }
 
   body {
@@ -157,6 +159,21 @@
 .custom-scrollbar,
 .no-scrollbar {
   -webkit-overflow-scrolling: touch;
+}
+
+/* Utility to completely hide scrollbar across all browsers */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 .font-brand {

@@ -75,13 +75,13 @@ export function CarouselCard({
       onClick={onClick}
       className={cn(
         // ── Fixed card size and snap behavior ──────────────────────────────
-        'snap-center shrink-0 w-[295px] sm:w-[460px] lg:w-[500px]',
+        'snap-center shrink-0 w-[300px] sm:w-[420px] lg:w-[460px]',
         'p-[1.5px] rounded-[26px] sm:rounded-[28px] transition-all duration-400 ease-out cursor-pointer group transform-gpu will-change-transform',
         // ── Active: gradient border, elevated, full opacity ─────────
         isCenter
-          ? 'bg-gradient-to-b from-sky-400 via-blue-500 to-indigo-500 shadow-[0_12px_30px_rgba(56,189,248,0.22)] sm:shadow-[0_20px_50px_rgba(56,189,248,0.25),0_0_25px_rgba(99,102,241,0.15)] -translate-y-2 sm:-translate-y-4 scale-[1.02] sm:scale-105 opacity-100 z-20'
+          ? 'bg-gradient-to-b from-sky-400 via-blue-500 to-indigo-500 shadow-[0_12px_30px_rgba(56,189,248,0.22)] sm:shadow-[0_20px_50px_rgba(56,189,248,0.25),0_0_25px_rgba(99,102,241,0.15)] -translate-y-2 sm:-translate-y-3 scale-[1.02] sm:scale-105 opacity-100 z-20'
           // ── Inactive: muted border, lowered, lightweight blur on desktop only ──
-          : 'bg-slate-300/70 shadow-sm sm:shadow-lg shadow-slate-400/20 translate-y-1 sm:translate-y-2 scale-95 sm:scale-90 opacity-60 sm:opacity-50 z-10 sm:blur-[2px] blur-none hover:opacity-85 hover:blur-none'
+          : 'bg-slate-300/70 shadow-sm sm:shadow-lg shadow-slate-400/20 translate-y-1 sm:translate-y-2 scale-95 opacity-60 sm:opacity-50 z-10 sm:blur-[1.5px] blur-none hover:opacity-85 hover:blur-none'
       )}
     >
       {/* ── Inner card surface ─────────────────────────────────────── */}

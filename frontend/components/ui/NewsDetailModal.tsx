@@ -165,7 +165,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
             </div>
 
             {/* Scrollable Content Container */}
-            <div className="overflow-y-auto custom-scrollbar flex-1 overscroll-contain">
+            <div className="overflow-y-auto no-scrollbar flex-1 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
               {/* Hero Banner Header */}
               {item.image && (
                 <div className={`relative w-full overflow-hidden ${isPortrait ? 'h-60 sm:h-72 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950' : 'h-52 sm:h-72 bg-slate-900'}`}>

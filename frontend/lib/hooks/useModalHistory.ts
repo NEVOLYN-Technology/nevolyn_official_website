@@ -32,15 +32,20 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     if (isClosingRef.current) return
     isClosingRef.current = true
 
+    // 1. Immediately invoke onClose with 0ms delay so the UI responds instantaneously
+    onClose()
+
+    // 2. Safely pop the pushed history entry in background if present
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
       if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
-        window.history.back()
-        return
+        try {
+          window.history.back()
+        } catch {
+          // ignore error if history.back fails
+        }
       }
     }
-
-    onClose()
   }, [onClose, modalId])
 
   useEffect(() => {
@@ -64,6 +69,8 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
 
     const handlePopState = () => {
       // User tapped phone back button or swiped back
+      if (isClosingRef.current) return
+      isClosingRef.current = true
       hasPushedStateRef.current = false
       onClose()
     }

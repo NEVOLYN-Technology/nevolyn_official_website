@@ -129,7 +129,7 @@ export const InnovationsSection = (): JSX.Element => {
           <div
             ref={scrollContainerRef}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 py-8 px-[calc(50%-160px)] sm:px-[calc(50%-230px)] lg:px-[calc(50%-250px)] select-none no-scrollbar"
+            className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 py-8 px-[calc(50%-150px)] sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
           >
             {filteredProjects.map((project, idx) => {
               const isCenter = idx === safeCenteredIndex

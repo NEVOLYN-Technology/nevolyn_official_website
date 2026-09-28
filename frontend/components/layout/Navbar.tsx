@@ -31,6 +31,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Mail, Menu, X } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
+import { scrollToSection } from '@/lib/scroll'
 
 /** Static link definitions. Defined outside the component to avoid re-creating the array on every render. */
 const NAV_LINKS = [
@@ -118,21 +119,15 @@ export const Navbar = (): JSX.Element => {
     if (isHomePage) {
       e.preventDefault()
       setIsOpen(false)
+      scrollToSection(sectionId)
       if (sectionId === 'home') {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
         if (window.location.hash) {
           window.history.replaceState(null, '', '/')
         }
         setActiveSection('home')
       } else {
-        const element = document.getElementById(sectionId)
-        if (element) {
-          const yOffset = -90
-          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
-          window.scrollTo({ top: y, behavior: 'smooth' })
-          window.history.replaceState(null, '', `/#${sectionId}`)
-          setActiveSection(sectionId)
-        }
+        window.history.replaceState(null, '', `/#${sectionId}`)
+        setActiveSection(sectionId)
       }
     } else {
       setIsOpen(false)

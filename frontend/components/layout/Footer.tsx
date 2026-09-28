@@ -20,6 +20,7 @@ import { Mail, MapPin, Phone } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
 import { SECTION_BG } from '@/lib/constants/theme'
 import { CONTACT } from '@/lib/constants/contact'
+import { scrollToSection } from '@/lib/scroll'
 
 /**
  * Site-wide bottom footer component with organization info and contact channels.
@@ -30,7 +31,7 @@ export const Footer = (): JSX.Element => {
   const scrollToHome = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (window.location.pathname === '/') {
       e.preventDefault()
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      scrollToSection('home')
       if (window.location.hash) {
         window.history.pushState(null, '', '/')
       }

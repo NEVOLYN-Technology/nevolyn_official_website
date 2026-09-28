@@ -208,7 +208,7 @@ export const LatestNewsSection = (): JSX.Element => {
               <div
                 ref={scrollContainerRef}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                className="flex snap-x snap-mandatory select-none gap-6 overflow-x-auto scroll-smooth px-[calc(50%-145px)] py-6 sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
+                className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-[calc(50%-150px)] py-6 sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
               >
                 {sortedFeatured.map((item, index) => {
                   const isCentered = index === activeIndex
@@ -219,7 +219,7 @@ export const LatestNewsSection = (): JSX.Element => {
                       data-milestone-index={index}
                       onClick={() => scrollToCard(index)}
                       className={cn(
-                        'w-[290px] shrink-0 snap-center sm:w-[420px] lg:w-[460px]',
+                        'w-[300px] shrink-0 snap-center sm:w-[420px] lg:w-[460px]',
                         'group transform-gpu cursor-pointer rounded-[26px] sm:rounded-[28px] p-[1.5px] transition-all duration-400 ease-out will-change-transform',
                         isCentered
                           ? 'z-20 -translate-y-2 sm:-translate-y-3 scale-[1.02] sm:scale-105 bg-gradient-to-b from-sky-400/80 via-sky-500/50 to-blue-600/30 opacity-100 shadow-[0_12px_30px_rgba(14,165,233,0.25)] sm:shadow-[0_20px_50px_rgba(14,165,233,0.35),0_0_25px_rgba(14,165,233,0.2)]'
@@ -405,8 +405,8 @@ export const LatestNewsSection = (): JSX.Element => {
             {/* Scrollable Track: exactly 2 rows (4 news) visible at once */}
             <div
               ref={verticalScrollRef}
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              className="h-[460px] sm:h-[490px] overflow-y-auto scroll-smooth overscroll-contain snap-y snap-mandatory select-none no-scrollbar p-2 sm:p-3 pb-16 sm:pb-16"
+              style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="h-[460px] sm:h-[490px] overflow-y-auto scroll-smooth sm:snap-y sm:snap-mandatory no-scrollbar p-2 sm:p-3 pb-16 sm:pb-16 overscroll-contain"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
                 {sortedNews.map((item: NewsItem, idx: number) => {
