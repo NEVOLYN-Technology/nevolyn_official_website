@@ -244,15 +244,13 @@ export function LeadersSection(): JSX.Element {
       </div>
 
       {/* ── Member Profile Modal ──────────────────────────────── */}
-      <AnimatePresence>
-        {selectedMember && (
-          <LeaderDetails
-            member={selectedMember}
-            isFeatured={selectedIdx === 0}
-            onClose={() => setSelectedMember(null)}
-          />
-        )}
-      </AnimatePresence>
+      {selectedMember && (
+        <LeaderDetails
+          member={selectedMember}
+          isFeatured={selectedIdx === 0}
+          onClose={() => setSelectedMember(null)}
+        />
+      )}
     </section>
   )
 }

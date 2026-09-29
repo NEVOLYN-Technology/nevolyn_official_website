@@ -1,94 +1,168 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 interface UseModalHistoryOptions {
   isOpen: boolean
   onClose: () => void
   modalId?: string
+  animationDuration?: number
+}
+
+// Module-level tracking for popstate interception so Next.js App Router never sees modal pops
+let pendingHistoryPops = 0
+let activeModalCloser: (() => void) | null = null
+let isGlobalPopListenerAttached = false
+
+function initGlobalPopListener() {
+  if (typeof window === 'undefined' || isGlobalPopListenerAttached) return
+  isGlobalPopListenerAttached = true
+
+  // Capture phase listener: runs BEFORE Next.js's router popstate listener!
+  window.addEventListener(
+    'popstate',
+    (e: PopStateEvent) => {
+      // 1. If we triggered window.history.back() during on-screen modal close:
+      if (pendingHistoryPops > 0) {
+        pendingHistoryPops--
+        e.stopImmediatePropagation()
+        return
+      }
+
+      // 2. If the user pressed phone's physical back button or gesture while modal was open:
+      if (activeModalCloser) {
+        e.stopImmediatePropagation()
+        const closer = activeModalCloser
+        activeModalCloser = null
+        closer()
+      }
+    },
+    { capture: true }
+  )
 }
 
 /**
- * useModalHistory - Manages browser history integration for popup modals.
+ * useModalHistory - Manages hardware back button, smooth exit transition, and scroll locking.
  *
- * Solves the critical mobile UX issue where tapping the phone's physical Back button,
- * swipe-back gesture, or browser back button navigates away from the website instead
- * of closing the modal.
- *
- * When the modal opens:
- * 1. Pushes a dummy state into history so the modal becomes the latest history entry.
- * 2. If the user presses the phone's back button / edge swipe, `popstate` fires and
- *    smoothly closes the modal without leaving the website.
- * 3. If the user clicks any on-screen "Back" or "Close" button, `handleClose()` will
- *    call `window.history.back()`, cleanly popping the history state and closing the modal.
- * 4. Manages body scroll locking and keyboard Escape handling.
+ * Eliminates stutter/freeze on modal exit ("laggy for a small time") by:
+ * 1. Pre-exit transition state (`isClosing`): triggers GPU-accelerated CSS exit animations
+ *    for 180ms before unmounting.
+ * 2. Non-blocking focus & scroll restoration: deferred to `requestAnimationFrame` during cleanup
+ *    to prevent synchronous forced layout recalculations.
+ * 3. Next.js router isolation: captures popstate in the capture phase and prevents propagation,
+ *    stopping Next.js App Router from running slow route reconciliation transitions on mobile.
  */
-export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModalHistoryOptions) {
-  const hasPushedStateRef = useRef(false)
+export function useModalHistory({
+  isOpen,
+  onClose,
+  modalId = 'modal',
+  animationDuration = 180,
+}: UseModalHistoryOptions) {
+  const [isClosing, setIsClosing] = useState(false)
   const isClosingRef = useRef(false)
+  const hasPushedStateRef = useRef(false)
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
-  // Unified close handler for on-screen buttons and backdrop clicks
-  const handleClose = useCallback(() => {
+  // Ensure global capture listener is attached once on the client
+  useEffect(() => {
+    initGlobalPopListener()
+  }, [])
+
+  // Unified exit sequence for both on-screen buttons and mobile physical back button
+  const startCloseSequence = useCallback(() => {
     if (isClosingRef.current) return
     isClosingRef.current = true
+    setIsClosing(true)
 
+    // Clear active modal closer
+    if (activeModalCloser === startCloseSequence) {
+      activeModalCloser = null
+    }
+
+    // Clean up pushed history entry without triggering Next.js navigation
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
-      if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
+      pendingHistoryPops++
+      try {
         window.history.back()
-        return
+      } catch {
+        pendingHistoryPops = Math.max(0, pendingHistoryPops - 1)
       }
     }
 
-    onClose()
-  }, [onClose, modalId])
+    // Allow the 180ms GPU-accelerated exit animation to complete before unmounting
+    closeTimeoutRef.current = setTimeout(() => {
+      // Non-blocking focus & layout restoration: defer to RAF
+      requestAnimationFrame(() => {
+        onCloseRef.current()
+      })
+    }, animationDuration)
+  }, [animationDuration])
+
+  // On-screen buttons, Escape key, or backdrop click
+  const handleClose = useCallback(() => {
+    startCloseSequence()
+  }, [startCloseSequence])
 
   useEffect(() => {
     if (!isOpen) {
       isClosingRef.current = false
+      setIsClosing(false)
       hasPushedStateRef.current = false
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
       return
     }
 
     isClosingRef.current = false
+    setIsClosing(false)
+    activeModalCloser = startCloseSequence
 
-    // Push history entry for mobile back-button handling
+    // Push dummy history entry for mobile hardware back-button handling
     try {
       const currentState = window.history.state || {}
-      window.history.pushState({ ...currentState, [modalId]: true }, '')
+      window.history.pushState(
+        { ...currentState, [modalId]: true, __modal: true },
+        '',
+        window.location.href
+      )
       hasPushedStateRef.current = true
     } catch {
-      // Fallback if pushState is restricted
       hasPushedStateRef.current = false
     }
 
-    const handlePopState = () => {
-      // User tapped phone back button or swiped back
-      hasPushedStateRef.current = false
-      onClose()
-    }
-
+    // Keyboard Escape handler
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleClose()
       }
     }
-
-    window.addEventListener('popstate', handlePopState)
     window.addEventListener('keydown', handleKeyDown)
 
-    // Lock background scroll while modal is active
+    // Non-blocking body scroll locking
     const originalOverflow = document.body.style.overflow
-    const originalTouchAction = document.body.style.touchAction
     document.body.style.overflow = 'hidden'
+    document.body.dataset.modalOpen = 'true'
 
     return () => {
-      window.removeEventListener('popstate', handlePopState)
       window.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = originalOverflow
-      document.body.style.touchAction = originalTouchAction
-    }
-  }, [isOpen, modalId, onClose, handleClose])
+      if (activeModalCloser === startCloseSequence) {
+        activeModalCloser = null
+      }
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
 
-  return { handleClose }
+      // Non-blocking scroll restoration via RAF
+      requestAnimationFrame(() => {
+        document.body.style.overflow = originalOverflow
+        delete document.body.dataset.modalOpen
+      })
+    }
+  }, [isOpen, modalId, handleClose, startCloseSequence])
+
+  return { handleClose, isClosing }
 }
