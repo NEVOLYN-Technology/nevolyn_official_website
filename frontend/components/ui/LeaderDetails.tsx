@@ -1,12 +1,8 @@
 /**
  * LeaderDetails — full-profile popup modal for a single team leader.
  *
- * Rendered when the user clicks "View Details" on a leadership card.
- * Performance-tuned for mobile apps & webviews:
- * - Uses GPU-accelerated CSS animations (animate-dialog-in/out, animate-backdrop-in/out)
- * - Employs isClosing pre-exit state to eliminate DOM teardown stutter
- * - Non-blocking focus/layout restoration via requestAnimationFrame
- * - Selected black state on hover and click for Back and Close buttons
+ * Rendered via AnimatePresence in LeadersSection when the user clicks
+ * "View Details" on a leadership card.
  *
  * @module components/ui/LeaderDetails
  */
@@ -14,11 +10,11 @@
 
 import { useId, useRef } from 'react'
 import type { JSX } from 'react'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { X, Mail, ExternalLink, User, ArrowLeft } from 'lucide-react'
 import type { TeamMember } from '@/lib/data/leaders'
 import { useModalHistory } from '@/lib/hooks/useModalHistory'
-import { cn } from '@/lib/utils'
 
 interface LeaderDetailsProps {
   member: TeamMember
@@ -34,45 +30,47 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
   const panelRef = useRef<HTMLDivElement>(null)
   const headingId = useId()
 
-  // Integrates browser history and pre-exit transition state
-  const { handleClose, isClosing } = useModalHistory({
+  // Integrates browser history so phone back button / edge swipe closes the modal smoothly
+  const { handleClose } = useModalHistory({
     isOpen: true,
     onClose,
     modalId: 'leader-details',
-    animationDuration: 180,
   })
 
   const accentRing = 'ring-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
   const bioParagraphs: string[] = member.extendedBio ?? [member.bio]
 
   return (
-    <div
-      role="presentation"
+    <motion.div
+      key="leader-modal-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 lg:p-8 overscroll-contain"
     >
       {/* Backdrop Overlay — dims the page and closes on tap */}
       <div
         onClick={handleClose}
-        className={cn(
-          'fixed inset-0 bg-slate-950/70 sm:backdrop-blur-md cursor-pointer',
-          isClosing ? 'animate-backdrop-out' : 'animate-backdrop-in'
-        )}
+        className="fixed inset-0 bg-slate-950/70 sm:backdrop-blur-md cursor-pointer"
         aria-hidden="true"
       />
 
       {/* Dialog panel — mobile-first full sheet or centered desktop dialog */}
-      <div
+      <motion.div
+        key="leader-modal-panel"
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
-        className={cn(
-          'relative sm:relative w-full h-[100dvh] sm:h-auto sm:w-[94%] sm:max-w-3xl sm:max-h-[85vh] flex flex-col',
-          'bg-white rounded-none sm:rounded-[28px] shadow-2xl',
-          'border-0 sm:border-2 border-emerald-500/70 sm:ring-4 ring-emerald-500/10',
-          'overflow-hidden overscroll-contain z-10 will-change-transform transform-gpu',
-          isClosing ? 'animate-dialog-out' : 'animate-dialog-in'
-        )}
+        initial={{ opacity: 0, scale: 0.95, y: 24 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 16 }}
+        transition={{ duration: 0.26, ease: [0.21, 0.47, 0.32, 0.98] }}
+        className="relative sm:relative w-full h-[100dvh] sm:h-auto sm:w-[94%] sm:max-w-3xl sm:max-h-[85vh] flex flex-col
+                   bg-white rounded-none sm:rounded-[28px] shadow-2xl
+                   border-0 sm:border-2 border-emerald-500/70 sm:ring-4 ring-emerald-500/10
+                   overflow-hidden overscroll-contain z-10"
       >
         {/* Top Decorative Gradient Line */}
         <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-sky-400 shrink-0" />
@@ -109,18 +107,13 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
             </div>
           </div>
 
-          {/* Top Right Close Button with Selected Black State on Hover & Click */}
+          {/* Top Right Close Button */}
           <div className="flex items-center shrink-0">
             <button
               onClick={handleClose}
               type="button"
               aria-label="Close profile"
-              className={cn(
-                'p-2 sm:p-2.5 rounded-full transition-all duration-200 cursor-pointer touch-manipulation active:scale-95 border border-transparent',
-                isClosing
-                  ? 'bg-black text-white border-black scale-95'
-                  : 'text-slate-500 hover:bg-black hover:text-white hover:border-black active:bg-black active:text-white active:border-black'
-              )}
+              className="p-2 sm:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation active:scale-95"
             >
               <X className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2]" />
             </button>
@@ -209,25 +202,20 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
             </div>
           )}
 
-          {/* Bottom Dismiss / Back Button with Selected Black State on Hover & Click */}
+          {/* Bottom Dismiss / Back Button */}
           <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
             <button
               onClick={handleClose}
               type="button"
-              className={cn(
-                'group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-200 cursor-pointer shadow-xs touch-manipulation',
-                isClosing
-                  ? 'bg-black text-white border-black scale-95'
-                  : 'bg-slate-200 text-slate-700 border border-slate-300 hover:bg-black hover:text-white hover:border-black active:bg-black active:text-white active:border-black active:scale-95'
-              )}
+              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-slate-200 text-slate-700 border border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 active:bg-black active:scale-95 font-bold text-sm transition-all duration-200 cursor-pointer shadow-xs touch-manipulation"
             >
               <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" />
               <span>Back to Leadership Team</span>
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 

@@ -81,13 +81,7 @@ export const MarqueeTicker = (): JSX.Element => {
     observer.observe(el)
 
     const tick = () => {
-      if (
-        isVisible &&
-        !isHoveredRef.current &&
-        !isDraggingRef.current &&
-        document.body.dataset.modalOpen !== 'true' &&
-        el
-      ) {
+      if (isVisible && !isHoveredRef.current && !isDraggingRef.current && el) {
         el.scrollLeft += 1.3 // Balanced, brisk glide speed
 
         // Seamless wrap-around when scrolled past half of duplicated content
