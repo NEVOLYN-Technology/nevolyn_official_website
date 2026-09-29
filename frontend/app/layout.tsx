@@ -75,7 +75,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="scroll-smooth bg-background" data-scroll-behavior="smooth">
+    <html lang="en" suppressHydrationWarning className="bg-background">
       <body className="antialiased bg-background text-slate-900 overflow-x-hidden selection:bg-sky-500 selection:text-white">
         {/* Ambient colorful atmospheric background — fixed, behind all content */}
         <div className="fixed inset-0 -z-50 pointer-events-none overflow-hidden [contain:paint]">
