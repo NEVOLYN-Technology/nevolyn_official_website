@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, UploadCloud, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { PageShell } from '@/components/layout/PageShell'
 import { cn } from '@/lib/utils'
 import { SuccessModal } from '@/components/ui/SuccessModal'
@@ -17,6 +18,7 @@ import { useJoinForm } from '@/lib/hooks/useJoinForm'
  * @returns Rendered join application page element
  */
 export default function JoinPage(): JSX.Element {
+  const router = useRouter()
   const { submitJoinForm, isLoading, isSuccess, successMessage, errorMessage, fieldErrors } = useJoinForm()
 
   const [formData, setFormData] = useState({
@@ -86,13 +88,13 @@ export default function JoinPage(): JSX.Element {
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-sky-500 mb-8 transition-colors"
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-sky-500 mb-8 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
-        </Link>
+          Go Back
+        </button>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -27,8 +27,8 @@ export interface MotionPropsPreset {
 /** Standard ease used for every entrance animation on the site. */
 const EASE_OUT: Transition['ease'] = 'easeOut'
 
-/** Standard viewport trigger: animate every time it enters the view. */
-export const defaultViewport = { once: false, margin: '0px' } as const
+/** Standard viewport trigger: animate once when it enters view (prevents re-firing when modal closes). */
+export const defaultViewport = { once: true, margin: '0px' } as const
 
 /**
  * Parent wrapper variants that stagger its children's entrance animations.

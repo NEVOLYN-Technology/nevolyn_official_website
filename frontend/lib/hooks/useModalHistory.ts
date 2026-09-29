@@ -85,8 +85,13 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     return () => {
       window.removeEventListener('popstate', handlePopState)
       window.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = originalOverflow
-      document.body.style.touchAction = originalTouchAction
+      // Defer scroll-unlock to the next frame so the browser doesn't synchronously
+      // reflow the entire page layout on the same frame the modal DOM is removed.
+      // This is the main cause of the visible freeze on mobile after closing.
+      requestAnimationFrame(() => {
+        document.body.style.overflow = originalOverflow
+        document.body.style.touchAction = originalTouchAction
+      })
     }
   }, [isOpen, modalId, onClose, handleClose])
 
