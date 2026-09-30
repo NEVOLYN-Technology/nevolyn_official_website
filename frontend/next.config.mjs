@@ -180,6 +180,64 @@ const nextConfig = {
   ],
 
   /**
+   * Automatic SEO redirects for career and vacancy search paths (NEVOLYN & FABINS).
+   */
+  async redirects() {
+    return [
+      {
+        source: '/careers',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/career',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/jobs',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/job',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/vacancy',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/vacancies',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/fabins-career',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/fabins-careers',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/join-fabins',
+        destination: '/join_us',
+        permanent: true,
+      },
+      {
+        source: '/fabins-jobs',
+        destination: '/join_us',
+        permanent: true,
+      },
+    ]
+  },
+
+  /**
    * Disable the floating Next.js dev-mode indicator (the "N" badge in the
    * bottom-right corner). It only appears in development and is purely cosmetic.
    */

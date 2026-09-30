@@ -29,7 +29,7 @@ import type { JSX } from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Briefcase, Mail, Menu, X } from 'lucide-react'
+import { Mail, Menu, X } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
 import { scrollToSection } from '@/lib/scroll'
 
@@ -224,9 +224,8 @@ export const Navbar = (): JSX.Element => {
               <Link
                 href="/join_us"
                 onClick={() => setIsOpen(false)}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl border border-emerald-300/80 bg-white py-2.5 text-sm font-semibold text-slate-800 hover:bg-emerald-50/60 transition-all shadow-xs"
+                className="w-full flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >
-                <Briefcase className="h-4 w-4 text-emerald-600" />
                 <span>Careers & Join Us</span>
               </Link>
               <a

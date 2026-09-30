@@ -18,7 +18,6 @@ import type { JSX } from 'react'
 import Link from 'next/link'
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
-import { SECTION_BG } from '@/lib/constants/theme'
 import { CONTACT } from '@/lib/constants/contact'
 import { scrollToSection } from '@/lib/scroll'
 
