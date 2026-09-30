@@ -32,21 +32,30 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     if (isClosingRef.current) return
     isClosingRef.current = true
 
+    // Instantly unlock body scroll so page scrolling works immediately
+    document.body.style.overflow = ''
+    document.body.style.touchAction = ''
+    document.body.style.paddingRight = ''
+
+    // 1. Instantly trigger UI close in React state (0ms latency, no async lag on web)
+    onClose()
+
+    // 2. Safely pop history state in the background
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
       if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
         window.history.back()
-        return
       }
     }
-
-    onClose()
   }, [onClose, modalId])
 
   useEffect(() => {
     if (!isOpen) {
       isClosingRef.current = false
       hasPushedStateRef.current = false
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+      document.body.style.paddingRight = ''
       return
     }
 
@@ -63,7 +72,17 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     }
 
     const handlePopState = () => {
-      // User tapped phone back button or swiped back
+      // Instantly restore page scroll
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+      document.body.style.paddingRight = ''
+
+      // If handleClose() already triggered UI close, ignore the subsequent popstate event
+      if (isClosingRef.current) {
+        hasPushedStateRef.current = false
+        return
+      }
+      isClosingRef.current = true
       hasPushedStateRef.current = false
       onClose()
     }
@@ -77,21 +96,21 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     window.addEventListener('popstate', handlePopState)
     window.addEventListener('keydown', handleKeyDown)
 
-    // Lock background scroll while modal is active
-    const originalOverflow = document.body.style.overflow
-    const originalTouchAction = document.body.style.touchAction
+    // Lock background scroll while modal is active, compensating scrollbar width to prevent Windows layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+
     document.body.style.overflow = 'hidden'
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+    }
 
     return () => {
       window.removeEventListener('popstate', handlePopState)
       window.removeEventListener('keydown', handleKeyDown)
-      // Defer scroll-unlock to the next frame so the browser doesn't synchronously
-      // reflow the entire page layout on the same frame the modal DOM is removed.
-      // This is the main cause of the visible freeze on mobile after closing.
-      requestAnimationFrame(() => {
-        document.body.style.overflow = originalOverflow
-        document.body.style.touchAction = originalTouchAction
-      })
+      // Directly restore body scroll styles without RAF race conditions
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+      document.body.style.paddingRight = ''
     }
   }, [isOpen, modalId, onClose, handleClose])
 

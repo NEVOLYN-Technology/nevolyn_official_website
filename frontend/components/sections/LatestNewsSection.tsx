@@ -13,7 +13,7 @@
 
 import type { JSX } from 'react'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, Star, Eye, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { featuredMilestones } from '@/lib/data/featured-milestones'
 import { news, type NewsItem } from '@/lib/data/latest-news'
@@ -572,11 +572,15 @@ export const LatestNewsSection = (): JSX.Element => {
       </div>
 
       {/* Pop-up Modal Window for View Details */}
-      <NewsDetailModal
-        item={selectedNews}
-        isOpen={Boolean(selectedNews)}
-        onClose={handleCloseNews}
-      />
+      <AnimatePresence>
+        {selectedNews && (
+          <NewsDetailModal
+            key="news-detail-modal"
+            item={selectedNews}
+            onClose={handleCloseNews}
+          />
+        )}
+      </AnimatePresence>
     </section>
   )
 }

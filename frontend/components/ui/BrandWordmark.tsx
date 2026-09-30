@@ -1,14 +1,12 @@
 /**
- * BrandWordmark — NEVOLYN Technology stacked logo lockup.
+ * BrandWordmark — NEVOLYN brand wordmark lockup.
  *
- * Renders the brand icon followed by the stacked "NEVOLYN / Technology"
- * text wordmark in the Ethnocentric brand font. Used in both the Navbar
- * (small size) and the Footer (medium size) to ensure a consistent brand
- * identity without duplicating the markup.
+ * Renders the brand icon followed by the "NEVOLYN" text wordmark in the
+ * Ethnocentric brand font. Used in both the Navbar (sm) and Footer (md).
  *
  * ## Sizes
- * - `"sm"` — compact navbar size (icon 36–40px, text 15–16px / 8.8–9.2px)
- * - `"md"` — footer size (icon 40–44px, text lg–xl / 10.5–11.5px)
+ * - `"sm"` — navbar size (icon 36–40px, text scaled vertically)
+ * - `"md"` — footer size (icon 44–48px, text scaled vertically)
  *
  * @module components/ui/BrandWordmark
  */
@@ -23,10 +21,10 @@ interface BrandWordmarkProps {
 }
 
 /**
- * Stacked "NEVOLYN / Technology" brand wordmark with icon.
+ * "NEVOLYN" brand wordmark with icon.
  *
  * @param props.size - `"sm"` for navbar, `"md"` for footer
- * @returns Rendered brand wordmark (icon + stacked text)
+ * @returns Rendered brand wordmark (icon + vertically enlarged NEVOLYN text)
  */
 export function BrandWordmark({ size = 'sm' }: BrandWordmarkProps): JSX.Element {
   const isSmall = size === 'sm'
@@ -36,38 +34,25 @@ export function BrandWordmark({ size = 'sm' }: BrandWordmarkProps): JSX.Element 
       {/* Brand Icon */}
       <img
         src="/nevolyn-icon.png"
-        alt="NEVOLYN Technology"
+        alt="NEVOLYN"
         className={
           isSmall
-            ? 'block h-9 w-9 sm:h-10 sm:w-10 object-contain rounded-full drop-shadow-sm'
-            : 'h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-full drop-shadow-sm'
+            ? 'block h-7 w-7 sm:h-8 sm:w-8 object-contain drop-shadow-sm'
+            : 'block h-8 w-8 sm:h-9 sm:w-9 object-contain drop-shadow-sm'
         }
       />
 
-      {/* Stacked Text Lockup */}
-      <span className="flex flex-col justify-center leading-none">
-        {/* Primary brand name in Ethnocentric typeface */}
-        <span
-          className={
-            isSmall
-              ? 'block font-brand text-[15px] sm:text-[16px] tracking-[0.16em] text-slate-900'
-              : 'block font-brand text-lg sm:text-xl tracking-[0.16em] text-slate-900'
-          }
-        >
-          NEVOLYN
-        </span>
-
-        {/* Sub-brand descriptor — same font, smaller size */}
-        <span
-          className={
-            isSmall
-              ? 'mt-1 block font-brand text-[8.8px] sm:text-[9.2px] uppercase tracking-[0.09em] text-slate-600'
-              : 'mt-1.5 block font-brand text-[10.5px] sm:text-[11.5px] uppercase tracking-[0.14em] text-slate-600'
-          }
-        >
-          Technology
-        </span>
+      {/* Primary brand name in Ethnocentric typeface */}
+      <span
+        className={
+          isSmall
+            ? 'block font-brand text-[13px] sm:text-[14px] tracking-[0.14em] text-slate-900 scale-y-110 origin-left select-none leading-none'
+            : 'block font-brand text-[16px] sm:text-[18px] tracking-[0.14em] text-slate-900 scale-y-110 origin-left select-none leading-none'
+        }
+      >
+        NEVOLYN
       </span>
     </>
   )
 }
+

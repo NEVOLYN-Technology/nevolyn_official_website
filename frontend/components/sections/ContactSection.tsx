@@ -104,7 +104,7 @@ export const ContactSection = (): JSX.Element => {
             </div>
 
             <Link
-              href="/join_us"
+              href="/join_us?from=contact"
               className="group inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 shrink-0"
             >
               <span>Join our team</span>

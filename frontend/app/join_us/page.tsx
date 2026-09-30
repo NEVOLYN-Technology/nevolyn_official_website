@@ -74,6 +74,31 @@ export default function JoinPage(): JSX.Element {
     }
   }
 
+  const handleBack = () => {
+    // 1. If user has browsing history on the site, accurately return them to wherever they came from
+    // while preserving their previous scroll position
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      const isExternal =
+        document.referrer &&
+        !document.referrer.startsWith(window.location.origin)
+
+      if (!isExternal) {
+        router.back()
+        return
+      }
+    }
+
+    // 2. Safe Fallback: if accessed directly in a fresh tab without history, check explicit source param or fallback to /
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+    const fromSource = params?.get('from')
+
+    if (fromSource && fromSource !== 'home') {
+      router.push(`/#${fromSource}`)
+    } else {
+      router.push('/')
+    }
+  }
+
   return (
     <PageShell>
       {/* Animated Success Popup Modal */}
@@ -88,7 +113,7 @@ export default function JoinPage(): JSX.Element {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <button
-          onClick={() => router.back()}
+          onClick={handleBack}
           className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-sky-500 mb-8 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -292,8 +317,8 @@ export default function JoinPage(): JSX.Element {
                   isOverWordLimit
                     ? 'border-rose-500 focus:ring-rose-500/50'
                     : fieldErrors.reason
-                    ? 'border-rose-500'
-                    : 'border-slate-200 dark:border-slate-800/80 focus:ring-orange-500/50'
+                      ? 'border-rose-500'
+                      : 'border-slate-200 dark:border-slate-800/80 focus:ring-orange-500/50'
                 )}
                 placeholder="Tell us about your passion for technology innovation and engineering (Max 250 words)..."
               />

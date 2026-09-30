@@ -203,6 +203,67 @@ export const NEVOLYN_LEGITIMATE_ALIASES = [
   'নেভোলিন টেকনোলজি',
 ] as const
 
+/** Comprehensive list of career, job vacancy, and recruitment search keywords */
+export const NEVOLYN_CAREER_KEYWORDS = [
+  // ── English Career & Job Search Queries ──
+  'nevolyn career',
+  'career nevolyn',
+  'job nevolyn',
+  'nevolyn job',
+  'vacancy nevolyn',
+  'nevolyn vacancy',
+  'nevolyn vacancies',
+  'nevolyn career search',
+  'career search nevolyn',
+  'nevolyn join us',
+  'join us nevolyn',
+  'join nevolyn',
+  'nevolyn careers',
+  'careers nevolyn',
+  'nevolyn jobs',
+  'jobs nevolyn',
+  'nevolyn hiring',
+  'hiring nevolyn',
+  'nevolyn recruitment',
+  'nevolyn job circular',
+  'nevolyn circular',
+  'nevolyn tech jobs',
+  'nevolyn software engineer job',
+  'nevolyn ai engineer job',
+  'nevolyn automation engineer job',
+  'nevolyn robotics engineer job',
+  'nevolyn embedded systems job',
+  'nevolyn full stack developer',
+  'nevolyn technology careers',
+  'nevolyn technology job vacancy',
+  'nevolyn internship',
+  'nevolyn careers bangladesh',
+  'nevolyn jobs in dhaka',
+  'nevolyn work with us',
+  'apply to nevolyn',
+
+  // ── Bengali Script Career & Vacancy Variations ──
+  'নেভোলিন ক্যারিয়ার',
+  'নেভোলিন চাকরি',
+  'নেভোলিন জব',
+  'নেভোলিন নিয়োগ',
+  'নেভোলিন সার্কুলার',
+  'নেভোলিন ক্যারিয়ার সার্চ',
+  'নেভোলিন ভ্যাকেন্সি',
+  'নেভোলিন জয়েন আস',
+] as const
+
+/** Careers / Join Us page SEO configuration */
+export const NEVOLYN_CAREERS_SEO = {
+  title: 'Careers | NEVOLYN',
+  description:
+    'Explore NEVOLYN career opportunities, job vacancies, and engineering internships. Apply to join our deep-tech team building industrial robotics, AI systems, and automation software in Dhaka, Bangladesh.',
+  keywords: [
+    ...NEVOLYN_BRAND_ALIASES,
+    ...NEVOLYN_CAREER_KEYWORDS,
+  ],
+} as const
+
 export const NEVOLYN_SEO_CONFIG = {
   siteUrl: 'https://nevolyn.com',
   fabinsUrl: 'https://fabins.nevolyn.com',
@@ -218,6 +279,9 @@ export const NEVOLYN_SEO_CONFIG = {
   keywords: [
     // ── All NEVOLYN Brand, Typos & Transliterations ──
     ...NEVOLYN_BRAND_ALIASES,
+
+    // ── Career & Job Search Queries ──
+    ...NEVOLYN_CAREER_KEYWORDS,
 
     // ── Core Industry & Engineering Domains ──
     'Industrial Automation',

@@ -3,6 +3,36 @@
  *
  * @see https://nextjs.org/docs/app/api-reference/next-config-js
  */
+import os from 'node:os'
+
+/**
+ * Dynamically discover local IPv4 addresses to show clickable phone links and whitelist in dev
+ */
+const localNetworkIps = (() => {
+  const ips = []
+  try {
+    const nets = os.networkInterfaces()
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name] || []) {
+        if (net.family === 'IPv4' && !net.internal) {
+          ips.push(net.address)
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return ips
+})()
+
+if (process.env.NODE_ENV !== 'production' && localNetworkIps.length > 0) {
+  console.log('\n\x1b[36m📱 Mobile / Local Network Access:\x1b[0m')
+  localNetworkIps.forEach((ip) => {
+    console.log(`   \x1b[1m\x1b[32mhttp://${ip}:3000\x1b[0m`)
+  })
+  console.log('')
+}
+
 
 /**
  * Origin of the Spring Boot API, used to build the connect-src CSP directive.
@@ -142,7 +172,12 @@ const nextConfig = {
   /**
    * Allowed development origins for network access (e.g. mobile/other devices on local network)
    */
-  allowedDevOrigins: ['192.168.68.103', 'localhost:3000'],
+  allowedDevOrigins: [
+    ...localNetworkIps,
+    ...localNetworkIps.map((ip) => `${ip}:3000`),
+    'localhost:3000',
+    '127.0.0.1:3000',
+  ],
 
   /**
    * Disable the floating Next.js dev-mode indicator (the "N" badge in the
