@@ -288,7 +288,7 @@ export const LatestNewsSection = (): JSX.Element => {
                             </h4>
 
                             {/* Clean short description summary */}
-                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4 font-normal line-clamp-3">
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4 font-normal line-clamp-3 text-justify">
                               {item.description}
                             </p>
                           </div>
@@ -346,9 +346,9 @@ export const LatestNewsSection = (): JSX.Element => {
                                   facebookUrl: item.facebookUrl,
                                 })
                               }}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white transition-all duration-200 active:scale-95 shadow-xs border border-sky-100/90 cursor-pointer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white transition-all duration-200 active:scale-95 shadow-xs border border-sky-200/80 cursor-pointer"
                             >
-                              <Eye size={15} />
+                              <Eye size={14} className="w-3.5 h-3.5" />
                               <span>View Details</span>
                             </button>
                           </div>
@@ -466,7 +466,7 @@ export const LatestNewsSection = (): JSX.Element => {
                               <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-sky-600 transition-colors leading-snug line-clamp-2 mb-1">
                                 {item.title}
                               </h4>
-                              <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed font-normal">
+                              <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed font-normal text-justify">
                                 {item.description}
                               </p>
                             </div>
@@ -511,9 +511,9 @@ export const LatestNewsSection = (): JSX.Element => {
                           <button
                             type="button"
                             onClick={() => setSelectedNews(item)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white transition-all duration-200 active:scale-95 shadow-xs cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white border border-sky-200/80 transition-all duration-200 active:scale-95 shadow-xs cursor-pointer"
                           >
-                            <Eye size={13} />
+                            <Eye size={12} className="w-3 h-3" />
                             <span>View Details</span>
                           </button>
                         </div>

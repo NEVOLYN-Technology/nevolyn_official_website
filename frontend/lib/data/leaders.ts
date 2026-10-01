@@ -1,13 +1,8 @@
 /**
  * Team & leadership content.
  *
- * Single source of truth for the **leadership profiles** shown in the
- * "Our Leaders" section on the homepage (`components/sections/LeadersSection.tsx`).
- *
- * The engineering team roster is a separate file, `lib/data/team.ts`, which
- * reuses the {@link TeamMember} interface declared below — so an entry can be
- * moved between the two files unchanged. Add leadership here; add engineers
- * there.
+ * Single source of truth for all **leadership profiles** and **engineering team members**
+ * shown in the "Our Leaders" section on the homepage (`components/sections/LeadersSection.tsx`).
  *
  * ## 📋 Standard Template for Adding a New Team Member
  *
@@ -127,9 +122,39 @@ export const teamDepartments: Department[] = [
         ]
       },
       {
+        id: 'lutfar',
+        name: 'Md Lutfar Rahman',
+        title: 'Director of Finance & Operations',
+        bio: 'Driving operational execution, financial discipline, and organizational coordination to support the growth and development of NEVOLYN Technology.',
+
+        extendedBio: [
+          'Md Lutfar Rahman provides broad operational and execution-focused leadership at NEVOLYN Technology, supporting the organization’s day-to-day execution, financial coordination, administrative functions, and strategic initiatives. As Executive Director, he works closely with the leadership team to ensure that NEVOLYN’s business, technology, and operational priorities are effectively translated into structured execution and sustainable organizational growth.',
+
+          'With approximately 25 years of experience in the textile industry and around 18 years of experience in accounting and finance leadership, he brings extensive expertise in financial management, operational planning, organizational coordination, and business support. Having been associated with Saturn Textiles Limited for approximately eight years, he contributes a strong understanding of industrial operations and financial management while helping bridge the operational requirements of the textile industry with NEVOLYN’s technology-driven initiatives.',
+
+          'At NEVOLYN Technology, he plays a key role in ensuring that strategic plans are supported by effective execution, financial discipline, and organizational coordination. He works closely with the leadership and engineering teams to facilitate resources, manage operational priorities, support business initiatives, and maintain alignment between the company’s technological ambitions and its organizational capabilities. His experience provides an important foundation for NEVOLYN’s continued development as a deep-tech organization focused on practical industrial innovation.'
+        ],
+
+        email: '',
+
+        responsibilities: [
+          'Oversee NEVOLYN Technology’s operational execution and organizational priorities',
+          'Support financial planning, budgeting, accounting, and resource management',
+          'Coordinate business operations across leadership and engineering teams',
+          'Translate strategic decisions into structured operational execution',
+          'Support business development, partnerships, procurement, and resource planning',
+          'Coordinate operational activities with Saturn Textiles Limited and industry partners',
+          'Provide financial and operational insights for strategic decision-making',
+          'Strengthen organizational processes, accountability, and operational efficiency',
+          'Facilitate resources and support for Research & Development initiatives',
+          'Ensure alignment between technology, business, finance, and operations'
+        ],
+        image: '/ed-photo.png',
+      },
+      {
         id: 'rahin',
         name: 'Md Rahinur Rahman',
-        title: 'Lead AI Systems Engineer',
+        title: 'Founder & AI Systems Engineer',
         bio: 'Leads the design and development of industrial AI and automation platforms at NEVOLYN Technology.',
         extendedBio: [
           'Rahin leads the design and development of AI-powered industrial automation solutions at NEVOLYN Technology, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
@@ -154,7 +179,7 @@ export const teamDepartments: Department[] = [
       {
         id: 'ninad',
         name: 'Mohammad Ninad Mahmud Nobo',
-        title: 'Lead AI Software Engineer',
+        title: 'Co-Founder & AI Software Engineer',
         bio: 'Leads full-stack web development and machine learning model integration for NEVOLYN Technology platforms.',
         extendedBio: [
           'Ninad leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN Technology platforms. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
@@ -181,3 +206,6 @@ export const teamDepartments: Department[] = [
     ],
   },
 ]
+
+/** Direct export of leadership members for component consumption. */
+export const leaders: TeamMember[] = teamDepartments[0].members

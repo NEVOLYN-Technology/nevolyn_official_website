@@ -161,8 +161,7 @@ The backend exposes **3 core REST API endpoints**:
 - Marks it verified, then dispatches the admin dossier and the sender's receipt.
 - Returns `HTTP 200 OK`, or `404` for an unknown, consumed or fabricated token.
 
-### Site content — static by design
-The team roster, innovations, milestones and news are static TypeScript files in `frontend/lib/data/`, bundled with the frontend at build time. The team roster specifically lives in `frontend/lib/data/team.ts` (engineers) and `leaders.ts` (leadership), and renders as the Leaders section — edit those files and redeploy the frontend to update them.
+The leadership profiles, innovations, milestones and news are static TypeScript files in `frontend/lib/data/`, bundled with the frontend at build time. The leadership profiles live in `frontend/lib/data/leaders.ts` and render as the Leaders section — edit that file and redeploy the frontend to update them.
 
 This content is identical for every visitor and changes a few times a year, so serving it over the network buys nothing and adds a cold-start failure mode. **The API and its database handle only what visitors submit.**
 

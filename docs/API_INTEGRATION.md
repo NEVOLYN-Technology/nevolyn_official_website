@@ -178,8 +178,8 @@ probe has no reason to disclose.
 
 #### There is no team-roster endpoint
 
-The R&D team roster is static content, not application data. It lives in
-`frontend/lib/data/team.ts` and ships with the frontend build — see Integration 3
+The leadership roster is static content, not application data. It lives in
+`frontend/lib/data/leaders.ts` and ships with the frontend build — see Integration 3
 below. The API persists only what visitors submit.
 
 ---
@@ -497,7 +497,7 @@ export default function JoinPage() {
 
 ### Integration 3: Team roster — static, not fetched
 
-**Data files**: `frontend/lib/data/leaders.ts`, `frontend/lib/data/team.ts`
+**Data file**: `frontend/lib/data/leaders.ts`
 **Component file**: `frontend/components/sections/LeadersSection.tsx`
 
 The roster is plain TypeScript, bundled at build time. There is no fetch, no
@@ -507,12 +507,9 @@ component renders:
 ```tsx
 'use client'
 
-import { teamDepartments } from '@/lib/data/leaders'   // leadership profiles
-import { engineeringTeamMembers } from '@/lib/data/team' // engineering roster
+import { leaders } from '@/lib/data/leaders' // leadership profiles
 
 export function LeadersSection() {
-  const leaders = teamDepartments[0].members
-
   // No fetch, no useEffect, no loading state, no error state — the data is
   // already in the bundle by the time the component renders.
   return (
@@ -520,19 +517,13 @@ export function LeadersSection() {
       {leaders.map((member) => (
         <MemberCard key={member.id} member={member} />
       ))}
-
-      {/* Expandable subsection; the toggle hides itself when the array is empty. */}
-      {engineeringTeamMembers.map((member) => (
-        <MemberCard key={member.id} member={member} />
-      ))}
     </section>
   )
 }
 ```
 
-**To update the roster**, edit `frontend/lib/data/team.ts` (engineers) or
-`frontend/lib/data/leaders.ts` (leadership) and redeploy the frontend. No backend
-change, no migration, no database access. See each file's header comment for the
+**To update the roster**, edit `frontend/lib/data/leaders.ts` and redeploy the frontend. No backend
+change, no migration, no database access. See the file's header comment for the
 entry template and field reference.
 
 **Keep it static.** Serving this over the network buys nothing — it is identical

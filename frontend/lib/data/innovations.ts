@@ -48,8 +48,14 @@ export interface Project {
   /** Optional external link to live product / website. */
   url?: string
 
+  /** Optional contact email address. */
+  email?: string
+
   /** Optional descriptive CTA button label. */
   actionLabel?: string
+
+  /** Optional website logo image URL. */
+  websiteLogo?: string
 }
 
 export const projects: Project[] = [
@@ -63,59 +69,14 @@ export const projects: Project[] = [
       'Machine Learning',
       'Computer Vision (YOLOv8)',
       'Spring Boot & Java',
-      'Hikrobot SDK',
       'React & Next.js',
       'FastAPI & Node.js',
     ],
     startDate: '2026-01-15',
     category: 'Industrial AI',
     url: 'https://fabins.nevolyn.com/',
+    email: 'fabins@nevolyn.com',
+    websiteLogo: 'https://fabins.nevolyn.com/fabins-logo-light-mode.png',
     actionLabel: 'FABINS Automation',
-  },
-
-  {
-    id: 'rnd-website',
-    title: 'NEVOLYN Technology Official Website',
-    description:
-      'Official corporate website for NEVOLYN Technology, showcasing active projects, AI innovation portfolios, engineering team profiles, and company capabilities.',
-    status: 'completed',
-    technologies: [
-      'Next.js',
-      'React',
-      'TypeScript',
-      'Spring Boot',
-      'Rest API',
-      'PostgreSQL',
-      'Tailwind CSS',
-      'Responsive UI/UX',
-    ],
-    startDate: '2026-07-01',
-    endDate: '2026-07-31',
-    category: 'Software Development',
-    url: 'https://nevolyn.com/',
-    actionLabel: 'NEVOLYN Technology',
-  },
-
-  {
-    id: 'portfolio-website',
-    title: 'FABINS - Product Portfolio',
-    description:
-      'Centralized interactive product portfolio for FABINS, showcasing hardware architecture, AI vision models, system specifications, and live deployment workflows.',
-    status: 'completed',
-    technologies: [
-      'Next.js',
-      'React',
-      'TypeScript',
-      'Spring Boot',
-      'Rest API',
-      'PostgreSQL',
-      'Tailwind CSS',
-      'Responsive UI/UX',
-    ],
-    startDate: '2026-07-01',
-    endDate: '2026-07-31',
-    category: 'Product Development',
-    url: 'https://fabins.nevolyn.com/',
-    actionLabel: 'AI-Powered Fabric Inspection',
   },
 ]

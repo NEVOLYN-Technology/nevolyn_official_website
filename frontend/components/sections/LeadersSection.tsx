@@ -1,20 +1,11 @@
 /**
- * LeadersSection — leadership card grid, plus an expandable engineering roster.
+ * LeadersSection — leadership card grid.
  *
  * Renders a 3-column card grid with scroll-triggered entrance animations, and
  * the full-profile popup handled by `components/ui/LeaderDetails.tsx`.
  *
  * ## Where the data comes from
- * Two static files, both bundled at build time — there is no API call here:
- *
- * - **`lib/data/leaders.ts`** → `teamDepartments` — leadership profiles, always
- *   visible.
- * - **`lib/data/team.ts`** → `engineeringTeamMembers` — the engineering roster,
- *   shown in the collapsible "R&D Engineering Team" subsection below. The toggle
- *   button hides itself entirely while that array is empty.
- *
- * Both files share the `TeamMember` interface declared in `leaders.ts`, so an
- * entry can be moved between them unchanged.
+ * Static content bundled at build time from `lib/data/leaders.ts` (`leaders`).
  *
  * Keep this section synchronous. The roster is static content, so rendering it
  * from the bundle avoids a loading flash on every visit and an empty section
@@ -37,9 +28,8 @@ import type { JSX } from 'react'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { ChevronDown, ChevronUp, User, Users } from 'lucide-react'
-import { teamDepartments } from '@/lib/data/leaders'
-import { engineeringTeamMembers } from '@/lib/data/team'
+import { User, ChevronDown } from 'lucide-react'
+import { leaders } from '@/lib/data/leaders'
 import { LeaderDetails } from '@/components/ui/LeaderDetails'
 import { fadeInUpVariants, staggerContainer, defaultViewport } from '@/lib/animations'
 import type { TeamMember } from '@/lib/data/leaders'
@@ -57,35 +47,34 @@ const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }): JSX.El
 )
 
 /**
- * Leadership section displaying team member profile cards and expandable team member grid.
+ * Leadership section displaying team member profile cards.
  *
  * @returns Rendered leaders section element
  */
 export function LeadersSection(): JSX.Element {
-  const department = teamDepartments[0]
-  const leaders = department.members
-
-  const [showTeam, setShowTeam] = useState(false)
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+  const selectedIdx = selectedMember ? leaders.indexOf(selectedMember) : -1
 
-  const allMembers = [...leaders, ...engineeringTeamMembers]
-  const selectedIdx = selectedMember ? allMembers.indexOf(selectedMember) : -1
+  const executiveLeaders = leaders.filter(
+    (m) => m.id === 'chagla' || m.id === 'lutfar' || m.title.toLowerCase().includes('director')
+  )
+  const otherLeaders = leaders.filter((m) => !executiveLeaders.some((e) => e.id === m.id))
 
   const containerVariants = staggerContainer()
   const itemVariants = fadeInUpVariants
 
   const renderCard = (member: TeamMember, _idx: number = 0) => {
-    const ringBorder = 'border-2 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
+    const ringBorder = 'border-2 border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
     const titleColor = 'text-emerald-700'
     const dividerBg = 'bg-emerald-500'
     const btnStyle = 'border-emerald-200 hover:border-emerald-400 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-700 hover:shadow-sm'
     const hoverBorder = 'hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/10'
 
     return (
-      <div className={`bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-[2rem] p-8 flex flex-col transition-all duration-300 shadow-sm hover:-translate-y-1 h-full ${hoverBorder}`}>
+      <div className={`bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-6 sm:p-7 flex flex-col transition-all duration-300 shadow-sm hover:-translate-y-1 h-full max-w-[390px] mx-auto w-full ${hoverBorder}`}>
         {/* Avatar */}
-        <div className="flex justify-center mb-6">
-          <div className={`w-40 h-40 rounded-full p-1 bg-white ${ringBorder}`}>
+        <div className="flex justify-center mb-4">
+          <div className={`w-28 h-28 rounded-full p-1 bg-white ${ringBorder}`}>
             {member.image ? (
               <img
                 src={member.image}
@@ -94,7 +83,7 @@ export function LeadersSection(): JSX.Element {
               />
             ) : (
               <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                <User className={`w-20 h-20 ${titleColor}`} />
+                <User className={`w-14 h-14 ${titleColor}`} />
               </div>
             )}
           </div>
@@ -103,26 +92,26 @@ export function LeadersSection(): JSX.Element {
         {/* Name · Title · CTA */}
         <div className="text-center flex-1 flex flex-col">
           <div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2 min-h-[3.5rem] flex items-center justify-center leading-tight">
+            <h3 className="text-xl font-bold text-slate-900 mb-1.5 min-h-[3rem] flex items-center justify-center leading-tight">
               {member.name}
             </h3>
-            <p className={`text-sm font-semibold ${titleColor}`}>{member.title}</p>
-            <p className="text-xs text-slate-600 mt-2 line-clamp-2 max-w-xs mx-auto">{member.bio}</p>
+            <p className={`text-xs sm:text-sm font-semibold ${titleColor}`}>{member.title}</p>
+            <p className="text-xs text-slate-600 mt-2 line-clamp-2 max-w-xs mx-auto leading-relaxed">{member.bio}</p>
           </div>
 
           <div className="mt-auto">
-            <div className={`w-8 h-[2px] mx-auto mt-5 mb-6 rounded-full ${dividerBg}`} />
+            <div className={`w-8 h-[2px] mx-auto mt-4 mb-4 rounded-full ${dividerBg}`} />
             <button
               onClick={() => setSelectedMember(member)}
-              className={`group inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:shadow-md hover:scale-105 active:scale-95 mb-2 cursor-pointer ${btnStyle}`}
+              className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:shadow-md hover:scale-105 active:scale-95 mb-1 cursor-pointer ${btnStyle}`}
             >
-              View Details <ChevronDown className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+              View Details <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
             </button>
           </div>
         </div>
 
         {/* Social footer slot — consistent height across cards to align View Details buttons */}
-        <div className={`mt-6 pt-6 border-t ${member.social?.linkedin ? 'border-slate-100' : 'border-transparent'} min-h-[4.25rem] flex items-center justify-center`}>
+        <div className={`mt-4 pt-3.5 border-t ${member.social?.linkedin ? 'border-slate-100' : 'border-transparent'} min-h-[3rem] flex items-center justify-center`}>
           {member.social?.linkedin ? (
             <Link
               href={member.social.linkedin}
@@ -131,11 +120,11 @@ export function LeadersSection(): JSX.Element {
               className="inline-flex items-center gap-2 text-slate-700 hover:text-[#0a66c2] bg-transparent transition-colors duration-200 active:scale-95 group cursor-pointer"
               aria-label={`${member.name} LinkedIn`}
             >
-              <LinkedinIcon className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-semibold tracking-wide group-hover:underline">LinkedIn</span>
+              <LinkedinIcon className="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform" />
+              <span className="text-xs sm:text-sm font-semibold tracking-wide group-hover:underline">LinkedIn</span>
             </Link>
           ) : (
-            <div className="h-5" aria-hidden="true" />
+            <div className="h-4" aria-hidden="true" />
           )}
         </div>
       </div>
@@ -152,7 +141,7 @@ export function LeadersSection(): JSX.Element {
           initial="hidden"
           whileInView="visible"
           viewport={defaultViewport}
-          className="text-center mb-12 sm:mb-16"
+          className="text-center mb-10 sm:mb-12"
         >
           {/* Status pill — uses shared StatusPill component */}
           <StatusPill label="EXECUTIVE & RESEARCH LEADERSHIP" />
@@ -174,73 +163,38 @@ export function LeadersSection(): JSX.Element {
           </motion.p>
         </motion.div>
 
-        {/* ── 3 Core Leaders Grid ─────────────────────────────────── */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={defaultViewport}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto"
-        >
-          {leaders.map((leader, idx) => (
-            <motion.div key={leader.id} variants={itemVariants}>
-              {renderCard(leader, idx)}
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* ── Two Rows: 1st for MD & ED, 2nd for Other Leaders ── */}
+        <div className="space-y-6 max-w-[840px] mx-auto">
+          {/* Row 1: MD & ED */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={defaultViewport}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center"
+          >
+            {executiveLeaders.map((leader, idx) => (
+              <motion.div key={leader.id} variants={itemVariants} className="flex justify-center">
+                {renderCard(leader, idx)}
+              </motion.div>
+            ))}
+          </motion.div>
 
-        {/* ── Toggle Button for R&D Engineering Team ───────────────── */}
-        {engineeringTeamMembers.length > 0 && (
-          <div className="flex justify-center pt-10">
-            <button
-              onClick={() => setShowTeam(!showTeam)}
-              className="group inline-flex items-center gap-3 px-8 py-3.5 rounded-full border border-sky-300 bg-gradient-to-r from-sky-50 to-blue-50/70 hover:from-sky-400 hover:via-blue-500 hover:to-indigo-500 text-sky-700 hover:text-white hover:border-transparent text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-sky-400/30 hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <Users className="w-4 h-4 transition-transform group-hover:scale-110" />
-              <span>{showTeam ? 'Hide Team Members' : 'Show Team Members'}</span>
-              {showTeam ? (
-                <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
-              ) : (
-                <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
-              )}
-            </button>
-          </div>
-        )}
-
-        {/* ── Expandable R&D Engineering Team Grid ───────────────── */}
-        <AnimatePresence>
-          {showTeam && (
-            <motion.div
-              initial={{ opacity: 0, height: 0, scale: 0.95 }}
-              animate={{ opacity: 1, height: 'auto', scale: 1 }}
-              exit={{ opacity: 0, height: 0, scale: 0.95 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="overflow-hidden pt-10"
-            >
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 uppercase tracking-wide">
-                  R&D Engineering Team
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Engineering specialists driving computer vision, machine learning models, and edge hardware systems
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                {engineeringTeamMembers.map((member, idx) => (
-                  <motion.div
-                    key={member.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: idx * 0.1 }}
-                  >
-                    {renderCard(member, idx)}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Row 2: Other Leaders */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={defaultViewport}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center"
+          >
+            {otherLeaders.map((leader, idx) => (
+              <motion.div key={leader.id} variants={itemVariants} className="flex justify-center">
+                {renderCard(leader, executiveLeaders.length + idx)}
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </div>
 
       {/* ── Member Profile Modal ──────────────────────────────── */}

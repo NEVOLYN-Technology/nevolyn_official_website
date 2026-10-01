@@ -31,8 +31,7 @@ nevolyn_official_website/           ← Git root (monorepo)
 │   │       ├── innovations.ts      # Projects & product status
 │   │       ├── leaders.ts          # Leadership team profiles & bio
 │   │       ├── featured-milestones.ts # High-impact milestone showcase
-│   │       ├── latest-news.ts      # Milestones & news timeline
-│   │       └── team.ts             # Engineering team roster
+│   │       └── latest-news.ts      # Milestones & news timeline
 │   ├── public/                     # Static assets (logos, photos, icons)
 │   └── package.json                # Node.js dependencies & scripts
 ├── backend/                        ← Spring Boot 3 (Java 21) REST API
@@ -133,9 +132,9 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 | `GET /api/v1/applications/verify?token=` | GET | Confirms the candidate, emails the CV to the NEVOLYN team |
 | `GET /actuator/health` | GET | Liveness probe for Render — not part of the public API |
 
-> **The team roster is static content, not an API.** It lives in
-> [`frontend/lib/data/team.ts`](./frontend/lib/data/team.ts) and renders as a
-> subsection of the Leaders section. To update it, edit that file and redeploy
+> **The leadership profiles are static content, not an API.** They live in
+> [`frontend/lib/data/leaders.ts`](./frontend/lib/data/leaders.ts) and render as the
+> Leaders section. To update them, edit that file and redeploy
 > the frontend — no backend change and no migration. The API stores only what
 > visitors submit.
 

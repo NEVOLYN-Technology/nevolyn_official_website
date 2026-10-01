@@ -51,9 +51,9 @@ flowchart LR
 | `GET /api/v1/applications/verify?token=` | Same confirmation flow, CV attached to the admin email |
 | `GET /actuator/health` | Liveness probe for Render — not part of the public API |
 
-> **The team roster is static content, not an API.** It lives in
-> [`frontend/lib/data/team.ts`](../frontend/lib/data/team.ts) and renders as a
-> subsection of the Leaders section. To update the roster, edit that file and
+> **The leadership profiles are static content, not an API.** They live in
+> [`frontend/lib/data/leaders.ts`](../frontend/lib/data/leaders.ts) and render as the
+> Leaders section. To update the profiles, edit that file and
 > redeploy the frontend — no backend change, no migration.
 >
 > This split is deliberate: the roster changes a few times a year, is identical

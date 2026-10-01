@@ -62,8 +62,8 @@ class FlywayMigrationValidationTest {
                 .as("Flyway records applied migrations in its history table")
                 .contains("flyway_schema_history");
 
-        // This database stores submissions only. The team roster is static
-        // content in frontend/lib/data/team.ts and must not gain a table here.
+        // This database stores submissions only. Leadership profiles are static
+        // content in frontend/lib/data/leaders.ts and must not gain a table here.
         assertThat(tables)
                 .as("team roster is static frontend content, not database state")
                 .doesNotContain("team_members");

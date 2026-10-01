@@ -14,11 +14,11 @@
 import type { JSX } from 'react'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Tag, Calendar, Sparkles, ExternalLink } from 'lucide-react'
+import { Tag, Sparkles, ExternalLink, Globe, Mail } from 'lucide-react'
 import { Badge, type BadgeTone } from '@/components/ui/badge'
 import { projects, type Project } from '@/lib/data/innovations'
 import { fadeUpProps } from '@/lib/animations'
-import { formatDate, cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 import { CarouselCard } from '@/components/ui/CarouselCard'
 import { CarouselArrows, CarouselDots } from '@/components/ui/CarouselControls'
@@ -84,34 +84,36 @@ export const InnovationsSection = (): JSX.Element => {
           description="Pioneering next-generation intelligent systems, automated computer vision, and scalable software platforms engineered for real-world execution."
         />
 
-        {/* Filter Tabs */}
-        <motion.div {...fadeUpProps(0.15)} className="flex flex-wrap justify-center gap-3 mb-8 sm:mb-10">
-          {FILTERS.map((filter) => {
-            const isSelected = activeFilter === filter
-            const isMatchingCenteredStatus =
-              currentCenteredProject &&
-              ((filter === 'Ongoing' && currentCenteredProject.status === 'active') ||
-                (filter === 'Completed' && currentCenteredProject.status === 'completed'))
+        {/* Filter Tabs — shown when multiple projects are available */}
+        {projects.length > 1 && (
+          <motion.div {...fadeUpProps(0.15)} className="flex flex-wrap justify-center gap-3 mb-8 sm:mb-10">
+            {FILTERS.map((filter) => {
+              const isSelected = activeFilter === filter
+              const isMatchingCenteredStatus =
+                currentCenteredProject &&
+                ((filter === 'Ongoing' && currentCenteredProject.status === 'active') ||
+                  (filter === 'Completed' && currentCenteredProject.status === 'completed'))
 
-            return (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={cn(
-                  "px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 border transform cursor-pointer",
-                  "hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95",
-                  isSelected
-                    ? "bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 text-white border-transparent shadow-lg shadow-sky-500/30 -translate-y-0.5 scale-105 font-extrabold"
-                    : isMatchingCenteredStatus
-                      ? "bg-sky-50 text-sky-700 border-sky-300 shadow-[0_0_15px_rgba(56,189,248,0.25)] -translate-y-0.5 scale-105 font-bold"
-                      : "bg-white text-slate-600 border-slate-300 hover:border-sky-400 hover:text-sky-600 hover:shadow-[0_0_12px_rgba(56,189,248,0.2)] shadow-sm"
-                )}
-              >
-                {filter}
-              </button>
-            )
-          })}
-        </motion.div>
+              return (
+                <button
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  className={cn(
+                    "px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 border transform cursor-pointer",
+                    "hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95",
+                    isSelected
+                      ? "bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 text-white border-transparent shadow-lg shadow-sky-500/30 -translate-y-0.5 scale-105 font-extrabold"
+                      : isMatchingCenteredStatus
+                        ? "bg-sky-50 text-sky-700 border-sky-300 shadow-[0_0_15px_rgba(56,189,248,0.25)] -translate-y-0.5 scale-105 font-bold"
+                        : "bg-white text-slate-600 border-slate-300 hover:border-sky-400 hover:text-sky-600 hover:shadow-[0_0_12px_rgba(56,189,248,0.2)] shadow-sm"
+                  )}
+                >
+                  {filter}
+                </button>
+              )
+            })}
+          </motion.div>
+        )}
 
         {/* ── 3D Horizontal Carousel Stage ─────────────────────────────── */}
         <motion.div {...fadeUpProps(0.25)} className="relative w-full py-4">
@@ -129,7 +131,12 @@ export const InnovationsSection = (): JSX.Element => {
           <div
             ref={scrollContainerRef}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 py-8 px-[calc(50%-150px)] sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
+            className={cn(
+              "flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 py-8 no-scrollbar",
+              filteredProjects.length === 1
+                ? "justify-center px-4"
+                : "px-[calc(50%-150px)] sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)]"
+            )}
           >
             {filteredProjects.map((project, idx) => {
               const isCenter = idx === safeCenteredIndex
@@ -144,6 +151,9 @@ export const InnovationsSection = (): JSX.Element => {
                   onClick={() => scrollToCard(idx)}
                   dataIndex={idx}
                   dataAttr="data-card-index"
+                  className={cn(
+                    filteredProjects.length === 1 && "w-full max-w-[460px]"
+                  )}
                 >
 
                     <div>
@@ -191,7 +201,7 @@ export const InnovationsSection = (): JSX.Element => {
                       </h3>
 
                       {/* Description */}
-                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[44px]">
+                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[44px] text-justify">
                         {project.description}
                       </p>
                     </div>
@@ -203,47 +213,77 @@ export const InnovationsSection = (): JSX.Element => {
                           <Sparkles className="w-3.5 h-3.5 text-sky-500" />
                           <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">Tech Stack & Frameworks</span>
                         </div>
-                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                          {project.technologies.map((tech) => (
-                            <span
-                              key={tech}
-                              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-sm"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
+                        {project.technologies.length === 5 ? (
+                          <div className="flex flex-col gap-1.5 sm:gap-2">
+                            {/* Row 1: 2 items */}
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              {project.technologies.slice(0, 2).map((tech) => (
+                                <span
+                                  key={tech}
+                                  className="px-2.5 min-[380px]:px-3 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-sm whitespace-nowrap"
+                                >
+                                  {tech}
+                                </span>
+                              ))}
+                            </div>
+                            {/* Row 2: 3 items */}
+                            <div className="grid grid-cols-3 gap-1 min-[380px]:gap-1.5 sm:gap-2">
+                              {project.technologies.slice(2).map((tech) => (
+                                <span
+                                  key={tech}
+                                  className="px-1 min-[380px]:px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[10px] min-[360px]:text-[10.5px] min-[400px]:text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-sm text-center truncate"
+                                  title={tech}
+                                >
+                                  {tech}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                            {project.technologies.map((tech) => (
+                              <span
+                                key={tech}
+                                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-sm"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
-                      {/* Date & Interactive CTA Footer */}
-                      <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-sky-500 shrink-0" />
-                          <span>
-                            {project.status === 'completed' && project.endDate
-                              ? `Completed ${formatDate(project.endDate)}`
-                              : project.status === 'planning'
-                                ? 'Upcoming R&D Initiative'
-                                : `Started ${formatDate(project.startDate)}`}
-                          </span>
-                        </div>
+                      {/* Interactive Website & Email Links Footer */}
+                      <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-1.5 min-[380px]:gap-2.5 text-xs font-medium">
+                        {/* Website Link with Website Logo */}
                         {project.url ? (
                           <a
                             href={project.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 text-sky-700 hover:bg-sky-100 hover:text-sky-900 border border-sky-200 text-xs font-semibold transition-all duration-200 shadow-sm hover:scale-105 active:scale-95 cursor-pointer"
-                            title={project.actionLabel ? `${project.actionLabel} (${project.title})` : `Visit ${project.title}`}
+                            className="group/btn inline-flex items-center gap-1 min-[380px]:gap-1.5 px-2 min-[380px]:px-2.5 sm:px-3 py-1.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-900 border border-sky-200 text-[10px] min-[360px]:text-[11px] sm:text-xs font-semibold transition-all duration-200 shadow-2xs hover:shadow-xs hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                            title={`Visit Official Website (${project.url})`}
+                            aria-label={`Visit ${project.title} official website`}
                           >
-                            <span>{project.actionLabel || 'Visit Platform'}</span>
-                            <ExternalLink className="w-3 h-3 text-sky-600" />
+                            <Globe className="w-3 h-3 min-[380px]:w-3.5 min-[380px]:h-3.5 text-sky-500 group-hover/btn:text-sky-700 transition-colors shrink-0" />
+                            <span className="whitespace-nowrap">{project.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                            <ExternalLink className="w-2.5 h-2.5 min-[380px]:w-3 min-[380px]:h-3 text-sky-400 group-hover/btn:text-sky-600 transition-colors shrink-0" />
                           </a>
-                        ) : (
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold group-hover:border-sky-400 group-hover:text-sky-600 transition-all duration-300">
-                            <img src="/nevolyn-icon.png" alt="NEVOLYN Technology" className="w-3.5 h-3.5 object-contain shrink-0" />
-                            <span className="font-brand tracking-wider text-[10px]">NEVOLYN</span>
-                          </div>
+                        ) : <div />}
+
+                        {/* Email Link with Email Logo */}
+                        {project.email && (
+                          <a
+                            href={`mailto:${project.email}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="group/mail inline-flex items-center gap-1 min-[380px]:gap-1.5 px-2 min-[380px]:px-2.5 sm:px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 border border-emerald-200 text-[10px] min-[360px]:text-[11px] sm:text-xs font-semibold transition-all duration-200 shadow-2xs hover:shadow-xs hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                            title={`Email ${project.email}`}
+                            aria-label={`Send email to ${project.email}`}
+                          >
+                            <Mail className="w-3 h-3 min-[380px]:w-3.5 min-[380px]:h-3.5 text-emerald-600 group-hover/mail:text-emerald-700 transition-colors shrink-0" />
+                            <span className="whitespace-nowrap">{project.email}</span>
+                          </a>
                         )}
                       </div>
                     </div>

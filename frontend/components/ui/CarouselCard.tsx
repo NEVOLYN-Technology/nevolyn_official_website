@@ -40,6 +40,8 @@ interface CarouselCardProps {
   dataIndex?: number
   /** data attribute name (e.g., "data-card-index" or "data-news-index"). */
   dataAttr?: string
+  /** Additional custom class names for the outer wrapper. */
+  className?: string
 }
 
 /**
@@ -65,6 +67,7 @@ export function CarouselCard({
   children,
   dataIndex,
   dataAttr = 'data-card-index',
+  className,
 }: CarouselCardProps): JSX.Element {
   // Build the data attribute object dynamically so we can spread it below
   const dataProps = dataIndex !== undefined ? { [dataAttr]: dataIndex } : {}
@@ -81,11 +84,12 @@ export function CarouselCard({
         isCenter
           ? 'bg-gradient-to-b from-sky-400 via-blue-500 to-indigo-500 shadow-[0_12px_30px_rgba(56,189,248,0.22)] sm:shadow-[0_20px_50px_rgba(56,189,248,0.25),0_0_25px_rgba(99,102,241,0.15)] -translate-y-2 sm:-translate-y-3 scale-[1.02] sm:scale-105 opacity-100 z-20'
           // ── Inactive: muted border, lowered, lightweight blur on desktop only ──
-          : 'bg-slate-300/70 shadow-sm sm:shadow-lg shadow-slate-400/20 translate-y-1 sm:translate-y-2 scale-95 opacity-60 sm:opacity-50 z-10 sm:blur-[1.5px] blur-none hover:opacity-85 hover:blur-none'
+          : 'bg-slate-300/70 shadow-sm sm:shadow-lg shadow-slate-400/20 translate-y-1 sm:translate-y-2 scale-95 opacity-60 sm:opacity-50 z-10 sm:blur-[1.5px] blur-none hover:opacity-85 hover:blur-none',
+        className
       )}
     >
       {/* ── Inner card surface ─────────────────────────────────────── */}
-      <div className="relative w-full h-full p-5 sm:p-7 rounded-[24px] sm:rounded-[26px] bg-white text-slate-900 shadow-sm flex flex-col justify-between overflow-hidden">
+      <div className="relative w-full h-full p-4 min-[380px]:p-5 sm:p-7 rounded-[24px] sm:rounded-[26px] bg-white text-slate-900 shadow-sm flex flex-col justify-between overflow-hidden">
 
         {/* Subtle radial ambient glow in the top-right corner */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_55%)] pointer-events-none" />

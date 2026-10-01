@@ -112,7 +112,7 @@ export const CapabilitiesSection = (): JSX.Element => {
                 <h3 className={`text-sm font-bold text-slate-900 mb-3 tracking-wider uppercase transition-colors group-hover:${feature.accentColor}`}>
                   {feature.title}
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed text-justify">
                   {feature.description}
                 </p>
               </div>
