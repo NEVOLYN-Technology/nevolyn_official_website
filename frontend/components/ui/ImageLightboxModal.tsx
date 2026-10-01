@@ -14,8 +14,10 @@ interface ImageLightboxModalProps {
 /**
  * ImageLightboxModal — Full-screen uncropped photo viewer.
  *
- * Displays only the full, uncropped photo against a dark translucent backdrop.
- * Integrates `useModalHistory` for smooth mobile back-button/swipe-back closing.
+ * Displays the full photo against a crisp dark backdrop.
+ * Uses a single unified root motion transition (150ms easeOut) so the close button,
+ * backdrop, and photo all disappear synchronously without lingering cross buttons
+ * or GPU compositor blur.
  */
 export function ImageLightboxModal({
   image,
@@ -30,26 +32,27 @@ export function ImageLightboxModal({
   })
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center overflow-hidden">
-      {/* Dark backdrop with blur */}
-      <motion.div
-        key="lightbox-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15, ease: 'easeOut' }}
+      className="fixed inset-0 z-[60] flex items-center justify-center overflow-hidden"
+    >
+      {/* Dark backdrop: clean solid dark overlay without heavy GPU backdrop-filter blur */}
+      <div
         onClick={handleClose}
-        className="fixed inset-0 bg-black/90 backdrop-blur-md cursor-zoom-out"
+        className="fixed inset-0 bg-black/92 cursor-zoom-out"
         aria-hidden="true"
       />
 
-      {/* Top action bar: Close button */}
+      {/* Top action bar: Close button — fades out synchronously with root */}
       <div className="absolute top-4 right-4 z-[70] flex items-center gap-2">
         <button
           onClick={handleClose}
           type="button"
           aria-label="Close full photo view"
-          className="p-2 sm:p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/35 text-white border border-white/20 backdrop-blur-md shadow-lg transition-all duration-200 cursor-pointer"
+          className="p-2 sm:p-2.5 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 text-white border border-white/25 shadow-lg transition-all duration-150 cursor-pointer"
         >
           <X className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
         </button>
@@ -57,11 +60,10 @@ export function ImageLightboxModal({
 
       {/* Main photo container */}
       <motion.div
-        key="lightbox-content"
-        initial={{ opacity: 0, scale: 0.92 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.94 }}
-        transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ duration: 0.15, ease: 'easeOut' }}
         onClick={handleClose}
         className="relative z-[65] max-w-[96vw] max-h-[92vh] flex flex-col items-center justify-center p-2 sm:p-4 cursor-zoom-out"
       >
@@ -80,12 +82,12 @@ export function ImageLightboxModal({
         {title && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="mt-3 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/15 text-white text-xs sm:text-sm font-semibold max-w-[90vw] truncate shadow-lg"
+            className="mt-3 px-4 py-1.5 rounded-full bg-slate-900/90 border border-white/15 text-white text-xs sm:text-sm font-semibold max-w-[90vw] truncate shadow-lg"
           >
             {title}
           </div>
         )}
       </motion.div>
-    </div>
+    </motion.div>
   )
 }
