@@ -71,7 +71,7 @@ export function ImageLightboxModal({
   }
 
   // Dismiss modal on backdrop / outside clicks unless user was swiping
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = () => {
     if (isDraggingRef.current) {
       isDraggingRef.current = false
       return
