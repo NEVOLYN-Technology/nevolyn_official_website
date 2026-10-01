@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { X, ZoomIn } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useModalHistory } from '@/lib/hooks/useModalHistory'
 
 interface ImageLightboxModalProps {

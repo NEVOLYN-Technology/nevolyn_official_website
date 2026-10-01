@@ -106,9 +106,6 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
     modalId: 'news-detail',
   })
 
-  // Check if image is a portrait photo to style container appropriately
-  const isPortrait = item.image?.includes('photo')
-
   // State for opening full uncropped photo in Lightbox
   const [isPhotoOpen, setIsPhotoOpen] = useState(false)
 
