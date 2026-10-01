@@ -159,7 +159,7 @@ export function LeadersSection(): JSX.Element {
             variants={itemVariants}
             className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal"
           >
-            Meet the leaders and engineering specialists driving NEVOLYN Technology from deep-tech research to high-precision industrial reality.
+            Meet the leaders and engineers driving NEVOLYN from deep-tech research to high-precision industrial reality.
           </motion.p>
         </motion.div>
 

@@ -16,7 +16,7 @@
 import React from 'react'
 import type { JSX } from 'react'
 import Link from 'next/link'
-import { Mail, MapPin, Phone } from 'lucide-react'
+import { Mail, MapPin, Phone, Compass, ChevronRight } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
 import { CONTACT } from '@/lib/constants/contact'
 import { scrollToSection } from '@/lib/scroll'
@@ -60,22 +60,19 @@ export const Footer = (): JSX.Element => {
         {/* Main Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 lg:gap-10 mb-3">
           {/* Brand */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2.5">
             <Link
               href="/"
               onClick={scrollToHome}
               aria-label="Go to top of Home page"
-              className="inline-flex items-center gap-2.5 group transition-all duration-200 hover:-translate-y-0.5 cursor-pointer w-fit"
+              className="inline-flex items-center gap-2.5 sm:gap-3 group transition-all duration-200 hover:-translate-y-0.5 cursor-pointer w-fit mt-1.5 sm:mt-2"
             >
               {/* Reusable brand icon + NEVOLYN wordmark (md = footer size) */}
               <BrandWordmark size="md" />
             </Link>
-            <p className="text-xs sm:text-[13px] text-slate-500 font-normal leading-normal max-w-sm">
-              Engineering what is next.
-            </p>
 
-            {/* Social Links — under tagline in brand column */}
-            <div className="flex items-center gap-2 pt-1">
+            {/* Social Links — in brand column */}
+            <div className="flex items-center gap-2 pt-0.5">
               {/* LinkedIn */}
               <a
                 href="https://www.linkedin.com/company/nevolyn/"
@@ -107,74 +104,93 @@ export const Footer = (): JSX.Element => {
           </div>
 
           {/* Navigation — middle column */}
-          <div className="space-y-2 md:justify-self-center">
-            <h3 className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-              <span>Navigation</span>
-            </h3>
-            <ul className="grid grid-cols-2 gap-x-8 gap-y-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
+          <div className="space-y-2 md:justify-self-center w-full max-w-md lg:max-w-lg">
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-300/60">
+              <h3 className="text-xs sm:text-[13px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-md bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-700">
+                  <Compass className="w-3.5 h-3.5" />
+                </div>
+                <span>Navigation</span>
+              </h3>
+              <span className="font-mono text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 uppercase">
+                Explore
+              </span>
+            </div>
+
+            <ul className="grid grid-cols-3 gap-1.5 text-[11px] sm:text-xs">
               <li>
                 <a
                   href="/"
                   onClick={(e) => handleNavClick(e, 'home')}
-                  className="hover:text-emerald-600 transition-colors inline-block hover:translate-x-0.5 duration-150"
+                  className="group flex items-center justify-between px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/70 hover:bg-white border border-slate-200/90 hover:border-emerald-300 text-slate-800 hover:text-emerald-700 shadow-2xs hover:shadow-xs font-semibold transition-all duration-150"
                 >
-                  Home
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/#leaders"
-                  onClick={(e) => handleNavClick(e, 'leaders')}
-                  className="hover:text-emerald-600 transition-colors inline-block hover:translate-x-0.5 duration-150"
-                >
-                  Leaders
+                  <span className="truncate">Home</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
                 </a>
               </li>
               <li>
                 <a
                   href="/#about"
                   onClick={(e) => handleNavClick(e, 'about')}
-                  className="hover:text-emerald-600 transition-colors inline-block hover:translate-x-0.5 duration-150"
+                  className="group flex items-center justify-between px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/70 hover:bg-white border border-slate-200/90 hover:border-emerald-300 text-slate-800 hover:text-emerald-700 shadow-2xs hover:shadow-xs font-semibold transition-all duration-150"
                 >
-                  About
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/#latest-news"
-                  onClick={(e) => handleNavClick(e, 'latest-news')}
-                  className="hover:text-emerald-600 transition-colors inline-block hover:translate-x-0.5 duration-150"
-                >
-                  News
+                  <span className="truncate">About</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
                 </a>
               </li>
               <li>
                 <a
                   href="/#innovations"
                   onClick={(e) => handleNavClick(e, 'innovations')}
-                  className="hover:text-emerald-600 transition-colors inline-block hover:translate-x-0.5 duration-150"
+                  className="group flex items-center justify-between px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/70 hover:bg-white border border-slate-200/90 hover:border-emerald-300 text-slate-800 hover:text-emerald-700 shadow-2xs hover:shadow-xs font-semibold transition-all duration-150"
                 >
-                  Innovations
+                  <span className="truncate">Innovations</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/#leaders"
+                  onClick={(e) => handleNavClick(e, 'leaders')}
+                  className="group flex items-center justify-between px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/70 hover:bg-white border border-slate-200/90 hover:border-emerald-300 text-slate-800 hover:text-emerald-700 shadow-2xs hover:shadow-xs font-semibold transition-all duration-150"
+                >
+                  <span className="truncate">Leaders</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/#latest-news"
+                  onClick={(e) => handleNavClick(e, 'latest-news')}
+                  className="group flex items-center justify-between px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/70 hover:bg-white border border-slate-200/90 hover:border-emerald-300 text-slate-800 hover:text-emerald-700 shadow-2xs hover:shadow-xs font-semibold transition-all duration-150"
+                >
+                  <span className="truncate">News</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
                 </a>
               </li>
               <li>
                 <Link
                   href="/join_us"
-                  className="hover:text-emerald-600 transition-colors inline-block hover:translate-x-0.5 duration-150"
+                  className="group flex items-center justify-between px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/70 hover:bg-white border border-slate-200/90 hover:border-emerald-300 text-slate-800 hover:text-emerald-700 shadow-2xs hover:shadow-xs font-semibold transition-all duration-150"
                 >
-                  Careers
+                  <span className="truncate">Careers</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Contact Info — sourced from lib/constants/contact.ts */}
-          <div className="space-y-2 md:justify-self-end">
-            <h3 className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block" />
-              <span>Contact</span>
-            </h3>
+          <div className="space-y-2.5 md:justify-self-end">
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-300/60">
+              <h3 className="text-xs sm:text-[13px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-sky-500 inline-block shadow-2xs" />
+                <span>Contact</span>
+              </h3>
+              <span className="font-mono text-[10px] font-bold text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 uppercase">
+                Direct
+              </span>
+            </div>
             <ul className="space-y-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
               {/* Address */}
               <li className="flex items-start gap-2">

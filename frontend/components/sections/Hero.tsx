@@ -47,7 +47,7 @@ export const Hero = (): JSX.Element => {
 
             {/* Subtitle */}
             <p className="mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600 font-normal">
-              We build smart software and automation systems that help businesses work faster, smarter, and more reliable.
+              We build smart software and automation systems that help businesses work faster and smarter
             </p>
 
             {/* Social & CTA Action Buttons (Single line on both web and mobile) */}

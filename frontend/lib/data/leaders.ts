@@ -100,10 +100,10 @@ export const teamDepartments: Department[] = [
         id: 'chagla',
         name: 'Chagla Amanullah',
         title: 'Managing Director',
-        bio: 'Providing strategic leadership, driving innovation and engineering excellence at NEVOLYN Technology.',
+        bio: 'Providing strategic leadership, driving innovation and engineering excellence at NEVOLYN.',
 
         extendedBio: [
-          'Amanullah Chagla provides the strategic leadership for NEVOLYN Technology, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and engineering excellence work together to create lasting industrial value.',
+          'Amanullah Chagla provides the strategic leadership for NEVOLYN, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and engineering excellence work together to create lasting industrial value.',
 
           'With decades of experience in industry and entrepreneurship, he has led the development and expansion of operations while building strong partnerships with globally recognized organizations and institutions. His leadership philosophy combines business excellence with continuous innovation, responsible engineering, and long-term value creation for customers and stakeholders alike.',
 
@@ -125,7 +125,7 @@ export const teamDepartments: Department[] = [
         id: 'lutfar',
         name: 'Md Lutfar Rahman',
         title: 'Director of Finance & Operations',
-        bio: 'Driving operational execution, financial discipline, and organizational coordination to support the growth and development of NEVOLYN Technology.',
+        bio: 'Driving operational execution and financial discipline to support the growth and development of NEVOLYN.',
 
         extendedBio: [
           'Md Lutfar Rahman provides broad operational and execution-focused leadership at NEVOLYN Technology, supporting the organization’s day-to-day execution, financial coordination, administrative functions, and strategic initiatives. As Executive Director, he works closely with the leadership team to ensure that NEVOLYN’s business, technology, and operational priorities are effectively translated into structured execution and sustainable organizational growth.',
@@ -155,9 +155,9 @@ export const teamDepartments: Department[] = [
         id: 'rahin',
         name: 'Md Rahinur Rahman',
         title: 'Founder & AI Systems Engineer',
-        bio: 'Leads the design and development of industrial AI and automation platforms at NEVOLYN Technology.',
+        bio: 'Leads the design and development of industrial AI and automation platforms at NEVOLYN.',
         extendedBio: [
-          'Rahin leads the design and development of AI-powered industrial automation solutions at NEVOLYN Technology, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
+          'Rahin leads the design and development of AI-powered industrial automation solutions at NEVOLYN, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
           'He graduated in Electrical and Electronic Engineering (EEE) from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools, with a specialization in Communication and Signal Processing (CSP). His academic foundation provided a solid basis in digital signal processing, mathematical modeling, and pattern recognition, bridging deep engineering theory with practical AI systems.',
           'Throughout his academic and research work, he explored advanced signal analysis, embedded systems, and computer vision algorithms for real-world problems. His hands-on research in hardware-software co-design and intelligent imaging built the technical foundation for his current work in industrial automation, edge AI, and real-time inspection systems.'
         ],
@@ -180,15 +180,15 @@ export const teamDepartments: Department[] = [
         id: 'ninad',
         name: 'Mohammad Ninad Mahmud Nobo',
         title: 'Co-Founder & AI Software Engineer',
-        bio: 'Leads full-stack web development and machine learning model integration for NEVOLYN Technology platforms.',
+        bio: 'Leads full-stack web development and machine learning model integration for NEVOLYN.',
         extendedBio: [
-          'Ninad leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN Technology platforms. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
+          'Ninad leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
           'He graduated in Computer Science and Engineering from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools. There, he explored how AI could tackle complex, real-world challenges, from automated software testing to medical image analysis to Bangla speech processing. That foundation of rigorous research and hands-on building led him to industrial AI, where the software challenges are just as demanding, but the impact is immediate and visible on the factory floor.',
           'His research includes AutoTestGenX, a multi-agent system that writes and executes software tests autonomously, and MedCAR, which resolves conflicting AI readings of chest X-rays. Beyond FABINS, he has built impactful AI applications including MindTrace, providing caregivers simple tools for dementia support, and GemmaVetCare, delivering edge AI livestock health guidance for low-connectivity environments.'
         ],
         email: 'mninadmnobo@gmail.com',
         responsibilities: [
-          'Full-stack development of NEVOLYN Technology portfolio & FABINS web applications',
+          'Full-stack development of NEVOLYN & FABINS web applications',
           'Image processing, computer vision model training for FABINS',
           'ML pipeline architecture & production deployment',
           'API design, software quality standards, & DevOps automation'
