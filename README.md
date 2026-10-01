@@ -151,4 +151,5 @@ For deployment, migrations and abuse protection, see [docs/CICD_AND_DEPLOYMENT.m
 - 🤖 **[CI/CD Beginner Handbook (`docs/CICD_GUIDE.md`)](./docs/CICD_GUIDE.md)** — Beginner intuition guide for CI/CD pipelines, Docker container files, and step-by-step custom domain deployment.
 - 🔌 **[Spring Boot REST API Master Spec (`docs/API_INTEGRATION.md`)](./docs/API_INTEGRATION.md)** — Master API guide with 5-layer code traces, field constraints, cURL examples, CORS config, and tutorial on adding new APIs.
 - ⚛️ **[Frontend Developer Handbook (`docs/FRONTEND_GUIDE.md`)](./docs/FRONTEND_GUIDE.md)** — Next.js 16 architecture, component breakdown, content editing workflows, animations, and API integration.
+- 🎨 **[UI Component & Design System Standards (`docs/UI_COMPONENT_DESIGN_SYSTEM.md`)](./docs/UI_COMPONENT_DESIGN_SYSTEM.md)** — Layout architectures, mobile single-row constraints, card hover matrix, full photo lightboxes, and button guidelines.
 - 🍃 **[Backend Developer Handbook (`docs/BACKEND_GUIDE.md`)](./docs/BACKEND_GUIDE.md)** — Spring Boot 3 architecture, package layer responsibilities, JPA database setup, and file storage logic.

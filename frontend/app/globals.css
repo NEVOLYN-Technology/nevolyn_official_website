@@ -168,6 +168,16 @@
   scrollbar-width: none;
 }
 
+/* Modal and lightbox bounce containment */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+/* Zoom cursor affordance */
+.cursor-zoom-in {
+  cursor: zoom-in;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

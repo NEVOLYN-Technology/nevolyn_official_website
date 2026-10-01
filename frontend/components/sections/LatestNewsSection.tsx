@@ -23,6 +23,7 @@ import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 import { SECTION_BG } from '@/lib/constants/theme'
 import { NewsDetailModal, type NewsModalItem } from '@/components/ui/NewsDetailModal'
 import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
+import { useModalHistory } from '@/lib/hooks/useModalHistory'
 
 /**
  * News timeline section rendering featured project announcements in a 3D carousel and
@@ -44,6 +45,16 @@ export const LatestNewsSection = (): JSX.Element => {
     images?: string[]
     initialIndex?: number
   } | null>(null)
+
+  const handleClosePhoto = useCallback(() => {
+    setSelectedPhoto(null)
+  }, [])
+
+  const { handleClose: handleClosePhotoHistory } = useModalHistory({
+    isOpen: Boolean(selectedPhoto),
+    onClose: handleClosePhoto,
+    modalId: 'photo-lightbox',
+  })
 
   // Ref for the vertical scroll feed
   const verticalScrollRef = useRef<HTMLDivElement>(null)
@@ -645,7 +656,7 @@ export const LatestNewsSection = (): JSX.Element => {
             images={selectedPhoto.images}
             initialIndex={selectedPhoto.initialIndex}
             title={selectedPhoto.title}
-            onClose={() => setSelectedPhoto(null)}
+            onClose={handleClosePhotoHistory}
           />
         )}
       </AnimatePresence>

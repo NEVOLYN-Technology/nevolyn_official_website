@@ -111,16 +111,28 @@ function parseContactBlock(text: string) {
  * Supports multi-image swipe/scroll and switching between main show and detail views.
  */
 export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.Element {
-  // Integrates browser history so phone back button / edge swipe closes the modal smoothly
-  // Remains active (isOpen: true) during exit animation so background scroll unlock doesn't stutter
-  const { handleClose } = useModalHistory({
-    isOpen: true,
-    onClose,
-    modalId: 'news-detail',
-  })
-
   // State for opening full uncropped photo in Lightbox
   const [isPhotoOpen, setIsPhotoOpen] = useState(false)
+
+  // Handler for closing the modal or nested photo view smoothly on mobile back gesture
+  const handleModalClose = useCallback(() => {
+    if (isPhotoOpen) {
+      setIsPhotoOpen(false)
+      try {
+        const currentState = window.history.state || {}
+        window.history.pushState({ ...currentState, 'news-detail': true }, '')
+      } catch {}
+      return
+    }
+    onClose()
+  }, [isPhotoOpen, onClose])
+
+  // Integrates browser history so phone back button / edge swipe closes the modal smoothly
+  const { handleClose } = useModalHistory({
+    isOpen: true,
+    onClose: handleModalClose,
+    modalId: 'news-detail',
+  })
 
   // Multi-image collection: preserves primary first, then secondary, then others
   const modalImages: string[] = useMemo(() => {
@@ -188,10 +200,10 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        initial={{ opacity: 0, scale: 0.96, y: 15 }}
+        initial={{ opacity: 0, scale: 0.98, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 15 }}
-        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+        exit={{ opacity: 0, scale: 0.98, y: 12 }}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
         className="fixed inset-0 lg:inset-auto lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 z-50
                    w-full h-[100dvh] lg:h-auto lg:w-[94%] lg:max-w-2xl lg:max-h-[92vh] flex flex-col
                    rounded-none lg:rounded-3xl bg-white shadow-2xl border-0 lg:border border-slate-200/90

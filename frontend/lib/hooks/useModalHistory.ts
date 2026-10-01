@@ -11,11 +11,6 @@ interface UseModalHistoryOptions {
 /**
  * useModalHistory - Manages browser history integration for popup modals.
  *
- * Solves the critical mobile UX issue where tapping the phone's physical Back button,
- * swipe-back gesture, or browser back button navigates away from the website instead
- * of closing the modal.
- *
- * When the modal opens:
  * 1. Pushes a dummy state into history so the modal becomes the latest history entry.
  * 2. If the user presses the phone's back button / edge swipe, `popstate` fires and
  *    smoothly closes the modal without leaving the website.
@@ -26,36 +21,29 @@ interface UseModalHistoryOptions {
 export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModalHistoryOptions) {
   const hasPushedStateRef = useRef(false)
   const isClosingRef = useRef(false)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
   // Unified close handler for on-screen buttons and backdrop clicks
   const handleClose = useCallback(() => {
     if (isClosingRef.current) return
     isClosingRef.current = true
 
-    // Instantly unlock body scroll so page scrolling works immediately
-    document.body.style.overflow = ''
-    document.body.style.touchAction = ''
-    document.body.style.paddingRight = ''
-
-    // 1. Instantly trigger UI close in React state (0ms latency, no async lag on web)
-    onClose()
-
-    // 2. Safely pop history state in the background
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
       if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
         window.history.back()
+        return
       }
     }
-  }, [onClose, modalId])
+
+    onCloseRef.current()
+  }, [modalId])
 
   useEffect(() => {
     if (!isOpen) {
       isClosingRef.current = false
       hasPushedStateRef.current = false
-      document.body.style.overflow = ''
-      document.body.style.touchAction = ''
-      document.body.style.paddingRight = ''
       return
     }
 
@@ -67,24 +55,12 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       window.history.pushState({ ...currentState, [modalId]: true }, '')
       hasPushedStateRef.current = true
     } catch {
-      // Fallback if pushState is restricted
       hasPushedStateRef.current = false
     }
 
     const handlePopState = () => {
-      // Instantly restore page scroll
-      document.body.style.overflow = ''
-      document.body.style.touchAction = ''
-      document.body.style.paddingRight = ''
-
-      // If handleClose() already triggered UI close, ignore the subsequent popstate event
-      if (isClosingRef.current) {
-        hasPushedStateRef.current = false
-        return
-      }
-      isClosingRef.current = true
       hasPushedStateRef.current = false
-      onClose()
+      onCloseRef.current()
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -96,23 +72,18 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     window.addEventListener('popstate', handlePopState)
     window.addEventListener('keydown', handleKeyDown)
 
-    // Lock background scroll while modal is active, compensating scrollbar width to prevent Windows layout shift
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-
+    // Lock background scroll while modal is active
+    const originalOverflow = document.body.style.overflow
+    const originalTouchAction = document.body.style.touchAction
     document.body.style.overflow = 'hidden'
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`
-    }
 
     return () => {
       window.removeEventListener('popstate', handlePopState)
       window.removeEventListener('keydown', handleKeyDown)
-      // Directly restore body scroll styles without RAF race conditions
-      document.body.style.overflow = ''
-      document.body.style.touchAction = ''
-      document.body.style.paddingRight = ''
+      document.body.style.overflow = originalOverflow
+      document.body.style.touchAction = originalTouchAction
     }
-  }, [isOpen, modalId, onClose, handleClose])
+  }, [isOpen, modalId, handleClose])
 
   return { handleClose }
 }

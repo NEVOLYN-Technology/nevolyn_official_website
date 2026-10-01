@@ -1,25 +1,26 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { motion } from 'framer-motion'
+import type { JSX } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 
-interface ImageLightboxModalProps {
-  image: string
+export interface ImageLightboxModalProps {
+  isOpen?: boolean
+  onClose: () => void
+  title?: string
+  image?: string
   images?: string[]
   initialIndex?: number
-  title?: string
   alt?: string
-  onClose: () => void
-  onIndexChange?: (index: number) => void
+  onIndexChange?: (newIndex: number) => void
 }
 
 /**
  * ImageLightboxModal — High-performance full-screen uncropped photo viewer.
  *
  * Designed for 0ms latency and 60fps on mobile.
- * Completely avoids window.history manipulation which causes Next.js App Router
- * to trigger route revalidation / white screen flashes.
+ * Decouples router state from lightbox: secondary photo viewing remains pure React state.
  *
  * UX Requirements:
  * 1. Anywhere outside the photo click dismisses the lightbox.
@@ -28,81 +29,43 @@ interface ImageLightboxModalProps {
  * 4. Responsive breakpoints: iPad vertical (<1024px) matches mobile UX; iPad horizontal & desktop (>=1024px) matches desktop web.
  */
 export function ImageLightboxModal({
+  isOpen = true,
+  onClose,
+  title,
   image,
   images,
   initialIndex = 0,
-  title,
   alt = 'Full view image',
-  onClose,
   onIndexChange,
-}: ImageLightboxModalProps) {
-  const photoList = images && images.length > 0 ? images : [image]
-  const [currentIndex, setCurrentIndex] = useState(
-    initialIndex >= 0 && initialIndex < photoList.length ? initialIndex : 0
-  )
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-
-  // Drag & pointer tracking to disambiguate swiping/scrolling from true outside-clicks
-  const pointerStartRef = useRef<{ x: number; y: number } | null>(null)
+}: ImageLightboxModalProps): JSX.Element | null {
+  const validImages: string[] =
+    images && images.length > 0 ? images : image ? [image] : []
+  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const isDraggingRef = useRef(false)
+  const pointerStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
-  // Notify parent component of index changes
+  // Sync currentIndex when initialIndex changes or modal opens
   useEffect(() => {
-    onIndexChange?.(currentIndex)
-  }, [currentIndex, onIndexChange])
-
-  // Scroll to initial index on mount
-  useEffect(() => {
-    const el = scrollContainerRef.current
-    if (el && initialIndex > 0) {
-      const width = el.clientWidth
-      el.scrollTo({ left: initialIndex * width, behavior: 'auto' })
+    if (isOpen) {
+      const targetIndex = Math.max(0, Math.min(initialIndex, validImages.length - 1))
+      setCurrentIndex(targetIndex)
+      requestAnimationFrame(() => {
+        const el = scrollRef.current
+        if (el) {
+          el.scrollLeft = targetIndex * el.clientWidth
+        }
+      })
     }
-  }, [initialIndex])
+  }, [isOpen, initialIndex, validImages.length])
 
-  // Smooth scroll container to a specific index
-  const scrollToPhoto = useCallback((index: number) => {
-    const el = scrollContainerRef.current
-    if (!el) {
-      setCurrentIndex(index)
-      return
-    }
-    const width = el.clientWidth
-    el.scrollTo({ left: index * width, behavior: 'smooth' })
-    setCurrentIndex(index)
-  }, [])
-
-  const handlePrev = useCallback(() => {
-    const target = currentIndex > 0 ? currentIndex - 1 : photoList.length - 1
-    scrollToPhoto(target)
-  }, [currentIndex, photoList.length, scrollToPhoto])
-
-  const handleNext = useCallback(() => {
-    const target = currentIndex < photoList.length - 1 ? currentIndex + 1 : 0
-    scrollToPhoto(target)
-  }, [currentIndex, photoList.length, scrollToPhoto])
-
-  // Track horizontal scroll position and update currentIndex
-  const handleScroll = useCallback(() => {
-    const el = scrollContainerRef.current
-    if (!el) return
-    const width = el.clientWidth
-    if (width > 0) {
-      const newIndex = Math.round(el.scrollLeft / width)
-      if (newIndex >= 0 && newIndex < photoList.length && newIndex !== currentIndex) {
-        setCurrentIndex(newIndex)
-      }
-    }
-  }, [currentIndex, photoList.length])
-
-  // Pointer event handlers for swipe detection
+  // Track pointer gestures to prevent closing when dragging/swiping
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerStartRef.current = { x: e.clientX, y: e.clientY }
     isDraggingRef.current = false
   }
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) return
     const dx = Math.abs(e.clientX - pointerStartRef.current.x)
     const dy = Math.abs(e.clientY - pointerStartRef.current.y)
     if (dx > 10 || dy > 10) {
@@ -110,7 +73,7 @@ export function ImageLightboxModal({
     }
   }
 
-  // Dismiss only if user truly tapped/clicked outside without dragging/swiping
+  // Dismiss modal on backdrop / outside clicks unless user was swiping
   const handleBackdropClick = () => {
     if (isDraggingRef.current) {
       isDraggingRef.current = false
@@ -119,135 +82,178 @@ export function ImageLightboxModal({
     onClose()
   }
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      } else if (e.key === 'ArrowLeft' && photoList.length > 1) {
-        handlePrev()
-      } else if (e.key === 'ArrowRight' && photoList.length > 1) {
-        handleNext()
+  // Real-time horizontal scroll tracking
+  const handleScroll = useCallback(() => {
+    isDraggingRef.current = true
+    const el = scrollRef.current
+    if (!el) return
+    const width = el.clientWidth
+    if (width > 0) {
+      const newIndex = Math.round(el.scrollLeft / width)
+      if (newIndex >= 0 && newIndex < validImages.length && newIndex !== currentIndex) {
+        setCurrentIndex(newIndex)
+        onIndexChange?.(newIndex)
       }
     }
+  }, [validImages.length, currentIndex, onIndexChange])
+
+  // Scroll to a specific photo index
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      const el = scrollRef.current
+      if (!el) return
+      const targetLeft = index * el.clientWidth
+      el.scrollTo({ left: targetLeft, behavior: 'smooth' })
+      setCurrentIndex(index)
+      onIndexChange?.(index)
+    },
+    [onIndexChange]
+  )
+
+  // Keyboard navigation (ArrowLeft, ArrowRight, Escape)
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        onClose()
+      } else if (e.key === 'ArrowLeft') {
+        e.stopPropagation()
+        if (currentIndex > 0) scrollToIndex(currentIndex - 1)
+      } else if (e.key === 'ArrowRight') {
+        e.stopPropagation()
+        if (currentIndex < validImages.length - 1) scrollToIndex(currentIndex + 1)
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose, photoList.length, handlePrev, handleNext])
+  }, [isOpen, currentIndex, validImages.length, onClose, scrollToIndex])
+
+  if (!isOpen || validImages.length === 0) return null
+
+  const isMultiple = validImages.length > 1
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.12, ease: 'easeOut' }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onClick={handleBackdropClick}
-      className="fixed inset-0 z-[60] flex items-center justify-center overflow-hidden touch-none overscroll-none cursor-zoom-out select-none"
-    >
-      {/* Dark backdrop: solid dark overlay for 0ms lag */}
-      <div
-        className="fixed inset-0 bg-black/92 pointer-events-none"
-        aria-hidden="true"
-      />
-
-      {/* Top action bar: Close button */}
-      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[75] flex items-center gap-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onClose()
-          }}
-          type="button"
-          aria-label="Close full photo view"
-          className="p-2 sm:p-2.5 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 text-white border border-white/25 shadow-lg transition-all duration-150 cursor-pointer"
-        >
-          <X className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
-        </button>
-      </div>
-
-      {/* Prev / Next navigation buttons for multiple images */}
-      {photoList.length > 1 && (
-        <>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              handlePrev()
-            }}
-            type="button"
-            aria-label="Previous image"
-            className="absolute left-2 sm:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-[70] p-2.5 sm:p-3 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 text-white border border-white/25 shadow-xl transition-all duration-150 cursor-pointer active:scale-95"
-          >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              handleNext()
-            }}
-            type="button"
-            aria-label="Next image"
-            className="absolute right-2 sm:right-4 lg:right-6 top-1/2 -translate-y-1/2 z-[70] p-2.5 sm:p-3 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 text-white border border-white/25 shadow-xl transition-all duration-150 cursor-pointer active:scale-95"
-          >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
-          </button>
-        </>
-      )}
-
-      {/* Main photo container */}
+    <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.97 }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title || alt || 'Photo Lightbox'}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         transition={{ duration: 0.12, ease: 'easeOut' }}
-        className="relative z-[65] w-full h-full flex items-center justify-center p-2 sm:p-4 pointer-events-none"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onClick={handleBackdropClick}
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 text-white select-none overscroll-contain cursor-pointer"
       >
-        {/* Horizontal Swipe/Scroll Track for multiple photos with snap */}
+        {/* Floating Top-Right Close Button */}
+        <div className="absolute top-0 right-0 p-3 sm:p-5 z-40">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose()
+            }}
+            aria-label="Close photo lightbox"
+            className="p-2 sm:p-2.5 rounded-full text-slate-300 hover:text-white bg-black/60 hover:bg-black/90 border border-white/20 transition-all active:scale-95 cursor-pointer shadow-lg"
+          >
+            <X className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.2} />
+          </button>
+        </div>
+
+        {/* Scrollable Photos Carousel with CSS Scroll Snapping */}
         <div
-          ref={scrollContainerRef}
+          ref={scrollRef}
           onScroll={handleScroll}
-          className="relative w-full h-full flex items-center overflow-x-auto overflow-y-hidden snap-x snap-mandatory no-scrollbar touch-pan-x overscroll-x-contain scroll-smooth pointer-events-auto"
+          className="relative w-full h-full flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory no-scrollbar touch-pan-x overscroll-x-contain scroll-smooth cursor-pointer"
         >
-          {photoList.map((photoSrc, idx) => (
+          {validImages.map((src, idx) => (
             <div
               key={idx}
-              onClick={handleBackdropClick}
-              className="w-full h-full shrink-0 snap-center snap-always flex flex-col items-center justify-center p-2 sm:p-3 lg:p-4 cursor-zoom-out"
+              className="w-full h-full shrink-0 snap-center snap-always flex flex-col items-center justify-center p-3 sm:p-6 cursor-pointer"
             >
-              {/* Photo Card: Clicking on the image stops dismissal */}
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="relative max-w-full flex flex-col items-center justify-center cursor-default"
-              >
+              {/* Photo & Caption Group: Centers photo and places caption just below it */}
+              <div className="flex flex-col items-center max-w-full">
+                {/* Photo Image — Clicking the photo itself does NOT close */}
                 <img
-                  src={photoSrc}
-                  alt={`${alt || title || 'Full photo'} ${idx + 1}`}
-                  className="max-w-[94vw] max-h-[72vh] sm:max-h-[76vh] lg:max-h-[82vh] w-auto h-auto object-contain rounded-xl sm:rounded-2xl shadow-2xl border border-white/10 select-none pointer-events-auto"
+                  src={src}
+                  alt={title ? `${title} — Photo ${idx + 1}` : `${alt} ${idx + 1}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="max-w-[96vw] lg:max-w-[92vw] max-h-[66vh] lg:max-h-[74vh] object-contain rounded-lg shadow-2xl pointer-events-auto cursor-default select-none"
                 />
 
-                {/* Photo Name & Counter: Positioned directly below the image */}
-                {(title || photoList.length > 1) && (
-                  <div className="mt-2 sm:mt-2.5 flex items-center justify-center gap-1.5 sm:gap-2 max-w-[92vw] sm:max-w-lg lg:max-w-xl mx-auto pointer-events-auto">
-                    {photoList.length > 1 && (
-                      <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-slate-900/90 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-xs font-bold shrink-0 shadow-md">
-                        {idx + 1} / {photoList.length}
-                      </span>
-                    )}
+                {/* Photo Caption & Counter: Positioned directly below photo */}
+                <div className="mt-2.5 flex flex-col items-center justify-center gap-1.5 text-center max-w-2xl px-2">
+                  <div className="flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-2.5">
                     {title && (
-                      <div
-                        title={title}
-                        className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-slate-900/90 backdrop-blur-md border border-white/15 text-white font-medium shadow-md truncate text-[11px] sm:text-xs lg:text-sm max-w-[70vw] sm:max-w-sm lg:max-w-md text-center"
-                      >
+                      <h4 className="text-xs sm:text-sm lg:text-base font-medium text-slate-200 line-clamp-1 max-w-[90vw] lg:max-w-xl text-center">
                         {title}
-                      </div>
+                      </h4>
                     )}
+                    <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-white/20 text-slate-200 border border-white/10 tracking-wide">
+                      Photo {idx + 1} of {validImages.length}
+                    </span>
                   </div>
-                )}
+
+                  {/* Interactive Indicator Dots */}
+                  {isMultiple && (
+                    <div className="flex items-center justify-center gap-1.5 pt-0.5">
+                      {validImages.map((_, dotIdx) => (
+                        <button
+                          key={dotIdx}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            scrollToIndex(dotIdx)
+                          }}
+                          aria-label={`Jump to photo ${dotIdx + 1}`}
+                          className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                            dotIdx === currentIndex
+                              ? 'w-4 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]'
+                              : 'w-1.5 bg-white/40 hover:bg-white/70'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Desktop / iPad Navigation Arrows */}
+        {isMultiple && currentIndex > 0 && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              scrollToIndex(currentIndex - 1)
+            }}
+            aria-label="Previous photo"
+            className="hidden sm:flex absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 shadow-lg transition-all active:scale-90 cursor-pointer"
+          >
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        )}
+        {isMultiple && currentIndex < validImages.length - 1 && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              scrollToIndex(currentIndex + 1)
+            }}
+            aria-label="Next photo"
+            className="hidden sm:flex absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 shadow-lg transition-all active:scale-90 cursor-pointer"
+          >
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        )}
       </motion.div>
-    </motion.div>
+    </AnimatePresence>
   )
 }
