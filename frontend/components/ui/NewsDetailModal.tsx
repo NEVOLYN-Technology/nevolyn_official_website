@@ -1,10 +1,11 @@
 'use client'
 
-import { useMemo, type JSX } from 'react'
-import { motion } from 'framer-motion'
-import { X, Calendar, ExternalLink, Globe, Mail, ArrowLeft } from 'lucide-react'
+import { useMemo, useState, type JSX } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, Calendar, ExternalLink, Globe, Mail, ArrowLeft, Maximize2 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { useModalHistory } from '@/lib/hooks/useModalHistory'
+import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
 
 export interface NewsModalItem {
   id: string
@@ -108,6 +109,9 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
   // Check if image is a portrait photo to style container appropriately
   const isPortrait = item.image?.includes('photo')
 
+  // State for opening full uncropped photo in Lightbox
+  const [isPhotoOpen, setIsPhotoOpen] = useState(false)
+
   // Memoize paragraph splitting and contact parsing so exit animation runs at 60fps without CPU spikes
   const parsedParagraphs = useMemo(() => {
     return item.content.split('\n\n').map((paragraph) => ({
@@ -164,18 +168,27 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
 
         {/* Scrollable Content Container */}
         <div className="overflow-y-auto no-scrollbar flex-1 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-          {/* Hero Banner Header */}
+          {/* Hero Banner Header: Shows full uncropped photo, click to enlarge in full-screen Lightbox */}
           {item.image && (
-            <div className={`relative w-full overflow-hidden ${isPortrait ? 'h-60 sm:h-72 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950' : 'h-52 sm:h-72 bg-slate-900'}`}>
+            <div
+              onClick={() => setIsPhotoOpen(true)}
+              title="Click to view full uncropped photo"
+              className="relative w-full h-56 sm:h-72 overflow-hidden bg-slate-950 flex items-center justify-center cursor-zoom-in group"
+            >
               <img
                 src={item.image}
                 alt={item.title}
-                className={`relative z-10 w-full h-full ${isPortrait ? 'object-contain py-3' : 'object-cover object-center'
-                  }`}
+                className="w-full h-full object-contain p-2 sm:p-3 group-hover:scale-[1.02] transition-transform duration-300"
               />
 
               {/* Gradient shadow for contrast */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/20 pointer-events-none z-10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none z-10" />
+
+              {/* Full photo view badge */}
+              <div className="absolute bottom-3 right-3 z-20 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow-md group-hover:bg-sky-600 transition-colors">
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>Full Photo</span>
+              </div>
             </div>
           )}
 
@@ -220,26 +233,26 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
                         </h4>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2.5">
+                      <div className={`grid gap-1.5 sm:gap-2.5 w-full ${contact.website && contact.email ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                        {contact.email && (
+                          <a
+                            href={`mailto:${contact.email}`}
+                            className="min-w-0 w-full flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-2 rounded-xl bg-white border border-emerald-200/90 text-emerald-700 hover:text-white hover:bg-emerald-600 hover:border-transparent font-bold text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm shadow-xs transition-all duration-200 active:scale-95 group overflow-hidden"
+                          >
+                            <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-emerald-500 group-hover:text-white transition-colors" />
+                            <span className="truncate">{contact.email}</span>
+                          </a>
+                        )}
                         {contact.website && (
                           <a
                             href={contact.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-sky-200/90 text-sky-700 hover:text-white hover:bg-sky-600 hover:border-transparent font-bold text-xs sm:text-sm shadow-xs transition-all duration-200 active:scale-95 group"
+                            className="min-w-0 w-full flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-2 rounded-xl bg-white border border-sky-200/90 text-sky-700 hover:text-white hover:bg-sky-600 hover:border-transparent font-bold text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm shadow-xs transition-all duration-200 active:scale-95 group overflow-hidden"
                           >
-                            <Globe size={15} className="text-sky-500 group-hover:text-white transition-colors" />
-                            <span>{contact.website.replace(/^https?:\/\//, '')}</span>
-                            <ExternalLink size={13} className="opacity-70 group-hover:text-white" />
-                          </a>
-                        )}
-                        {contact.email && (
-                          <a
-                            href={`mailto:${contact.email}`}
-                            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-emerald-200/90 text-emerald-700 hover:text-white hover:bg-emerald-600 hover:border-transparent font-bold text-xs sm:text-sm shadow-xs transition-all duration-200 active:scale-95 group"
-                          >
-                            <Mail size={15} className="text-emerald-500 group-hover:text-white transition-colors" />
-                            <span>{contact.email}</span>
+                            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-sky-500 group-hover:text-white transition-colors" />
+                            <span className="truncate">{contact.website.replace(/^https?:\/\//, '')}</span>
+                            <ExternalLink className="w-3 h-3 shrink-0 opacity-70 group-hover:text-white hidden min-[440px]:inline-block sm:inline-block" />
                           </a>
                         )}
                       </div>
@@ -255,21 +268,23 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
               })}
             </div>
 
-            {/* Bottom Action Toolbar: Back Button & Social Links */}
-            <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-2.5">
+            {/* Bottom Action Toolbar: Back Button & Social Links in one single row on mobile and desktop */}
+            <div className="pt-4 sm:pt-6 border-t border-slate-100 flex items-center justify-between gap-2 sm:gap-3">
+              <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                 {item.linkedinUrl && (
                   <a
                     href={item.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0a66c2]/10 text-[#0a66c2] border border-[#0a66c2]/25 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] active:bg-[#0a66c2] active:text-white transition-all duration-200 active:scale-95"
+                    className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-[#0a66c2] border border-[#0a66c2]/30 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] active:bg-[#084e96] active:text-white transition-all duration-200 active:scale-95 shadow-xs shrink-0"
                   >
-                    <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current shrink-0" viewBox="0 0 24 24">
                       <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                     </svg>
-                    <span>View on LinkedIn</span>
-                    <ExternalLink size={13} className="opacity-80" />
+                    <span>
+                      <span className="hidden sm:inline">View on </span>LinkedIn
+                    </span>
+                    <ExternalLink size={12} className="opacity-80 shrink-0 hidden sm:inline" />
                   </a>
                 )}
 
@@ -278,30 +293,44 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
                     href={item.facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#1877f2]/10 text-[#1877f2] border border-[#1877f2]/25 hover:bg-[#1877f2] hover:text-white hover:border-[#1877f2] active:bg-[#1877f2] active:text-white transition-all duration-200 active:scale-95"
+                    className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-[#1877f2] border border-[#1877f2]/30 hover:bg-[#1877f2] hover:text-white hover:border-[#1877f2] active:bg-[#145dbf] active:text-white transition-all duration-200 active:scale-95 shadow-xs shrink-0"
                   >
-                    <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current shrink-0" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
-                    <span>View on Facebook</span>
-                    <ExternalLink size={13} className="opacity-80" />
+                    <span>
+                      <span className="hidden sm:inline">View on </span>Facebook
+                    </span>
+                    <ExternalLink size={12} className="opacity-80 shrink-0 hidden sm:inline" />
                   </a>
                 )}
               </div>
 
-              {/* Prominent Back Button at bottom with instant touch-manipulation */}
+              {/* Prominent Back Button */}
               <button
                 onClick={handleClose}
                 type="button"
-                className="group inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-200 text-slate-700 border border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 active:bg-black active:scale-95 transition-all duration-200 cursor-pointer shadow-xs touch-manipulation"
+                className="group inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-200 text-slate-700 border border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 hover:shadow-md hover:shadow-slate-900/20 active:bg-black active:text-white transition-all duration-200 active:scale-95 shadow-xs cursor-pointer shrink-0"
               >
-                <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
-                <span>Back to Updates</span>
+                <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-1 shrink-0" />
+                <span className="hidden sm:inline">Back to Updates</span>
+                <span className="sm:hidden">Back</span>
               </button>
             </div>
           </div>
         </div>
       </motion.div>
+
+      {/* Full-screen Photo Lightbox Modal */}
+      <AnimatePresence>
+        {isPhotoOpen && item.image && (
+          <ImageLightboxModal
+            image={item.image}
+            title={item.title}
+            onClose={() => setIsPhotoOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   )
 }

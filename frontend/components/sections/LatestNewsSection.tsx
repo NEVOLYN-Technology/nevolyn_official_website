@@ -14,7 +14,7 @@
 import type { JSX } from 'react'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Star, Eye, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, Star, Eye, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
 import { featuredMilestones } from '@/lib/data/featured-milestones'
 import { news, type NewsItem } from '@/lib/data/latest-news'
 import { fadeLeftProps, fadeUpProps } from '@/lib/animations'
@@ -22,6 +22,7 @@ import { formatDate, cn } from '@/lib/utils'
 import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 import { SECTION_BG } from '@/lib/constants/theme'
 import { NewsDetailModal, type NewsModalItem } from '@/components/ui/NewsDetailModal'
+import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
 
 /**
  * News timeline section rendering featured project announcements in a 3D carousel and
@@ -35,6 +36,9 @@ export const LatestNewsSection = (): JSX.Element => {
   const handleCloseNews = useCallback(() => {
     setSelectedNews(null)
   }, [])
+
+  // Active selected photo for the full-screen photo lightbox
+  const [selectedPhoto, setSelectedPhoto] = useState<{ image: string; title: string } | null>(null)
 
   // Ref for the vertical scroll feed
   const verticalScrollRef = useRef<HTMLDivElement>(null)
@@ -211,7 +215,7 @@ export const LatestNewsSection = (): JSX.Element => {
               <div
                 ref={scrollContainerRef}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-[calc(50%-150px)] py-6 sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
+                className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-[calc(50%-155px)] py-6 sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
               >
                 {sortedFeatured.map((item, index) => {
                   const isCentered = index === activeIndex
@@ -220,16 +224,16 @@ export const LatestNewsSection = (): JSX.Element => {
                     <div
                       key={item.id}
                       data-milestone-index={index}
-                      onClick={() => scrollToCard(index)}
+                      onClick={isCentered ? undefined : () => scrollToCard(index)}
                       className={cn(
-                        'w-[300px] shrink-0 snap-center sm:w-[420px] lg:w-[460px]',
-                        'group transform-gpu cursor-pointer rounded-[26px] sm:rounded-[28px] p-[1.5px] transition-all duration-400 ease-out will-change-transform',
+                        'w-[310px] shrink-0 snap-center sm:w-[420px] lg:w-[460px]',
+                        'group transform-gpu rounded-[26px] sm:rounded-[28px] p-[1.5px] transition-all duration-400 ease-out will-change-transform',
                         isCentered
-                          ? 'z-20 -translate-y-2 sm:-translate-y-3 scale-[1.02] sm:scale-105 bg-gradient-to-b from-sky-400/80 via-sky-500/50 to-blue-600/30 opacity-100 shadow-[0_12px_30px_rgba(14,165,233,0.25)] sm:shadow-[0_20px_50px_rgba(14,165,233,0.35),0_0_25px_rgba(14,165,233,0.2)]'
-                          : 'z-10 translate-y-1 sm:translate-y-2 scale-95 bg-slate-200/50 opacity-60 shadow-md sm:shadow-lg sm:filter sm:blur-[1.5px] blur-none hover:opacity-90 hover:blur-0'
+                          ? 'cursor-default z-20 -translate-y-2 sm:-translate-y-3 scale-[1.02] sm:scale-105 bg-gradient-to-b from-sky-400/80 via-sky-500/50 to-blue-600/30 opacity-100 shadow-[0_12px_30px_rgba(14,165,233,0.25)] sm:shadow-[0_20px_50px_rgba(14,165,233,0.35),0_0_25px_rgba(14,165,233,0.2)]'
+                          : 'cursor-pointer z-10 translate-y-1 sm:translate-y-2 scale-95 bg-slate-200/50 opacity-60 shadow-md sm:shadow-lg sm:filter sm:blur-[1.5px] blur-none hover:opacity-90 hover:blur-0'
                       )}
                     >
-                      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[24px] sm:rounded-[26px] bg-white">
+                      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[24px] sm:rounded-[26px] bg-white cursor-default">
                         {/* Accent beam across top edge */}
                         <div
                           className={cn(
@@ -240,14 +244,29 @@ export const LatestNewsSection = (): JSX.Element => {
                           )}
                         />
 
-                        {/* Card Image Header */}
-                        <div className="relative w-full h-44 sm:h-52 overflow-hidden bg-slate-900 shrink-0">
+                        {/* Card Image Header: Clickable to View Full Uncropped Photo */}
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (item.image) {
+                              setSelectedPhoto({ image: item.image, title: item.title })
+                            }
+                          }}
+                          title="Click to view full uncropped photo"
+                          className="relative w-full h-44 sm:h-52 overflow-hidden bg-slate-900 shrink-0 cursor-zoom-in group/photo"
+                        >
                           <img
                             src={item.image}
                             alt={item.title}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                            className="w-full h-full object-cover object-center group-hover/photo:scale-105 transition-transform duration-700 ease-out"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+
+                          {/* Full photo view badge on hover */}
+                          <div className="absolute bottom-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full bg-slate-900/75 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold flex items-center gap-1 opacity-0 group-hover/photo:opacity-100 transition-opacity duration-200 shadow-md">
+                            <Maximize2 size={11} />
+                            <span>Full Photo</span>
+                          </div>
                         </div>
 
                         {/* Card Content Body */}
@@ -282,21 +301,39 @@ export const LatestNewsSection = (): JSX.Element => {
                               </div>
                             </div>
 
-                            {/* Milestone Title */}
-                            <h4 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-sky-600 transition-all duration-300 tracking-tight leading-snug mb-2">
-                              {item.title}
-                            </h4>
+                            {/* Milestone Title: ONLY this bolded heading part routes to View Details */}
+                            <div className="mb-2">
+                              <h4
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setSelectedNews({
+                                    id: item.id,
+                                    title: item.title,
+                                    description: item.description,
+                                    content: item.content,
+                                    category: item.category,
+                                    date: item.date,
+                                    image: item.image,
+                                    linkedinUrl: item.linkedinUrl,
+                                    facebookUrl: item.facebookUrl,
+                                  })
+                                }}
+                                className="inline text-lg sm:text-xl font-black text-slate-900 hover:text-sky-600 transition-colors duration-200 tracking-tight leading-snug cursor-pointer"
+                              >
+                                {item.title}
+                              </h4>
+                            </div>
 
-                            {/* Clean short description summary */}
-                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4 font-normal line-clamp-3 text-justify">
+                            {/* Tagline / Short description: Non-clickable standard text */}
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4 font-normal line-clamp-3 text-justify cursor-default">
                               {item.description}
                             </p>
                           </div>
 
-                          {/* Actions and Social Links Row */}
-                          <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                          {/* Actions and Social Links Row: Guaranteed single line on mobile and desktop */}
+                          <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2 w-full">
                             {/* Social links */}
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                               {item.linkedinUrl && (
                                 <a
                                   href={item.linkedinUrl}
@@ -304,12 +341,12 @@ export const LatestNewsSection = (): JSX.Element => {
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
                                   aria-label="View on LinkedIn"
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#0a66c2]/10 text-[#0a66c2] border border-[#0a66c2]/25 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] active:bg-[#0a66c2] active:text-white transition-all duration-200 active:scale-95 shadow-xs"
+                                  className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold text-[#0a66c2] bg-white border border-[#0a66c2]/30 shadow-xs hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] active:bg-[#084e96] active:text-white transition-all duration-200 active:scale-95 shrink-0"
                                 >
-                                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                  <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                                   </svg>
-                                  <span>LinkedIn</span>
+                                  <span className="hidden sm:inline">LinkedIn</span>
                                 </a>
                               )}
                               {item.facebookUrl && (
@@ -319,12 +356,12 @@ export const LatestNewsSection = (): JSX.Element => {
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
                                   aria-label="View on Facebook"
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1877f2]/10 text-[#1877f2] border border-[#1877f2]/25 hover:bg-[#1877f2] hover:text-white hover:border-[#1877f2] active:bg-[#1877f2] active:text-white transition-all duration-200 active:scale-95 shadow-xs"
+                                  className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold text-[#1877f2] bg-white border border-[#1877f2]/30 shadow-xs hover:bg-[#1877f2] hover:text-white hover:border-[#1877f2] active:bg-[#145dbf] active:text-white transition-all duration-200 active:scale-95 shrink-0"
                                 >
-                                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                  <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                                   </svg>
-                                  <span>Facebook</span>
+                                  <span className="hidden sm:inline">Facebook</span>
                                 </a>
                               )}
                             </div>
@@ -346,9 +383,9 @@ export const LatestNewsSection = (): JSX.Element => {
                                   facebookUrl: item.facebookUrl,
                                 })
                               }}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white transition-all duration-200 active:scale-95 shadow-xs border border-sky-200/80 cursor-pointer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-sky-700 bg-white hover:bg-sky-600 hover:text-white border border-sky-600/30 transition-all duration-200 active:scale-95 shadow-xs cursor-pointer shrink-0"
                             >
-                              <Eye size={14} className="w-3.5 h-3.5" />
+                              <Eye size={13} className="shrink-0" />
                               <span>View Details</span>
                             </button>
                           </div>
@@ -433,7 +470,7 @@ export const LatestNewsSection = (): JSX.Element => {
                       {...fadeLeftProps(idx * 0.02)}
                       whileHover={{ y: -3 }}
                       transition={{ duration: 0.2 }}
-                      className="snap-start rounded-2xl border border-slate-200/90 bg-white shadow-xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between overflow-hidden relative min-h-[200px]"
+                      className="snap-start rounded-2xl border border-slate-200/90 bg-white shadow-xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between overflow-hidden relative min-h-[200px] cursor-default"
                     >
                       {/* Left Colored Accent Bar */}
                       <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${barColor} transition-all duration-300`} />
@@ -454,19 +491,34 @@ export const LatestNewsSection = (): JSX.Element => {
                           {/* Main News Title & Short Description with image thumbnail */}
                           <div className="flex gap-3.5 items-start mb-3">
                             {item.image && (
-                              <div className="w-16 h-16 sm:w-18 sm:h-18 shrink-0 rounded-xl overflow-hidden border border-slate-100 bg-slate-100 shadow-inner">
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setSelectedPhoto({ image: item.image, title: item.title })
+                                }}
+                                title="Click to view full photo"
+                                className="w-16 h-16 sm:w-18 sm:h-18 shrink-0 rounded-xl overflow-hidden border border-slate-100 bg-slate-100 shadow-inner cursor-zoom-in group/thumb"
+                              >
                                 <img
                                   src={item.image}
                                   alt={item.title}
-                                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-300"
+                                  className="w-full h-full object-cover object-center group-hover/thumb:scale-110 transition-transform duration-300"
                                 />
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-sky-600 transition-colors leading-snug line-clamp-2 mb-1">
-                                {item.title}
-                              </h4>
-                              <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed font-normal text-justify">
+                              <div className="mb-1">
+                                <h4
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    setSelectedNews(item)
+                                  }}
+                                  className="inline text-sm sm:text-base font-bold text-slate-900 hover:text-sky-600 cursor-pointer transition-colors duration-200 leading-snug"
+                                >
+                                  {item.title}
+                                </h4>
+                              </div>
+                              <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed font-normal text-justify cursor-default">
                                 {item.description}
                               </p>
                             </div>
@@ -481,10 +533,11 @@ export const LatestNewsSection = (): JSX.Element => {
                                 href={item.linkedinUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
                                 aria-label="View on LinkedIn"
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#0a66c2]/10 text-[#0a66c2] border border-[#0a66c2]/25 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] active:bg-[#0a66c2] active:text-white transition-all duration-200 active:scale-95"
+                                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold text-[#0a66c2] bg-white border border-[#0a66c2]/30 shadow-xs hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] active:bg-[#084e96] active:text-white transition-all duration-200 active:scale-95 shrink-0"
                               >
-                                <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                                <svg className="w-3 h-3 fill-current shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                                   <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                                 </svg>
                                 <span className="hidden sm:inline">LinkedIn</span>
@@ -496,10 +549,11 @@ export const LatestNewsSection = (): JSX.Element => {
                                 href={item.facebookUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
                                 aria-label="View on Facebook"
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#1877f2]/10 text-[#1877f2] border border-[#1877f2]/25 hover:bg-[#1877f2] hover:text-white hover:border-[#1877f2] active:bg-[#1877f2] active:text-white transition-all duration-200 active:scale-95"
+                                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold text-[#1877f2] bg-white border border-[#1877f2]/30 shadow-xs hover:bg-[#1877f2] hover:text-white hover:border-[#1877f2] active:bg-[#145dbf] active:text-white transition-all duration-200 active:scale-95 shrink-0"
                               >
-                                <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                                <svg className="w-3 h-3 fill-current shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                                 </svg>
                                 <span className="hidden sm:inline">Facebook</span>
@@ -510,10 +564,13 @@ export const LatestNewsSection = (): JSX.Element => {
                           {/* Prominent View Details Button */}
                           <button
                             type="button"
-                            onClick={() => setSelectedNews(item)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white border border-sky-200/80 transition-all duration-200 active:scale-95 shadow-xs cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedNews(item)
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-sky-700 bg-white hover:bg-sky-600 hover:text-white border border-sky-600/30 transition-all duration-200 active:scale-95 shadow-xs cursor-pointer shrink-0"
                           >
-                            <Eye size={12} className="w-3 h-3" />
+                            <Eye size={13} className="shrink-0" />
                             <span>View Details</span>
                           </button>
                         </div>
@@ -578,6 +635,18 @@ export const LatestNewsSection = (): JSX.Element => {
             key="news-detail-modal"
             item={selectedNews}
             onClose={handleCloseNews}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Full-screen Photo Lightbox Modal for clicking pictures */}
+      <AnimatePresence>
+        {selectedPhoto && (
+          <ImageLightboxModal
+            key="photo-lightbox-modal"
+            image={selectedPhoto.image}
+            title={selectedPhoto.title}
+            onClose={() => setSelectedPhoto(null)}
           />
         )}
       </AnimatePresence>

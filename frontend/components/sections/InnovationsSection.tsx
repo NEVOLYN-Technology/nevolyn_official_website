@@ -13,8 +13,8 @@
 
 import type { JSX } from 'react'
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Tag, Sparkles, ExternalLink, Globe, Mail } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Tag, Sparkles, Globe, Mail } from 'lucide-react'
 import { Badge, type BadgeTone } from '@/components/ui/badge'
 import { projects, type Project } from '@/lib/data/innovations'
 import { fadeUpProps } from '@/lib/animations'
@@ -24,6 +24,7 @@ import { CarouselCard } from '@/components/ui/CarouselCard'
 import { CarouselArrows, CarouselDots } from '@/components/ui/CarouselControls'
 import { useCarousel } from '@/lib/hooks/useCarousel'
 import { SECTION_BG } from '@/lib/constants/theme'
+import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
 
 /** Maps each project status to the appropriate Badge tone (color). */
 const STATUS_TONE: Record<Project['status'], BadgeTone> = {
@@ -43,6 +44,8 @@ type FilterLabel = typeof FILTERS[number]
  */
 export const InnovationsSection = (): JSX.Element => {
   const [activeFilter, setActiveFilter] = useState<FilterLabel>('All')
+  // Active photo for the full-screen photo lightbox
+  const [selectedPhoto, setSelectedPhoto] = useState<{ image: string; title: string } | null>(null)
 
   // ── Filtered project list ─────────────────────────────────────────────────
   const filteredProjects = projects.filter((project) => {
@@ -149,6 +152,7 @@ export const InnovationsSection = (): JSX.Element => {
                   image={project.image}
                   imageAlt={project.title}
                   onClick={() => scrollToCard(idx)}
+                  onImageClick={project.image ? () => setSelectedPhoto({ image: project.image!, title: project.title }) : undefined}
                   dataIndex={idx}
                   dataAttr="data-card-index"
                   className={cn(
@@ -158,7 +162,7 @@ export const InnovationsSection = (): JSX.Element => {
 
                     <div>
                       {/* Category & Status Header Row */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pt-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                         {/* Dynamic Colorful Category Chip */}
                         {(() => {
                           const cat = project.category.toLowerCase()
@@ -172,10 +176,18 @@ export const InnovationsSection = (): JSX.Element => {
 
                           return (
                             <div className={cn(
-                              "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider border shadow-sm",
+                              "inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider border shadow-2xs",
                               colorClasses
                             )}>
-                              <Tag className="w-3.5 h-3.5" />
+                              {project.websiteLogo || project.id === 'fabins' ? (
+                                <img
+                                  src={project.websiteLogo || '/fabins-logo.png'}
+                                  alt={`${project.title} Logo`}
+                                  className="w-4 h-4 object-contain shrink-0"
+                                />
+                              ) : (
+                                <Tag className="w-3.5 h-3.5 shrink-0" />
+                              )}
                               <span>{project.category}</span>
                             </div>
                           )
@@ -195,94 +207,115 @@ export const InnovationsSection = (): JSX.Element => {
                         </div>
                       </div>
 
-                      {/* Project Title */}
-                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-sky-600 transition-all duration-300 tracking-tight leading-snug mb-3">
-                        {project.title}
-                      </h3>
+                      {/* Project Title: Logo + FABINS on top line (clickable only), Subtitle on second line, no arrows */}
+                      {(() => {
+                        const parts = project.title.split(' - ')
+                        const brand = parts[0]
+                        const subtitle = parts.slice(1).join(' - ')
+
+                        if (subtitle && project.url) {
+                          return (
+                            <div className="mb-2 sm:mb-2.5">
+                              {/* Top line: FABINS Logo + FABINS (Only this is clickable) */}
+                              <div>
+                                <a
+                                  href={project.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="group/brand inline-flex items-center gap-2 hover:opacity-100 transition-all duration-300 ease-out cursor-pointer mb-1 transform-gpu hover:-translate-y-1 sm:hover:-translate-y-1.5 hover:drop-shadow-[0_8px_16px_rgba(10,130,157,0.25)]"
+                                  title={`Visit ${brand} (${project.url})`}
+                                >
+                                  <img
+                                    src={project.websiteLogo || '/fabins-logo.png'}
+                                    alt={`${brand} Logo`}
+                                    className="w-6 h-6 sm:w-7 sm:h-7 object-contain shrink-0 group-hover/brand:scale-110 group-hover/brand:-rotate-3 transition-transform duration-300 ease-out drop-shadow-xs"
+                                  />
+                                  <span className="text-xl sm:text-2xl font-black tracking-tight transition-transform duration-300 group-hover/brand:scale-[1.02]">
+                                    {brand === 'FABINS' ? (
+                                      <>
+                                        <span className="text-slate-900">FAB</span>
+                                        <span className="text-[#0a829d] group-hover/brand:text-[#07687d] transition-colors">INS</span>
+                                      </>
+                                    ) : (
+                                      <span className="text-slate-900 group-hover/brand:text-[#0a829d] transition-colors">{brand}</span>
+                                    )}
+                                  </span>
+                                </a>
+                              </div>
+
+                              {/* Second line: Subtitle (Non-clickable) */}
+                              <h3 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight leading-snug">
+                                {subtitle}
+                              </h3>
+                            </div>
+                          )
+                        }
+
+                        return (
+                          <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug mb-3">
+                            {project.title}
+                          </h3>
+                        )
+                      })()}
 
                       {/* Description */}
-                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal min-h-[44px] text-justify">
+                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4 font-normal text-justify">
                         {project.description}
                       </p>
                     </div>
 
                     <div>
                       {/* Technology Stack Badges */}
-                      <div className="mb-5">
-                        <div className="flex items-center gap-1.5 mb-2.5">
+                      <div className="mb-3.5 sm:mb-4">
+                        <div className="flex items-center gap-1.5 mb-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-sky-500" />
                           <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">Tech Stack & Frameworks</span>
                         </div>
-                        {project.technologies.length === 5 ? (
-                          <div className="flex flex-col gap-1.5 sm:gap-2">
-                            {/* Row 1: 2 items */}
-                            <div className="flex items-center gap-1.5 sm:gap-2">
-                              {project.technologies.slice(0, 2).map((tech) => (
-                                <span
-                                  key={tech}
-                                  className="px-2.5 min-[380px]:px-3 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-sm whitespace-nowrap"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
-                            </div>
-                            {/* Row 2: 3 items */}
-                            <div className="grid grid-cols-3 gap-1 min-[380px]:gap-1.5 sm:gap-2">
-                              {project.technologies.slice(2).map((tech) => (
-                                <span
-                                  key={tech}
-                                  className="px-1 min-[380px]:px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[10px] min-[360px]:text-[10.5px] min-[400px]:text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-sm text-center truncate"
-                                  title={tech}
-                                >
-                                  {tech}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                            {project.technologies.map((tech) => (
-                              <span
-                                key={tech}
-                                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-sm"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                          {project.technologies.map((tech) => (
+                            <span
+                              key={tech}
+                              className="px-2.5 min-[380px]:px-3 py-1 sm:py-1.5 rounded-xl text-[10.5px] min-[360px]:text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 group-hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all duration-200 shadow-2xs whitespace-nowrap"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
                       </div>
 
-                      {/* Interactive Website & Email Links Footer */}
-                      <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-1.5 min-[380px]:gap-2.5 text-xs font-medium">
-                        {/* Website Link with Website Logo */}
-                        {project.url ? (
+                      {/* Interactive Email & Website Links Footer: Email (flex-1 expands for full address) & View Details (shrink-0) */}
+                      <div className="pt-3 sm:pt-3.5 border-t border-slate-100 flex items-center gap-1.5 min-[380px]:gap-2 w-full max-w-full overflow-hidden text-xs font-medium">
+                        {/* Email Link (LEFT - expands to give full space to email address) */}
+                        {project.email && (
+                          <a
+                            href={`mailto:${project.email}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="group/mail flex-1 min-w-0 flex items-center justify-center gap-1 min-[360px]:gap-1.5 px-2 min-[380px]:px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 border border-emerald-200/90 text-[10px] min-[360px]:text-[11px] sm:text-xs font-bold transition-all duration-200 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer overflow-hidden"
+                            title={`Email ${project.email}`}
+                            aria-label={`Send email to ${project.email}`}
+                          >
+                            <Mail className="w-3.5 h-3.5 text-emerald-600 group-hover/mail:text-emerald-700 shrink-0" />
+                            <span className="truncate block min-w-0">
+                              <span className="hidden min-[340px]:inline">{project.email}</span>
+                              <span className="min-[340px]:hidden">Email</span>
+                            </span>
+                          </a>
+                        )}
+
+                        {/* Website Link (RIGHT - shrink-0 on mobile for perfect fit, sm:flex-1 on web for equal 50/50 balance) */}
+                        {project.url && (
                           <a
                             href={project.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="group/btn inline-flex items-center gap-1 min-[380px]:gap-1.5 px-2 min-[380px]:px-2.5 sm:px-3 py-1.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-900 border border-sky-200 text-[10px] min-[360px]:text-[11px] sm:text-xs font-semibold transition-all duration-200 shadow-2xs hover:shadow-xs hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                            className="group/btn shrink-0 sm:flex-1 sm:min-w-0 flex items-center justify-center gap-1 min-[360px]:gap-1.5 px-2.5 min-[380px]:px-3.5 sm:px-3 py-1.5 sm:py-2 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-900 border border-sky-200/90 text-[10px] min-[360px]:text-[11px] sm:text-xs font-bold transition-all duration-200 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer"
                             title={`Visit Official Website (${project.url})`}
                             aria-label={`Visit ${project.title} official website`}
                           >
-                            <Globe className="w-3 h-3 min-[380px]:w-3.5 min-[380px]:h-3.5 text-sky-500 group-hover/btn:text-sky-700 transition-colors shrink-0" />
-                            <span className="whitespace-nowrap">{project.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
-                            <ExternalLink className="w-2.5 h-2.5 min-[380px]:w-3 min-[380px]:h-3 text-sky-400 group-hover/btn:text-sky-600 transition-colors shrink-0" />
-                          </a>
-                        ) : <div />}
-
-                        {/* Email Link with Email Logo */}
-                        {project.email && (
-                          <a
-                            href={`mailto:${project.email}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="group/mail inline-flex items-center gap-1 min-[380px]:gap-1.5 px-2 min-[380px]:px-2.5 sm:px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 border border-emerald-200 text-[10px] min-[360px]:text-[11px] sm:text-xs font-semibold transition-all duration-200 shadow-2xs hover:shadow-xs hover:scale-105 active:scale-95 cursor-pointer shrink-0"
-                            title={`Email ${project.email}`}
-                            aria-label={`Send email to ${project.email}`}
-                          >
-                            <Mail className="w-3 h-3 min-[380px]:w-3.5 min-[380px]:h-3.5 text-emerald-600 group-hover/mail:text-emerald-700 transition-colors shrink-0" />
-                            <span className="whitespace-nowrap">{project.email}</span>
+                            <Globe className="w-3.5 h-3.5 text-sky-500 group-hover/btn:text-sky-700 shrink-0" />
+                            <span className="whitespace-nowrap font-bold">View Details</span>
                           </a>
                         )}
                       </div>
@@ -303,6 +336,18 @@ export const InnovationsSection = (): JSX.Element => {
           )}
         </motion.div>
       </div>
+
+      {/* Full-screen Photo Lightbox Modal for clicking machine photo */}
+      <AnimatePresence>
+        {selectedPhoto && (
+          <ImageLightboxModal
+            key="innovations-photo-lightbox"
+            image={selectedPhoto.image}
+            title={selectedPhoto.title}
+            onClose={() => setSelectedPhoto(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   )
 }

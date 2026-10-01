@@ -76,7 +76,8 @@ export const projects: Project[] = [
     category: 'Industrial AI',
     url: 'https://fabins.nevolyn.com/',
     email: 'fabins@nevolyn.com',
-    websiteLogo: 'https://fabins.nevolyn.com/fabins-logo-light-mode.png',
+    image: '/fabins-machine.png',
+    websiteLogo: '/fabins-logo.png',
     actionLabel: 'FABINS Automation',
   },
 ]
