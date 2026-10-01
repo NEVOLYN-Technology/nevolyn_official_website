@@ -26,7 +26,7 @@
 'use client'
 
 import type { JSX } from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Mail, Menu, X } from 'lucide-react'
@@ -48,6 +48,8 @@ export const Navbar = (): JSX.Element => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [activeSection, setActiveSection] = useState(isHomePage ? 'home' : '')
+  const drawerRef = useRef<HTMLDivElement>(null)
+  const navBarRef = useRef<HTMLDivElement>(null)
 
   // Immediately strip #home if present on page load
   useEffect(() => {
@@ -55,6 +57,38 @@ export const Navbar = (): JSX.Element => {
       window.history.replaceState(null, '', window.location.pathname)
     }
   }, [])
+
+  // Tap anywhere outside to dismiss the mobile navigation menu
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node
+      if (
+        (drawerRef.current && drawerRef.current.contains(target)) ||
+        (navBarRef.current && navBarRef.current.contains(target))
+      ) {
+        return
+      }
+      setIsOpen(false)
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside, { passive: true })
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen])
 
   useEffect(() => {
     if (!isHomePage) {
@@ -135,9 +169,22 @@ export const Navbar = (): JSX.Element => {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4 pointer-events-none">
-      {/* Floating Pill Navbar Container with Cool Blue Frosted Glass Shade */}
-      <div className="pointer-events-auto mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full border border-sky-300/65 bg-gradient-to-r from-white/90 via-[#e6f0fb]/85 to-[#dceaf8]/85 px-3 py-1.5 sm:px-4 sm:py-2 shadow-[0_8px_28px_rgba(14,165,233,0.12)] backdrop-blur-xl transition-all duration-300 hover:border-emerald-400 hover:shadow-[0_8px_32px_rgba(16,185,129,0.16)]">
+    <>
+      {/* Fullscreen Backdrop: tapping anywhere outside dismisses the mobile navigation */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-xs lg:hidden pointer-events-auto transition-opacity"
+          onClick={() => setIsOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4 pointer-events-none">
+        {/* Floating Pill Navbar Container with Cool Blue Frosted Glass Shade */}
+        <div
+          ref={navBarRef}
+          className="pointer-events-auto mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full border border-sky-300/65 bg-gradient-to-r from-white/90 via-[#e6f0fb]/85 to-[#dceaf8]/85 px-3 py-1.5 sm:px-4 sm:py-2 shadow-[0_8px_28px_rgba(14,165,233,0.12)] backdrop-blur-xl transition-all duration-300 hover:border-emerald-400 hover:shadow-[0_8px_32px_rgba(16,185,129,0.16)]"
+        >
 
         {/* Brand Logo & Wordmark */}
         <Link
@@ -200,50 +247,48 @@ export const Navbar = (): JSX.Element => {
         </div>
       </div>
 
-      {/* Mobile Drawer (Optimized for Android and iPhone) */}
-      {isOpen && (
-        <div className="pointer-events-auto mx-auto mt-2 max-w-md w-full px-1 lg:hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="rounded-3xl border border-sky-300/65 bg-gradient-to-b from-white/95 via-[#e6f0fb]/95 to-[#dceaf8]/95 p-4 shadow-xl shadow-sky-500/10 backdrop-blur-2xl flex flex-col gap-1">
-            {NAV_LINKS.map((link) => {
-              const isActive = activeSection === link.sectionId
-              return (
+        {/* Mobile Drawer (Optimized for Android and iPhone) */}
+        {isOpen && (
+          <div
+            ref={drawerRef}
+            className="pointer-events-auto relative z-50 mx-auto mt-2 max-w-md w-full px-1 lg:hidden animate-in fade-in slide-in-from-top-2 duration-200"
+          >
+            <div className="rounded-3xl border border-sky-300/65 bg-gradient-to-b from-white/95 via-[#e6f0fb]/95 to-[#dceaf8]/95 p-4 shadow-xl shadow-sky-500/10 backdrop-blur-2xl flex flex-col gap-1">
+              {NAV_LINKS.map((link) => {
+                const isActive = activeSection === link.sectionId
+                return (
+                  <a
+                    key={link.sectionId}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.sectionId)}
+                    className={`flex items-center justify-between px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all ${isActive
+                      ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-white shadow-sm shadow-emerald-500/25'
+                      : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
+                      }`}
+                  >
+                    <span>{link.label}</span>
+                  </a>
+                )
+              })}
+              <div className="pt-2 mt-1 border-t border-slate-100">
                 <a
-                  key={link.sectionId}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.sectionId)}
-                  className={`flex items-center justify-between px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all ${isActive
-                    ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-white shadow-sm shadow-emerald-500/25'
-                    : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
-                    }`}
+                  href="/#contact"
+                  onClick={(e) => handleNavClick(e, 'contact')}
+                  className={`w-full flex items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-semibold transition-all ${
+                    activeSection === 'contact'
+                      ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/35 ring-2 ring-emerald-300 border border-transparent'
+                      : 'border border-emerald-300/90 bg-gradient-to-r from-emerald-50/90 to-teal-50/80 text-emerald-800 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-teal-600 hover:text-white hover:border-transparent'
+                  }`}
                 >
-                  <span>{link.label}</span>
+                  <Mail className="h-4 w-4" />
+                  <span>Let's Connect</span>
                 </a>
-              )
-            })}
-            <div className="pt-2 mt-1 border-t border-slate-100 flex flex-col gap-2">
-              <Link
-                href="/join_us"
-                onClick={() => setIsOpen(false)}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
-              >
-                <span>Careers & Join Us</span>
-              </Link>
-              <a
-                href="/#contact"
-                onClick={(e) => handleNavClick(e, 'contact')}
-                className={`w-full flex items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-semibold transition-all ${
-                  activeSection === 'contact'
-                    ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/35 ring-2 ring-emerald-300'
-                    : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:brightness-105 shadow-sm shadow-emerald-500/20'
-                }`}
-              >
-                <Mail className="h-4 w-4" />
-                <span>Let's Connect</span>
-              </a>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </header>
+        )}
+      </header>
+    </>
   )
 }
+
