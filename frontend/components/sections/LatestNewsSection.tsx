@@ -56,6 +56,7 @@ export const LatestNewsSection = (): JSX.Element => {
     modalId: 'photo-lightbox',
   })
 
+
   // Ref for the vertical scroll feed
   const verticalScrollRef = useRef<HTMLDivElement>(null)
   const [canScrollUp, setCanScrollUp] = useState(false)
@@ -637,24 +638,20 @@ export const LatestNewsSection = (): JSX.Element => {
       </div>
 
       {/* Pop-up Modal Window for View Details */}
-      <AnimatePresence>
-        {selectedNews && (
-          <NewsDetailModal
-            key="news-detail-modal"
-            item={selectedNews}
-            onClose={handleCloseNews}
-          />
-        )}
-      </AnimatePresence>
+      <NewsDetailModal
+        item={selectedNews}
+        isOpen={Boolean(selectedNews)}
+        onClose={handleCloseNews}
+      />
 
       {/* Full-screen Photo Lightbox Modal for clicking pictures */}
       <AnimatePresence>
         {selectedPhoto && (
           <ImageLightboxModal
             key="photo-lightbox-modal"
-            image={selectedPhoto.image}
-            images={selectedPhoto.images}
-            initialIndex={selectedPhoto.initialIndex}
+            isOpen={Boolean(selectedPhoto)}
+            images={selectedPhoto.images ?? (selectedPhoto.image ? [selectedPhoto.image] : [])}
+            initialIndex={selectedPhoto.initialIndex ?? 0}
             title={selectedPhoto.title}
             onClose={handleClosePhotoHistory}
           />

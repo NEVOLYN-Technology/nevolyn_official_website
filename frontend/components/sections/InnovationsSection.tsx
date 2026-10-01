@@ -58,6 +58,7 @@ export const InnovationsSection = (): JSX.Element => {
     modalId: 'photo-lightbox',
   })
 
+
   // ── Filtered project list ─────────────────────────────────────────────────
   const filteredProjects = projects.filter((project) => {
     if (activeFilter === 'All') return true
@@ -353,7 +354,8 @@ export const InnovationsSection = (): JSX.Element => {
         {selectedPhoto && (
           <ImageLightboxModal
             key="innovations-photo-lightbox"
-            image={selectedPhoto.image}
+            isOpen={Boolean(selectedPhoto)}
+            images={selectedPhoto.image ? [selectedPhoto.image] : []}
             title={selectedPhoto.title}
             onClose={handleClosePhotoHistory}
           />
