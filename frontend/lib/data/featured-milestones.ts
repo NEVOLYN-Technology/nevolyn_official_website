@@ -28,6 +28,10 @@ export interface FeaturedMilestone {
   date: string
   /** Specific path to image asset in `/public`. */
   image: string
+  /** Optional secondary image shown in detail view. */
+  secondaryImage?: string
+  /** Optional list of all media gallery images for detail view. */
+  images?: string[]
   /** Direct link to LinkedIn post or company page. */
   linkedinUrl: string
   /** Direct link to Facebook post or page. */
@@ -48,6 +52,8 @@ export const featuredMilestones: FeaturedMilestone[] = [
     category: 'Award & Prize',
     date: '2026-09-14',
     image: '/news_fabinsXfair02.jpg',
+    secondaryImage: '/news_fabinsXfair03.jpg',
+    images: ['/news_fabinsXfair02.jpg', '/news_fabinsXfair03.jpg'],
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-bangladeshinnovationfair2026-activity-7508553026446512128-zo3h?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
     facebookUrl: 'https://www.facebook.com/share/p/1EsgpSB4Vo/',

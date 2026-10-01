@@ -56,8 +56,8 @@ export const AboutSection = (): JSX.Element => {
           description="NEVOLYN is an advanced engineering company. We research, develop, and deploy production-ready software solutions and hardware automation systems built to solve complex industrial and technical challenges."
         />
 
-        {/* ── 3 Action Pillars: Innovate · Automate · Elevate ───────── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16 sm:mb-20">
+        {/* ── 3 Action Pillars: Innovate · Automate · Elevate (1 col on mobile & vertical iPad, 3 cols on rotated iPad & web) ───────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-16 sm:mb-20">
 
           {/* Pillar 1: Innovate */}
           <motion.div

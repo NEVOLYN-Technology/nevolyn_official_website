@@ -1,9 +1,20 @@
 'use client'
 
-import { useMemo, useState, type JSX } from 'react'
+import { useMemo, useState, useRef, useCallback, type JSX } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Calendar, ExternalLink, Globe, Mail, ArrowLeft, Maximize2 } from 'lucide-react'
-import { formatDate } from '@/lib/utils'
+import {
+  X,
+  Calendar,
+  ExternalLink,
+  Globe,
+  Mail,
+  ArrowLeft,
+  Maximize2,
+  ChevronLeft,
+  ChevronRight,
+  Images,
+} from 'lucide-react'
+import { formatDate, cn } from '@/lib/utils'
 import { useModalHistory } from '@/lib/hooks/useModalHistory'
 import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
 
@@ -15,6 +26,8 @@ export interface NewsModalItem {
   category: string
   date: string
   image?: string
+  secondaryImage?: string
+  images?: string[]
   linkedinUrl?: string
   facebookUrl?: string
 }
@@ -95,7 +108,7 @@ function parseContactBlock(text: string) {
 /**
  * Premium pop-up modal window displaying the full news details, photo,
  * and direct links to LinkedIn and Facebook.
- * Follows the proven LeaderDetails architecture for lag-free mobile back navigation.
+ * Supports multi-image swipe/scroll and switching between main show and detail views.
  */
 export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.Element {
   // Integrates browser history so phone back button / edge swipe closes the modal smoothly
@@ -108,6 +121,45 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
 
   // State for opening full uncropped photo in Lightbox
   const [isPhotoOpen, setIsPhotoOpen] = useState(false)
+
+  // Multi-image collection: preserves primary first, then secondary, then others
+  const modalImages: string[] = useMemo(() => {
+    if (item.images && item.images.length > 0) return item.images
+    const list: string[] = []
+    if (item.image) list.push(item.image)
+    if (item.secondaryImage && !list.includes(item.secondaryImage)) list.push(item.secondaryImage)
+    return list
+  }, [item.image, item.secondaryImage, item.images])
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const heroScrollRef = useRef<HTMLDivElement>(null)
+
+  // Sync active index with horizontal scroll position
+  const handleHeroScroll = useCallback(() => {
+    const el = heroScrollRef.current
+    if (!el) return
+    const width = el.clientWidth
+    if (width > 0) {
+      const newIndex = Math.round(el.scrollLeft / width)
+      if (newIndex >= 0 && newIndex < modalImages.length && newIndex !== activeImageIndex) {
+        setActiveImageIndex(newIndex)
+      }
+    }
+  }, [modalImages.length, activeImageIndex])
+
+  // Smooth-scroll the hero container to specific image index
+  const scrollToHeroImage = useCallback((index: number) => {
+    const el = heroScrollRef.current
+    if (!el) {
+      setActiveImageIndex(index)
+      return
+    }
+    const width = el.clientWidth
+    el.scrollTo({ left: index * width, behavior: 'smooth' })
+    setActiveImageIndex(index)
+  }, [])
+
+  const activeImage = modalImages[activeImageIndex] || item.image
 
   // Memoize paragraph splitting and contact parsing so exit animation runs at 60fps without CPU spikes
   const parsedParagraphs = useMemo(() => {
@@ -165,24 +217,96 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
 
         {/* Scrollable Content Container */}
         <div className="overflow-y-auto no-scrollbar flex-1 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-          {/* Hero Banner Header: Shows full uncropped photo, click to enlarge in full-screen Lightbox */}
-          {item.image && (
-            <div
-              onClick={() => setIsPhotoOpen(true)}
-              title="Click to view full uncropped photo"
-              className="relative w-full h-56 sm:h-72 overflow-hidden bg-slate-950 flex items-center justify-center cursor-zoom-in group"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-full object-contain p-2 sm:p-3 group-hover:scale-[1.02] transition-transform duration-300"
-              />
+          {/* Hero Banner Header: Swipeable / Scrollable horizontally for multiple images */}
+          {modalImages.length > 0 && (
+            <div className="relative w-full h-56 sm:h-72 overflow-hidden bg-slate-950 select-none">
+              {/* Horizontal Scroll Track with Snapping */}
+              <div
+                ref={heroScrollRef}
+                onScroll={handleHeroScroll}
+                className="w-full h-full flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory no-scrollbar touch-pan-x overscroll-x-contain scroll-smooth"
+              >
+                {modalImages.map((imgSrc, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      setActiveImageIndex(idx)
+                      setIsPhotoOpen(true)
+                    }}
+                    title="Click to view full uncropped photo"
+                    className="w-full h-full shrink-0 snap-center snap-always flex items-center justify-center relative cursor-zoom-in group"
+                  >
+                    <img
+                      src={imgSrc}
+                      alt={`${item.title} photo ${idx + 1}`}
+                      className="w-full h-full object-contain p-2 sm:p-3 group-hover:scale-[1.02] transition-transform duration-300 pointer-events-none"
+                    />
+                  </div>
+                ))}
+              </div>
 
               {/* Gradient shadow for contrast */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none z-10" />
 
+              {/* Prev / Next buttons for multi-image gallery */}
+              {modalImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const prev = activeImageIndex > 0 ? activeImageIndex - 1 : modalImages.length - 1
+                      scrollToHeroImage(prev)
+                    }}
+                    aria-label="Previous photo"
+                    className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 rounded-full bg-slate-900/80 hover:bg-sky-600 active:bg-sky-700 text-white backdrop-blur-md border border-white/20 shadow-lg transition-all duration-200 cursor-pointer active:scale-95"
+                  >
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const next = activeImageIndex < modalImages.length - 1 ? activeImageIndex + 1 : 0
+                      scrollToHeroImage(next)
+                    }}
+                    aria-label="Next photo"
+                    className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 rounded-full bg-slate-900/80 hover:bg-sky-600 active:bg-sky-700 text-white backdrop-blur-md border border-white/20 shadow-lg transition-all duration-200 cursor-pointer active:scale-95"
+                  >
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
+                  </button>
+                </>
+              )}
+
+              {/* Multi-photo indicator pills with clickable dots */}
+              {modalImages.length > 1 && (
+                <div className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold shadow-md">
+                  <span>Photo {activeImageIndex + 1} of {modalImages.length}</span>
+                  <div className="flex items-center gap-1 ml-1">
+                    {modalImages.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          scrollToHeroImage(i)
+                        }}
+                        aria-label={`Jump to photo ${i + 1}`}
+                        className={cn(
+                          "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
+                          i === activeImageIndex ? "w-3.5 bg-sky-400" : "w-1.5 bg-white/40 hover:bg-white/70"
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Full photo view badge */}
-              <div className="absolute bottom-3 right-3 z-20 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow-md group-hover:bg-sky-600 transition-colors">
+              <div
+                onClick={() => setIsPhotoOpen(true)}
+                className="absolute bottom-3 right-3 z-20 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow-md hover:bg-sky-600 transition-colors cursor-pointer"
+              >
                 <Maximize2 className="w-3.5 h-3.5" />
                 <span>Full Photo</span>
               </div>
@@ -211,6 +335,58 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
             {item.description && (
               <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-sky-50/90 to-indigo-50/60 border border-sky-100/90 text-slate-800 text-sm sm:text-base font-semibold leading-relaxed mb-6 shadow-xs">
                 {item.description}
+              </div>
+            )}
+
+            {/* Multi-Photo Gallery: Clearly displays both 02 (Main) and 03 (Detail View) */}
+            {modalImages.length > 1 && (
+              <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-sky-50/40 border border-slate-200/90 shadow-xs">
+                <div className="flex items-center justify-between mb-3.5">
+                  <div className="flex items-center gap-2">
+                    <Images className="w-4 h-4 text-sky-600" />
+                    <h4 className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight">
+                      Event Gallery ({modalImages.length} Photos)
+                    </h4>
+                  </div>
+                  <span className="text-[11px] sm:text-xs text-slate-500 font-semibold">
+                    Tap to enlarge or switch
+                  </span>
+                </div>
+
+                <div className={cn(
+                  "grid gap-2.5 sm:gap-3.5",
+                  modalImages.length >= 4 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2"
+                )}>
+                  {modalImages.map((imgSrc, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        scrollToHeroImage(idx)
+                        setIsPhotoOpen(true)
+                      }}
+                      className={cn(
+                        "group relative rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 border-2 text-left transition-all duration-200 aspect-[16/10] cursor-pointer shadow-xs active:scale-[0.98]",
+                        activeImageIndex === idx
+                          ? "border-sky-500 ring-2 ring-sky-400/40 shadow-md"
+                          : "border-slate-200/90 hover:border-sky-300"
+                      )}
+                    >
+                      <img
+                        src={imgSrc}
+                        alt={`${item.title} photo ${idx + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
+                      <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[11px] font-bold">
+                        <span className="truncate">
+                          {idx === 0 ? 'Photo 1 • Main' : modalImages.length === 2 ? 'Photo 2 • Detail' : `Photo ${idx + 1}`}
+                        </span>
+                        <Maximize2 size={12} className="opacity-80 group-hover:opacity-100 shrink-0 ml-1" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -320,10 +496,17 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
 
       {/* Full-screen Photo Lightbox Modal */}
       <AnimatePresence>
-        {isPhotoOpen && item.image && (
+        {isPhotoOpen && activeImage && (
           <ImageLightboxModal
-            image={item.image}
-            title={item.title}
+            image={activeImage}
+            images={modalImages.length > 1 ? modalImages : undefined}
+            initialIndex={activeImageIndex}
+            title={
+              modalImages.length > 1
+                ? `${item.title} (Photo ${activeImageIndex + 1} of ${modalImages.length})`
+                : item.title
+            }
+            onIndexChange={scrollToHeroImage}
             onClose={() => setIsPhotoOpen(false)}
           />
         )}

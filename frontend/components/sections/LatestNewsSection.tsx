@@ -38,7 +38,12 @@ export const LatestNewsSection = (): JSX.Element => {
   }, [])
 
   // Active selected photo for the full-screen photo lightbox
-  const [selectedPhoto, setSelectedPhoto] = useState<{ image: string; title: string } | null>(null)
+  const [selectedPhoto, setSelectedPhoto] = useState<{
+    image: string
+    title: string
+    images?: string[]
+    initialIndex?: number
+  } | null>(null)
 
   // Ref for the vertical scroll feed
   const verticalScrollRef = useRef<HTMLDivElement>(null)
@@ -249,7 +254,13 @@ export const LatestNewsSection = (): JSX.Element => {
                           onClick={(e) => {
                             e.stopPropagation()
                             if (item.image) {
-                              setSelectedPhoto({ image: item.image, title: item.title })
+                              const photoGallery = item.images || (item.secondaryImage ? [item.image, item.secondaryImage] : undefined)
+                              setSelectedPhoto({
+                                image: item.image,
+                                title: item.title,
+                                images: photoGallery,
+                                initialIndex: 0,
+                              })
                             }
                           }}
                           title="Click to view full uncropped photo"
@@ -314,6 +325,8 @@ export const LatestNewsSection = (): JSX.Element => {
                                     category: item.category,
                                     date: item.date,
                                     image: item.image,
+                                    secondaryImage: item.secondaryImage,
+                                    images: item.images,
                                     linkedinUrl: item.linkedinUrl,
                                     facebookUrl: item.facebookUrl,
                                   })
@@ -448,7 +461,7 @@ export const LatestNewsSection = (): JSX.Element => {
               style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               className="h-[460px] sm:h-[490px] overflow-y-auto scroll-smooth sm:snap-y sm:snap-mandatory no-scrollbar p-2 sm:p-3 pb-16 sm:pb-16 overscroll-contain"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
                 {sortedNews.map((item: NewsItem, idx: number) => {
                   const isGreen = idx % 3 === 0
                   const isRed = idx % 3 === 1
@@ -494,7 +507,13 @@ export const LatestNewsSection = (): JSX.Element => {
                               <div
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  setSelectedPhoto({ image: item.image, title: item.title })
+                                  const photoGallery = item.images || (item.secondaryImage ? [item.image, item.secondaryImage] : undefined)
+                                  setSelectedPhoto({
+                                    image: item.image,
+                                    title: item.title,
+                                    images: photoGallery,
+                                    initialIndex: 0,
+                                  })
                                 }}
                                 title="Click to view full photo"
                                 className="w-16 h-16 sm:w-18 sm:h-18 shrink-0 rounded-xl overflow-hidden border border-slate-100 bg-slate-100 shadow-inner cursor-zoom-in group/thumb"
@@ -645,6 +664,8 @@ export const LatestNewsSection = (): JSX.Element => {
           <ImageLightboxModal
             key="photo-lightbox-modal"
             image={selectedPhoto.image}
+            images={selectedPhoto.images}
+            initialIndex={selectedPhoto.initialIndex}
             title={selectedPhoto.title}
             onClose={() => setSelectedPhoto(null)}
           />

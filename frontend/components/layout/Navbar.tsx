@@ -224,7 +224,7 @@ export const Navbar = (): JSX.Element => {
           <a
             href="/#contact"
             onClick={(e) => handleNavClick(e, 'contact')}
-            className={`relative hidden !px-5 !py-2 text-[13px] sm:inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5 shadow-sm ${
+            className={`relative hidden !px-5 !py-2 text-[13px] lg:inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5 shadow-sm ${
               activeSection === 'contact'
                 ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-white shadow-[0_4px_16px_rgba(16,185,129,0.35)] border border-transparent scale-105'
                 : 'border border-emerald-300/90 bg-gradient-to-r from-emerald-50/90 to-teal-50/80 text-emerald-800 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-teal-600 hover:text-white hover:border-transparent hover:shadow-emerald-500/25'

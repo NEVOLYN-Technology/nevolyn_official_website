@@ -57,8 +57,8 @@ export const Footer = (): JSX.Element => {
   return (
     <footer className={`text-slate-700 border-t border-sky-300/60 bg-gradient-to-b from-[#e8edf2] to-[#dde3ea]`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 lg:gap-10 mb-3">
+        {/* Main Grid: single column on mobile & vertical iPad, 3 columns on web & rotated iPad */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 mb-3">
           {/* Brand */}
           <div className="flex flex-col gap-2.5">
             <Link
@@ -104,7 +104,7 @@ export const Footer = (): JSX.Element => {
           </div>
 
           {/* Navigation — middle column */}
-          <div className="space-y-2 md:justify-self-center w-full max-w-md lg:max-w-lg">
+          <div className="space-y-2 lg:justify-self-center w-full max-w-md lg:max-w-lg">
             <div className="flex items-center justify-between pb-1.5 border-b border-slate-300/60">
               <h3 className="text-xs sm:text-[13px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
                 <div className="w-5 h-5 rounded-md bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-700">
@@ -181,7 +181,7 @@ export const Footer = (): JSX.Element => {
           </div>
 
           {/* Contact Info — sourced from lib/constants/contact.ts */}
-          <div className="space-y-2.5 md:justify-self-end">
+          <div className="space-y-2.5 lg:justify-self-end">
             <div className="flex items-center justify-between pb-1.5 border-b border-slate-300/60">
               <h3 className="text-xs sm:text-[13px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-sky-500 inline-block shadow-2xs" />
