@@ -57,10 +57,10 @@ export const Footer = (): JSX.Element => {
   return (
     <footer className={`text-slate-700 border-t border-sky-300/60 bg-gradient-to-b from-[#e8edf2] to-[#dde3ea]`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-        {/* Main Grid: single column on mobile & vertical iPad, 3 columns on web & rotated iPad */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 mb-3">
+        {/* Main Grid: mobile = single col, iPad vertical = [Brand + Nav beside it in row 1, Contact in 3 cols in row 2], Desktop = [Brand, Nav in exact middle of both, Contact on right] */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-row lg:items-start lg:justify-between gap-6 md:gap-x-8 md:gap-y-6 lg:gap-8 mb-3">
           {/* Brand */}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2.5 shrink-0">
             <Link
               href="/"
               onClick={scrollToHome}
@@ -103,8 +103,8 @@ export const Footer = (): JSX.Element => {
             </div>
           </div>
 
-          {/* Navigation — middle column */}
-          <div className="space-y-2 lg:justify-self-center w-full max-w-md lg:max-w-lg">
+          {/* Navigation — situated in the exact middle of both Brand and Contact */}
+          <div className="space-y-2 w-full max-w-sm sm:max-w-md shrink-0">
             <div className="flex items-center justify-between pb-1.5 border-b border-slate-300/60">
               <h3 className="text-xs sm:text-[13px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
                 <div className="w-5 h-5 rounded-md bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-700">
@@ -181,7 +181,7 @@ export const Footer = (): JSX.Element => {
           </div>
 
           {/* Contact Info — sourced from lib/constants/contact.ts */}
-          <div className="space-y-2.5 lg:justify-self-end">
+          <div className="space-y-2.5 md:col-span-2 lg:col-span-1 w-full lg:w-auto lg:max-w-sm shrink-0">
             <div className="flex items-center justify-between pb-1.5 border-b border-slate-300/60">
               <h3 className="text-xs sm:text-[13px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-sky-500 inline-block shadow-2xs" />
@@ -191,7 +191,7 @@ export const Footer = (): JSX.Element => {
                 Direct
               </span>
             </div>
-            <ul className="space-y-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
+            <ul className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-2.5 md:gap-4 lg:gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
               {/* Address */}
               <li className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600" />
@@ -221,7 +221,7 @@ export const Footer = (): JSX.Element => {
                       </a>
                       {/* Bullet separator between numbers — hidden on mobile */}
                       {idx < CONTACT.phones.length - 1 && (
-                        <span className="text-slate-300 hidden sm:inline">•</span>
+                        <span className="text-slate-300 hidden sm:inline md:hidden lg:inline">•</span>
                       )}
                     </React.Fragment>
                   ))}

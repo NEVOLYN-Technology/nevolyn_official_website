@@ -64,20 +64,20 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 15 }}
         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-        className="fixed inset-0 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50
-                   w-full h-[100dvh] sm:h-auto sm:w-[94%] sm:max-w-3xl sm:max-h-[85vh] flex flex-col
-                   bg-white rounded-none sm:rounded-[28px] shadow-2xl
-                   border-0 sm:border-2 border-emerald-500/70 sm:ring-4 ring-emerald-500/10
+        className="fixed inset-0 lg:inset-auto lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 z-50
+                   w-full h-[100dvh] lg:h-auto lg:w-[94%] lg:max-w-3xl lg:max-h-[85vh] flex flex-col
+                   bg-white rounded-none lg:rounded-[28px] shadow-2xl
+                   border-0 lg:border-2 border-emerald-500/70 lg:ring-4 ring-emerald-500/10
                    overflow-hidden overscroll-contain"
       >
         {/* Top Decorative Gradient Line */}
         <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-sky-400 shrink-0" />
 
         {/* ── Fixed Header: portrait, name, title, & close button ── */}
-        <div className="flex shrink-0 items-center justify-between gap-3 sm:gap-4 border-b border-slate-100 bg-white p-3.5 sm:p-6 md:px-8 z-10">
-          <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+        <div className="flex shrink-0 items-center justify-between gap-3 lg:gap-4 border-b border-slate-100 bg-white p-3.5 lg:p-6 lg:px-8 z-10">
+          <div className="flex items-center gap-3 lg:gap-6 min-w-0">
             {/* Avatar */}
-            <div className={`relative flex h-12 w-12 sm:h-20 sm:w-20 shrink-0 items-center justify-center rounded-full bg-white p-0.5 sm:p-1 ring-2 ${accentRing}`}>
+            <div className={`relative flex h-12 w-12 lg:h-20 lg:w-20 shrink-0 items-center justify-center rounded-full bg-white p-0.5 lg:p-1 ring-2 ${accentRing}`}>
               {member.image ? (
                 <img
                   src={member.image}
@@ -86,7 +86,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-100 text-slate-400">
-                  <User className="h-6 w-6 sm:h-8 sm:w-8 text-emerald-600/80" />
+                  <User className="h-6 w-6 lg:h-8 lg:w-8 text-emerald-600/80" />
                 </div>
               )}
             </div>
@@ -95,11 +95,11 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
             <div className="min-w-0">
               <h3
                 id={headingId}
-                className="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 truncate leading-tight"
+                className="text-lg lg:text-2xl font-extrabold tracking-tight text-slate-900 truncate leading-tight"
               >
                 {member.name}
               </h3>
-              <p className="mt-0.5 sm:mt-1 text-xs sm:text-base font-semibold text-emerald-700 truncate">
+              <p className="mt-0.5 lg:mt-1 text-xs lg:text-base font-semibold text-emerald-700 truncate">
                 {member.title}
               </p>
             </div>
@@ -205,7 +205,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
             <button
               onClick={handleClose}
               type="button"
-              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-slate-200 text-slate-700 border border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 active:bg-black active:scale-95 font-bold text-sm transition-all duration-200 cursor-pointer shadow-xs touch-manipulation"
+              className="group w-full lg:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-slate-200 text-slate-700 border border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 active:bg-black active:scale-95 font-bold text-sm transition-all duration-200 cursor-pointer shadow-xs touch-manipulation"
             >
               <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" />
               <span>Back to Leadership Team</span>

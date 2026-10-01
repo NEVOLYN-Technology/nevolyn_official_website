@@ -317,19 +317,7 @@ export const LatestNewsSection = (): JSX.Element => {
                               <h4
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  setSelectedNews({
-                                    id: item.id,
-                                    title: item.title,
-                                    description: item.description,
-                                    content: item.content,
-                                    category: item.category,
-                                    date: item.date,
-                                    image: item.image,
-                                    secondaryImage: item.secondaryImage,
-                                    images: item.images,
-                                    linkedinUrl: item.linkedinUrl,
-                                    facebookUrl: item.facebookUrl,
-                                  })
+                                  setSelectedNews(item)
                                 }}
                                 className="inline text-lg sm:text-xl font-black text-slate-900 hover:text-sky-600 transition-colors duration-200 tracking-tight leading-snug cursor-pointer"
                               >
@@ -384,17 +372,7 @@ export const LatestNewsSection = (): JSX.Element => {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation()
-                                setSelectedNews({
-                                  id: item.id,
-                                  title: item.title,
-                                  description: item.description,
-                                  content: item.content,
-                                  category: item.category,
-                                  date: item.date,
-                                  image: item.image,
-                                  linkedinUrl: item.linkedinUrl,
-                                  facebookUrl: item.facebookUrl,
-                                })
+                                setSelectedNews(item)
                               }}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-sky-700 bg-white hover:bg-sky-600 hover:text-white border border-sky-600/30 transition-all duration-200 active:scale-95 shadow-xs cursor-pointer shrink-0"
                             >

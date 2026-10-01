@@ -192,26 +192,26 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 15 }}
         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-        className="fixed inset-0 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50
-                   w-full h-[100dvh] sm:h-auto sm:w-[94%] sm:max-w-2xl sm:max-h-[92vh] flex flex-col
-                   rounded-none sm:rounded-3xl bg-white shadow-2xl border-0 sm:border border-slate-200/90
+        className="fixed inset-0 lg:inset-auto lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 z-50
+                   w-full h-[100dvh] lg:h-auto lg:w-[94%] lg:max-w-2xl lg:max-h-[92vh] flex flex-col
+                   rounded-none lg:rounded-3xl bg-white shadow-2xl border-0 lg:border border-slate-200/90
                    overflow-hidden overscroll-contain"
       >
         {/* ── Sticky Top Navigation Bar ────────────────────────── */}
-        <div className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-b border-slate-100 shrink-0">
+        <div className="sticky top-0 z-30 flex items-center justify-between px-4 lg:px-6 py-3 bg-white/95 backdrop-blur-md border-b border-slate-100 shrink-0">
           {/* Category pill */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-black tracking-wider uppercase bg-sky-50 text-sky-700 border border-sky-200/80">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] lg:text-xs font-black tracking-wider uppercase bg-sky-50 text-sky-700 border border-sky-200/80">
             <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
-            <span className="truncate max-w-[220px] sm:max-w-xs">{item.category}</span>
+            <span className="truncate max-w-[220px] lg:max-w-xs">{item.category}</span>
           </span>
 
           <button
             onClick={handleClose}
             type="button"
             aria-label="Close dialog"
-            className="p-2 sm:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation active:scale-95"
+            className="p-2 lg:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation active:scale-95"
           >
-            <X className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2]" />
+            <X className="w-6 h-6 lg:w-7 lg:h-7 stroke-[2.2]" />
           </button>
         </div>
 
@@ -219,7 +219,7 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
         <div className="overflow-y-auto no-scrollbar flex-1 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
           {/* Hero Banner Header: Swipeable / Scrollable horizontally for multiple images */}
           {modalImages.length > 0 && (
-            <div className="relative w-full h-56 sm:h-72 overflow-hidden bg-slate-950 select-none">
+            <div className="relative w-full h-56 lg:h-72 overflow-hidden bg-slate-950 select-none">
               {/* Horizontal Scroll Track with Snapping */}
               <div
                 ref={heroScrollRef}
@@ -314,9 +314,9 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
           )}
 
           {/* Main Body Content */}
-          <div className="p-5 sm:p-8">
+          <div className="p-5 lg:p-8">
             {/* Meta details */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-semibold mb-3">
+            <div className="flex items-center gap-2 text-xs lg:text-sm text-slate-500 font-semibold mb-3">
               <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                 <Calendar size={14} className="text-sky-500" />
                 <span>{formatDate(item.date)}</span>
@@ -326,14 +326,14 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
             {/* Title */}
             <h3
               id="modal-title"
-              className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug mb-4"
+              className="text-xl lg:text-2xl font-black text-slate-900 tracking-tight leading-snug mb-4"
             >
               {item.title}
             </h3>
 
             {/* Short preview highlight box */}
             {item.description && (
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-sky-50/90 to-indigo-50/60 border border-sky-100/90 text-slate-800 text-sm sm:text-base font-semibold leading-relaxed mb-6 shadow-xs">
+              <div className="p-4 lg:p-5 rounded-2xl bg-gradient-to-r from-sky-50/90 to-indigo-50/60 border border-sky-100/90 text-slate-800 text-sm lg:text-base font-semibold leading-relaxed mb-6 shadow-xs">
                 {item.description}
               </div>
             )}
@@ -442,22 +442,22 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
             </div>
 
             {/* Bottom Action Toolbar: Back Button & Social Links in one single row on mobile and desktop */}
-            <div className="pt-4 sm:pt-6 border-t border-slate-100 flex items-center justify-between gap-2 sm:gap-3">
-              <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <div className="pt-4 lg:pt-6 border-t border-slate-100 flex items-center justify-between gap-2 lg:gap-3">
+              <div className="flex items-center gap-1.5 lg:gap-2.5 shrink-0">
                 {item.linkedinUrl && (
                   <a
                     href={item.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-[#0a66c2] border border-[#0a66c2]/30 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] active:bg-[#084e96] active:text-white transition-all duration-200 active:scale-95 shadow-xs shrink-0"
+                    className="inline-flex items-center justify-center gap-1.5 lg:gap-2 px-3 lg:px-4 py-2 lg:py-2.5 rounded-full text-xs lg:text-sm font-semibold bg-white text-[#0a66c2] border border-[#0a66c2]/30 hover:bg-[#0a66c2] hover:text-white hover:border-[#0a66c2] active:bg-[#084e96] active:text-white transition-all duration-200 active:scale-95 shadow-xs shrink-0"
                   >
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 lg:w-4 lg:h-4 fill-current shrink-0" viewBox="0 0 24 24">
                       <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                     </svg>
                     <span>
-                      <span className="hidden sm:inline">View on </span>LinkedIn
+                      <span className="hidden lg:inline">View on </span>LinkedIn
                     </span>
-                    <ExternalLink size={12} className="opacity-80 shrink-0 hidden sm:inline" />
+                    <ExternalLink size={12} className="opacity-80 shrink-0 hidden lg:inline" />
                   </a>
                 )}
 
@@ -466,15 +466,15 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
                     href={item.facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-[#1877f2] border border-[#1877f2]/30 hover:bg-[#1877f2] hover:text-white hover:border-[#1877f2] active:bg-[#145dbf] active:text-white transition-all duration-200 active:scale-95 shadow-xs shrink-0"
+                    className="inline-flex items-center justify-center gap-1.5 lg:gap-2 px-3 lg:px-4 py-2 lg:py-2.5 rounded-full text-xs lg:text-sm font-semibold bg-white text-[#1877f2] border border-[#1877f2]/30 hover:bg-[#1877f2] hover:text-white hover:border-[#1877f2] active:bg-[#145dbf] active:text-white transition-all duration-200 active:scale-95 shadow-xs shrink-0"
                   >
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 lg:w-4 lg:h-4 fill-current shrink-0" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                     <span>
-                      <span className="hidden sm:inline">View on </span>Facebook
+                      <span className="hidden lg:inline">View on </span>Facebook
                     </span>
-                    <ExternalLink size={12} className="opacity-80 shrink-0 hidden sm:inline" />
+                    <ExternalLink size={12} className="opacity-80 shrink-0 hidden lg:inline" />
                   </a>
                 )}
               </div>
@@ -483,11 +483,11 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps): JSX.El
               <button
                 onClick={handleClose}
                 type="button"
-                className="group inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-200 text-slate-700 border border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 hover:shadow-md hover:shadow-slate-900/20 active:bg-black active:text-white transition-all duration-200 active:scale-95 shadow-xs cursor-pointer shrink-0"
+                className="group inline-flex items-center justify-center gap-1.5 lg:gap-2 px-3.5 lg:px-5 py-2 lg:py-2.5 rounded-xl text-xs lg:text-sm font-bold bg-slate-200 text-slate-700 border border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 hover:shadow-md hover:shadow-slate-900/20 active:bg-black active:text-white transition-all duration-200 active:scale-95 shadow-xs cursor-pointer shrink-0"
               >
                 <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-1 shrink-0" />
-                <span className="hidden sm:inline">Back to Updates</span>
-                <span className="sm:hidden">Back</span>
+                <span className="hidden lg:inline">Back to Updates</span>
+                <span className="lg:hidden">Back</span>
               </button>
             </div>
           </div>
