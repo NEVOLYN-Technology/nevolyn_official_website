@@ -111,7 +111,7 @@ export function ImageLightboxModal({
   }
 
   // Dismiss only if user truly tapped/clicked outside without dragging/swiping
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = () => {
     if (isDraggingRef.current) {
       isDraggingRef.current = false
       return
