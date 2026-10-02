@@ -143,12 +143,19 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Eliminate 300ms mobile tap delay and optimize responsiveness */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Eliminate 300ms mobile tap delay and optimize touch responsiveness across all devices */
   button,
   a,
   input,
   select,
-  textarea {
+  textarea,
+  [role="button"],
+  .cursor-pointer,
+  .cursor-zoom-in {
     touch-action: manipulation;
   }
 }

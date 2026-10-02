@@ -87,8 +87,8 @@ export function CarouselCard({
         // ── Active: gradient border, elevated, full opacity, default cursor ─────────
         isCenter
           ? 'cursor-default bg-gradient-to-b from-sky-400 via-blue-500 to-indigo-500 shadow-[0_12px_30px_rgba(56,189,248,0.22)] sm:shadow-[0_20px_50px_rgba(56,189,248,0.25),0_0_25px_rgba(99,102,241,0.15)] -translate-y-2 sm:-translate-y-3 scale-[1.02] sm:scale-105 opacity-100 z-20'
-          // ── Inactive: muted border, lowered, lightweight blur on desktop only, pointer to center card ──
-          : 'cursor-pointer bg-slate-300/70 shadow-sm sm:shadow-lg shadow-slate-400/20 translate-y-1 sm:translate-y-2 scale-95 opacity-60 sm:opacity-50 z-10 sm:blur-[1.5px] blur-none hover:opacity-85 hover:blur-none',
+          // ── Inactive: muted border, lowered, crisp opacity without blur (matching Fabins) ──
+          : 'cursor-pointer bg-slate-300/70 shadow-sm sm:shadow-lg shadow-slate-400/20 translate-y-1 sm:translate-y-2 scale-95 opacity-75 sm:opacity-85 z-10 hover:opacity-100 hover:scale-[0.97]',
         className
       )}
     >

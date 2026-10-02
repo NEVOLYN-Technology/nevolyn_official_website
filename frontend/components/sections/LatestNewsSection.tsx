@@ -244,7 +244,7 @@ export const LatestNewsSection = (): JSX.Element => {
                         'group transform-gpu rounded-[26px] sm:rounded-[28px] p-[1.5px] transition-all duration-400 ease-out will-change-transform',
                         isCentered
                           ? 'cursor-default z-20 -translate-y-2 sm:-translate-y-3 scale-[1.02] sm:scale-105 bg-gradient-to-b from-sky-400/80 via-sky-500/50 to-blue-600/30 opacity-100 shadow-[0_12px_30px_rgba(14,165,233,0.25)] sm:shadow-[0_20px_50px_rgba(14,165,233,0.35),0_0_25px_rgba(14,165,233,0.2)]'
-                          : 'cursor-pointer z-10 translate-y-1 sm:translate-y-2 scale-95 bg-slate-200/50 opacity-60 shadow-md sm:shadow-lg sm:filter sm:blur-[1.5px] blur-none hover:opacity-90 hover:blur-0'
+                          : 'cursor-pointer z-10 translate-y-1 sm:translate-y-2 scale-95 bg-slate-200/50 opacity-75 sm:opacity-85 shadow-md sm:shadow-lg hover:opacity-100 hover:scale-[0.97]'
                       )}
                     >
                       <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[24px] sm:rounded-[26px] bg-white cursor-default">
