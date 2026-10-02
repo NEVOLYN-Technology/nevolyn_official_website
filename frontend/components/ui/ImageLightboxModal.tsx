@@ -4,7 +4,6 @@ import type { JSX } from 'react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useModalHistory } from '@/lib/hooks/useModalHistory'
 
 export interface ImageLightboxModalProps {
   isOpen: boolean
@@ -18,13 +17,13 @@ export interface ImageLightboxModalProps {
 /**
  * Zero-Lag Fullscreen Photo Lightbox.
  *
- * Implements ultra-smooth, cross-device zero-lag architecture:
- * - Instant 0ms response when tapping X button, backdrop, or pressing Escape.
- * - Mobile hardware back button & edge-swipe gesture support (smoothly closes lightbox without leaving site).
- * - Full hardware-accelerated Framer Motion exit fade (0.15s easeOut) via AnimatePresence.
+ * Implements pure React-state zero-lag architecture matching Fabins:
+ * - NO window.history integration to prevent Next.js App Router route reload/re-fetching.
+ * - Hardware-accelerated Framer Motion exit fade (0.15s easeOut) via AnimatePresence.
  * - Solid high-performance backdrop (bg-black/92) without expensive GPU backdrop-filter blur.
- * - Drag disambiguation: swipe gestures between photos are never mistaken for dismiss clicks,
- *   while normal taps outside the photo dismiss instantaneously.
+ * - Instant 0ms response when clicking X, pressing Escape, or tapping backdrop.
+ * - Bulletproof drag disambiguation: finger taps on mobile/tablets always dismiss on the 1st tap,
+ *   while horizontal swipe gestures slide the gallery.
  * - Photo title, counter ("Photo X of Y"), and indicator dots placed below the photo.
  * - Touch-pan horizontal CSS scroll snap and keyboard arrow keys.
  */
@@ -42,19 +41,11 @@ export function ImageLightboxModal({
   const isDraggingRef = useRef(false)
   const pointerStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
-  // Integrated mobile back-gesture support (Android hardware back & iOS edge-swipe)
-  const { handleClose } = useModalHistory({
-    isOpen: Boolean(isOpen && validImages.length > 0),
-    onClose,
-    modalId: 'image-lightbox',
-  })
-
   // Sync currentIndex when initialIndex changes or modal opens
   useEffect(() => {
     if (isOpen) {
       const targetIndex = Math.max(0, Math.min(initialIndex, validImages.length - 1))
       setCurrentIndex(targetIndex)
-      // Slight delay to allow DOM to layout before scrolling
       requestAnimationFrame(() => {
         const el = scrollRef.current
         if (el) {
@@ -64,7 +55,7 @@ export function ImageLightboxModal({
     }
   }, [isOpen, initialIndex, validImages.length])
 
-  // Track pointer gestures to prevent closing when dragging/swiping
+  // Track pointer gestures to disambiguate taps from swipes
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerStartRef.current = { x: e.clientX, y: e.clientY }
     isDraggingRef.current = false
@@ -73,24 +64,30 @@ export function ImageLightboxModal({
   const handlePointerMove = (e: React.PointerEvent) => {
     const dx = Math.abs(e.clientX - pointerStartRef.current.x)
     const dy = Math.abs(e.clientY - pointerStartRef.current.y)
-    // 25px threshold ensures natural finger taps on mobile/tablets are never misclassified as drags
-    if (dx > 25 || dy > 25) {
+    // 20px threshold ensures natural finger taps on mobile/tablets are never misclassified as drags
+    if (dx > 20 || dy > 20) {
       isDraggingRef.current = true
     }
   }
 
+  const handlePointerUp = () => {
+    // Reset dragging flag shortly after release
+    setTimeout(() => {
+      isDraggingRef.current = false
+    }, 80)
+  }
+
   // Dismiss modal on backdrop / outside clicks unless user was swiping
-  const handleBackdropClick = () => {
+  const handleBackdropClick = (e: React.MouseEvent) => {
     if (isDraggingRef.current) {
       isDraggingRef.current = false
       return
     }
-    handleClose()
+    onClose()
   }
 
   // Real-time horizontal scroll tracking
   const handleScroll = useCallback(() => {
-    isDraggingRef.current = true
     const el = scrollRef.current
     if (!el) return
     const width = el.clientWidth
@@ -113,12 +110,15 @@ export function ImageLightboxModal({
     onIndexChange?.(index)
   }, [onIndexChange])
 
-  // Keyboard navigation (ArrowLeft, ArrowRight)
+  // Keyboard navigation (ArrowLeft, ArrowRight, Escape)
   useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        onClose()
+      } else if (e.key === 'ArrowLeft') {
         e.stopPropagation()
         if (currentIndex > 0) {
           scrollToIndex(currentIndex - 1)
@@ -133,7 +133,18 @@ export function ImageLightboxModal({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, currentIndex, validImages.length, scrollToIndex])
+  }, [isOpen, currentIndex, validImages.length, onClose, scrollToIndex])
+
+  // Prevent background body scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isOpen])
 
   const isMultiple = validImages.length > 1
 
@@ -151,6 +162,7 @@ export function ImageLightboxModal({
           transition={{ duration: 0.15, ease: 'easeOut' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
           onClick={handleBackdropClick}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/92 text-white select-none overscroll-contain cursor-pointer"
         >
@@ -161,7 +173,7 @@ export function ImageLightboxModal({
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation()
-                handleClose()
+                onClose()
               }}
               aria-label="Close photo lightbox"
               className="p-2 sm:p-2.5 rounded-full text-slate-300 hover:text-white bg-black/60 hover:bg-black/90 border border-white/20 transition-all active:scale-95 cursor-pointer shadow-lg"
@@ -179,6 +191,7 @@ export function ImageLightboxModal({
             {validImages.map((src, idx) => (
               <div
                 key={idx}
+                onClick={handleBackdropClick}
                 className="w-full h-full shrink-0 snap-center snap-always flex flex-col items-center justify-center p-3 sm:p-6 cursor-pointer"
               >
                 {/* Photo & Caption Group: Centers photo and places caption just below it */}
