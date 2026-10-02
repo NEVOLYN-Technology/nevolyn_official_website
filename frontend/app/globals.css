@@ -26,7 +26,6 @@
  */
 
 @import 'tailwindcss';
-@import 'tw-animate-css';
 
 @font-face {
   font-family: 'Ethnocentric';
@@ -107,6 +106,10 @@
   --ticker-bg: #dde5ef;
   --hero-card-bg: #e2eaf4;
 
+  /* ── Ambient decoration for PageShell ── */
+  --glow-a: rgba(14, 165, 233, 0.16);
+  --glow-b: rgba(6, 182, 212, 0.12);
+
   /* ── Component tokens ───────────────────────────────────────────────────── */
   --card: #f9fafb;
   --card-foreground: #0f172a;
@@ -129,40 +132,37 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
-    background-color: var(--background);
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 6rem;
   }
 
   body {
-    @apply bg-background text-foreground overflow-x-hidden;
     background-color: var(--background);
+    color: var(--foreground);
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  * {
-    -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* Utility to completely hide scrollbar across all browsers */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+  /* Utility to completely hide scrollbar across all browsers */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 

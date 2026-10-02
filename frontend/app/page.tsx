@@ -19,7 +19,7 @@
  * @module app/page
  */
 import type { JSX } from 'react'
-import { Navbar } from '@/components/layout/Navbar'
+import { PageShell } from '@/components/layout/PageShell'
 import { Hero } from '@/components/sections/Hero'
 import { MarqueeTicker } from '@/components/sections/MarqueeTicker'
 import { AboutSection } from '@/components/sections/AboutSection'
@@ -27,7 +27,6 @@ import { InnovationsSection } from '@/components/sections/InnovationsSection'
 import { LeadersSection } from '@/components/sections/LeadersSection'
 import { LatestNewsSection } from '@/components/sections/LatestNewsSection'
 import { ContactSection } from '@/components/sections/ContactSection'
-import { Footer } from '@/components/layout/Footer'
 
 /**
  * Main application homepage component rendering single-page scrolling sections.
@@ -36,21 +35,16 @@ import { Footer } from '@/components/layout/Footer'
  */
 export default function Home(): JSX.Element {
   return (
-    <main className="w-full min-h-screen bg-background">
-      <Navbar />
-      {/* Offsets the floating capsule navbar cleanly without excess dead space */}
-      <div className="pt-16 sm:pt-20">
-        <div id="home">
-          <Hero />
-        </div>
-        <MarqueeTicker />
-        <AboutSection />
-        <InnovationsSection />
-        <LeadersSection />
-        <LatestNewsSection />
-        <ContactSection />
+    <PageShell>
+      <div id="home">
+        <Hero />
       </div>
-      <Footer />
-    </main>
+      <MarqueeTicker />
+      <AboutSection />
+      <InnovationsSection />
+      <LeadersSection />
+      <LatestNewsSection />
+      <ContactSection />
+    </PageShell>
   )
 }

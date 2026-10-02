@@ -14,7 +14,7 @@
  */
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Providers } from '@/components/providers/ThemeProvider'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { NEVOLYN_SEO_CONFIG, nevolynJsonLd } from '@/lib/seo/config'
 import './globals.css'
 
@@ -66,10 +66,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
-  viewportFit: 'cover',
-  colorScheme: 'light',
   themeColor: '#eef1f5',
 }
 
@@ -79,34 +75,22 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="bg-background" style={{ backgroundColor: '#eef1f5' }}>
-      <body className="antialiased bg-background text-slate-900 overflow-x-hidden selection:bg-sky-500 selection:text-white" style={{ backgroundColor: '#eef1f5' }}>
-        {/* Ambient colorful atmospheric background — fixed, behind all content */}
-        <div className="fixed inset-0 -z-50 pointer-events-none overflow-hidden [contain:paint]">
-          {/* Technical precision grid overlay */}
-          <div className="absolute inset-0 grid-bg opacity-40" />
-          {/* Top ambient soft sky-blue & cyan glow */}
-          <div className="absolute -top-28 left-1/2 -translate-x-1/2 h-[380px] w-[540px] sm:h-[520px] sm:w-[950px] max-w-[100vw] rounded-full bg-gradient-to-b from-sky-400/25 via-blue-400/18 via-indigo-300/12 to-transparent blur-3xl sm:blur-[140px] transform-gpu will-change-transform" />
-          {/* Vibrant mint/emerald ambient glow on left (desktop) */}
-          <div className="hidden sm:block absolute top-[22%] -left-28 h-[460px] w-[460px] rounded-full bg-gradient-to-tr from-emerald-400/16 to-teal-300/12 blur-[140px] transform-gpu" />
-          {/* Warm radiant violet/rose glow on right (desktop) */}
-          <div className="hidden sm:block absolute top-[48%] -right-28 h-[480px] w-[480px] rounded-full bg-gradient-to-br from-purple-400/15 via-pink-400/12 to-rose-400/10 blur-[150px] transform-gpu" />
-          {/* Soft warm amber highlight (desktop) */}
-          <div className="hidden sm:block absolute top-[70%] left-[10%] h-[380px] w-[380px] rounded-full bg-amber-400/10 blur-[140px] transform-gpu" />
-          {/* Bottom soft cyan & ocean azure glow */}
-          <div className="absolute -bottom-24 right-1/4 h-[320px] w-[380px] sm:h-[440px] sm:w-[540px] max-w-[100vw] rounded-full bg-gradient-to-t from-sky-400/20 via-cyan-400/14 to-transparent blur-3xl sm:blur-[150px] transform-gpu" />
-        </div>
-
-        <Providers>
-          {/* Schema.org Organization & Product Rich Snippet Graph */}
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(nevolynJsonLd) }}
-          />
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans antialiased bg-background text-slate-900 selection:bg-sky-500 selection:text-white">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(nevolynJsonLd) }}
+        />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          forcedTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
           {children}
-          {/* Analytics are only injected in production builds */}
           {process.env.NODE_ENV === 'production' && <Analytics />}
-        </Providers>
+        </ThemeProvider>
       </body>
     </html>
   )

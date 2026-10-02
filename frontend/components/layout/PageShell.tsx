@@ -35,10 +35,27 @@ export interface PageShellProps {
  */
 export function PageShell({ children }: PageShellProps): JSX.Element {
   return (
-    <main className={`${SECTION_BG.primary} min-h-screen`}>
+    <div className="relative min-h-screen bg-background text-slate-900">
+      {/* Engineering grid. Pattern is defined by `.grid-bg` in globals.css. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 grid-bg opacity-40" />
+
+      {/* Cyan wash behind the hero with lightweight radial gradient (zero GPU blur overhead for mobile 60/120fps) */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed -top-40 left-1/2 -z-10 h-[420px] w-[820px] -translate-x-1/2 rounded-full"
+        style={{ background: 'radial-gradient(ellipse at center, var(--glow-a) 0%, transparent 70%)' }}
+      />
+
+      {/* Blue wash anchored to the bottom-right corner */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed bottom-0 right-0 -z-10 h-[380px] w-[520px] rounded-full"
+        style={{ background: 'radial-gradient(ellipse at center, var(--glow-b) 0%, transparent 70%)' }}
+      />
+
       <Navbar />
-      <div className="pt-28 min-h-screen">{children}</div>
+      <main className="pt-16 sm:pt-20">{children}</main>
       <Footer />
-    </main>
+    </div>
   )
 }
