@@ -86,9 +86,9 @@ export const Hero = (): JSX.Element => {
             </div>
 
             {/* Enterprise Trust Indicator Badge */}
-            <div className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-blue-300/85 bg-blue-100/65 px-4.5 py-2 text-xs sm:text-sm font-medium text-slate-900 shadow-sm backdrop-blur-sm transition-all hover:bg-blue-100/85 hover:border-blue-400">
-              <ShieldCheck className="h-4 w-4 text-blue-800 shrink-0" />
-              <span>Enterprise-grade software engineering and automation solutions.</span>
+            <div className="mt-6 sm:mt-8 inline-flex items-center gap-1.5 sm:gap-2.5 rounded-full border border-blue-300/85 bg-blue-100/65 px-2.5 min-[380px]:px-3 sm:px-4.5 py-1.5 sm:py-2 text-[9px] min-[350px]:text-[10px] min-[390px]:text-[11px] sm:text-xs md:text-sm font-medium text-slate-900 shadow-sm backdrop-blur-sm transition-all hover:bg-blue-100/85 hover:border-blue-400 max-w-full tracking-tight shrink-0 whitespace-nowrap">
+              <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-800 shrink-0" />
+              <span className="whitespace-nowrap">Enterprise-grade software engineering and automation solutions.</span>
             </div>
           </motion.div>
 
