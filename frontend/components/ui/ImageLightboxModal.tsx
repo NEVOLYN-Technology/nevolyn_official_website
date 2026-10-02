@@ -17,15 +17,15 @@ export interface ImageLightboxModalProps {
 /**
  * Zero-Lag Fullscreen Photo Lightbox.
  *
- * Implements pure React-state zero-lag architecture matching Fabins:
- * - NO window.history integration to prevent Next.js App Router route reload/re-fetching.
- * - Hardware-accelerated Framer Motion exit fade (0.15s easeOut) via AnimatePresence.
- * - Solid high-performance backdrop (bg-black/92) without expensive GPU backdrop-filter blur.
- * - Instant 0ms response when clicking X, pressing Escape, or tapping backdrop.
- * - Bulletproof drag disambiguation: finger taps on mobile/tablets always dismiss on the 1st tap,
- *   while horizontal swipe gestures slide the gallery.
- * - Photo title, counter ("Photo X of Y"), and indicator dots placed below the photo.
- * - Touch-pan horizontal CSS scroll snap and keyboard arrow keys.
+ * Implements strict zero-lag architecture:
+ * - Pure React state control (NO window.history.pushState to prevent Next.js revalidation freeze)
+ * - Ultra-lightweight hardware-accelerated Framer Motion fade (duration: 0.12s, easeOut)
+ * - Solid high-performance backdrop without expensive backdrop-filter blur
+ * - Clicking anywhere outside the photo takes the user back on the first tap
+ * - Photo title, counter ("Photo X of Y"), and indicator dots placed below the photo
+ * - Responsive typography (smaller title version on mobile/tablet)
+ * - Touch-pan horizontal CSS scroll snap and keyboard arrow keys
+ * - Synchronizes active index changes back to parent via `onIndexChange`
  */
 export function ImageLightboxModal({
   isOpen,
@@ -46,6 +46,7 @@ export function ImageLightboxModal({
     if (isOpen) {
       const targetIndex = Math.max(0, Math.min(initialIndex, validImages.length - 1))
       setCurrentIndex(targetIndex)
+      // Slight delay to allow DOM to layout before scrolling
       requestAnimationFrame(() => {
         const el = scrollRef.current
         if (el) {
@@ -55,7 +56,7 @@ export function ImageLightboxModal({
     }
   }, [isOpen, initialIndex, validImages.length])
 
-  // Track pointer gestures to disambiguate taps from swipes
+  // Track pointer gestures to prevent closing when dragging/swiping
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerStartRef.current = { x: e.clientX, y: e.clientY }
     isDraggingRef.current = false
@@ -64,21 +65,13 @@ export function ImageLightboxModal({
   const handlePointerMove = (e: React.PointerEvent) => {
     const dx = Math.abs(e.clientX - pointerStartRef.current.x)
     const dy = Math.abs(e.clientY - pointerStartRef.current.y)
-    // 20px threshold ensures natural finger taps on mobile/tablets are never misclassified as drags
-    if (dx > 20 || dy > 20) {
+    if (dx > 12 || dy > 12) {
       isDraggingRef.current = true
     }
   }
 
-  const handlePointerUp = () => {
-    // Reset dragging flag shortly after release
-    setTimeout(() => {
-      isDraggingRef.current = false
-    }, 80)
-  }
-
   // Dismiss modal on backdrop / outside clicks unless user was swiping
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = () => {
     if (isDraggingRef.current) {
       isDraggingRef.current = false
       return
@@ -159,10 +152,9 @@ export function ImageLightboxModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.15, ease: 'easeOut' }}
+          transition={{ duration: 0.12, ease: 'easeOut' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
           onClick={handleBackdropClick}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/92 text-white select-none overscroll-contain cursor-pointer"
         >
@@ -170,7 +162,6 @@ export function ImageLightboxModal({
           <div className="absolute top-0 right-0 p-3 sm:p-5 z-40">
             <button
               type="button"
-              onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation()
                 onClose()
@@ -191,7 +182,6 @@ export function ImageLightboxModal({
             {validImages.map((src, idx) => (
               <div
                 key={idx}
-                onClick={handleBackdropClick}
                 className="w-full h-full shrink-0 snap-center snap-always flex flex-col items-center justify-center p-3 sm:p-6 cursor-pointer"
               >
                 {/* Photo & Caption Group: Centers photo and places caption just below it */}
@@ -231,17 +221,15 @@ export function ImageLightboxModal({
                           <button
                             key={dotIdx}
                             type="button"
-                            onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => {
                               e.stopPropagation()
                               scrollToIndex(dotIdx)
                             }}
                             aria-label={`Jump to photo ${dotIdx + 1}`}
-                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                              dotIdx === currentIndex
+                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${dotIdx === currentIndex
                                 ? 'w-4 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]'
                                 : 'w-1.5 bg-white/40 hover:bg-white/70'
-                            }`}
+                              }`}
                           />
                         ))}
                       </div>
@@ -256,7 +244,6 @@ export function ImageLightboxModal({
           {isMultiple && currentIndex > 0 && (
             <button
               type="button"
-              onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation()
                 scrollToIndex(currentIndex - 1)
@@ -272,7 +259,6 @@ export function ImageLightboxModal({
           {isMultiple && currentIndex < validImages.length - 1 && (
             <button
               type="button"
-              onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation()
                 scrollToIndex(currentIndex + 1)

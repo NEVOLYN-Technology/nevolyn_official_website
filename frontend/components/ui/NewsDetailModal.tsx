@@ -163,16 +163,13 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
     <>
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            key="news-detail-wrapper"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-0 lg:p-8 overscroll-contain"
-          >
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-0 lg:p-8 overscroll-contain">
             {/* Backdrop Overlay */}
-            <div
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={handleClose}
               className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm lg:backdrop-blur-md cursor-pointer"
               aria-hidden="true"
@@ -180,14 +177,13 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
 
             {/* Modal Container: Fullscreen on mobile & iPad vertical, floating centered dialog on iPad horizontal & web */}
             <motion.div
-              key="news-detail-dialog"
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-title"
-              initial={{ scale: 0.96, y: 12 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.96, y: 12 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
+              initial={{ opacity: 0, scale: 0.96, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 15 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 350 }}
               className="relative w-full h-[100dvh] lg:h-auto lg:max-w-2xl lg:max-h-[92vh] flex flex-col rounded-none lg:rounded-3xl bg-white shadow-2xl border-0 lg:border border-slate-200/90 overflow-hidden z-10 overscroll-contain"
             >
               {/* Sticky Top Navigation Bar */}
@@ -518,7 +514,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                 </div>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

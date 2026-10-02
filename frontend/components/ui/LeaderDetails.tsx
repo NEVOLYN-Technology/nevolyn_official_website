@@ -74,10 +74,10 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
         <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-sky-400 shrink-0" />
 
         {/* ── Fixed Header: portrait, name, title, & close button ── */}
-        <div className="flex shrink-0 items-center justify-between gap-3 lg:gap-4 border-b border-slate-100 bg-white p-3.5 lg:p-6 lg:px-8 z-10">
-          <div className="flex items-center gap-3 lg:gap-6 min-w-0">
+        <div className="flex shrink-0 items-center justify-between gap-2.5 sm:gap-4 lg:gap-6 border-b border-slate-100 bg-white p-3 sm:p-5 lg:p-6 lg:px-8 z-10">
+          <div className="flex items-center gap-2.5 sm:gap-4 lg:gap-6 min-w-0 flex-1">
             {/* Avatar */}
-            <div className={`relative flex h-12 w-12 lg:h-20 lg:w-20 shrink-0 items-center justify-center rounded-full bg-white p-0.5 lg:p-1 ring-2 ${accentRing}`}>
+            <div className={`relative flex h-11 w-11 sm:h-16 sm:w-16 lg:h-20 lg:w-20 shrink-0 items-center justify-center rounded-full bg-white p-0.5 lg:p-1 ring-2 ${accentRing}`}>
               {member.image ? (
                 <img
                   src={member.image}
@@ -86,20 +86,20 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-100 text-slate-400">
-                  <User className="h-6 w-6 lg:h-8 lg:w-8 text-emerald-600/80" />
+                  <User className="h-5 w-5 sm:h-7 sm:h-7 lg:h-8 lg:w-8 text-emerald-600/80" />
                 </div>
               )}
             </div>
 
             {/* Name & title */}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h3
                 id={headingId}
-                className="text-lg lg:text-2xl font-extrabold tracking-tight text-slate-900 truncate leading-tight"
+                className="text-[13px] min-[360px]:text-[14.5px] min-[390px]:text-base sm:text-xl lg:text-2xl font-extrabold tracking-tight text-slate-900 whitespace-nowrap leading-tight"
               >
                 {member.name}
               </h3>
-              <p className="mt-0.5 lg:mt-1 text-xs lg:text-base font-semibold text-emerald-700 truncate">
+              <p className="mt-0.5 lg:mt-1 text-[11px] sm:text-xs lg:text-base font-semibold text-emerald-700 truncate">
                 {member.title}
               </p>
             </div>
@@ -111,9 +111,9 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
               onClick={handleClose}
               type="button"
               aria-label="Close profile"
-              className="p-2 sm:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation active:scale-95"
+              className="p-1.5 sm:p-2 lg:p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 cursor-pointer touch-manipulation active:scale-95"
             >
-              <X className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2]" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 stroke-[2.2]" />
             </button>
           </div>
         </div>

@@ -71,10 +71,10 @@ export function LeadersSection(): JSX.Element {
     const hoverBorder = 'hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/10'
 
     return (
-      <div className={`bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-6 sm:p-7 flex flex-col transition-all duration-300 shadow-sm hover:-translate-y-1 h-full max-w-[390px] mx-auto w-full ${hoverBorder}`}>
+      <div className={`bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-4 min-[360px]:p-5 sm:p-7 flex flex-col transition-all duration-300 shadow-sm hover:-translate-y-1 h-full max-w-[390px] mx-auto w-full ${hoverBorder}`}>
         {/* Avatar */}
         <div className="flex justify-center mb-4">
-          <div className={`w-28 h-28 rounded-full p-1 bg-white ${ringBorder}`}>
+          <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-white ${ringBorder}`}>
             {member.image ? (
               <img
                 src={member.image}
@@ -83,7 +83,7 @@ export function LeadersSection(): JSX.Element {
               />
             ) : (
               <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                <User className={`w-14 h-14 ${titleColor}`} />
+                <User className={`w-12 h-12 sm:w-14 sm:h-14 ${titleColor}`} />
               </div>
             )}
           </div>
@@ -92,7 +92,7 @@ export function LeadersSection(): JSX.Element {
         {/* Name · Title · CTA */}
         <div className="text-center flex-1 flex flex-col">
           <div>
-            <h3 className="text-xl font-bold text-slate-900 mb-1.5 min-h-[3rem] flex items-center justify-center leading-tight">
+            <h3 className="text-[13px] min-[360px]:text-[14px] min-[390px]:text-[15.5px] sm:text-lg md:text-xl font-bold text-slate-900 mb-1.5 min-h-[2.25rem] sm:min-h-[3rem] flex items-center justify-center leading-tight whitespace-nowrap tracking-tight">
               {member.name}
             </h3>
             <p className={`text-xs sm:text-sm font-semibold ${titleColor}`}>{member.title}</p>

@@ -11,12 +11,15 @@ interface UseModalHistoryOptions {
 /**
  * useModalHistory - Zero-Lag Browser History Integration for Modals.
  *
- * Guarantees:
- * 1. Instant 0ms visual dismissal on on-screen button/backdrop taps (zero delay).
- * 2. Mobile hardware back button & swipe-back gesture smoothly dismisses the modal.
- * 3. Complete suppression of Next.js App Router route reload/re-fetching via
- *    capture-phase `stopImmediatePropagation()`.
- * 4. Zero website blur or re-renders when navigating back.
+ * Smooth modal history pattern:
+ * 1. Pushes a dummy state into history so the modal becomes the latest history entry.
+ * 2. If the user presses the phone's back button / swipe-back gesture, `popstate` fires and
+ *    smoothly closes the modal without leaving the website or reloading.
+ * 3. If the user clicks any on-screen "Back" or "Close" button, `handleClose()` will
+ *    immediately dismiss the modal (0ms UI response) and revert history in the background.
+ * 4. Intercepts `popstate` in capture phase with `stopImmediatePropagation()` so Next.js App Router
+ *    never treats the modal history pop as a page route change, preventing any background blur or reload.
+ * 5. Manages body scroll locking and keyboard Escape handling.
  */
 export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModalHistoryOptions) {
   const hasPushedStateRef = useRef(false)
@@ -29,25 +32,14 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     if (isClosingRef.current) return
     isClosingRef.current = true
 
-    // 1. Immediately trigger React state closure for instant 0ms dismissal!
+    // Immediately trigger React state closure for instant 0ms dismissal
     onCloseRef.current()
 
-    // 2. Cleanly revert history entry in background if one was pushed
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
       if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
-        // Intercept and swallow the popstate event so Next.js never sees it and never reloads
-        const consumePopState = (e: PopStateEvent) => {
-          e.stopImmediatePropagation()
-          window.removeEventListener('popstate', consumePopState, true)
-        }
-        window.addEventListener('popstate', consumePopState, true)
-        // Safety timeout to clean up listener if popstate was not fired
-        setTimeout(() => {
-          window.removeEventListener('popstate', consumePopState, true)
-        }, 1000)
-
         window.history.back()
+        return
       }
     }
   }, [modalId])
@@ -61,7 +53,7 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
 
     isClosingRef.current = false
 
-    // Push lightweight history entry for mobile back-button handling
+    // Push history entry for mobile back-button handling
     try {
       const currentState = window.history.state || {}
       window.history.pushState({ ...currentState, [modalId]: true }, '')
@@ -71,12 +63,9 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     }
 
     const handlePopState = (e: PopStateEvent) => {
-      // User tapped phone physical back button or swiped back
-      if (isClosingRef.current) return
-      isClosingRef.current = true
+      // User tapped phone back button or swiped back
       hasPushedStateRef.current = false
-
-      // Prevent Next.js App Router from treating modal pop as a page route change
+      // Prevent Next.js App Router from treating modal pop as a route transition (no reload/blur)
       e.stopImmediatePropagation()
       onCloseRef.current()
     }
@@ -87,7 +76,6 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       }
     }
 
-    // Attach in CAPTURE phase so we intercept before Next.js App Router
     window.addEventListener('popstate', handlePopState, true)
     window.addEventListener('keydown', handleKeyDown)
 
@@ -106,3 +94,4 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
 
   return { handleClose }
 }
+
