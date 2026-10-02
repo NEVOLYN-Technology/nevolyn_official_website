@@ -13,7 +13,7 @@
 
 import type { JSX } from 'react'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Calendar, Star, Eye, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
 import { featuredMilestones } from '@/lib/data/featured-milestones'
 import { news, type NewsItem } from '@/lib/data/latest-news'
