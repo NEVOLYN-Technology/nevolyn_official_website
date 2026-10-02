@@ -37,7 +37,7 @@ export function PageShell({ children }: PageShellProps): JSX.Element {
   return (
     <div className="relative min-h-screen bg-background text-slate-900">
       {/* Engineering grid. Pattern is defined by `.grid-bg` in globals.css. */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 grid-bg opacity-40" />
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 grid-bg opacity-70" />
 
       {/* Cyan wash behind the hero with lightweight radial gradient (zero GPU blur overhead for mobile 60/120fps) */}
       <div
@@ -54,7 +54,7 @@ export function PageShell({ children }: PageShellProps): JSX.Element {
       />
 
       <Navbar />
-      <main className="pt-16 sm:pt-20">{children}</main>
+      <main className="pt-24">{children}</main>
       <Footer />
     </div>
   )

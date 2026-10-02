@@ -76,7 +76,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased bg-background text-slate-900 selection:bg-sky-500 selection:text-white">
+      <body className="font-sans antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(nevolynJsonLd) }}
@@ -89,7 +89,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          {process.env.NODE_ENV === 'production' && <Analytics />}
         </ThemeProvider>
       </body>
     </html>
