@@ -24,6 +24,14 @@ import { SECTION_BG } from '@/lib/constants/theme'
 import { NewsDetailModal, type NewsModalItem } from '@/components/ui/NewsDetailModal'
 import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
 
+// Sort complete objects strictly by date descending: Newest -> Top/First, Oldest -> Bottom/Last (computed once statically)
+const sortedFeatured = [...featuredMilestones].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+)
+const sortedNews = [...news].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+)
+
 /**
  * News timeline section rendering featured project announcements in a 3D carousel and
  * recent updates in a smooth vertical row-by-row scroll stage.
@@ -46,14 +54,6 @@ export const LatestNewsSection = (): JSX.Element => {
   const verticalScrollRef = useRef<HTMLDivElement>(null)
   const [canScrollUp, setCanScrollUp] = useState(false)
   const [canScrollDown, setCanScrollDown] = useState(true)
-
-  // Sort complete objects strictly by date descending: Newest -> Top/First, Oldest -> Bottom/Last
-  const sortedFeatured = [...featuredMilestones].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
-  const sortedNews = [...news].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
 
   // ── Featured Milestones Carousel (SystemSection scroll behavior) ──────────
   const [centeredIndex, setCenteredIndex] = useState(0)

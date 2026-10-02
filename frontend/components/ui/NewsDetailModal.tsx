@@ -1,7 +1,7 @@
 'use client'
 
 import type { JSX } from 'react'
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Calendar, ExternalLink, Globe, Mail, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
@@ -118,12 +118,12 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
   const lightboxIndexRef = useRef(0)
   const heroScrollRef = useRef<HTMLDivElement>(null)
 
-  // Construct complete gallery list in deterministic order: [main, secondary1, secondary2, ...]
-  const modalImages: string[] = item
-    ? item.images && item.images.length > 0
-      ? item.images
-      : [item.image, item.secondaryImage].filter((img): img is string => Boolean(img))
-    : []
+  // Memoize complete gallery list in deterministic order: [main, secondary1, secondary2, ...]
+  const modalImages: string[] = useMemo(() => {
+    if (!item) return []
+    if (item.images && item.images.length > 0) return item.images
+    return [item.image, item.secondaryImage].filter((img): img is string => Boolean(img))
+  }, [item])
 
   // Reset to first photo whenever opened or item changes
   useEffect(() => {
@@ -170,6 +170,10 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
     if (el) {
       el.scrollLeft = targetIdx * el.clientWidth
     }
+  }, [])
+
+  const handleLightboxIndexChange = useCallback((newIdx: number) => {
+    lightboxIndexRef.current = newIdx
   }, [])
 
   if (!item) return null
@@ -374,11 +378,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                           return (
                             <div
                               key={idx}
-                              onClick={() => {
-                                scrollToHeroIndex(idx)
-                                lightboxIndexRef.current = idx
-                                setIsPhotoOpen(true)
-                              }}
+                              onClick={() => handleOpenPhoto(idx)}
                               className={`group relative rounded-xl sm:rounded-2xl overflow-hidden bg-slate-900 border-2 cursor-pointer shadow-xs transition-all duration-200 active:scale-95 ${
                                 isCurrent
                                   ? 'border-sky-500 ring-2 ring-sky-400/40 shadow-md'
@@ -540,9 +540,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
         title={item.title}
         images={modalImages}
         initialIndex={activeImageIndex}
-        onIndexChange={(newIdx) => {
-          lightboxIndexRef.current = newIdx
-        }}
+        onIndexChange={handleLightboxIndexChange}
       />
     </>
   )

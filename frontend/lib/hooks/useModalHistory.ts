@@ -8,18 +8,69 @@ interface UseModalHistoryOptions {
   modalId?: string
 }
 
+interface ModalEntry {
+  modalId: string
+  onClose: () => void
+}
+
+declare global {
+  interface Window {
+    __MODAL_HISTORY_INITIALIZED__?: boolean
+  }
+}
+
+// Global counter tracking programmatic window.history.back() calls triggered by on-screen buttons
+let programmaticBackCount = 0
+
+// Global LIFO stack of active modals
+const activeModalStack: ModalEntry[] = []
+
 /**
- * useModalHistory - Zero-Lag Browser History Integration for Modals.
+ * Global capture-phase popstate interceptor.
+ * Intercepts popstate events BEFORE Next.js App Router receives them.
+ * This completely eliminates:
+ * 1. Next.js router revalidation / window.location.reload()
+ * 2. Unnecessary page remounts and loading screen flashes
+ * 3. Mobile alpha-composite white screen flicker
+ */
+if (typeof window !== 'undefined' && !window.__MODAL_HISTORY_INITIALIZED__) {
+  window.__MODAL_HISTORY_INITIALIZED__ = true
+
+  window.addEventListener(
+    'popstate',
+    (e: PopStateEvent) => {
+      // 1. Programmatic close (triggered by on-screen X / Backdrop / Back button)
+      if (programmaticBackCount > 0) {
+        programmaticBackCount--
+        e.stopImmediatePropagation()
+        return
+      }
+
+      // 2. Hardware back button / mobile swipe-back gesture
+      if (activeModalStack.length > 0) {
+        const topModal = activeModalStack[activeModalStack.length - 1]
+        // If the top modal's modalId is no longer present in history state, it was popped
+        if (!e.state || !e.state[topModal.modalId]) {
+          e.stopImmediatePropagation()
+          activeModalStack.pop()
+          topModal.onClose()
+        }
+      }
+    },
+    true // Capture phase: runs before Next.js App Router's popstate listener!
+  )
+}
+
+/**
+ * useModalHistory - Zero-Lag Hierarchical Browser History Integration for Modals.
  *
- * Smooth modal history pattern:
- * 1. Pushes a dummy state into history so the modal becomes the latest history entry.
- * 2. If the user presses the phone's back button / swipe-back gesture, `popstate` fires and
- *    smoothly closes the modal without leaving the website or reloading.
- * 3. If the user clicks any on-screen "Back" or "Close" button, `handleClose()` will
- *    immediately dismiss the modal (0ms UI response) and revert history in the background.
- * 4. Intercepts `popstate` in capture phase with `stopImmediatePropagation()` so Next.js App Router
- *    never treats the modal history pop as a page route change, preventing any background blur or reload.
- * 5. Manages body scroll locking and keyboard Escape handling.
+ * Implements strict LIFO (Last-In-First-Out) nested modal history stack:
+ * 1. Pushes lightweight history state with `[modalId]: true`.
+ * 2. On hardware Back button or swipe gesture, dismisses the top modal and
+ *    stops propagation in capture phase so Next.js never re-renders the route.
+ * 3. On on-screen Close/Back click, dismisses at 0ms and rolls back history
+ *    cleanly with programmatic suppression.
+ * 4. Preserves body scroll lock until all active modals are closed.
  */
 export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModalHistoryOptions) {
   const hasPushedStateRef = useRef(false)
@@ -32,23 +83,26 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     if (isClosingRef.current) return
     isClosingRef.current = true
 
-    // Immediately restore body scroll and touch responsiveness for zero mobile inactivity
-    if (typeof document !== 'undefined') {
-      const activeModals = document.querySelectorAll('[role="dialog"]')
-      if (activeModals.length <= 1) {
-        document.body.style.overflow = ''
-        document.body.style.touchAction = ''
-      }
+    // Remove from activeModalStack immediately
+    const idx = activeModalStack.findIndex((entry) => entry.modalId === modalId)
+    if (idx !== -1) {
+      activeModalStack.splice(idx, 1)
     }
 
     // Immediately trigger React state closure for instant 0ms dismissal
     onCloseRef.current()
 
+    // Revert history entry in background with programmatic suppression
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
       if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
+        programmaticBackCount++
         window.history.back()
-        return
+        setTimeout(() => {
+          if (programmaticBackCount > 0) {
+            programmaticBackCount--
+          }
+        }, 1000)
       }
     }
   }, [modalId])
@@ -56,63 +110,75 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
   useEffect(() => {
     if (!isOpen) {
       isClosingRef.current = false
-      hasPushedStateRef.current = false
       return
     }
 
     isClosingRef.current = false
 
-    // Push history entry for mobile back-button handling
+    // Register this modal in activeModalStack
+    const entry: ModalEntry = {
+      modalId,
+      onClose: () => {
+        isClosingRef.current = true
+        hasPushedStateRef.current = false
+        onCloseRef.current()
+      },
+    }
+    activeModalStack.push(entry)
+
+    // Push lightweight history entry for mobile back-button handling
     try {
-      const currentState = window.history.state || {}
+      const currentState = typeof window !== 'undefined' && window.history.state ? window.history.state : {}
       window.history.pushState({ ...currentState, [modalId]: true }, '')
       hasPushedStateRef.current = true
     } catch {
       hasPushedStateRef.current = false
     }
 
-    const handlePopState = (e: PopStateEvent) => {
-      // User tapped phone back button or swiped back
-      hasPushedStateRef.current = false
-      // Prevent Next.js App Router from treating modal pop as a route transition (no reload/blur)
-      e.stopImmediatePropagation()
-      if (typeof document !== 'undefined') {
-        const activeModals = document.querySelectorAll('[role="dialog"]')
-        if (activeModals.length <= 1) {
-          document.body.style.overflow = ''
-          document.body.style.touchAction = ''
-        }
-      }
-      onCloseRef.current()
-    }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleClose()
-      }
-    }
-
-    window.addEventListener('popstate', handlePopState, true)
-    window.addEventListener('keydown', handleKeyDown)
-
     // Lock background scroll while modal is active
     const originalOverflow = document.body.style.overflow
     const originalTouchAction = document.body.style.touchAction
     document.body.style.overflow = 'hidden'
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        handleClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
     return () => {
-      window.removeEventListener('popstate', handlePopState, true)
       window.removeEventListener('keydown', handleKeyDown)
-      if (typeof document !== 'undefined') {
-        const activeModals = document.querySelectorAll('[role="dialog"]')
-        if (activeModals.length <= 1) {
-          document.body.style.overflow = originalOverflow
-          document.body.style.touchAction = originalTouchAction
+
+      // Remove from activeModalStack if still present
+      const index = activeModalStack.findIndex((item) => item.modalId === modalId)
+      if (index !== -1) {
+        activeModalStack.splice(index, 1)
+      }
+
+      // Revert history entry if unmounted while still having an active state
+      if (hasPushedStateRef.current && !isClosingRef.current) {
+        hasPushedStateRef.current = false
+        if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
+          programmaticBackCount++
+          window.history.back()
+          setTimeout(() => {
+            if (programmaticBackCount > 0) {
+              programmaticBackCount--
+            }
+          }, 1000)
         }
+      }
+
+      // Only restore scroll if no other dialogs are still active
+      if (activeModalStack.length === 0) {
+        document.body.style.overflow = originalOverflow
+        document.body.style.touchAction = originalTouchAction
       }
     }
   }, [isOpen, modalId, handleClose])
 
   return { handleClose }
 }
-

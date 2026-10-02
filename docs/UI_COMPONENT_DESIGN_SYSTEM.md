@@ -268,7 +268,7 @@ On the bottom action bar (`CarouselCard.tsx`):
 | **Event Gallery Grid** | 2 columns (`grid-cols-2`) | 2–4 columns | 4 columns (`grid-cols-4`) |
 | **Contact Block** | 2 columns (Email Left, Web Right) | 2 columns (Email Left, Web Right) | 2 columns (Email Left, Web Right) |
 | **Lightbox Backdrop** | Solid `bg-black/92` | Solid `bg-black/92` | Solid `bg-black/92` |
-| **Lightbox State** | Pure React (`NO pushState`) | Pure React (`NO pushState`) | Pure React (`NO pushState`) |
+| **Lightbox State** | `useModalHistory` (`image-lightbox`) + 0ms `handleClose` | `useModalHistory` (`image-lightbox`) + 0ms `handleClose` | `useModalHistory` (`image-lightbox`) + 0ms `handleClose` |
 | **Lightbox Arrows** | Visible (`absolute left-2`) | Visible (`absolute left-3`) | Visible (`absolute left-4`) |
 | **Back Button Action** | Closes modal via `popstate` / `history.back()` | Closes modal via `popstate` / `history.back()` | Closes modal via on-screen button / `Esc` |
 
@@ -350,8 +350,13 @@ When a modal unmounts via Framer Motion, standard spring transitions (`damping: 
 2. **Instant Scroll & Touch Unlock (0ms)**:
    In `useModalHistory.ts`, unlock body styles immediately inside `handleClose()` and `handlePopState()`:
    ```typescript
-   document.body.style.overflow = ''
-   document.body.style.touchAction = ''
+   if (typeof document !== 'undefined') {
+     const activeModals = document.querySelectorAll('[role="dialog"]')
+     if (activeModals.length <= 1) {
+       document.body.style.overflow = ''
+       document.body.style.touchAction = ''
+     }
+   }
    ```
    *Result*: The user can scroll or tap the webpage the exact millisecond they tap Close, with 0ms dead time.
 
@@ -374,3 +379,92 @@ To eliminate white screen flashes when unmounting full-screen overlays on mobile
   }
   ```
 - `app/layout.tsx` must declare `style={{ backgroundColor: '#eef1f5' }}` directly on both tags to guarantee the browser window canvas matches the page background prior to CSS hydration.
+
+---
+
+## 12. Fullscreen Photo Lightbox Specification (`ImageLightboxModal.tsx`)
+
+### 1. Close & Dismissal Ergonomics (Instant 0ms on Mobile)
+- **Top-Right Close ("X") Button**:
+  - Must include **Safe-Area Insets**:
+    ```tsx
+    <div className="absolute top-0 right-0 p-3 sm:p-5 z-40 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))]">
+    ```
+  - Must have a minimum **44–48px touch target**:
+    ```tsx
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation()
+        handleClose()
+      }}
+      aria-label="Close photo lightbox"
+      className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-slate-300 hover:text-white bg-black/60 hover:bg-black/90 border border-white/20 transition-all active:scale-95 cursor-pointer shadow-lg touch-manipulation"
+    >
+      <X className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.2} />
+    </button>
+    ```
+- **Backdrop Click vs. Swipe Drag Detection**:
+  - Differentiate finger swipes from quick taps using elapsed duration (`Date.now() - startTime`) and displacement threshold (`dx > 20px || dy > 20px`).
+  - Do NOT swallow taps if `elapsed < 250ms`:
+    ```tsx
+    const handleBackdropClick = (e: React.MouseEvent) => {
+      if ((e.target as HTMLElement).closest('[data-lightbox-photo]')) return
+      const elapsed = Date.now() - pointerStartRef.current.time
+      if (isDraggingRef.current && elapsed > 250) {
+        isDraggingRef.current = false
+        return
+      }
+      isDraggingRef.current = false
+      handleClose()
+    }
+    ```
+- **Hardware / Gesture Back Button Handling**:
+  - Plug `ImageLightboxModal` into `useModalHistory({ isOpen, onClose, modalId: 'image-lightbox' })`.
+  - When the user swipes back from the phone's edge or taps the Android back button, the modal dismisses smoothly in place at 0ms without triggering Next.js route transitions or page reloads.
+
+### 2. High-Performance Horizontal Swiping
+- **Native CSS Scroll Snapping**:
+  ```tsx
+  <div
+    ref={scrollRef}
+    onScroll={handleScroll}
+    className="relative w-full h-full flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory no-scrollbar touch-pan-x overscroll-x-contain cursor-pointer"
+  >
+  ```
+- **CRITICAL**: Do **NOT** add `scroll-smooth` to the class list of the touch container. `scroll-smooth` causes mobile touch drag momentum to clash with browser easing physics. Programmatic smooth scrolling should only be used via `el.scrollTo({ left, behavior: 'smooth' })` on arrow and dot clicks.
+- **Decouple Hidden Background Hero Scrolling**:
+  - When opening the lightbox from `NewsDetailModal`, do **NOT** smooth-scroll the hidden hero banner behind the lightbox on every swipe step.
+  - Track the active index in a lightweight ref (`lightboxIndexRef.current = newIdx`) during swipe.
+  - When the lightbox closes, instantly sync the hero banner:
+    ```tsx
+    const handleClosePhoto = useCallback(() => {
+      setIsPhotoOpen(false)
+      const targetIdx = lightboxIndexRef.current
+      setActiveImageIndex(targetIdx)
+      if (heroScrollRef.current) {
+        heroScrollRef.current.scrollLeft = targetIdx * heroScrollRef.current.clientWidth
+      }
+    }, [])
+    ```
+
+---
+
+## 13. Strict Engineering Guardrails (DOs & DON'Ts)
+
+### ❌ What NEVER to Do
+1. **NEVER** use `window.history.pushState` directly without `useModalHistory`'s capture-phase `e.stopImmediatePropagation()`. Doing raw `pushState` in Next.js App Router triggers route revalidation and severe 200–400ms mobile UI freezes.
+2. **NEVER** add `backdrop-filter: blur(...)` to fullscreen photo lightboxes. Mobile tile-based GPUs drop frame rates from 60–120 FPS down to 15 FPS. Use solid `bg-black/92`.
+3. **NEVER** use `scroll-smooth` in CSS on native touch containers (`touch-pan-x` + `snap-x`).
+4. **NEVER** smooth-scroll hidden background elements while a foreground modal is actively being swiped.
+5. **NEVER** add `truncate` or `line-clamp` to leadership member names. Full names (e.g. `Mohammad Ninad Mahmud Nobo`) must remain on one single line (`whitespace-nowrap`).
+6. **NEVER** leave exit animations without `pointerEvents: 'none'`. Failing to add this causes 300–500ms of dead touch time on mobile.
+7. **NEVER** wrap a modal in outer `<AnimatePresence>` if the modal internally contains its own `<AnimatePresence>`. Double presence contexts break exit animations.
+
+### ✅ What ALWAYS to Do
+1. **ALWAYS** use `h-[100dvh]` on mobile sheets instead of `100vh`.
+2. **ALWAYS** provide safe-area padding (`pt-[max(0.75rem,env(safe-area-inset-top))]`) and at least 44–48px touch targets for mobile close buttons.
+3. **ALWAYS** clear `document.body.style.overflow = ''` and `touchAction = ''` at 0ms in `handleClose()` and `handlePopState()`.
+4. **ALWAYS** set explicit background colors on `<html>` and `<body>` to prevent GPU white flashes upon modal unmounting.
+5. **ALWAYS** use `touch-action: manipulation` on buttons and interactive cards to eliminate the 300ms mobile tap delay.
+
