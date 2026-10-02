@@ -102,9 +102,9 @@
        section-alt → alternate (About, Leaders, Contact) — slightly cooler
        footer-bg   → footer — anchoring the bottom
      Change a hex here; every component using the semantic class updates.     */
-  --section-alt:  #e8edf2;
-  --footer-bg:    #dde3ea;
-  --ticker-bg:    #dde5ef;
+  --section-alt: #e8edf2;
+  --footer-bg: #dde3ea;
+  --ticker-bg: #dde5ef;
   --hero-card-bg: #e2eaf4;
 
   /* ── Component tokens ───────────────────────────────────────────────────── */
@@ -148,55 +148,16 @@
   * {
     -webkit-tap-highlight-color: transparent;
   }
-
-  /* Eliminate 300ms mobile tap delay and optimize touch responsiveness across all devices */
-  button,
-  a,
-  input,
-  select,
-  textarea,
-  [role="button"],
-  .cursor-pointer,
-  .cursor-zoom-in {
-    touch-action: manipulation;
-  }
-}
-
-/* Touch momentum scrolling optimizations */
-.custom-scrollbar,
-.no-scrollbar {
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Utility to completely hide scrollbar across all browsers */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* Modal and lightbox bounce containment */
-.overscroll-contain {
-  overscroll-behavior: contain;
-}
-
-/* Zoom cursor affordance */
-.cursor-zoom-in {
-  cursor: zoom-in;
-}
-
-/* Eliminate 300ms mobile touch tap delay across all interactive elements */
-html,
-body,
-button,
-a,
-[role="button"],
-.cursor-pointer,
-.cursor-zoom-in {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -222,6 +183,7 @@ a,
   from {
     transform: translate3d(0, 0, 0);
   }
+
   to {
     transform: translate3d(-50%, 0, 0);
   }

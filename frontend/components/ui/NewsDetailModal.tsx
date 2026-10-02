@@ -1,7 +1,7 @@
 'use client'
 
 import type { JSX } from 'react'
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Calendar, ExternalLink, Globe, Mail, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
@@ -102,7 +102,7 @@ function parseContactBlock(text: string) {
 /**
  * Premium pop-up modal window displaying the full news details, multi-image hero carousel,
  * event gallery grid, full body content, and direct social links.
- * Includes mobile-first back navigation and zero-lag photo lightbox integration matching Fabins.
+ * Includes mobile-first back navigation and zero-lag photo lightbox integration.
  */
 export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps): JSX.Element | null {
   // Integrates browser history so phone back button / edge swipe closes the modal smoothly
@@ -117,48 +117,34 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const heroScrollRef = useRef<HTMLDivElement>(null)
 
-  // Stable refs to track current values without stale closures
-  // These avoid the need to add activeImageIndex as a useCallback dependency,
-  // which would recreate the scroll handler on every scroll — degrading swipe smoothness.
-  const activeImageIndexRef = useRef(activeImageIndex)
-  activeImageIndexRef.current = activeImageIndex
-  const lightboxIndexRef = useRef(0)
-
-  // Memoize complete gallery list in deterministic order: [main, secondary1, secondary2, ...]
-  const modalImages: string[] = useMemo(() => {
-    if (!item) return []
-    if (item.images && item.images.length > 0) return item.images
-    return [item.image, item.secondaryImage].filter((img): img is string => Boolean(img))
-  }, [item])
-
-  const modalImagesLengthRef = useRef(modalImages.length)
-  modalImagesLengthRef.current = modalImages.length
+  // Construct complete gallery list in deterministic order: [main, secondary1, secondary2, ...]
+  const modalImages: string[] = item
+    ? item.images && item.images.length > 0
+      ? item.images
+      : [item.image, item.secondaryImage].filter((img): img is string => Boolean(img))
+    : []
 
   // Reset to first photo whenever opened or item changes
   useEffect(() => {
     setActiveImageIndex(0)
-    activeImageIndexRef.current = 0
-    lightboxIndexRef.current = 0
     const el = heroScrollRef.current
     if (el) {
       el.scrollLeft = 0
     }
   }, [item?.id, isOpen])
 
-  // Real-time horizontal scroll tracking for hero banner.
-  // Uses stable refs instead of activeImageIndex as a dependency to prevent
-  // the callback from being recreated on every scroll (which degraded swipe smoothness).
+  // Real-time horizontal scroll tracking for hero banner
   const handleHeroScroll = useCallback(() => {
     const el = heroScrollRef.current
     if (!el) return
     const width = el.clientWidth
     if (width > 0) {
       const newIndex = Math.round(el.scrollLeft / width)
-      if (newIndex >= 0 && newIndex < modalImagesLengthRef.current && newIndex !== activeImageIndexRef.current) {
+      if (newIndex >= 0 && newIndex < modalImages.length && newIndex !== activeImageIndex) {
         setActiveImageIndex(newIndex)
       }
     }
-  }, [])
+  }, [modalImages.length, activeImageIndex])
 
   // Scroll hero track to a target index smoothly
   const scrollToHeroIndex = useCallback((index: number) => {
@@ -167,35 +153,6 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
     const targetLeft = index * el.clientWidth
     el.scrollTo({ left: targetLeft, behavior: 'smooth' })
     setActiveImageIndex(index)
-  }, [])
-
-  const handleOpenPhoto = useCallback((index: number) => {
-    lightboxIndexRef.current = index
-    setActiveImageIndex(index)
-    setIsPhotoOpen(true)
-  }, [])
-
-  // Closes the lightbox and restores the hero carousel to the last-swiped index.
-  // Uses lightboxIndexRef (updated synchronously by onIndexChange) rather than reading
-  // state after AnimatePresence exit to avoid a race condition where the exiting state
-  // has already been reset before this callback fires.
-  const handleClosePhoto = useCallback(() => {
-    const targetIdx = lightboxIndexRef.current
-    setIsPhotoOpen(false)
-    // Restore hero position immediately so the NewsDetail panel shows the right image
-    // when the lightbox fade-out completes (no jump or blank state)
-    setActiveImageIndex(targetIdx)
-    requestAnimationFrame(() => {
-      const el = heroScrollRef.current
-      if (el) {
-        el.scrollLeft = targetIdx * el.clientWidth
-      }
-    })
-  }, [])
-
-  // Track lightbox swipe index synchronously via ref (no re-render overhead)
-  const handleLightboxIndexChange = useCallback((newIdx: number) => {
-    lightboxIndexRef.current = newIdx
   }, [])
 
   if (!item) return null
@@ -207,13 +164,14 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
       <AnimatePresence>
         {isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-0 lg:p-8 overscroll-contain">
+            {/* Backdrop Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, pointerEvents: 'none' }}
-              transition={{ duration: 0.12, ease: 'easeOut' }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={handleClose}
-              className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm lg:backdrop-blur-md cursor-pointer"
+              className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm lg:backdrop-blur-md"
               aria-hidden="true"
             />
 
@@ -224,8 +182,8 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
               aria-labelledby="modal-title"
               initial={{ opacity: 0, scale: 0.96, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.97, pointerEvents: 'none' }}
-              transition={{ duration: 0.12, ease: 'easeOut' }}
+              exit={{ opacity: 0, scale: 0.96, y: 15 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 350 }}
               className="relative w-full h-[100dvh] lg:h-auto lg:max-w-2xl lg:max-h-[92vh] flex flex-col rounded-none lg:rounded-3xl bg-white shadow-2xl border-0 lg:border border-slate-200/90 overflow-hidden z-10 overscroll-contain"
             >
               {/* Sticky Top Navigation Bar */}
@@ -261,19 +219,20 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                     <div
                       ref={heroScrollRef}
                       onScroll={handleHeroScroll}
-                      className="w-full h-full flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory no-scrollbar touch-pan-x overscroll-x-contain"
+                      className="w-full h-full flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory no-scrollbar touch-pan-x overscroll-x-contain scroll-smooth"
                     >
                       {modalImages.map((imgSrc, idx) => (
                         <div
                           key={idx}
-                          onClick={() => handleOpenPhoto(idx)}
+                          onClick={() => {
+                            setActiveImageIndex(idx)
+                            setIsPhotoOpen(true)
+                          }}
                           className="w-full h-full shrink-0 snap-center snap-always flex items-center justify-center cursor-zoom-in relative"
                         >
                           <img
                             src={imgSrc}
-                            alt={`${item.title} - Photo ${idx + 1}`}
-                            loading="eager"
-                            decoding="async"
+                            alt={`${item.title} — Photo ${idx + 1}`}
                             className="w-full h-full object-contain p-2 sm:p-3 pointer-events-none"
                           />
                         </div>
@@ -337,11 +296,10 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                               scrollToHeroIndex(idx)
                             }}
                             aria-label={`Go to photo ${idx + 1}`}
-                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                              idx === activeImageIndex
-                                ? 'w-5 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]'
-                                : 'w-1.5 bg-white/40 hover:bg-white/70'
-                            }`}
+                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${idx === activeImageIndex
+                              ? 'w-3.5 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]'
+                              : 'w-1.5 bg-white/40 hover:bg-white/70'
+                              }`}
                           />
                         ))}
                       </div>
@@ -350,9 +308,9 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                 )}
 
                 {/* Main Body Content */}
-                <div className="p-5 lg:p-8">
+                <div className="p-4 sm:p-8">
                   {/* Meta details */}
-                  <div className="flex items-center gap-2 text-xs lg:text-sm text-slate-500 font-semibold mb-3">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-semibold mb-3">
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                       <Calendar size={14} className="text-sky-500" />
                       <span>{formatDate(item.date)}</span>
@@ -362,67 +320,62 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                   {/* Title */}
                   <h3
                     id="modal-title"
-                    className="text-xl lg:text-2xl font-black text-slate-900 tracking-tight leading-snug mb-4"
+                    className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug mb-4"
                   >
                     {item.title}
                   </h3>
 
                   {/* Short preview highlight box */}
                   {item.description && (
-                    <div className="p-4 lg:p-5 rounded-2xl bg-gradient-to-r from-sky-50/90 to-indigo-50/60 border border-sky-100/90 text-slate-800 text-sm lg:text-base font-semibold leading-relaxed mb-6 shadow-xs">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-sky-50/90 to-indigo-50/60 border border-sky-100/90 text-slate-800 text-sm sm:text-base font-semibold leading-relaxed mb-6 shadow-xs select-text cursor-default">
                       {item.description}
                     </div>
                   )}
 
-                  {/* Event Gallery Grid for Multi-Image News */}
+                  {/* Event Gallery Grid (when item has multiple images) */}
                   {isMultiple && (
-                    <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-sky-50/40 border border-slate-200/90 shadow-xs">
-                      <div className="flex items-center justify-between mb-3.5">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
-                          <h4 className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight">
-                            Event Gallery ({modalImages.length} Photos)
-                          </h4>
-                        </div>
-                        <span className="text-[11px] sm:text-xs text-slate-500 font-semibold">
-                          Tap to enlarge or switch
+                    <div className="mb-6 pt-1">
+                      <div className="flex items-center justify-between mb-2.5">
+                        <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                          <span>Event Gallery</span>
+                          <span className="text-[11px] text-slate-500 font-semibold lowercase">
+                            ({modalImages.length} photos)
+                          </span>
+                        </h4>
+                        <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+                          Click photo to expand
                         </span>
                       </div>
 
                       <div
-                        className={`grid gap-2.5 sm:gap-3.5 ${
-                          modalImages.length >= 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'
-                        }`}
+                        className={`grid gap-2 sm:gap-3 ${modalImages.length >= 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'
+                          }`}
                       >
                         {modalImages.map((imgSrc, idx) => {
-                          const isCurrent = idx === activeImageIndex
+                          const isActive = idx === activeImageIndex
                           return (
                             <div
                               key={idx}
-                              onClick={() => handleOpenPhoto(idx)}
-                              className={`group relative rounded-xl sm:rounded-2xl overflow-hidden bg-slate-900 border-2 cursor-pointer shadow-xs transition-all duration-200 active:scale-95 ${
-                                isCurrent
-                                  ? 'border-sky-500 ring-2 ring-sky-400/40 shadow-md'
-                                  : 'border-slate-200/80 hover:border-sky-300'
-                              }`}
+                              onClick={() => {
+                                setActiveImageIndex(idx)
+                                scrollToHeroIndex(idx)
+                                setIsPhotoOpen(true)
+                              }}
+                              className={`group relative aspect-[4/3] rounded-xl overflow-hidden cursor-zoom-in border-2 transition-all duration-200 bg-slate-900 shadow-xs ${isActive
+                                ? 'border-sky-500 ring-2 ring-sky-400/40 shadow-md'
+                                : 'border-slate-200 hover:border-sky-400'
+                                }`}
                             >
-                              <div className="w-full h-20 sm:h-24 overflow-hidden">
-                                <img
-                                  src={imgSrc}
-                                  alt={`${item.title} - Photo ${idx + 1}`}
-                                  loading="lazy"
-                                  decoding="async"
-                                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                                />
-                              </div>
-
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-
-                              <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between">
+                              <img
+                                src={imgSrc}
+                                alt={`Thumbnail ${idx + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 pointer-events-none"
+                              />
+                              <div className="absolute inset-0 bg-black/15 group-hover:bg-transparent transition-colors" />
+                              <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between pointer-events-none">
                                 <span
-                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-xs shadow-xs ${
-                                    idx === 0 ? 'bg-sky-500 text-white' : 'bg-black/60 text-white'
-                                  }`}
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-xs shadow-xs ${idx === 0 ? 'bg-sky-500 text-white' : 'bg-black/60 text-white'
+                                    }`}
                                 >
                                   {idx === 0 ? 'Photo 1 • Main' : `Photo ${idx + 1}`}
                                 </span>
@@ -452,9 +405,8 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                             </div>
 
                             <div
-                              className={`grid gap-1.5 sm:gap-2.5 w-full ${
-                                contact.website && contact.email ? 'grid-cols-2' : 'grid-cols-1'
-                              }`}
+                              className={`grid gap-1.5 sm:gap-2.5 w-full ${contact.website && contact.email ? 'grid-cols-2' : 'grid-cols-1'
+                                }`}
                             >
                               {/* Email on LEFT */}
                               {contact.email && (
@@ -557,11 +509,14 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
       {/* Zero-Lag Fullscreen Photo Lightbox Modal */}
       <ImageLightboxModal
         isOpen={isPhotoOpen}
-        onClose={handleClosePhoto}
+        onClose={() => setIsPhotoOpen(false)}
         title={item.title}
         images={modalImages}
         initialIndex={activeImageIndex}
-        onIndexChange={handleLightboxIndexChange}
+        onIndexChange={(newIdx) => {
+          setActiveImageIndex(newIdx)
+          scrollToHeroIndex(newIdx)
+        }}
       />
     </>
   )

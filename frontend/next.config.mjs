@@ -100,6 +100,7 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
   },
+
   /**
    * TypeScript build errors.
    *
