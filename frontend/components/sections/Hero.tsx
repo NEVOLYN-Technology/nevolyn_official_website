@@ -45,11 +45,6 @@ export const Hero = (): JSX.Element => {
               </span>
             </h1>
 
-            {/* Subtitle */}
-            <p className="mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600 font-normal">
-              We build smart software and automation systems that help businesses work faster and smarter
-            </p>
-
             {/* Social & CTA Action Buttons (Single line on both web and mobile) */}
             <div className="mt-6 flex items-center gap-1.5 min-[380px]:gap-2.5 sm:gap-3 max-w-full overflow-x-auto no-scrollbar py-1">
               <a

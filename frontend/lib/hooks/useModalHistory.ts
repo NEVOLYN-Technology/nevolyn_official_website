@@ -33,8 +33,13 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     isClosingRef.current = true
 
     // Immediately restore body scroll and touch responsiveness for zero mobile inactivity
-    document.body.style.overflow = ''
-    document.body.style.touchAction = ''
+    if (typeof document !== 'undefined') {
+      const activeModals = document.querySelectorAll('[role="dialog"]')
+      if (activeModals.length <= 1) {
+        document.body.style.overflow = ''
+        document.body.style.touchAction = ''
+      }
+    }
 
     // Immediately trigger React state closure for instant 0ms dismissal
     onCloseRef.current()
@@ -71,8 +76,13 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       hasPushedStateRef.current = false
       // Prevent Next.js App Router from treating modal pop as a route transition (no reload/blur)
       e.stopImmediatePropagation()
-      document.body.style.overflow = ''
-      document.body.style.touchAction = ''
+      if (typeof document !== 'undefined') {
+        const activeModals = document.querySelectorAll('[role="dialog"]')
+        if (activeModals.length <= 1) {
+          document.body.style.overflow = ''
+          document.body.style.touchAction = ''
+        }
+      }
       onCloseRef.current()
     }
 
@@ -93,8 +103,13 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     return () => {
       window.removeEventListener('popstate', handlePopState, true)
       window.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = originalOverflow
-      document.body.style.touchAction = originalTouchAction
+      if (typeof document !== 'undefined') {
+        const activeModals = document.querySelectorAll('[role="dialog"]')
+        if (activeModals.length <= 1) {
+          document.body.style.overflow = originalOverflow
+          document.body.style.touchAction = originalTouchAction
+        }
+      }
     }
   }, [isOpen, modalId, handleClose])
 

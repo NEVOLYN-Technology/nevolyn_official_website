@@ -23,8 +23,22 @@ Both **FABINS** (`D:\fabins_automation_website`) and **NEVOLYN** (`D:\nevolyn_of
    - *Solution*: Modals use `h-[100dvh]` (Dynamic Viewport Height) on mobile devices to ensure full content visibility.
 5. **Accidental Dismissal During Photo Swiping**:
    - *Problem*: Touch-swiping between photos can trigger background click handlers upon pointer release, abruptly closing the lightbox.
-   - *Solution*: Pointer gesture detection tracks drag distance (`dx > 10 || dy > 10`) and suppresses click events if the user was swiping.
-
+   - *Solution*: Pointer gesture detection tracks drag distance (`dx > 12 || dy > 12`) and suppresses click events if the user was swiping. `handleScroll` does NOT mark dragging, so stationary backdrop taps always close on the very first touch.
+6. **White Flash When Returning from Fullscreen Image View**:
+   - *Problem*: On mobile GPUs, fading out a 92% black fixed overlay over an `<html>` canvas with no explicit background color triggers an alpha-blending composite pass that flashes the root white canvas for 50–100ms.
+   - *Solution*: Set explicit background color (`var(--background)` / `#eef1f5`) on both `<html>` and `<body>` in CSS and layout. In `ImageLightboxModal`, execute `if (!isOpen || validImages.length === 0) return null` before the return statement so dismissal is instantaneous (0ms) without triggering an opacity blend pass on mobile GPUs.
+7. **Mobile Touch Inactivity / Dead Time on Modal Dismissal (`LeaderDetails` & `NewsDetailModal`)**:
+   - *Problem*: Standard spring exit transitions (`damping: 30, stiffness: 350`) hold the fixed backdrop and modal in the DOM for ~450ms. With `pointer-events: auto`, the dying modal absorbs all mobile touches, making the website feel frozen or unresponsive for half a second.
+   - *Solution*: Apply `pointerEvents: 'none'` on exit (`exit={{ opacity: 0, scale: 0.97, pointerEvents: 'none' }}`) with a fast 120ms easeOut (`duration: 0.12, ease: 'easeOut'`), and immediately restore `document.body.style.overflow = ''` in `handleClose()` and `handlePopState()` at 0ms so scrolling and tapping unlock instantly.
+8. **Underlying Page Re-fetching & Background Blur on History Pop**:
+   - *Problem*: Next.js App Router listens globally to `popstate`. When `window.history.back()` runs, Next.js treats it as a route transition, triggering server revalidation which blurs the underlying page and re-fetches RSC payloads over cellular networks.
+   - *Solution*: Use capture-phase listener (`window.addEventListener('popstate', handlePopState, true)`) and call `e.stopImmediatePropagation()` to intercept the pop before Next.js ever sees it.
+9. **Mobile Image Viewer Delay on Close/Back from Webpage Feed**:
+   - *Problem*: On mobile, when opening an image viewer directly from the website, tapping the close button or tapping outside took a few seconds before closing. Brittle touch movement thresholds (`dx > 12`) misidentified normal capacitive finger taps as drags, ignoring backdrop clicks, while small touch targets without safe-area insets overlapped phone status bars. Furthermore, unhandled phone edge-swipes or back button presses triggered native browser route unloading.
+   - *Solution*: Integrate `useModalHistory` with `modalId: 'image-lightbox'`, safe-area inset padding (`pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))]`), a minimum 44–48px touch target with `touch-manipulation`, proper tap-duration detection (`elapsed < 250ms`), and immediate 0ms body scroll and touch restoration.
+10. **View Details Fullscreen Lightbox Swiping Jank & Stutter**:
+   - *Problem*: Swiping between multiple photos inside View Details was noticeably less smooth than the website viewer. The `onIndexChange` callback continuously smooth-scrolled the hidden hero carousel track in the background and updated parent state on every swipe step, causing full modal re-renders and re-triggering programmatic scroll overrides while the user's finger was still dragging.
+   - *Solution*: Decouple background hero scrolling from active lightbox swiping. Keep the active index in a lightweight ref (`lightboxIndexRef`), let the lightbox utilize unconstrained native GPU-accelerated CSS scroll snapping during swipe, and synchronize the hero track directly upon modal close.
 ---
 
 ## 🔬 Deep Dive: Why "Works in Localhost but Lags When Deployed on Mobile" Happens
@@ -141,13 +155,13 @@ interface UseModalHistoryOptions {
 }
 
 /**
- * useModalHistory - Manages browser history integration for popup modals.
+ * useModalHistory - Zero-Lag Browser History Integration for Modals.
  *
  * 1. Pushes a lightweight history state when the modal opens.
- * 2. Catches `popstate` when the user swipes back or taps the phone's back button,
- *    closing the modal smoothly without navigating away.
- * 3. `handleClose()` pops the pushed state via `window.history.back()` or falls back to `onClose()`.
- * 4. Locks body scroll and keyboard Escape events while open.
+ * 2. Catches `popstate` in CAPTURE phase (`true`) with `e.stopImmediatePropagation()` so
+ *    Next.js App Router never triggers a route transition (no page reload/blur).
+ * 3. Immediately unlocks body scroll (`document.body.style.overflow = ''`) on close for zero touch inactivity.
+ * 4. `handleClose()` calls `window.history.back()` in the background while dismissing the UI at 0ms.
  */
 export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModalHistoryOptions) {
   const hasPushedStateRef = useRef(false)
@@ -160,6 +174,13 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     if (isClosingRef.current) return
     isClosingRef.current = true
 
+    // Immediately restore body scroll and touch responsiveness for zero mobile inactivity
+    document.body.style.overflow = ''
+    document.body.style.touchAction = ''
+
+    // Immediately trigger React state closure for instant 0ms dismissal
+    onCloseRef.current()
+
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
       if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
@@ -167,8 +188,6 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
         return
       }
     }
-
-    onCloseRef.current()
   }, [modalId])
 
   useEffect(() => {
@@ -189,8 +208,12 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       hasPushedStateRef.current = false
     }
 
-    const handlePopState = () => {
+    const handlePopState = (e: PopStateEvent) => {
       hasPushedStateRef.current = false
+      // Prevent Next.js App Router from treating modal pop as a route transition (no reload/blur)
+      e.stopImmediatePropagation()
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
       onCloseRef.current()
     }
 
@@ -200,7 +223,8 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       }
     }
 
-    window.addEventListener('popstate', handlePopState)
+    // Attach in CAPTURE phase so we intercept before Next.js App Router
+    window.addEventListener('popstate', handlePopState, true)
     window.addEventListener('keydown', handleKeyDown)
 
     // Lock background scrolling while open
@@ -209,7 +233,7 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     document.body.style.overflow = 'hidden'
 
     return () => {
-      window.removeEventListener('popstate', handlePopState)
+      window.removeEventListener('popstate', handlePopState, true)
       window.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = originalOverflow
       document.body.style.touchAction = originalTouchAction
@@ -257,63 +281,88 @@ export function ImageLightboxModal({
   initialIndex = 0,
   onIndexChange,
 }: ImageLightboxModalProps): JSX.Element | null {
-  const validImages = images.length > 0 ? images : []
+  const lastValidImagesRef = useRef<string[]>([])
+  if (images && images.length > 0) {
+    lastValidImagesRef.current = images
+  }
+  const displayImages = images && images.length > 0 ? images : lastValidImagesRef.current
+  const isMultiple = displayImages.length > 1
+
+  // Integrates browser history so phone back button / edge swipe closes the lightbox smoothly
+  const { handleClose } = useModalHistory({
+    isOpen: Boolean(isOpen && displayImages.length > 0),
+    onClose,
+    modalId: 'image-lightbox',
+  })
+
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const isFirstOpenRef = useRef(false)
+  const pointerStartRef = useRef<{ x: number; y: number; time: number }>({ x: 0, y: 0, time: 0 })
   const isDraggingRef = useRef(false)
-  const pointerStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
-  // Synchronize index when initialIndex changes or modal opens
+  // Initialize active photo ONLY when modal transitions from closed to open
   useEffect(() => {
     if (isOpen) {
-      const targetIndex = Math.max(0, Math.min(initialIndex, validImages.length - 1))
-      setCurrentIndex(targetIndex)
-      requestAnimationFrame(() => {
-        const el = scrollRef.current
-        if (el) {
-          el.scrollLeft = targetIndex * el.clientWidth
-        }
-      })
+      if (!isFirstOpenRef.current) {
+        isFirstOpenRef.current = true
+        const targetIndex = Math.max(0, Math.min(initialIndex, displayImages.length - 1))
+        setCurrentIndex(targetIndex)
+        requestAnimationFrame(() => {
+          const el = scrollRef.current
+          if (el) {
+            el.scrollLeft = targetIndex * el.clientWidth
+          }
+        })
+      }
+    } else {
+      isFirstOpenRef.current = false
     }
-  }, [isOpen, initialIndex, validImages.length])
+  }, [isOpen, initialIndex, displayImages.length])
 
-  // Track pointer gestures to prevent closing when dragging/swiping
+  // Track pointer gestures to distinguish true swipes from quick taps
   const handlePointerDown = (e: React.PointerEvent) => {
-    pointerStartRef.current = { x: e.clientX, y: e.clientY }
+    pointerStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() }
     isDraggingRef.current = false
   }
 
   const handlePointerMove = (e: React.PointerEvent) => {
     const dx = Math.abs(e.clientX - pointerStartRef.current.x)
     const dy = Math.abs(e.clientY - pointerStartRef.current.y)
-    if (dx > 10 || dy > 10) {
+    if (dx > 20 || dy > 20) {
       isDraggingRef.current = true
     }
   }
 
-  // Dismiss modal on backdrop clicks unless user was swiping
-  const handleBackdropClick = () => {
-    if (isDraggingRef.current) {
+  // Dismiss modal on backdrop / outside clicks unless user was swiping photos
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('[data-lightbox-photo]')) {
+      return
+    }
+
+    const elapsed = Date.now() - pointerStartRef.current.time
+    if (isDraggingRef.current && elapsed > 250) {
       isDraggingRef.current = false
       return
     }
-    onClose()
+
+    isDraggingRef.current = false
+    handleClose()
   }
 
   // Real-time horizontal scroll tracking
   const handleScroll = useCallback(() => {
-    isDraggingRef.current = true
     const el = scrollRef.current
     if (!el) return
     const width = el.clientWidth
     if (width > 0) {
       const newIndex = Math.round(el.scrollLeft / width)
-      if (newIndex >= 0 && newIndex < validImages.length && newIndex !== currentIndex) {
+      if (newIndex >= 0 && newIndex < displayImages.length && newIndex !== currentIndex) {
         setCurrentIndex(newIndex)
         onIndexChange?.(newIndex)
       }
     }
-  }, [validImages.length, currentIndex, onIndexChange])
+  }, [displayImages.length, currentIndex, onIndexChange])
 
   // Scroll to a specific photo index smoothly
   const scrollToIndex = useCallback((index: number) => {
@@ -589,10 +638,10 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, pointerEvents: 'none' }}
+              transition={{ duration: 0.12, ease: 'easeOut' }}
               onClick={handleClose}
-              className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm lg:backdrop-blur-md"
+              className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm lg:backdrop-blur-md cursor-pointer"
               aria-hidden="true"
             />
 
@@ -603,8 +652,8 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
               aria-labelledby="modal-title"
               initial={{ opacity: 0, scale: 0.96, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 15 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+              exit={{ opacity: 0, scale: 0.97, pointerEvents: 'none' }}
+              transition={{ duration: 0.12, ease: 'easeOut' }}
               className="relative w-full h-[100dvh] lg:h-auto lg:max-w-2xl lg:max-h-[92vh] flex flex-col rounded-none lg:rounded-3xl bg-white shadow-2xl border-0 lg:border border-slate-200/90 overflow-hidden z-10 overscroll-contain"
             >
               {/* Sticky Top Navigation Bar */}
@@ -966,3 +1015,8 @@ export function LatestNewsSection() {
 | **5** | **`100dvh` Mobile Modal Sheet** | `h-[100dvh]` on mobile breakpoints | Eliminates cutoff buttons caused by mobile browser address bars |
 | **6** | **CSS Scroll Snap** | `snap-x snap-mandatory touch-pan-x` | Uses compositor thread for 60/120Hz smooth touch panning |
 | **7** | **Single-Row Action Toolbars** | `flex items-center justify-between gap-2` with `shrink-0` | Prevents awkward multi-line button wrapping on screens `< 400px` |
+| **8** | **Capture-Phase `popstate` Interception** | `window.addEventListener('popstate', ..., true)` with `e.stopImmediatePropagation()` | Prevents Next.js App Router from reloading/blurring background page |
+| **9** | **`pointerEvents: 'none'` on Modal Exit** | `exit={{ opacity: 0, scale: 0.97, pointerEvents: 'none' }}` with `0.12s easeOut` | Eliminates 450ms touch dead time upon closing modals on mobile |
+| **10** | **Instant Body Scroll Unlock** | `document.body.style.overflow = ''` in `handleClose()` and `handlePopState()` | Unlocks touch scrolling at 0ms without waiting for React unmount |
+| **11** | **Explicit Root Canvas Background** | `html, body { background-color: var(--background); }` | Eliminates white flash during full-screen modal unmounts on mobile GPUs |
+| **12** | **No Drag Flag in `handleScroll`** | Track drag only in `handlePointerMove` (`dx > 12 \|\| dy > 12`) | Ensures first tap on backdrop immediately dismisses the lightbox |

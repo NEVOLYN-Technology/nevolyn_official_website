@@ -115,6 +115,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
   // Full-screen zero-lag lightbox state
   const [isPhotoOpen, setIsPhotoOpen] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const lightboxIndexRef = useRef(0)
   const heroScrollRef = useRef<HTMLDivElement>(null)
 
   // Construct complete gallery list in deterministic order: [main, secondary1, secondary2, ...]
@@ -153,6 +154,22 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
     const targetLeft = index * el.clientWidth
     el.scrollTo({ left: targetLeft, behavior: 'smooth' })
     setActiveImageIndex(index)
+  }, [])
+
+  const handleOpenPhoto = useCallback((index: number) => {
+    setActiveImageIndex(index)
+    lightboxIndexRef.current = index
+    setIsPhotoOpen(true)
+  }, [])
+
+  const handleClosePhoto = useCallback(() => {
+    setIsPhotoOpen(false)
+    const targetIdx = lightboxIndexRef.current
+    setActiveImageIndex(targetIdx)
+    const el = heroScrollRef.current
+    if (el) {
+      el.scrollLeft = targetIdx * el.clientWidth
+    }
   }, [])
 
   if (!item) return null
@@ -224,10 +241,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                       {modalImages.map((imgSrc, idx) => (
                         <div
                           key={idx}
-                          onClick={() => {
-                            setActiveImageIndex(idx)
-                            setIsPhotoOpen(true)
-                          }}
+                          onClick={() => handleOpenPhoto(idx)}
                           className="w-full h-full shrink-0 snap-center snap-always flex items-center justify-center cursor-zoom-in relative"
                         >
                           <img
@@ -362,6 +376,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                               key={idx}
                               onClick={() => {
                                 scrollToHeroIndex(idx)
+                                lightboxIndexRef.current = idx
                                 setIsPhotoOpen(true)
                               }}
                               className={`group relative rounded-xl sm:rounded-2xl overflow-hidden bg-slate-900 border-2 cursor-pointer shadow-xs transition-all duration-200 active:scale-95 ${
@@ -521,13 +536,12 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
       {/* Zero-Lag Fullscreen Photo Lightbox Modal */}
       <ImageLightboxModal
         isOpen={isPhotoOpen}
-        onClose={() => setIsPhotoOpen(false)}
+        onClose={handleClosePhoto}
         title={item.title}
         images={modalImages}
         initialIndex={activeImageIndex}
         onIndexChange={(newIdx) => {
-          setActiveImageIndex(newIdx)
-          scrollToHeroIndex(newIdx)
+          lightboxIndexRef.current = newIdx
         }}
       />
     </>

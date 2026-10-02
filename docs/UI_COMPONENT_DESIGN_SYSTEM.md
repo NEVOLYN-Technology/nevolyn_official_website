@@ -271,3 +271,106 @@ On the bottom action bar (`CarouselCard.tsx`):
 | **Lightbox State** | Pure React (`NO pushState`) | Pure React (`NO pushState`) | Pure React (`NO pushState`) |
 | **Lightbox Arrows** | Visible (`absolute left-2`) | Visible (`absolute left-3`) | Visible (`absolute left-4`) |
 | **Back Button Action** | Closes modal via `popstate` / `history.back()` | Closes modal via `popstate` / `history.back()` | Closes modal via on-screen button / `Esc` |
+
+---
+
+## 8. Leadership & Team Profile Cards (Single-Line Full Name Guarantee)
+
+### The Single-Line Full Name Requirement
+Names of all lengths (including long names up to 30 characters such as **`Mohammad Ninad Mahmud Nobo`**) must **always remain in a single horizontal line** (`whitespace-nowrap`) and **100% visible** without any truncation (`...`) or multi-line wrapping across all mobile device viewports (from 320px ultra-compact phones to 430px+ modern displays).
+
+### Card Shell Dimensions & Responsive Typography
+- **Container Padding Optimization**:
+  - Mobile: `p-4 min-[360px]:p-5 sm:p-7`
+  - *Rationale*: Standard 24px padding (`p-6`) consumes 48px of width, leaving too little room on 360px mobile screens. Reducing mobile padding to `p-4` or `p-5` expands the inner text width to 288px+, easily accommodating long names.
+- **Card Headline Typography**:
+  ```tsx
+  <h3 className="text-[13px] min-[360px]:text-[14px] min-[390px]:text-[15.5px] sm:text-lg md:text-xl font-bold text-slate-900 mb-1.5 min-h-[2.25rem] sm:min-h-[3rem] flex items-center justify-center leading-tight whitespace-nowrap tracking-tight">
+    {member.name}
+  </h3>
+  ```
+- **Proportional Avatar**:
+  - `w-24 h-24 sm:w-28 sm:h-28` to maintain balanced visual hierarchy alongside the responsive title.
+
+---
+
+## 9. Leader & Member Profile Modal Header (`LeaderDetails.tsx`)
+
+### Fullscreen Modal Header Sizing
+The sticky top navigation bar of member profile modals must accommodate long full names in **one single line** without text truncation:
+- **Header Container**:
+  ```tsx
+  <div className="flex shrink-0 items-center justify-between gap-2.5 sm:gap-4 lg:gap-6 border-b border-slate-100 bg-white p-3 sm:p-5 lg:p-6 lg:px-8 z-10">
+  ```
+- **Avatar in Header**:
+  ```tsx
+  <div className="relative flex h-11 w-11 sm:h-16 sm:w-16 lg:h-20 lg:w-20 shrink-0 items-center justify-center rounded-full bg-white p-0.5 lg:p-1 ring-2">
+  ```
+- **Header Name Typography**:
+  ```tsx
+  <h3
+    id={headingId}
+    className="text-[13px] min-[360px]:text-[14.5px] min-[390px]:text-base sm:text-xl lg:text-2xl font-extrabold tracking-tight text-slate-900 whitespace-nowrap leading-tight"
+  >
+    {member.name}
+  </h3>
+  ```
+- **Critical Rule**: **Never** add `truncate` to the member's name in this header. Use `whitespace-nowrap` paired with responsive font clamps so the full name is always 100% visible on mobile.
+
+---
+
+## 10. Modal Dismissal Touch Ergonomics (`pointer-events-none` & Zero Inactivity)
+
+### The Problem
+When a modal unmounts via Framer Motion, standard spring transitions (`damping: 30, stiffness: 350`) hold the fixed backdrop in the DOM for ~450ms. If `pointer-events: auto` remains active, user touches intended for the landing page are intercepted by the fading modal, causing noticeable touch lag or inactivity on mobile.
+
+### The Standard Implementation
+1. **Disable Touch Interception on Exit**:
+   ```tsx
+   {/* Backdrop Overlay */}
+   <motion.div
+     initial={{ opacity: 0 }}
+     animate={{ opacity: 1 }}
+     exit={{ opacity: 0, pointerEvents: 'none' }}
+     transition={{ duration: 0.12, ease: 'easeOut' }}
+     onClick={handleClose}
+     className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-sm sm:backdrop-blur-md cursor-pointer"
+   />
+
+   {/* Modal Dialog Panel */}
+   <motion.div
+     role="dialog"
+     initial={{ opacity: 0, scale: 0.96, y: 15 }}
+     animate={{ opacity: 1, scale: 1, y: 0 }}
+     exit={{ opacity: 0, scale: 0.97, pointerEvents: 'none' }}
+     transition={{ duration: 0.12, ease: 'easeOut' }}
+     className="fixed inset-0 ... z-50"
+   />
+   ```
+2. **Instant Scroll & Touch Unlock (0ms)**:
+   In `useModalHistory.ts`, unlock body styles immediately inside `handleClose()` and `handlePopState()`:
+   ```typescript
+   document.body.style.overflow = ''
+   document.body.style.touchAction = ''
+   ```
+   *Result*: The user can scroll or tap the webpage the exact millisecond they tap Close, with 0ms dead time.
+
+---
+
+## 11. Root Viewport Canvas Background Token
+
+To eliminate white screen flashes when unmounting full-screen overlays on mobile GPUs:
+- Both `<html>` and `<body>` must explicitly declare `background-color: var(--background)` in `globals.css`:
+  ```css
+  html {
+    background-color: var(--background);
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-background text-foreground overflow-x-hidden;
+    background-color: var(--background);
+  }
+  ```
+- `app/layout.tsx` must declare `style={{ backgroundColor: '#eef1f5' }}` directly on both tags to guarantee the browser window canvas matches the page background prior to CSS hydration.
