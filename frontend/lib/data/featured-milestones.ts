@@ -56,7 +56,7 @@ export const featuredMilestones: FeaturedMilestone[] = [
     images: ['/news_fabinsXfair02.jpg', '/news_fabinsXfair03.jpg'],
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-bangladeshinnovationfair2026-activity-7508553026446512128-zo3h?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1EsgpSB4Vo/',
+    facebookUrl: 'https://www.facebook.com/share/p/1Dic4Zk1C1/',
   },
   {
     id: 'milestone-axentec-nda',
@@ -70,7 +70,7 @@ export const featuredMilestones: FeaturedMilestone[] = [
     image: '/news_fabinsXexentec.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_nevolyn-fabins-fabricinspection-activity-7508471434042785792-6YqT?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1MgvnDq9Ds/',
+    facebookUrl: 'https://www.facebook.com/share/p/1KFM2uWrgb/',
   },
   {
     id: 'milestone-buet-irab-showcase',
@@ -84,7 +84,7 @@ export const featuredMilestones: FeaturedMilestone[] = [
     image: '/news_fabinsXbuet.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508466089102643200-nWOb?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1Bybv2bMbs/',
+    facebookUrl: 'https://www.facebook.com/share/p/1ExQkVx3WH/',
   },
   {
     id: 'milestone-saturn-partnership',
@@ -98,6 +98,6 @@ export const featuredMilestones: FeaturedMilestone[] = [
     image: '/news_fabinsXsaturn.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508463008101056512-7NoV?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1E3tTbM17b/',
+    facebookUrl: 'https://www.facebook.com/share/p/1Cu2GnNnWQ/',
   },
 ]

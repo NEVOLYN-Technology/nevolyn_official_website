@@ -61,7 +61,7 @@ export const news: NewsItem[] = [
     images: ['/news_fabinsXfair02.jpg', '/news_fabinsXfair03.jpg'],
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-bangladeshinnovationfair2026-activity-7508553026446512128-zo3h?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1EsgpSB4Vo/',
+    facebookUrl: 'https://www.facebook.com/share/p/1Dic4Zk1C1/',
   },
   {
     id: 'news-pm-visit-stall-15',
@@ -82,7 +82,7 @@ export const news: NewsItem[] = [
     ],
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-bangladeshinnovationfair2026-activity-7508552627731722240-UWcm?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1Dq8Li6t5H/',
+    facebookUrl: 'https://www.facebook.com/share/p/1EWaRZbEjL/',
   },
   {
     id: 'news-fair-selection-top50',
@@ -96,7 +96,7 @@ export const news: NewsItem[] = [
     image: '/news_fabinsXfair01.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-bangladeshinnovationfair2026-activity-7508552213913419776-FhHB?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1F985fryaC/',
+    facebookUrl: 'https://www.facebook.com/share/p/1Dneow7TW9/',
   },
   {
     id: 'news-axentec-nda',
@@ -110,7 +110,7 @@ export const news: NewsItem[] = [
     image: '/news_fabinsXexentec.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_nevolyn-fabins-fabricinspection-activity-7508471434042785792-6YqT?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1MgvnDq9Ds/',
+    facebookUrl: 'https://www.facebook.com/share/p/1KFM2uWrgb/',
   },
   {
     id: 'news-nsu-startups-next',
@@ -124,7 +124,7 @@ export const news: NewsItem[] = [
     image: '/news_fabinsXnsu.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_nevolyn-fabins-nsu-activity-7508470824220303362-3Cqq?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1Bar7mazn8/',
+    facebookUrl: 'https://www.facebook.com/share/p/1CCYuHFcQ4/',
   },
   {
     id: 'news-ontik-technology',
@@ -138,7 +138,7 @@ export const news: NewsItem[] = [
     image: '/news_fabinsXontik.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508467193739853824-OYF7?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1DjzwWEEtX/',
+    facebookUrl: 'https://www.facebook.com/share/p/196S5r5pyA/',
   },
   {
     id: 'news-buet-irab-showcase',
@@ -152,7 +152,7 @@ export const news: NewsItem[] = [
     image: '/news_fabinsXbuet.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508466089102643200-nWOb?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1Bybv2bMbs/',
+    facebookUrl: 'https://www.facebook.com/share/p/1ExQkVx3WH/',
   },
   {
     id: 'news-saturn-partnership',
@@ -166,7 +166,7 @@ export const news: NewsItem[] = [
     image: '/news_fabinsXsaturn.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508463008101056512-7NoV?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1E3tTbM17b/',
+    facebookUrl: 'https://www.facebook.com/share/p/1Cu2GnNnWQ/',
   },
   {
     id: 'news-saturn-poc',
@@ -180,6 +180,6 @@ export const news: NewsItem[] = [
     image: '/news_poc_1.jpg',
     linkedinUrl:
       'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508451195204718592-72CT?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
-    facebookUrl: 'https://www.facebook.com/share/p/1Dbpe1QLJD/',
+    facebookUrl: 'https://www.facebook.com/share/p/14qC7DiQEA4/',
   },
 ]

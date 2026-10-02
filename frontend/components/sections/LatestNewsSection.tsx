@@ -23,7 +23,6 @@ import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 import { SECTION_BG } from '@/lib/constants/theme'
 import { NewsDetailModal, type NewsModalItem } from '@/components/ui/NewsDetailModal'
 import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
-import { useModalHistory } from '@/lib/hooks/useModalHistory'
 
 /**
  * News timeline section rendering featured project announcements in a 3D carousel and
@@ -34,27 +33,13 @@ import { useModalHistory } from '@/lib/hooks/useModalHistory'
 export const LatestNewsSection = (): JSX.Element => {
   // Active selected item for the "View Details" pop-up modal
   const [selectedNews, setSelectedNews] = useState<NewsModalItem | null>(null)
-  const handleCloseNews = useCallback(() => {
-    setSelectedNews(null)
-  }, [])
 
-  // Active selected photo for the full-screen photo lightbox
+  // Active selected photo gallery for the zero-lag fullscreen lightbox
   const [selectedPhoto, setSelectedPhoto] = useState<{
-    image: string
     title: string
-    images?: string[]
+    images: string[]
     initialIndex?: number
   } | null>(null)
-
-  const handleClosePhoto = useCallback(() => {
-    setSelectedPhoto(null)
-  }, [])
-
-  const { handleClose: handleClosePhotoHistory } = useModalHistory({
-    isOpen: Boolean(selectedPhoto),
-    onClose: handleClosePhoto,
-    modalId: 'photo-lightbox',
-  })
 
 
   // Ref for the vertical scroll feed
@@ -266,9 +251,8 @@ export const LatestNewsSection = (): JSX.Element => {
                           onClick={(e) => {
                             e.stopPropagation()
                             if (item.image) {
-                              const photoGallery = item.images || (item.secondaryImage ? [item.image, item.secondaryImage] : undefined)
+                              const photoGallery = item.images || (item.secondaryImage ? [item.image, item.secondaryImage] : [item.image])
                               setSelectedPhoto({
-                                image: item.image,
                                 title: item.title,
                                 images: photoGallery,
                                 initialIndex: 0,
@@ -497,9 +481,8 @@ export const LatestNewsSection = (): JSX.Element => {
                               <div
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  const photoGallery = item.images || (item.secondaryImage ? [item.image, item.secondaryImage] : undefined)
+                                  const photoGallery = item.images || (item.secondaryImage ? [item.image, item.secondaryImage] : [item.image])
                                   setSelectedPhoto({
-                                    image: item.image,
                                     title: item.title,
                                     images: photoGallery,
                                     initialIndex: 0,
@@ -641,22 +624,17 @@ export const LatestNewsSection = (): JSX.Element => {
       <NewsDetailModal
         item={selectedNews}
         isOpen={Boolean(selectedNews)}
-        onClose={handleCloseNews}
+        onClose={() => setSelectedNews(null)}
       />
 
-      {/* Full-screen Photo Lightbox Modal for clicking pictures */}
-      <AnimatePresence>
-        {selectedPhoto && (
-          <ImageLightboxModal
-            key="photo-lightbox-modal"
-            isOpen={Boolean(selectedPhoto)}
-            images={selectedPhoto.images ?? (selectedPhoto.image ? [selectedPhoto.image] : [])}
-            initialIndex={selectedPhoto.initialIndex ?? 0}
-            title={selectedPhoto.title}
-            onClose={handleClosePhotoHistory}
-          />
-        )}
-      </AnimatePresence>
+      {/* Zero-Lag Fullscreen Photo Lightbox from Feed Clicks */}
+      <ImageLightboxModal
+        isOpen={Boolean(selectedPhoto)}
+        onClose={() => setSelectedPhoto(null)}
+        title={selectedPhoto?.title}
+        images={selectedPhoto?.images || []}
+        initialIndex={selectedPhoto?.initialIndex || 0}
+      />
     </section>
   )
 }

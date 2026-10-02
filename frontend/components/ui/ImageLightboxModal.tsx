@@ -17,7 +17,7 @@ export interface ImageLightboxModalProps {
 /**
  * Zero-Lag Fullscreen Photo Lightbox.
  *
- * Implements strict zero-lag architecture:
+ * Implements strict zero-lag architecture matching Fabins:
  * - Pure React state control (NO window.history.pushState to prevent Next.js revalidation freeze)
  * - Ultra-lightweight hardware-accelerated Framer Motion fade (duration: 0.12s, easeOut)
  * - Solid high-performance backdrop without expensive backdrop-filter blur
@@ -157,7 +157,7 @@ export function ImageLightboxModal({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onClick={handleBackdropClick}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 text-white select-none overscroll-contain cursor-pointer"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/92 text-white select-none overscroll-contain cursor-pointer"
       >
         {/* Floating Top-Right Close Button */}
         <div className="absolute top-0 right-0 p-3 sm:p-5 z-40">
@@ -251,7 +251,7 @@ export function ImageLightboxModal({
               scrollToIndex(currentIndex - 1)
             }}
             aria-label="Previous photo"
-            className="hidden sm:flex absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 shadow-lg transition-all active:scale-90 cursor-pointer"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 shadow-lg transition-all active:scale-90 cursor-pointer"
           >
             <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
@@ -266,7 +266,7 @@ export function ImageLightboxModal({
               scrollToIndex(currentIndex + 1)
             }}
             aria-label="Next photo"
-            className="hidden sm:flex absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 shadow-lg transition-all active:scale-90 cursor-pointer"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 shadow-lg transition-all active:scale-90 cursor-pointer"
           >
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
