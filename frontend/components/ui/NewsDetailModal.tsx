@@ -115,8 +115,14 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
   // Full-screen zero-lag lightbox state
   const [isPhotoOpen, setIsPhotoOpen] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const lightboxIndexRef = useRef(0)
   const heroScrollRef = useRef<HTMLDivElement>(null)
+
+  // Stable refs to track current values without stale closures
+  // These avoid the need to add activeImageIndex as a useCallback dependency,
+  // which would recreate the scroll handler on every scroll — degrading swipe smoothness.
+  const activeImageIndexRef = useRef(activeImageIndex)
+  activeImageIndexRef.current = activeImageIndex
+  const lightboxIndexRef = useRef(0)
 
   // Memoize complete gallery list in deterministic order: [main, secondary1, secondary2, ...]
   const modalImages: string[] = useMemo(() => {
@@ -125,27 +131,34 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
     return [item.image, item.secondaryImage].filter((img): img is string => Boolean(img))
   }, [item])
 
+  const modalImagesLengthRef = useRef(modalImages.length)
+  modalImagesLengthRef.current = modalImages.length
+
   // Reset to first photo whenever opened or item changes
   useEffect(() => {
     setActiveImageIndex(0)
+    activeImageIndexRef.current = 0
+    lightboxIndexRef.current = 0
     const el = heroScrollRef.current
     if (el) {
       el.scrollLeft = 0
     }
   }, [item?.id, isOpen])
 
-  // Real-time horizontal scroll tracking for hero banner
+  // Real-time horizontal scroll tracking for hero banner.
+  // Uses stable refs instead of activeImageIndex as a dependency to prevent
+  // the callback from being recreated on every scroll (which degraded swipe smoothness).
   const handleHeroScroll = useCallback(() => {
     const el = heroScrollRef.current
     if (!el) return
     const width = el.clientWidth
     if (width > 0) {
       const newIndex = Math.round(el.scrollLeft / width)
-      if (newIndex >= 0 && newIndex < modalImages.length && newIndex !== activeImageIndex) {
+      if (newIndex >= 0 && newIndex < modalImagesLengthRef.current && newIndex !== activeImageIndexRef.current) {
         setActiveImageIndex(newIndex)
       }
     }
-  }, [modalImages.length, activeImageIndex])
+  }, [])
 
   // Scroll hero track to a target index smoothly
   const scrollToHeroIndex = useCallback((index: number) => {
@@ -157,21 +170,30 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
   }, [])
 
   const handleOpenPhoto = useCallback((index: number) => {
-    setActiveImageIndex(index)
     lightboxIndexRef.current = index
+    setActiveImageIndex(index)
     setIsPhotoOpen(true)
   }, [])
 
+  // Closes the lightbox and restores the hero carousel to the last-swiped index.
+  // Uses lightboxIndexRef (updated synchronously by onIndexChange) rather than reading
+  // state after AnimatePresence exit to avoid a race condition where the exiting state
+  // has already been reset before this callback fires.
   const handleClosePhoto = useCallback(() => {
-    setIsPhotoOpen(false)
     const targetIdx = lightboxIndexRef.current
+    setIsPhotoOpen(false)
+    // Restore hero position immediately so the NewsDetail panel shows the right image
+    // when the lightbox fade-out completes (no jump or blank state)
     setActiveImageIndex(targetIdx)
-    const el = heroScrollRef.current
-    if (el) {
-      el.scrollLeft = targetIdx * el.clientWidth
-    }
+    requestAnimationFrame(() => {
+      const el = heroScrollRef.current
+      if (el) {
+        el.scrollLeft = targetIdx * el.clientWidth
+      }
+    })
   }, [])
 
+  // Track lightbox swipe index synchronously via ref (no re-render overhead)
   const handleLightboxIndexChange = useCallback((newIdx: number) => {
     lightboxIndexRef.current = newIdx
   }, [])
@@ -185,7 +207,6 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
       <AnimatePresence>
         {isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-0 lg:p-8 overscroll-contain">
-            {/* Backdrop Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
