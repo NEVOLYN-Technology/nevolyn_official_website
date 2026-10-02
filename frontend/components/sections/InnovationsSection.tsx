@@ -13,7 +13,7 @@
 
 import type { JSX } from 'react'
 import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Tag, Sparkles, Globe, Mail } from 'lucide-react'
 import { Badge, type BadgeTone } from '@/components/ui/badge'
 import { projects, type Project } from '@/lib/data/innovations'
@@ -25,7 +25,6 @@ import { CarouselArrows, CarouselDots } from '@/components/ui/CarouselControls'
 import { useCarousel } from '@/lib/hooks/useCarousel'
 import { SECTION_BG } from '@/lib/constants/theme'
 import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
-import { useModalHistory } from '@/lib/hooks/useModalHistory'
 
 /** Maps each project status to the appropriate Badge tone (color). */
 const STATUS_TONE: Record<Project['status'], BadgeTone> = {
@@ -51,12 +50,6 @@ export const InnovationsSection = (): JSX.Element => {
   const handleClosePhoto = useCallback(() => {
     setSelectedPhoto(null)
   }, [])
-
-  const { handleClose: handleClosePhotoHistory } = useModalHistory({
-    isOpen: Boolean(selectedPhoto),
-    onClose: handleClosePhoto,
-    modalId: 'photo-lightbox',
-  })
 
 
   // ── Filtered project list ─────────────────────────────────────────────────
@@ -147,7 +140,7 @@ export const InnovationsSection = (): JSX.Element => {
             ref={scrollContainerRef}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             className={cn(
-              "flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 py-8 no-scrollbar",
+              "flex overflow-x-auto snap-x snap-mandatory gap-6 py-8 no-scrollbar",
               filteredProjects.length === 1
                 ? "justify-center px-4"
                 : "px-[calc(50%-150px)] sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)]"
@@ -350,17 +343,12 @@ export const InnovationsSection = (): JSX.Element => {
       </div>
 
       {/* Full-screen Photo Lightbox Modal for clicking machine photo */}
-      <AnimatePresence>
-        {selectedPhoto && (
-          <ImageLightboxModal
-            key="innovations-photo-lightbox"
-            isOpen={Boolean(selectedPhoto)}
-            images={selectedPhoto.image ? [selectedPhoto.image] : []}
-            title={selectedPhoto.title}
-            onClose={handleClosePhotoHistory}
-          />
-        )}
-      </AnimatePresence>
+      <ImageLightboxModal
+        isOpen={Boolean(selectedPhoto)}
+        images={selectedPhoto?.image ? [selectedPhoto.image] : []}
+        title={selectedPhoto?.title}
+        onClose={handleClosePhoto}
+      />
     </section>
   )
 }

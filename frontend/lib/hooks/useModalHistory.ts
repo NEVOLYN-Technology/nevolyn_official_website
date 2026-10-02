@@ -29,15 +29,16 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     if (isClosingRef.current) return
     isClosingRef.current = true
 
+    // Immediately trigger React state closure for zero-lag UI response
+    onCloseRef.current()
+
+    // Cleanly revert history entry in background if one was pushed
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
       if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
         window.history.back()
-        return
       }
     }
-
-    onCloseRef.current()
   }, [modalId])
 
   useEffect(() => {
@@ -49,10 +50,10 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
 
     isClosingRef.current = false
 
-    // Push history entry for mobile back-button handling
+    // Push history entry for mobile back-button handling with full current URL
     try {
       const currentState = window.history.state || {}
-      window.history.pushState({ ...currentState, [modalId]: true }, '')
+      window.history.pushState({ ...currentState, [modalId]: true }, '', window.location.href)
       hasPushedStateRef.current = true
     } catch {
       hasPushedStateRef.current = false

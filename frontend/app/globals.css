@@ -178,6 +178,18 @@
   cursor: zoom-in;
 }
 
+/* Eliminate 300ms mobile touch tap delay across all interactive elements */
+html,
+body,
+button,
+a,
+[role="button"],
+.cursor-pointer,
+.cursor-zoom-in {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

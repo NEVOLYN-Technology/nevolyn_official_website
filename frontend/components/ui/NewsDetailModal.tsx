@@ -180,10 +180,10 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-title"
-              initial={{ opacity: 0, scale: 0.96, y: 15 }}
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 15 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+              exit={{ opacity: 0, scale: 0.98, y: 10 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
               className="relative w-full h-[100dvh] lg:h-auto lg:max-w-2xl lg:max-h-[92vh] flex flex-col rounded-none lg:rounded-3xl bg-white shadow-2xl border-0 lg:border border-slate-200/90 overflow-hidden z-10 overscroll-contain"
             >
               {/* Sticky Top Navigation Bar */}
@@ -219,7 +219,7 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                     <div
                       ref={heroScrollRef}
                       onScroll={handleHeroScroll}
-                      className="w-full h-full flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory no-scrollbar touch-pan-x overscroll-x-contain scroll-smooth"
+                      className="w-full h-full flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory no-scrollbar touch-pan-x overscroll-x-contain"
                     >
                       {modalImages.map((imgSrc, idx) => (
                         <div
@@ -233,6 +233,8 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                           <img
                             src={imgSrc}
                             alt={`${item.title} - Photo ${idx + 1}`}
+                            loading="eager"
+                            decoding="async"
                             className="w-full h-full object-contain p-2 sm:p-3 pointer-events-none"
                           />
                         </div>
@@ -372,6 +374,8 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                                 <img
                                   src={imgSrc}
                                   alt={`${item.title} - Photo ${idx + 1}`}
+                                  loading="lazy"
+                                  decoding="async"
                                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                                 />
                               </div>

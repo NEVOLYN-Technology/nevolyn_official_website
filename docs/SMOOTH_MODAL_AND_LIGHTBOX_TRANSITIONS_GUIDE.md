@@ -62,6 +62,27 @@ Here is the exact technical explanation of why this occurs and how the architect
 * Using `100vh` calculates height based on the viewport with bars collapsed. When the address bar is visible, the bottom 60–80px of the modal (including action buttons and toolbars) is pushed off-screen.
 * Using `h-[100dvh]` dynamically adapts to visible space, guaranteeing the toolbar and back buttons are always immediately visible and clickable.
 
+### 5. 300ms Mobile Tap Delay & Missing `touch-action: manipulation`
+* **In Localhost (Desktop)**: Clicks fire instantaneously (0ms) upon mouse release.
+* **In Production on Mobile**: Without `width=device-width, initialScale: 1` in Next.js `export const viewport` and without `touch-action: manipulation` in global CSS, mobile browsers (iOS Safari and Chrome Android) pause for 300ms after every finger tap to check if the user is double-tapping to zoom.
+* **The Solution**:
+  - Add `width: 'device-width', initialScale: 1, maximumScale: 5, userScalable: true` in `app/layout.tsx`.
+  - Add `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` to `html, body, button, a, [role="button"], .cursor-pointer, .cursor-zoom-in` in `app/globals.css`.
+
+### 6. Scroll-Jacking Conflict: `scroll-smooth` on Native Touch Tracks
+* When CSS `scroll-smooth` is declared on a container that also has `snap-x snap-mandatory touch-pan-x`, the mobile browser's native touch-drag momentum physics clashes directly with the CSS smooth-scroll easing engine on every finger drag.
+* This makes the swipe gesture feel sticky, heavy, and unresponsive.
+* **The Solution**: Remove `scroll-smooth` from native touch scroll tracks. Use pure CSS hardware snapping during gestures, and apply `behavior: 'smooth'` programmatically in JavaScript only when an arrow button is tapped.
+
+### 7. Synchronous Layout Thrashing in Scroll Listeners
+* Calling `querySelectorAll` and reading layout properties (`card.offsetLeft`, `card.offsetWidth`) inside a scroll event listener triggers synchronous layout recalculations (reflows) on every frame.
+* On a mobile device, this drops the frame rate to 10–15 FPS.
+* **The Solution**: Measure the card stride once on mount and on window resize. The active centered index is then computed with pure math: `Math.round(container.scrollLeft / stride)` with **0ms layout cost**.
+
+### 8. Asynchronous `popstate` Lag on Close
+* Calling `window.history.back()` without immediately executing `onClose()` in React forces the UI to wait 200–300ms until the mobile browser asynchronously dispatches `popstate`.
+* **The Solution**: `handleClose()` immediately invokes `onCloseRef.current()` on the exact millisecond of the tap, allowing Framer Motion to start the exit transition instantly while history rollback happens in the background.
+
 ---
 
 ## 🏗️ Architectural Overview & Interaction Flow

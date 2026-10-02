@@ -61,7 +61,28 @@ export const LatestNewsSection = (): JSX.Element => {
   const isRafPendingRef = useRef(false)
   const rafIdRef = useRef<number | null>(null)
 
-  /** Finds the milestone card closest to the container's horizontal centre with RAF throttle */
+  const strideRef = useRef(334)
+
+  // Measure card stride once on mount and on resize to avoid layout reflows during scrolling
+  useEffect(() => {
+    const updateStride = () => {
+      const container = scrollContainerRef.current
+      if (!container) return
+      const firstCard = container.querySelector<HTMLElement>('[data-milestone-index="0"]')
+      const secondCard = container.querySelector<HTMLElement>('[data-milestone-index="1"]')
+      if (firstCard && secondCard) {
+        strideRef.current = Math.max(100, secondCard.offsetLeft - firstCard.offsetLeft)
+      } else if (firstCard) {
+        strideRef.current = firstCard.offsetWidth + 24
+      }
+    }
+
+    updateStride()
+    window.addEventListener('resize', updateStride, { passive: true })
+    return () => window.removeEventListener('resize', updateStride)
+  }, [sortedFeatured.length])
+
+  /** Finds the milestone card closest to the container's horizontal centre with 0ms layout cost */
   const handleScroll = useCallback(() => {
     if (isRafPendingRef.current) return
     isRafPendingRef.current = true
@@ -71,24 +92,15 @@ export const LatestNewsSection = (): JSX.Element => {
       const container = scrollContainerRef.current
       if (!container) return
 
-      const containerCenter = container.scrollLeft + container.clientWidth / 2
-
-      let minDistance = Infinity
-      let closestIndex = 0
-
-      container.querySelectorAll<HTMLElement>('[data-milestone-index]').forEach((card) => {
-        const cardCenter = card.offsetLeft + card.offsetWidth / 2
-        const distance = Math.abs(containerCenter - cardCenter)
-
-        if (distance < minDistance) {
-          minDistance = distance
-          closestIndex = Number(card.getAttribute('data-milestone-index'))
-        }
-      })
+      const stride = strideRef.current || 334
+      const closestIndex = Math.max(
+        0,
+        Math.min(sortedFeatured.length - 1, Math.round(container.scrollLeft / stride))
+      )
 
       setCenteredIndex((prev) => (prev !== closestIndex ? closestIndex : prev))
     })
-  }, [])
+  }, [sortedFeatured.length])
 
   /** Scrolls the milestone card at `index` to the centre of the track */
   const scrollToCard = useCallback((index: number) => {
@@ -217,7 +229,7 @@ export const LatestNewsSection = (): JSX.Element => {
               <div
                 ref={scrollContainerRef}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-[calc(50%-155px)] py-6 sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
+                className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-[calc(50%-155px)] py-6 sm:px-[calc(50%-210px)] lg:px-[calc(50%-230px)] no-scrollbar"
               >
                 {sortedFeatured.map((item, index) => {
                   const isCentered = index === activeIndex
@@ -265,6 +277,8 @@ export const LatestNewsSection = (): JSX.Element => {
                           <img
                             src={item.image}
                             alt={item.title}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover object-center group-hover/photo:scale-105 transition-transform duration-700 ease-out"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
@@ -494,6 +508,8 @@ export const LatestNewsSection = (): JSX.Element => {
                                 <img
                                   src={item.image}
                                   alt={item.title}
+                                  loading="lazy"
+                                  decoding="async"
                                   className="w-full h-full object-cover object-center group-hover/thumb:scale-110 transition-transform duration-300"
                                 />
                               </div>

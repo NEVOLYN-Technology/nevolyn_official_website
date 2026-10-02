@@ -126,6 +126,8 @@ export function CarouselCard({
             <img
               src={image}
               alt={imageAlt}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover object-center group-hover/photo:scale-105 transition-transform duration-700 ease-out"
             />
             {/* Subtle gradient vignette overlay */}

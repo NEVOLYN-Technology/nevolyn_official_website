@@ -62,8 +62,27 @@ export function useCarousel(itemCount: number, dataAttribute: string): UseCarous
   const [centeredIndex, setCenteredIndex] = useState(0)
   const isRafPendingRef = useRef(false)
   const rafIdRef = useRef<number | null>(null)
+  const strideRef = useRef(380)
 
-  // ── Scroll detection: find the card closest to the container center with RAF throttle ──────
+  // Measure card stride once on mount and on window resize to avoid layout reflows during scroll
+  useEffect(() => {
+    const updateStride = () => {
+      const container = scrollContainerRef.current
+      if (!container) return
+      const cards = container.querySelectorAll<HTMLElement>(`[${dataAttribute}]`)
+      if (cards.length >= 2) {
+        strideRef.current = Math.max(100, cards[1].offsetLeft - cards[0].offsetLeft)
+      } else if (cards.length === 1) {
+        strideRef.current = cards[0].offsetWidth + 24
+      }
+    }
+
+    updateStride()
+    window.addEventListener('resize', updateStride, { passive: true })
+    return () => window.removeEventListener('resize', updateStride)
+  }, [dataAttribute, itemCount])
+
+  // ── Scroll detection: find the card closest to the container center with 0ms layout cost ──────
   const handleScroll = useCallback(() => {
     if (isRafPendingRef.current) return
     isRafPendingRef.current = true
@@ -73,25 +92,16 @@ export function useCarousel(itemCount: number, dataAttribute: string): UseCarous
       const container = scrollContainerRef.current
       if (!container) return
 
-      const containerCenter = container.scrollLeft + container.clientWidth / 2
-      let minDistance = Infinity
-      let closestIndex = 0
-
-      const cards = container.querySelectorAll<HTMLElement>(`[${dataAttribute}]`)
-      cards.forEach((card) => {
-        const cardIndex = Number(card.getAttribute(dataAttribute))
-        const cardCenter = card.offsetLeft + card.offsetWidth / 2
-        const distance = Math.abs(containerCenter - cardCenter)
-        if (distance < minDistance) {
-          minDistance = distance
-          closestIndex = cardIndex
-        }
-      })
+      const stride = strideRef.current || 380
+      const closestIndex = Math.max(
+        0,
+        Math.min(itemCount - 1, Math.round(container.scrollLeft / stride))
+      )
 
       // Only re-render when centered card index actually changed
       setCenteredIndex((prev) => (prev !== closestIndex ? closestIndex : prev))
     })
-  }, [dataAttribute])
+  }, [itemCount])
 
   // ── Smooth scroll a specific card into the center ────────────────────────
   const scrollToCard = useCallback(
