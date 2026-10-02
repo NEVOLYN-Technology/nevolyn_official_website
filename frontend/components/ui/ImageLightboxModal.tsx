@@ -139,25 +139,25 @@ export function ImageLightboxModal({
     }
   }, [isOpen])
 
+  if (!isOpen || validImages.length === 0) return null
+
   const isMultiple = validImages.length > 1
 
   return (
     <AnimatePresence>
-      {isOpen && validImages.length > 0 && (
-        <motion.div
-          key="lightbox-container"
-          role="dialog"
-          aria-modal="true"
-          aria-label={title || 'Photo Lightbox'}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.12, ease: 'easeOut' }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onClick={handleBackdropClick}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/92 text-white select-none overscroll-contain cursor-pointer"
-        >
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title || 'Photo Lightbox'}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onClick={handleBackdropClick}
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/92 text-white select-none overscroll-contain cursor-pointer"
+      >
           {/* Floating Top-Right Close Button */}
           <div className="absolute top-0 right-0 p-3 sm:p-5 z-40">
             <button
@@ -270,7 +270,6 @@ export function ImageLightboxModal({
             </button>
           )}
         </motion.div>
-      )}
     </AnimatePresence>
   )
 }

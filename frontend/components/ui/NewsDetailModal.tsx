@@ -168,8 +168,8 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, pointerEvents: 'none' }}
+              transition={{ duration: 0.12, ease: 'easeOut' }}
               onClick={handleClose}
               className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm lg:backdrop-blur-md cursor-pointer"
               aria-hidden="true"
@@ -182,8 +182,8 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
               aria-labelledby="modal-title"
               initial={{ opacity: 0, scale: 0.96, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 15 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+              exit={{ opacity: 0, scale: 0.97, pointerEvents: 'none' }}
+              transition={{ duration: 0.12, ease: 'easeOut' }}
               className="relative w-full h-[100dvh] lg:h-auto lg:max-w-2xl lg:max-h-[92vh] flex flex-col rounded-none lg:rounded-3xl bg-white shadow-2xl border-0 lg:border border-slate-200/90 overflow-hidden z-10 overscroll-contain"
             >
               {/* Sticky Top Navigation Bar */}

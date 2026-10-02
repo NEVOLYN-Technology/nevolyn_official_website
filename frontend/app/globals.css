@@ -133,12 +133,14 @@
   }
 
   html {
+    background-color: var(--background);
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 6rem;
   }
 
   body {
     @apply bg-background text-foreground overflow-x-hidden;
+    background-color: var(--background);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }

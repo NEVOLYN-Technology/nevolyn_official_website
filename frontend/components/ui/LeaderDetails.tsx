@@ -47,7 +47,8 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
         key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        exit={{ opacity: 0, pointerEvents: 'none' }}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
         onClick={handleClose}
         className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-sm sm:backdrop-blur-md cursor-pointer"
         aria-hidden="true"
@@ -62,8 +63,8 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
         aria-labelledby={headingId}
         initial={{ opacity: 0, scale: 0.96, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 15 }}
-        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+        exit={{ opacity: 0, scale: 0.97, pointerEvents: 'none' }}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
         className="fixed inset-0 lg:inset-auto lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 z-50
                    w-full h-[100dvh] lg:h-auto lg:w-[94%] lg:max-w-3xl lg:max-h-[85vh] flex flex-col
                    bg-white rounded-none lg:rounded-[28px] shadow-2xl

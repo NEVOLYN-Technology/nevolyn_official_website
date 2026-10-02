@@ -32,6 +32,10 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
     if (isClosingRef.current) return
     isClosingRef.current = true
 
+    // Immediately restore body scroll and touch responsiveness for zero mobile inactivity
+    document.body.style.overflow = ''
+    document.body.style.touchAction = ''
+
     // Immediately trigger React state closure for instant 0ms dismissal
     onCloseRef.current()
 
@@ -67,6 +71,8 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       hasPushedStateRef.current = false
       // Prevent Next.js App Router from treating modal pop as a route transition (no reload/blur)
       e.stopImmediatePropagation()
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
       onCloseRef.current()
     }
 

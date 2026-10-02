@@ -79,8 +79,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="bg-background">
-      <body className="antialiased bg-background text-slate-900 overflow-x-hidden selection:bg-sky-500 selection:text-white">
+    <html lang="en" suppressHydrationWarning className="bg-background" style={{ backgroundColor: '#eef1f5' }}>
+      <body className="antialiased bg-background text-slate-900 overflow-x-hidden selection:bg-sky-500 selection:text-white" style={{ backgroundColor: '#eef1f5' }}>
         {/* Ambient colorful atmospheric background — fixed, behind all content */}
         <div className="fixed inset-0 -z-50 pointer-events-none overflow-hidden [contain:paint]">
           {/* Technical precision grid overlay */}
