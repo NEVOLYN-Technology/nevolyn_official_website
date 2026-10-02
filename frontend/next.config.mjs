@@ -140,36 +140,6 @@ const nextConfig = {
     return [{ source: '/:path*', headers: securityHeaders }]
   },
 
-  images: {
-    /**
-     * `unoptimized: true` disables Next.js image optimisation.
-     *
-     * Note that this flag is currently inert either way: every image in the app
-     * is rendered with a plain `<img>` tag, and Next.js only optimises images
-     * rendered through `next/image`.
-     *
-     * ## Known issue: image payload
-     * `public/` totals ~3MB, dominated by `rahin-photo.png` at 1.8MB
-     * (1023x1311). Portraits display at 160px (`w-40`) at most, so that file is
-     * roughly 40x larger than the page needs. On a mobile connection this
-     * dominates load time and Largest Contentful Paint.
-     *
-     * Two ways to fix it, in increasing order of effort:
-     *
-     * 1. **Re-encode the source assets.** PNG is lossless and a poor fit for
-     *    photographs. Re-encoding the two portraits to WebP at 512px wide, and
-     *    the brand graphics to WebP at their current dimensions, measures at
-     *    ~3006KB -> ~265KB (91% smaller) with no layout change. Requires
-     *    updating the `src` / `image` paths that reference them.
-     * 2. **Adopt `next/image`.** Remove this flag, convert the `<img>` tags, and
-     *    give each a `width`/`height` or `fill`. Vercel then serves resized
-     *    WebP/AVIF from the original files, so the sources stay untouched. This
-     *    is the better long-term answer but touches 12 call sites and needs
-     *    visual checking.
-     */
-    unoptimized: true,
-  },
-
   /**
    * Allowed development origins for network access (e.g. mobile/other devices on local network)
    */

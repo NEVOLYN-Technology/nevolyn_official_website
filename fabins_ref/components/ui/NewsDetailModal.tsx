@@ -296,10 +296,11 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                               scrollToHeroIndex(idx)
                             }}
                             aria-label={`Go to photo ${idx + 1}`}
-                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${idx === activeImageIndex
-                              ? 'w-3.5 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]'
-                              : 'w-1.5 bg-white/40 hover:bg-white/70'
-                              }`}
+                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                              idx === activeImageIndex
+                                ? 'w-3.5 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]'
+                                : 'w-1.5 bg-white/40 hover:bg-white/70'
+                            }`}
                           />
                         ))}
                       </div>
@@ -348,8 +349,9 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                       </div>
 
                       <div
-                        className={`grid gap-2 sm:gap-3 ${modalImages.length >= 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'
-                          }`}
+                        className={`grid gap-2 sm:gap-3 ${
+                          modalImages.length >= 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'
+                        }`}
                       >
                         {modalImages.map((imgSrc, idx) => {
                           const isActive = idx === activeImageIndex
@@ -361,10 +363,11 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                                 scrollToHeroIndex(idx)
                                 setIsPhotoOpen(true)
                               }}
-                              className={`group relative aspect-[4/3] rounded-xl overflow-hidden cursor-zoom-in border-2 transition-all duration-200 bg-slate-900 shadow-xs ${isActive
-                                ? 'border-sky-500 ring-2 ring-sky-400/40 shadow-md'
-                                : 'border-slate-200 hover:border-sky-400'
-                                }`}
+                              className={`group relative aspect-[4/3] rounded-xl overflow-hidden cursor-zoom-in border-2 transition-all duration-200 bg-slate-900 shadow-xs ${
+                                isActive
+                                  ? 'border-sky-500 ring-2 ring-sky-400/40 shadow-md'
+                                  : 'border-slate-200 hover:border-sky-400'
+                              }`}
                             >
                               <img
                                 src={imgSrc}
@@ -374,8 +377,9 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                               <div className="absolute inset-0 bg-black/15 group-hover:bg-transparent transition-colors" />
                               <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between pointer-events-none">
                                 <span
-                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-xs shadow-xs ${idx === 0 ? 'bg-sky-500 text-white' : 'bg-black/60 text-white'
-                                    }`}
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-xs shadow-xs ${
+                                    idx === 0 ? 'bg-sky-500 text-white' : 'bg-black/60 text-white'
+                                  }`}
                                 >
                                   {idx === 0 ? 'Photo 1 • Main' : `Photo ${idx + 1}`}
                                 </span>
@@ -405,8 +409,9 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
                             </div>
 
                             <div
-                              className={`grid gap-1.5 sm:gap-2.5 w-full ${contact.website && contact.email ? 'grid-cols-2' : 'grid-cols-1'
-                                }`}
+                              className={`grid gap-1.5 sm:gap-2.5 w-full ${
+                                contact.website && contact.email ? 'grid-cols-2' : 'grid-cols-1'
+                              }`}
                             >
                               {/* Email on LEFT */}
                               {contact.email && (
@@ -513,6 +518,10 @@ export function NewsDetailModal({ item, isOpen, onClose }: NewsDetailModalProps)
         title={item.title}
         images={modalImages}
         initialIndex={activeImageIndex}
+        onIndexChange={(newIdx) => {
+          setActiveImageIndex(newIdx)
+          scrollToHeroIndex(newIdx)
+        }}
       />
     </>
   )
