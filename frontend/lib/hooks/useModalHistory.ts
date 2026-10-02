@@ -9,39 +9,41 @@ interface UseModalHistoryOptions {
 }
 
 /**
- * useModalHistory - Manages browser history integration for popup modals.
+ * useModalHistory - Zero-Lag Browser History Integration for Modals.
  *
- * Solves the critical mobile UX issue where tapping the phone's physical Back button,
- * swipe-back gesture, or browser back button navigates away from the website instead
- * of closing the modal.
+ * Provides instant 0ms visual dismissal on on-screen button taps while cleanly
+ * synchronizing with the browser history stack.
  *
- * When the modal opens:
  * 1. Pushes a dummy state into history so the modal becomes the latest history entry.
  * 2. If the user presses the phone's back button / edge swipe, `popstate` fires and
- *    smoothly closes the modal without leaving the website.
+ *    smoothly closes the modal without navigating away.
  * 3. If the user clicks any on-screen "Back" or "Close" button, `handleClose()` will
- *    call `window.history.back()`, cleanly popping the history state and closing the modal.
+ *    immediately trigger React closure for zero-lag UI response, and then roll back
+ *    history in the background.
  * 4. Manages body scroll locking and keyboard Escape handling.
  */
 export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModalHistoryOptions) {
   const hasPushedStateRef = useRef(false)
   const isClosingRef = useRef(false)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
   // Unified close handler for on-screen buttons and backdrop clicks
   const handleClose = useCallback(() => {
     if (isClosingRef.current) return
     isClosingRef.current = true
 
+    // 1. Immediately trigger React state closure so exit animation starts at 0ms!
+    onCloseRef.current()
+
+    // 2. Cleanly revert history entry in background if one was pushed
     if (hasPushedStateRef.current) {
       hasPushedStateRef.current = false
       if (typeof window !== 'undefined' && window.history.state && window.history.state[modalId]) {
         window.history.back()
-        return
       }
     }
-
-    onClose()
-  }, [onClose, modalId])
+  }, [modalId])
 
   useEffect(() => {
     if (!isOpen) {
@@ -52,20 +54,21 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
 
     isClosingRef.current = false
 
-    // Push history entry for mobile back-button handling
+    // Push history entry for mobile back-button handling (empty string URL keeps current route)
     try {
       const currentState = window.history.state || {}
       window.history.pushState({ ...currentState, [modalId]: true }, '')
       hasPushedStateRef.current = true
     } catch {
-      // Fallback if pushState is restricted
       hasPushedStateRef.current = false
     }
 
     const handlePopState = () => {
       // User tapped phone back button or swiped back
+      if (isClosingRef.current) return
+      isClosingRef.current = true
       hasPushedStateRef.current = false
-      onClose()
+      onCloseRef.current()
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -88,7 +91,7 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal' }: UseModal
       document.body.style.overflow = originalOverflow
       document.body.style.touchAction = originalTouchAction
     }
-  }, [isOpen, modalId, onClose, handleClose])
+  }, [isOpen, modalId, handleClose])
 
   return { handleClose }
 }
