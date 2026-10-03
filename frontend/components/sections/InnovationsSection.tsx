@@ -25,6 +25,7 @@ import { CarouselArrows, CarouselDots } from '@/components/ui/CarouselControls'
 import { useCarousel } from '@/lib/hooks/useCarousel'
 import { SECTION_BG } from '@/lib/constants/theme'
 import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
+import { useModalHistory } from '@/lib/hooks/useModalHistory'
 
 /** Maps each project status to the appropriate Badge tone (color). */
 const STATUS_TONE: Record<Project['status'], BadgeTone> = {
@@ -44,12 +45,14 @@ type FilterLabel = typeof FILTERS[number]
  */
 export const InnovationsSection = (): JSX.Element => {
   const [activeFilter, setActiveFilter] = useState<FilterLabel>('All')
-  // Active photo for the full-screen photo lightbox
+  // Active photo for the full-screen photo lightbox with mobile back button integration
   const [selectedPhoto, setSelectedPhoto] = useState<{ image: string; title: string } | null>(null)
 
-  const handleClosePhoto = useCallback(() => {
-    setSelectedPhoto(null)
-  }, [])
+  const { handleClose: handleClosePhoto } = useModalHistory({
+    isOpen: Boolean(selectedPhoto),
+    onClose: () => setSelectedPhoto(null),
+    modalId: 'innovation-photo',
+  })
 
 
   // ── Filtered project list ─────────────────────────────────────────────────
