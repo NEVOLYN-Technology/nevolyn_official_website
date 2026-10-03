@@ -77,20 +77,20 @@ services:
         value: https://api.nevolyn.com
 
       # ----------------------------------------------------------------------
-      # Mail (Brevo)
+      # Mail (cPanel / SMTPS)
       # ----------------------------------------------------------------------
       - key: SPRING_MAIL_PASSWORD
         sync: false
       - key: SPRING_MAIL_USERNAME
-        value: b3c905001@smtp-brevo.com
+        value: info@nevolyn.com
       - key: SPRING_MAIL_HOST
-        value: smtp-relay.brevo.com
+        value: mail.nevolyn.com
       - key: SPRING_MAIL_PORT
-        value: "587"
+        value: "465"
       - key: APP_EMAIL_FROM
         value: info@nevolyn.com
       - key: APP_EMAIL_ADMIN
-        value: admin@nevolyn.com
+        value: info@nevolyn.com
 
 # ------------------------------------------------------------------------------
 # Managed PostgreSQL

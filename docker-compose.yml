@@ -69,13 +69,12 @@ services:
       # Origin used to build verification links in outgoing email.
       APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:3000}
 
-      # Mail stays unset by default: EmailService then logs each message instead
-      # of sending it. Export SPRING_MAIL_PASSWORD (a Brevo 'xsmtpsib-…' key) to
-      # exercise real delivery.
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-mail.nevolyn.com}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-465}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-info@nevolyn.com}
       SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
-      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
-      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-noreply@nevolyn.com}
-      APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-admin@nevolyn.com}
+      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-info@nevolyn.com}
+      APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-info@nevolyn.com}
 
       # Matches the named volume below so uploads survive a container restart.
       APP_UPLOAD_DIR: /app/uploads/resumes
