@@ -88,18 +88,19 @@ spring:
   # AWS accounts, which block outbound 25/587; production uses SMTPS on 465 plus
   # the Brevo HTTPS API. See application-prod.yml.
   mail:
-    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
-    port: ${SPRING_MAIL_PORT:587}
-    username: ${SPRING_MAIL_USERNAME:dev@nevolyn.com}
-    # Also doubles as the Brevo API key: a value starting with 'xsmtpsib-'
-    # switches EmailService to the HTTPS REST engine automatically.
+    host: ${SPRING_MAIL_HOST:mail.nevolyn.com}
+    port: ${SPRING_MAIL_PORT:465}
+    username: ${SPRING_MAIL_USERNAME:info@nevolyn.com}
     password: ${SPRING_MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
           auth: true
-          starttls:
+          ssl:
             enable: true
+            trust: "*"
+          starttls:
+            enable: false
 
   # --------------------------------------------------------------------------
   # Flyway — disabled for local development
