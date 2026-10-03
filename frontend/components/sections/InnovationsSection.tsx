@@ -25,7 +25,6 @@ import { CarouselArrows, CarouselDots } from '@/components/ui/CarouselControls'
 import { useCarousel } from '@/lib/hooks/useCarousel'
 import { SECTION_BG } from '@/lib/constants/theme'
 import { ImageLightboxModal } from '@/components/ui/ImageLightboxModal'
-import { useModalHistory } from '@/lib/hooks/useModalHistory'
 
 /** Maps each project status to the appropriate Badge tone (color). */
 const STATUS_TONE: Record<Project['status'], BadgeTone> = {
@@ -45,14 +44,12 @@ type FilterLabel = typeof FILTERS[number]
  */
 export const InnovationsSection = (): JSX.Element => {
   const [activeFilter, setActiveFilter] = useState<FilterLabel>('All')
-  // Active photo for the full-screen photo lightbox with mobile back button integration
+  // Active photo for the full-screen photo lightbox
   const [selectedPhoto, setSelectedPhoto] = useState<{ image: string; title: string } | null>(null)
 
-  const { handleClose: handleClosePhoto } = useModalHistory({
-    isOpen: Boolean(selectedPhoto),
-    onClose: () => setSelectedPhoto(null),
-    modalId: 'innovation-photo',
-  })
+  const handleClosePhoto = useCallback(() => {
+    setSelectedPhoto(null)
+  }, [])
 
 
   // ── Filtered project list ─────────────────────────────────────────────────
@@ -79,7 +76,10 @@ export const InnovationsSection = (): JSX.Element => {
   return (
     <section id="innovations" className={`relative py-14 sm:py-20 overflow-hidden ${SECTION_BG.border} ${SECTION_BG.primary}`}>
       {/* Background Ambient Glow Orbs - Multi-chromatic Soft Aura */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] bg-gradient-to-tr from-sky-400/20 via-indigo-400/15 to-emerald-400/15 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full pointer-events-none z-0"
+        style={{ background: 'radial-gradient(circle at center, rgba(56,189,248,0.16) 0%, rgba(129,140,248,0.10) 35%, rgba(52,211,153,0.06) 55%, transparent 70%)' }}
+      />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── Section Header ────────────────────────────────────────── */}
