@@ -104,16 +104,20 @@ spring:
     host: ${SPRING_MAIL_HOST:mail.nevolyn.com}
     port: ${SPRING_MAIL_PORT:465}
     username: ${SPRING_MAIL_USERNAME:info@nevolyn.com}
-    password: ${SPRING_MAIL_PASSWORD:}
+    password: "${SPRING_MAIL_PASSWORD:}"
     properties:
       mail:
         smtp:
           auth: true
           ssl:
-            enable: true
+            enable: ${SPRING_MAIL_SSL_ENABLE:true}
             trust: "*"
           starttls:
-            enable: false
+            enable: ${SPRING_MAIL_STARTTLS_ENABLE:false}
+          socketFactory:
+            port: ${SPRING_MAIL_PORT:465}
+            class: javax.net.ssl.SSLSocketFactory
+        smtps:
           connectiontimeout: 10000
           timeout: 10000
           writetimeout: 10000
@@ -167,6 +171,9 @@ logging:
     org.hibernate.SQL: WARN
 
 app:
+  backend-url: ${APP_BACKEND_URL:https://api.nevolyn.com}
+  frontend-url: ${APP_FRONTEND_URL:https://nevolyn.com}
+
   storage:
     # Absolute path inside the container. NOTE: Render's free tier has an
     # ephemeral filesystem — uploaded CVs are lost on every redeploy or cold
@@ -175,14 +182,18 @@ app:
     # verification, which is currently the only lasting copy.
     upload-dir: ${APP_UPLOAD_DIR:/app/uploads/resumes}
 
+  mail:
+    admin-address: ${APP_MAIL_ADMIN_ADDRESS:${APP_EMAIL_ADMIN:info@nevolyn.com}}
+    from-address: ${APP_MAIL_FROM_ADDRESS:${APP_EMAIL_FROM:info@nevolyn.com}}
+    sender-name: ${APP_MAIL_SENDER_NAME:${APP_EMAIL_SENDER_NAME:NEVOLYN}}
+    admin-subject: "[NEVOLYN] %s Submission: %s"
+    sender-subject: "[NEVOLYN] %s Confirmed [Ref: %s]"
+    acknowledgement-subject: "[NEVOLYN] %s Acknowledged [Ref: %s]"
+
   email:
     from: ${APP_EMAIL_FROM:info@nevolyn.com}
     admin: ${APP_EMAIL_ADMIN:info@nevolyn.com}
-    sender-name: ${APP_EMAIL_SENDER_NAME:NEVOLYN Technology}
-    #
-    # Production custom domain settings
-    # ---------------------------------
-    # Verification links and admin links point to nevolyn.com / api.nevolyn.com
+    sender-name: ${APP_EMAIL_SENDER_NAME:NEVOLYN}
     frontend-url: ${APP_FRONTEND_URL:https://nevolyn.com}
     backend-url: ${APP_BACKEND_URL:https://api.nevolyn.com}
 

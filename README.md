@@ -21,8 +21,8 @@ nevolyn_official_website/           ← Git root (monorepo)
 │   │   └── join_us/page.tsx        # Job application page & CV upload
 │   ├── components/
 │   │   ├── layout/                 # Navbar, Footer, PageShell
-│   │   ├── sections/               # Hero, Capabilities, About, Leaders, Innovations, News, Contact
-│   │   ├── ui/                     # Badge, LeaderDetails modal, WelcomeBanner
+│   │   ├── sections/               # Hero, About, Leaders, Innovations, News, Contact
+│   │   ├── ui/                     # Badge, LeaderDetails modal
 │   │   └── providers/              # ThemeProvider
 │   ├── lib/
 │   │   ├── animations.ts           # Framer Motion animation presets

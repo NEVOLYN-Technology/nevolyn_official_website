@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.Year;
-import java.util.Random;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 /**
@@ -25,13 +24,13 @@ public class ContactService {
 
     private final ContactInquiryRepository repository;
     private final EmailService emailService;
-    private final Random random = new Random();
+    private final ReferenceCodeGenerator referenceCodeGenerator;
 
     @Transactional
     public ContactResponse processInquiry(ContactRequest request) {
         // Honeypot Bot Trap Check
         if (request.getHoneypot() != null && !request.getHoneypot().trim().isEmpty()) {
-            log.warn("Honeypot bot trap triggered for contact form submission from email: {}", request.getEmail());
+            log.warn("Honeypot bot trap triggered for contact form submission from email: {}", maskEmail(request.getEmail()));
             return ContactResponse.builder()
                     .inquiryId("INQ-DISCARDED")
                     .status("DISCARDED")
@@ -40,10 +39,10 @@ public class ContactService {
                     .build();
         }
 
-        String inquiryId = String.format("INQ-%d-%06d", Year.now().getValue(), System.currentTimeMillis() % 1000000L);
+        String inquiryId = referenceCodeGenerator.generate(SubmissionType.CONTACT_INQUIRY);
         String verificationToken = UUID.randomUUID().toString();
 
-        log.debug("Generating unique inquiry ID '{}' and verification token for email '{}'", inquiryId, request.getEmail());
+        log.debug("Generating unique inquiry ID '{}' for email '{}'", inquiryId, maskEmail(request.getEmail()));
 
         ContactInquiry entity = ContactInquiry.builder()
                 .inquiryId(inquiryId)
@@ -53,33 +52,19 @@ public class ContactService {
                 .message(request.getMessage())
                 .verificationToken(verificationToken)
                 .isVerified(true)
-                .verifiedAt(LocalDateTime.now())
+                .verifiedAt(LocalDateTime.now(ZoneOffset.UTC))
                 .build();
 
         ContactInquiry savedEntity = repository.save(entity);
         log.debug("Persisted ContactInquiry entity with ID: {}", savedEntity.getId());
 
+        SubmissionDetails details = SubmissionDetails.from(savedEntity);
+
         // Dispatch Admin Alert Email directly to NEVOLYN team
-        emailService.sendAdminNotificationEmail(
-                "Contact Inquiry",
-                inquiryId,
-                request.getName(),
-                request.getEmail(),
-                null,
-                null,
-                request.getSubject(),
-                null,
-                request.getMessage(),
-                null
-        );
+        emailService.sendAdminNotificationEmail(details);
 
         // Step 1: Dispatch Submission Confirmation Email to visitor
-        emailService.sendSenderVerificationEmail(
-                request.getEmail(),
-                request.getName(),
-                inquiryId,
-                "contact"
-        );
+        emailService.sendSenderConfirmationEmail(details);
 
         return ContactResponse.builder()
                 .inquiryId(inquiryId)
@@ -91,37 +76,23 @@ public class ContactService {
 
     @Transactional
     public ContactResponse verifyInquiry(String token) {
-        log.info("Verifying contact inquiry with token: {}", token);
+        log.info("Verifying contact inquiry with token");
         ContactInquiry inquiry = repository.findByVerificationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired verification token: " + token));
 
         if (!inquiry.getIsVerified()) {
             inquiry.setIsVerified(true);
-            inquiry.setVerifiedAt(LocalDateTime.now());
+            inquiry.setVerifiedAt(LocalDateTime.now(ZoneOffset.UTC));
             repository.save(inquiry);
             log.info("Contact inquiry '{}' verified successfully.", inquiry.getInquiryId());
 
+            SubmissionDetails details = SubmissionDetails.from(inquiry);
+
             // Step 2: Send Admin Notification
-            emailService.sendAdminNotificationEmail(
-                    "Contact Inquiry",
-                    inquiry.getInquiryId(),
-                    inquiry.getName(),
-                    inquiry.getEmail(),
-                    null,
-                    null,
-                    inquiry.getSubject(),
-                    null,
-                    inquiry.getMessage(),
-                    null
-            );
+            emailService.sendAdminNotificationEmail(details);
 
             // Step 3: Send User Receipt Acknowledgement
-            emailService.sendUserAcknowledgementEmail(
-                    inquiry.getEmail(),
-                    inquiry.getName(),
-                    inquiry.getInquiryId(),
-                    "Contact Inquiry"
-            );
+            emailService.sendUserAcknowledgementEmail(details);
         }
 
         return ContactResponse.builder()
@@ -130,5 +101,16 @@ public class ContactService {
                 .requiresVerification(false)
                 .isVerified(true)
                 .build();
+    }
+
+    private static String maskEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return "unknown";
+        }
+        int at = email.indexOf('@');
+        if (at <= 1) {
+            return "***" + (at >= 0 ? email.substring(at) : "");
+        }
+        return email.charAt(0) + "***" + email.substring(at);
     }
 }

@@ -55,7 +55,7 @@ class FlywayMigrationValidationTest {
         Set<String> tables = fetchTableNames();
 
         assertThat(tables)
-                .as("all entity tables created by V1__initial_schema.sql")
+                .as("all entity tables created by V1 and V2 migrations")
                 .contains("contact_inquiries", "job_applications");
 
         assertThat(tables)
@@ -76,10 +76,10 @@ class FlywayMigrationValidationTest {
         // inquiry_id. Hand-written DDL is the one place that convention can be
         // broken silently, so assert the columns most likely to be got wrong.
         assertThat(fetchColumnNames("contact_inquiries"))
-                .contains("inquiry_id", "is_verified", "verified_at", "created_at", "verification_token");
+                .contains("inquiry_id", "is_verified", "verified_at", "acknowledged_at", "created_at", "verification_token");
 
         assertThat(fetchColumnNames("job_applications"))
-                .contains("application_id", "resume_path", "original_file_name", "is_verified");
+                .contains("application_id", "resume_path", "dossier_path", "original_file_name", "file_size_bytes", "file_content_type", "acknowledged_at", "is_selected", "selection_status", "is_verified");
     }
 
     /** Returns every table name in the connected schema, lower-cased. */

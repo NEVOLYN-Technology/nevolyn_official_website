@@ -64,6 +64,17 @@ const getApiBaseUrl = (): string => {
 const API_BASE_URL = getApiBaseUrl()
 
 /**
+ * Resolves a backend path (e.g. `/api/v1/applications/.../pdf`) to a full URL
+ * when needed by client-side browser links or new windows.
+ */
+export function resolveApiUrl(path: string): string {
+  if (!path) return ''
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+  const host = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
+  return `${host}${path.startsWith('/') ? '' : '/'}${path}`
+}
+
+/**
  * Request timeout in milliseconds.
  *
  * Deliberately generous: the API runs on Render's free tier, which suspends the

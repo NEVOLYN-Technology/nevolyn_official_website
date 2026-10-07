@@ -2,23 +2,36 @@
 
 import type { JSX } from 'react'
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowLeft, UploadCloud, FileText } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft, ArrowRight, UploadCloud, FileText } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { PageShell } from '@/components/layout/PageShell'
 import { cn } from '@/lib/utils'
-import { SuccessModal } from '@/components/ui/SuccessModal'
 import { useJoinForm } from '@/lib/hooks/useJoinForm'
+import { JoinPreviewView } from '@/components/join/JoinPreviewView'
+import { JoinSuccessView } from '@/components/join/JoinSuccessView'
 
 /**
- * Job application form page component allowing candidate information and CV document upload.
- * Integrates with Spring Boot API client and 3-step Email Verification flow.
+ * Job application form page component following the FABINS multi-step workflow:
+ * 1. Editing: Candidate inputs credentials and CV document.
+ * 2. Previewing: Interactive pre-flight preview where candidate can review, go back to edit, or confirm dispatch.
+ * 3. Submitted: Official success screen with reference code and ONLY ONE action button: Download Application PDF.
  *
  * @returns Rendered join application page element
  */
 export default function JoinPage(): JSX.Element {
   const router = useRouter()
-  const { submitJoinForm, isLoading, isSuccess, successMessage, errorMessage, fieldErrors } = useJoinForm()
+  const {
+    submitJoinForm,
+    errorMessage: apiErrorMessage,
+    fieldErrors,
+    pdfUrl,
+    applicationId,
+  } = useJoinForm()
+
+  const [status, setStatus] = useState<'editing' | 'previewing' | 'sending' | 'submitted'>('editing')
+  const [localError, setLocalError] = useState<string | null>(null)
+  const [copiedCode, setCopiedCode] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -34,7 +47,6 @@ export default function JoinPage(): JSX.Element {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [submittedEmail, setSubmittedEmail] = useState('')
-  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const MAX_WORDS = 500
   const wordCount = formData.reason.trim() ? formData.reason.trim().split(/\s+/).length : 0
@@ -46,9 +58,61 @@ export default function JoinPage(): JSX.Element {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Email format validation
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  // Handle Initial Form Submission -> Validates all credentials and transitions to Preview
+  const handleProceedToPreview = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (isOverWordLimit) return
+    setLocalError(null)
+
+    if (!formData.name.trim()) {
+      setLocalError('Please enter your full name.')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    if (!formData.email.trim() || !isValidEmail(formData.email.trim())) {
+      setLocalError('Please enter a valid email address.')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    if (!formData.phone.trim() || formData.phone.trim().length < 5) {
+      setLocalError('Please enter a valid phone number.')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    if (!formData.address.trim()) {
+      setLocalError('Please enter your location or address.')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    if (!formData.reason.trim()) {
+      setLocalError('Please share why you wish to join NEVOLYN Technology.')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    if (isOverWordLimit) {
+      setLocalError(`Statement exceeds ${MAX_WORDS} words limit.`)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    if (!selectedFile) {
+      setLocalError('Please attach your CV/Resume document (.pdf, .doc, .docx).')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+
+    // Credentials validated: transition to preview view
+    setStatus('previewing')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // Handle Final Confirmed Dispatch from Preview View to backend
+  const handleConfirmSubmit = async () => {
+    setLocalError(null)
+    setStatus('sending')
 
     const emailToSave = formData.email
     const success = await submitJoinForm({
@@ -58,25 +122,45 @@ export default function JoinPage(): JSX.Element {
 
     if (success) {
       setSubmittedEmail(emailToSave)
-      setIsModalOpen(true)
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
-        reason: '',
-        linkedin: '',
-        github: '',
-        website: '',
-        honeypot: '',
-      })
-      setSelectedFile(null)
+      setStatus('submitted')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      setStatus('previewing')
+      setLocalError(apiErrorMessage || 'Application submission failed. Please review your details.')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const handleResetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      reason: '',
+      linkedin: '',
+      github: '',
+      website: '',
+      honeypot: '',
+    })
+    setSelectedFile(null)
+    setLocalError(null)
+    setStatus('editing')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const copyTrackingCode = async () => {
+    const code = applicationId || 'APP-2026-CONFIRMED'
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopiedCode(true)
+      setTimeout(() => setCopiedCode(false), 2500)
+    } catch {
+      // Fallback
     }
   }
 
   const handleBack = () => {
-    // 1. If user has browsing history on the site, accurately return them to wherever they came from
-    // while preserving their previous scroll position
     if (typeof window !== 'undefined' && window.history.length > 1) {
       const isExternal =
         document.referrer &&
@@ -88,7 +172,6 @@ export default function JoinPage(): JSX.Element {
       }
     }
 
-    // 2. Safe Fallback: if accessed directly in a fresh tab without history, check explicit source param or fallback to /
     const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
     const fromSource = params?.get('from')
 
@@ -99,307 +182,323 @@ export default function JoinPage(): JSX.Element {
     }
   }
 
+  const errorMessage = localError || apiErrorMessage
+  const isSending = status === 'sending'
+
   return (
     <PageShell>
-      {/* Animated Success Popup Modal */}
-      <SuccessModal
-        isOpen={isModalOpen && isSuccess}
-        onClose={() => setIsModalOpen(false)}
-        title="Application Received!"
-        message={successMessage}
-        email={submittedEmail}
-        formType="application"
-      />
+      <div className="relative pt-8 sm:pt-12 pb-20 overflow-hidden">
+        {/* Dynamic Multi-State Container following FABINS workflow */}
+        <AnimatePresence mode="wait">
+          {status === 'submitted' ? (
+            <JoinSuccessView
+              referenceCode={applicationId || 'APP-2026-CONFIRMED'}
+              copiedCode={copiedCode}
+              onCopyCode={copyTrackingCode}
+              senderEmail={submittedEmail}
+              pdfUrl={pdfUrl}
+              onResetForm={handleResetForm}
+            />
+          ) : status === 'previewing' || status === 'sending' ? (
+            <div className="space-y-6">
+              {errorMessage && (
+                <div className="mx-auto max-w-4xl px-4 sm:px-6">
+                  <div className="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-xs sm:text-sm font-semibold text-rose-500 flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                </div>
+              )}
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <button
-          onClick={handleBack}
-          className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-sky-500 mb-8 transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Go Back
-        </button>
+              <JoinPreviewView
+                formData={formData}
+                selectedFile={selectedFile}
+                onBackToEdit={() => {
+                  setStatus('editing')
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
+                onConfirmSubmit={handleConfirmSubmit}
+                isSending={isSending}
+              />
+            </div>
+          ) : (
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-sky-500 mb-8 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Go Back
+              </button>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white p-6 sm:p-10 md:p-12 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200"
-        >
-          <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight uppercase text-slate-900">
-              Join <span className="text-blue-600">Our Team</span>
-            </h1>
-            <p className="text-slate-600">
-              We're always looking for brilliant minds to help us pioneer the future of AI, intelligent systems, and next-generation engineering.
-            </p>
-          </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white p-6 sm:p-10 md:p-12 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200"
+              >
+                <div className="text-center mb-10">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight uppercase text-slate-900">
+                    Join <span className="text-blue-600">Our Team</span>
+                  </h1>
+                  <p className="text-slate-600">
+                    We're always looking for brilliant minds to help us pioneer the future of AI, intelligent systems, and next-generation engineering.
+                  </p>
+                </div>
 
-          {errorMessage && (
-            <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-500 text-sm">
-              {errorMessage}
+                {errorMessage && (
+                  <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-500 text-sm">
+                    {errorMessage}
+                  </div>
+                )}
+
+                <form className="space-y-6" onSubmit={handleProceedToPreview}>
+                  {/* Hidden Honeypot Input for Bot Detection */}
+                  <input
+                    type="text"
+                    name="company_website"
+                    value={formData.honeypot}
+                    onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                    className="hidden"
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+
+                  {/* Name & Email */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label htmlFor="join-name" className="text-sm font-medium text-slate-700">
+                        Full Name <span className="text-blue-600">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="join-name"
+                        name="name"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className={cn(
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm',
+                          fieldErrors.name ? 'border-rose-500' : 'border-slate-200'
+                        )}
+                        placeholder="John Doe"
+                      />
+                      {fieldErrors.name && <p className="text-xs text-rose-500 mt-1">{fieldErrors.name}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="join-email" className="text-sm font-medium text-slate-700">
+                        Email Address <span className="text-blue-600">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        id="join-email"
+                        name="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className={cn(
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm',
+                          fieldErrors.email ? 'border-rose-500' : 'border-slate-200'
+                        )}
+                        placeholder="john@example.com"
+                      />
+                      {fieldErrors.email && <p className="text-xs text-rose-500 mt-1">{fieldErrors.email}</p>}
+                    </div>
+                  </div>
+
+                  {/* Phone & Address */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label htmlFor="join-phone" className="text-sm font-medium text-slate-700">
+                        Phone Number <span className="text-blue-600">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        id="join-phone"
+                        name="phone"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className={cn(
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm',
+                          fieldErrors.phone ? 'border-rose-500' : 'border-slate-200'
+                        )}
+                        placeholder="+88017XXXXXXXX"
+                      />
+                      {fieldErrors.phone && <p className="text-xs text-rose-500 mt-1">{fieldErrors.phone}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="join-address" className="text-sm font-medium text-slate-700">
+                        Residential Address / Location <span className="text-blue-600">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="join-address"
+                        name="address"
+                        required
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        className={cn(
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm',
+                          fieldErrors.address ? 'border-rose-500' : 'border-slate-200'
+                        )}
+                        placeholder="Dhaka, Bangladesh"
+                      />
+                      {fieldErrors.address && <p className="text-xs text-rose-500 mt-1">{fieldErrors.address}</p>}
+                    </div>
+                  </div>
+
+                  {/* LinkedIn & GitHub */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label htmlFor="join-linkedin" className="text-sm font-medium text-slate-700">
+                        LinkedIn Profile <span className="text-slate-400 font-normal">(Optional)</span>
+                      </label>
+                      <input
+                        type="url"
+                        id="join-linkedin"
+                        name="linkedin"
+                        value={formData.linkedin}
+                        onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm"
+                        placeholder="https://linkedin.com/in/username"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="join-github" className="text-sm font-medium text-slate-700">
+                        GitHub Profile <span className="text-slate-400 font-normal">(Optional)</span>
+                      </label>
+                      <input
+                        type="url"
+                        id="join-github"
+                        name="github"
+                        value={formData.github}
+                        onChange={(e) => setFormData({ ...formData, github: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm"
+                        placeholder="https://github.com/username"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Website / Portfolio */}
+                  <div className="space-y-2">
+                    <label htmlFor="join-website" className="text-sm font-medium text-slate-700">
+                      Personal Website / Portfolio <span className="text-slate-400 font-normal">(Optional)</span>
+                    </label>
+                    <input
+                      type="url"
+                      id="join-website"
+                      name="website"
+                      value={formData.website}
+                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm"
+                      placeholder="https://portfolio.me"
+                    />
+                  </div>
+
+                  {/* Statement of Purpose */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="join-reason" className="text-sm font-medium text-slate-700">
+                        Why do you want to join us? <span className="text-blue-600">*</span>
+                      </label>
+                      <span className={cn('text-xs', isOverWordLimit ? 'text-rose-500 font-bold' : 'text-slate-400')}>
+                        {wordCount}/{MAX_WORDS} words
+                      </span>
+                    </div>
+                    <textarea
+                      id="join-reason"
+                      name="reason"
+                      required
+                      rows={5}
+                      value={formData.reason}
+                      onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                      className={cn(
+                        'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm resize-none',
+                        fieldErrors.reason || isOverWordLimit ? 'border-rose-500' : 'border-slate-200'
+                      )}
+                      placeholder="Tell us about your passions, achievements, and what makes you want to build the future with NEVOLYN Technology..."
+                    />
+                    {isOverWordLimit && (
+                      <p className="text-xs text-rose-500 mt-1">
+                        Your statement exceeds the 500-word limit. Please shorten it to continue.
+                      </p>
+                    )}
+                    {fieldErrors.reason && <p className="text-xs text-rose-500 mt-1">{fieldErrors.reason}</p>}
+                  </div>
+
+                  {/* CV Upload */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Resume / CV <span className="text-blue-600">*</span>
+                    </label>
+                    <div
+                      className={cn(
+                        'mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-2xl hover:border-blue-500/60 transition-colors cursor-pointer bg-slate-50',
+                        fieldErrors.resume ? 'border-rose-500' : 'border-slate-300'
+                      )}
+                    >
+                      <div className="space-y-2 text-center">
+                        {selectedFile ? (
+                          <div className="flex flex-col items-center">
+                            <FileText className="h-10 w-10 text-blue-600 mb-2" />
+                            <p className="text-sm font-semibold text-slate-800">{selectedFile.name}</p>
+                            <p className="text-xs text-slate-400">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+                          </div>
+                        ) : (
+                          <>
+                            <UploadCloud className="mx-auto h-10 w-10 text-slate-400" />
+                            <div className="flex text-sm text-slate-600 justify-center">
+                              <label
+                                htmlFor="join-file-upload"
+                                className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-sky-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500"
+                              >
+                                <span>Upload a file</span>
+                                <input
+                                  id="join-file-upload"
+                                  name="resume"
+                                  type="file"
+                                  className="sr-only"
+                                  required
+                                  accept=".pdf,.doc,.docx"
+                                  onChange={handleFileChange}
+                                />
+                              </label>
+                              <p className="pl-1">or drag and drop</p>
+                            </div>
+                            <p className="text-xs text-slate-500">PDF, DOC, DOCX up to 10MB</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    {fieldErrors.resume && <p className="text-xs text-rose-500 mt-1">{fieldErrors.resume}</p>}
+                  </div>
+
+                  {/* Submit Bar -> Proceed to Preview */}
+                  <div className="pt-4">
+                    <button
+                      type="submit"
+                      disabled={isOverWordLimit}
+                      className={cn(
+                        'w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-full shadow-md text-sm font-bold text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+                        isOverWordLimit
+                          ? 'bg-slate-400 cursor-not-allowed opacity-60'
+                          : 'bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 hover:brightness-105 shadow-blue-700/20 active:scale-95'
+                      )}
+                    >
+                      <span>Review Application</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
             </div>
           )}
-
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Hidden Honeypot Input for Bot Detection */}
-            <input
-              type="text"
-              name="company_website"
-              value={formData.honeypot}
-              onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
-              className="hidden"
-              tabIndex={-1}
-              autoComplete="off"
-            />
-
-            {/* Name & Email */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="join-name" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Full Name <span className="text-orange-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="join-name"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className={cn(
-                    'w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#030812] border focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:text-white transition-all text-sm',
-                    fieldErrors.name ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800/80'
-                  )}
-                  placeholder="John Doe"
-                />
-                {fieldErrors.name && <p className="text-xs text-rose-500 mt-1">{fieldErrors.name}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="join-email" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Email Address <span className="text-orange-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="join-email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={cn(
-                    'w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#030812] border focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:text-white transition-all text-sm',
-                    fieldErrors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800/80'
-                  )}
-                  placeholder="john@example.com"
-                />
-                {fieldErrors.email && <p className="text-xs text-rose-500 mt-1">{fieldErrors.email}</p>}
-              </div>
-            </div>
-
-            {/* Phone & Address */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="join-phone" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Phone Number <span className="text-orange-500">*</span>
-                </label>
-                <div
-                  className={cn(
-                    'flex rounded-xl bg-slate-50 dark:bg-[#030812] border focus-within:ring-2 focus-within:ring-orange-500/50 transition-all overflow-hidden',
-                    fieldErrors.phone ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800/80'
-                  )}
-                >
-                  <span className="px-3.5 py-3 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/60 border-r border-slate-200 dark:border-slate-800/80 shrink-0 flex items-center justify-center">
-                    +880
-                  </span>
-                  <input
-                    type="tel"
-                    id="join-phone"
-                    name="phone"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 bg-transparent text-slate-900 dark:text-white focus:outline-none text-sm"
-                    placeholder="17XX-XXXXXX"
-                  />
-                </div>
-                {fieldErrors.phone && <p className="text-xs text-rose-500 mt-1">{fieldErrors.phone}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="join-address" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Present Address <span className="text-orange-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="join-address"
-                  name="address"
-                  required
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className={cn(
-                    'w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#030812] border focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:text-white transition-all text-sm',
-                    fieldErrors.address ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800/80'
-                  )}
-                  placeholder="123 Innovation Drive, City, Country"
-                />
-                {fieldErrors.address && <p className="text-xs text-rose-500 mt-1">{fieldErrors.address}</p>}
-              </div>
-            </div>
-
-            {/* LinkedIn & GitHub */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="join-linkedin" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  LinkedIn Profile <span className="text-slate-400 font-normal">(Optional)</span>
-                </label>
-                <input
-                  type="url"
-                  id="join-linkedin"
-                  name="linkedin"
-                  value={formData.linkedin}
-                  onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#030812] border border-slate-200 dark:border-slate-800/80 focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:text-white transition-all text-sm"
-                  placeholder="https://linkedin.com/in/username"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="join-github" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  GitHub Profile <span className="text-slate-400 font-normal">(Optional)</span>
-                </label>
-                <input
-                  type="url"
-                  id="join-github"
-                  name="github"
-                  value={formData.github}
-                  onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#030812] border border-slate-200 dark:border-slate-800/80 focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:text-white transition-all text-sm"
-                  placeholder="https://github.com/username"
-                />
-              </div>
-            </div>
-
-            {/* Personal Website */}
-            <div className="space-y-2">
-              <label htmlFor="join-website" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Personal Website <span className="text-slate-400 font-normal">(Optional)</span>
-              </label>
-              <input
-                type="url"
-                id="join-website"
-                name="website"
-                value={formData.website}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#030812] border border-slate-200 dark:border-slate-800/80 focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:text-white transition-all text-sm"
-                placeholder="https://yourwebsite.com"
-              />
-            </div>
-
-            {/* Motivation */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label htmlFor="join-reason" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Why do you want to join us? <span className="text-orange-500">*</span>
-                </label>
-                <span className={cn('text-xs font-semibold', isOverWordLimit ? 'text-rose-500 font-bold' : 'text-slate-400')}>
-                  {wordCount} / {MAX_WORDS} words
-                </span>
-              </div>
-              <textarea
-                id="join-reason"
-                name="reason"
-                required
-                rows={5}
-                value={formData.reason}
-                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                className={cn(
-                  'w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#030812] border focus:outline-none focus:ring-2 dark:text-white transition-all resize-none text-sm',
-                  isOverWordLimit
-                    ? 'border-rose-500 focus:ring-rose-500/50'
-                    : fieldErrors.reason
-                      ? 'border-rose-500'
-                      : 'border-slate-200 dark:border-slate-800/80 focus:ring-orange-500/50'
-                )}
-                placeholder="Tell us about your passion for technology innovation and engineering (Max 250 words)..."
-              />
-              {isOverWordLimit && <p className="text-xs text-rose-500 font-semibold mt-1">Please shorten your response to 250 words or less.</p>}
-              {fieldErrors.reason && <p className="text-xs text-rose-500 mt-1">{fieldErrors.reason}</p>}
-            </div>
-
-            {/* CV Upload */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">
-                Resume / CV <span className="text-blue-600">*</span>
-              </label>
-              <div
-                className={cn(
-                  'mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-2xl hover:border-blue-500/60 transition-colors cursor-pointer bg-slate-50',
-                  fieldErrors.resume ? 'border-rose-500' : 'border-slate-300'
-                )}
-              >
-                <div className="space-y-2 text-center">
-                  {selectedFile ? (
-                    <div className="flex flex-col items-center">
-                      <FileText className="h-10 w-10 text-blue-600 mb-2" />
-                      <p className="text-sm font-semibold text-slate-800">{selectedFile.name}</p>
-                      <p className="text-xs text-slate-400">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
-                    </div>
-                  ) : (
-                    <>
-                      <UploadCloud className="mx-auto h-10 w-10 text-slate-400" />
-                      <div className="flex text-sm text-slate-600 justify-center">
-                        <label
-                          htmlFor="join-file-upload"
-                          className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-sky-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500"
-                        >
-                          <span>Upload a file</span>
-                          <input
-                            id="join-file-upload"
-                            name="resume"
-                            type="file"
-                            className="sr-only"
-                            required
-                            accept=".pdf,.doc,.docx"
-                            onChange={handleFileChange}
-                          />
-                        </label>
-                        <p className="pl-1">or drag and drop</p>
-                      </div>
-                      <p className="text-xs text-slate-500">PDF, DOC, DOCX up to 10MB</p>
-                    </>
-                  )}
-                </div>
-              </div>
-              {fieldErrors.resume && <p className="text-xs text-rose-500 mt-1">{fieldErrors.resume}</p>}
-            </div>
-
-            {/* Submit */}
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isLoading || isOverWordLimit}
-                className={cn(
-                  'w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-full shadow-md text-sm font-bold text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
-                  isOverWordLimit
-                    ? 'bg-slate-400 cursor-not-allowed opacity-60'
-                    : 'bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 hover:brightness-105 shadow-blue-700/20 active:scale-95'
-                )}
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Submitting Application...</span>
-                  </>
-                ) : (
-                  'Submit Application'
-                )}
-              </button>
-            </div>
-          </form>
-        </motion.div>
+        </AnimatePresence>
       </div>
     </PageShell>
   )

@@ -1,0 +1,264 @@
+<!--
+================================================================================
+EMAIL TEMPLATE: Job Application - Internal Admin Alert
+FILE: templates/email/application-admin-notification-mail.html
+--------------------------------------------------------------------------------
+WHEN IT IS USED:
+  Sent automatically to internal NEVOLYN R&D leadership team immediately
+  after a candidate submits an application on the /join_us page.
+
+RECIPIENT:
+  Internal NEVOLYN Team (info@nevolyn.com)
+
+SENDER:
+  NEVOLYN <info@nevolyn.com>
+  (Reply-To is automatically set to the candidate's email)
+
+SUBJECT LINE:
+  [NEVOLYN Alert] New Job Application: {{name}} [Ref: {{referenceCode}}]
+
+ATTACHMENTS:
+  Candidate CV / Resume document (PDF, DOC, DOCX)
+
+SUPPORTED PLACEHOLDERS:
+  - {{acknowledgeUrl}}          : Secure URL to the pre-flight acknowledgement page
+  - {{referenceCode}}           : Tracking Reference Code (e.g. APP-2026-XXXXXX)
+  - {{name}}                    : Candidate's full name
+  - {{email}}                   : Candidate's email address
+  - {{phone}}                   : Phone number
+  - {{address}}                 : Location / Residential address
+  - {{reason}}                  : Statement of purpose / motivation
+  - {{links}}                   : Professional links (LinkedIn, GitHub, Portfolio)
+  - {{resumeFileName}}          : Attached CV file name
+  - {{submittedAt}}             : Submission timestamp
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEVOLYN - New Job Application Alert</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    body,
+    table,
+    td,
+    p,
+    a,
+    li {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 30px 15px;
+    }
+
+    .wrapper {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      border: 1px solid #e2e8f0;
+    }
+
+    .header {
+      background: #0f172a;
+      padding: 28px 32px;
+      color: #ffffff;
+      border-bottom: 3px solid #0ea5e9;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-sub {
+      color: #38bdf8;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .body-content {
+      padding: 32px;
+    }
+
+    .ref-badge {
+      display: inline-block;
+      background-color: #e0f2fe;
+      color: #0369a1;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #bae6fd;
+    }
+
+    .attachment-box {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13.5px;
+      color: #166534;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .info-grid td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+    }
+
+    .info-grid td.label {
+      font-weight: 600;
+      color: #64748b;
+      width: 32%;
+      background-color: #fafafa;
+    }
+
+    .message-box {
+      background-color: #f8fafc;
+      border-left: 4px solid #0ea5e9;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      color: #334155;
+      margin: 15px 0 25px 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .cta-container {
+      text-align: center;
+      margin: 32px 0 20px 0;
+    }
+
+    .btn-acknowledge {
+      display: inline-block;
+      background: #0284c7;
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 28px;
+      text-decoration: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    }
+
+    .admin-system-footer {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Hidden Preheader -->
+  <div
+    style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+    New job application from {{name}} [Tracking Reference Code: {{referenceCode}}].
+  </div>
+
+  <div class="wrapper">
+    <div class="header">
+      <div class="brand-title">NEVOLYN</div>
+      <div class="brand-sub">Internal Operational Alert &bull; Candidate Job Application</div>
+    </div>
+
+    <div class="body-content">
+      <div class="ref-badge">
+        Tracking Reference Code: {{referenceCode}}
+      </div>
+
+      <div class="attachment-box">
+        &#128206;&nbsp; <strong>Candidate CV Attached:</strong> {{resumeFileName}}
+      </div>
+
+      <p style="margin-top:0; font-size:15px; color:#334155;">
+        A candidate has submitted an application to join NEVOLYN. Review their credentials below and click the
+        acknowledge button to notify the applicant that their application is under review.
+      </p>
+
+      <div
+        style="font-size:13px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin:24px 0 12px; border-bottom:1px solid #f1f5f9; padding-bottom:6px;">
+        Candidate Details
+      </div>
+      <table class="info-grid">
+        <tr>
+          <td class="label">Name</td>
+          <td><strong>{{name}}</strong></td>
+        </tr>
+        <tr>
+          <td class="label">Email</td>
+          <td><a href="mailto:{{email}}" style="color:#0284c7; font-weight: 600;">{{email}}</a></td>
+        </tr>
+        <tr>
+          <td class="label">Phone</td>
+          <td>{{phone}}</td>
+        </tr>
+        <tr>
+          <td class="label">Address / Location</td>
+          <td>{{address}}</td>
+        </tr>
+        <tr>
+          <td class="label">Profiles &amp; Links</td>
+          <td style="white-space: pre-line;">{{links}}</td>
+        </tr>
+        <tr>
+          <td class="label">Submitted At</td>
+          <td>{{submittedAt}}</td>
+        </tr>
+      </table>
+
+      <div
+        style="font-size:13px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin:20px 0 10px; border-bottom:1px solid #f1f5f9; padding-bottom:6px;">
+        Statement of Purpose / Motivation
+      </div>
+      <div class="message-box">
+        {{reason}}
+      </div>
+
+      <div class="cta-container">
+        <a href="{{acknowledgeUrl}}" class="btn-acknowledge">
+          &#10003; Acknowledge Application
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

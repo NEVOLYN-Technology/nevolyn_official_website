@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.Year;
-import java.util.Random;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 /**
- * Business logic service managing job applications, document storage, and verification pipeline.
+ * Business logic service managing job applications, document storage, and
+ * verification pipeline.
  */
 @Slf4j
 @Service
@@ -26,7 +26,8 @@ public class ApplicationService {
     private final JobApplicationRepository repository;
     private final FileStorageService fileStorageService;
     private final EmailService emailService;
-    private final Random random = new Random();
+    private final ReferenceCodeGenerator referenceCodeGenerator;
+    private final PdfGenerationService pdfGenerationService;
 
     @Transactional
     public ApplicationResponse processApplication(
@@ -39,11 +40,10 @@ public class ApplicationService {
             String github,
             String website,
             String honeypot,
-            MultipartFile resume
-    ) {
+            MultipartFile resume) {
         // Honeypot Bot Trap Check
         if (honeypot != null && !honeypot.trim().isEmpty()) {
-            log.warn("Honeypot bot trap triggered for job application submission from email: {}", email);
+            log.warn("Honeypot bot trap triggered for job application submission from email: {}", maskEmail(email));
             return ApplicationResponse.builder()
                     .applicationId("APP-DISCARDED")
                     .fileName(resume != null ? resume.getOriginalFilename() : "file.pdf")
@@ -53,12 +53,22 @@ public class ApplicationService {
                     .build();
         }
 
-        String applicationId = String.format("APP-%d-%06d", Year.now().getValue(), System.currentTimeMillis() % 1000000L);
+        String applicationId = referenceCodeGenerator.generate(SubmissionType.JOB_APPLICATION);
         String verificationToken = UUID.randomUUID().toString();
 
         log.debug("Processing job application for '{}', generated ID: {}", name, applicationId);
 
-        String storedPath = fileStorageService.storeFile(resume, applicationId + "_" + name.replaceAll("\\s+", "_").toLowerCase());
+        byte[] resumeBytes = null;
+        if (resume != null) {
+            try {
+                resumeBytes = resume.getBytes();
+            } catch (Exception e) {
+                log.warn("Could not read uploaded resume bytes: {}", e.getMessage());
+            }
+        }
+
+        String storedPath = fileStorageService.storeFile(resume,
+                applicationId + "_" + name.replaceAll("\\s+", "_").toLowerCase());
         log.debug("Resume stored on disk at path: {}", storedPath);
 
         JobApplication entity = JobApplication.builder()
@@ -73,45 +83,43 @@ public class ApplicationService {
                 .website(website)
                 .resumePath(storedPath)
                 .originalFileName(resume != null ? resume.getOriginalFilename() : "resume.pdf")
+                .fileSizeBytes(resume != null ? resume.getSize() : null)
+                .fileContentType(resume != null ? resume.getContentType() : null)
+                .isSelected(false)
+                .selectionStatus("PENDING")
                 .verificationToken(verificationToken)
                 .isVerified(true)
-                .verifiedAt(LocalDateTime.now())
+                .verifiedAt(LocalDateTime.now(ZoneOffset.UTC))
                 .build();
+
+        // Generate official candidate application dossier PDF (Page 1 statement & credentials, merged with candidate CV)
+        try {
+            byte[] dossierPdfBytes = pdfGenerationService.generateCandidateDossierPdf(entity, resumeBytes);
+            if (dossierPdfBytes != null && dossierPdfBytes.length > 0) {
+                String dossierPath = fileStorageService.storeBytes(dossierPdfBytes, applicationId + "_dossier.pdf");
+                entity.setDossierPath(dossierPath);
+                log.info("Candidate application dossier successfully generated and stored at '{}'", dossierPath);
+            }
+        } catch (Exception ex) {
+            log.error("Could not generate merged dossier PDF for '{}': {}", applicationId, ex.getMessage(), ex);
+        }
 
         JobApplication savedEntity = repository.save(entity);
         log.debug("Persisted JobApplication entity to database with PK ID: {}", savedEntity.getId());
 
-        // Join pre-formatted social links for the admin notification email
-        StringBuilder links = new StringBuilder();
-        if (linkedin != null && !linkedin.isBlank()) links.append("LinkedIn: ").append(linkedin).append("\n");
-        if (github != null && !github.isBlank()) links.append("GitHub: ").append(github).append("\n");
-        if (website != null && !website.isBlank()) links.append("Portfolio: ").append(website);
+        SubmissionDetails details = SubmissionDetails.from(savedEntity);
 
-        // Dispatch Admin Alert Email directly to NEVOLYN team with candidate CV attached
-        emailService.sendAdminNotificationEmail(
-                "Job Application",
-                applicationId,
-                name,
-                email,
-                phone,
-                address,
-                "Job Application Submission",
-                links.toString(),
-                reason,
-                storedPath
-        );
+        // Dispatch Admin Alert Email directly to NEVOLYN team with candidate CV
+        // attached
+        emailService.sendAdminNotificationEmail(details);
 
         // Step 1: Dispatch Submission Confirmation Email to candidate
-        emailService.sendSenderVerificationEmail(
-                email,
-                name,
-                applicationId,
-                "application"
-        );
+        emailService.sendSenderConfirmationEmail(details);
 
         return ApplicationResponse.builder()
                 .applicationId(applicationId)
                 .fileName(resume != null ? resume.getOriginalFilename() : "resume.pdf")
+                .pdfUrl("/api/v1/applications/" + applicationId + "/pdf")
                 .status("SUBMITTED")
                 .requiresVerification(false)
                 .isVerified(true)
@@ -120,50 +128,62 @@ public class ApplicationService {
 
     @Transactional
     public ApplicationResponse verifyApplication(String token) {
-        log.info("Verifying job application with token: {}", token);
+        log.info("Verifying job application with token");
         JobApplication app = repository.findByVerificationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired verification token: " + token));
 
         if (!app.getIsVerified()) {
             app.setIsVerified(true);
-            app.setVerifiedAt(LocalDateTime.now());
+            app.setVerifiedAt(LocalDateTime.now(ZoneOffset.UTC));
             repository.save(app);
             log.info("Job application '{}' verified successfully.", app.getApplicationId());
 
-            StringBuilder links = new StringBuilder();
-            if (app.getLinkedin() != null && !app.getLinkedin().isBlank()) links.append("LinkedIn: ").append(app.getLinkedin()).append("\n");
-            if (app.getGithub() != null && !app.getGithub().isBlank()) links.append("GitHub: ").append(app.getGithub()).append("\n");
-            if (app.getWebsite() != null && !app.getWebsite().isBlank()) links.append("Portfolio: ").append(app.getWebsite());
+            SubmissionDetails details = SubmissionDetails.from(app);
 
             // Step 2: Send Admin Notification with CV attachment
-            emailService.sendAdminNotificationEmail(
-                    "Job Application",
-                    app.getApplicationId(),
-                    app.getName(),
-                    app.getEmail(),
-                    app.getPhone(),
-                    app.getAddress(),
-                    "Application for R&D Team",
-                    links.toString(),
-                    app.getReason(),
-                    app.getResumePath()
-            );
+            emailService.sendAdminNotificationEmail(details);
 
             // Step 3: Send User Receipt Acknowledgement
-            emailService.sendUserAcknowledgementEmail(
-                    app.getEmail(),
-                    app.getName(),
-                    app.getApplicationId(),
-                    "Job Application"
-            );
+            emailService.sendUserAcknowledgementEmail(details);
         }
 
         return ApplicationResponse.builder()
                 .applicationId(app.getApplicationId())
                 .fileName(app.getOriginalFileName())
+                .pdfUrl("/api/v1/applications/" + app.getApplicationId() + "/pdf")
                 .status("VERIFIED")
                 .requiresVerification(false)
                 .isVerified(true)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] getApplicationPdfBytes(String applicationId) {
+        JobApplication app = repository.findByApplicationId(applicationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Application not found for ID: " + applicationId));
+
+        String pathToRead = app.getDossierPath() != null ? app.getDossierPath() : app.getResumePath();
+        if (pathToRead != null) {
+            try {
+                java.io.File file = new java.io.File(pathToRead);
+                if (file.isFile()) {
+                    return java.nio.file.Files.readAllBytes(file.toPath());
+                }
+            } catch (Exception ex) {
+                log.error("Could not read application dossier from disk: {}", ex.getMessage());
+            }
+        }
+        throw new ResourceNotFoundException("Application dossier document not available for ID: " + applicationId);
+    }
+
+    private static String maskEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return "unknown";
+        }
+        int at = email.indexOf('@');
+        if (at <= 1) {
+            return "***" + (at >= 0 ? email.substring(at) : "");
+        }
+        return email.charAt(0) + "***" + email.substring(at);
     }
 }

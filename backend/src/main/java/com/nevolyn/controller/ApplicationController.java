@@ -109,4 +109,22 @@ public class ApplicationController {
 
                 return ResponseEntity.ok(envelope);
         }
+
+        /**
+         * Serves the official application dossier PDF inline for browser preview and download.
+         *
+         * @param applicationId application tracking ID (e.g. APP-2026-X8K2M9PQ)
+         * @return PDF binary stream with inline content disposition header
+         */
+        @GetMapping(value = "/{applicationId}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+        public ResponseEntity<byte[]> getApplicationPdf(@PathVariable("applicationId") String applicationId) {
+                log.info("Received GET /api/v1/applications/{}/pdf request", applicationId);
+                byte[] pdfBytes = applicationService.getApplicationPdfBytes(applicationId);
+                String filename = "NEVOLYN_Application_" + applicationId + ".pdf";
+
+                return ResponseEntity.ok()
+                                .contentType(MediaType.APPLICATION_PDF)
+                                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                                .body(pdfBytes);
+        }
 }

@@ -44,11 +44,21 @@ public class ContactInquiry {
 
     private LocalDateTime verifiedAt;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isAcknowledged = false;
+
+    private LocalDateTime acknowledgedAt;
+
+    @Builder.Default
+    @Column(nullable = false, length = 32)
+    private String status = "NEW";
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(java.time.ZoneOffset.UTC);
     }
 }

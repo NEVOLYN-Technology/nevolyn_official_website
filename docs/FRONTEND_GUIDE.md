@@ -36,7 +36,6 @@ frontend/
 │   │   └── PageShell.tsx          # Wrapper supplying Navbar + Content Padding + Footer
 │   ├── sections/                  # Homepage scroll sections
 │   │   ├── Hero.tsx               # Primary landing headline & CTA buttons
-│   │   ├── CapabilitiesSection.tsx # 4 feature pillars with glowing icon circles
 │   │   ├── AboutSection.tsx        # Mission, Vision, What We Do, Focus Areas
 │   │   ├── LeadersSection.tsx     # Executive leadership & research engineering card grid
 │   │   ├── InnovationsSection.tsx # R&D project cards, status badges & progress indicators
@@ -44,8 +43,7 @@ frontend/
 │   │   └── ContactSection.tsx     # Visitor contact inquiry form
 │   ├── ui/                        # Reusable atomic UI elements
 │   │   ├── badge.tsx              # Status pill badge (neutral, info, success, warning, danger)
-│   │   ├── LeaderDetails.tsx      # Modal popup displaying full bio & research publications
-│   │   └── WelcomeBanner.tsx      # Top announcement banner bar
+│   │   └── LeaderDetails.tsx      # Modal popup displaying full bio & research publications
 │   └── providers/                 # Theme & Context providers
 │       └── ThemeProvider.tsx      # React context provider wrapper
 ├── lib/                           # Core utilities & data layer

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { apiClient, type ApiErrorResponse, type ApiFieldError } from '@/lib/apiClient'
+import { apiClient, resolveApiUrl, type ApiErrorResponse, type ApiFieldError } from '@/lib/apiClient'
 
 /** Fields posted as multipart/form-data to `POST /api/v1/applications`. */
 export interface JoinPayload {
@@ -20,6 +20,7 @@ export interface JoinPayload {
 export interface JoinResult {
   applicationId: string
   fileName: string
+  pdfUrl?: string
   status: string
   requiresVerification: boolean
   isVerified: boolean
@@ -46,6 +47,8 @@ export function useJoinForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const [applicationId, setApplicationId] = useState<string | null>(null)
 
   const submitJoinForm = async (payload: JoinPayload): Promise<boolean> => {
     // Honeypot: a filled hidden field means a bot. Mimic success without
@@ -59,6 +62,8 @@ export function useJoinForm() {
     setFieldErrors({})
     setErrorMessage(null)
     setSuccessMessage(null)
+    setPdfUrl(null)
+    setApplicationId(null)
 
     // Validate the upload before spending a round trip on it. The backend
     // enforces the same limits regardless.
@@ -90,6 +95,12 @@ export function useJoinForm() {
 
       if (response.success || response.status === 'success') {
         setIsSuccess(true)
+        if (response.data?.applicationId) {
+          setApplicationId(response.data.applicationId)
+        }
+        if (response.data?.pdfUrl) {
+          setPdfUrl(resolveApiUrl(response.data.pdfUrl))
+        }
         setSuccessMessage(
           response.message || 'Application received! A confirmation receipt has been sent to your email.',
         )
@@ -118,5 +129,5 @@ export function useJoinForm() {
     }
   }
 
-  return { submitJoinForm, isLoading, isSuccess, successMessage, errorMessage, fieldErrors }
+  return { submitJoinForm, isLoading, isSuccess, successMessage, errorMessage, fieldErrors, pdfUrl, applicationId }
 }
