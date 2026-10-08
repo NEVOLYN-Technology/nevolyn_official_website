@@ -105,8 +105,7 @@ public class AcknowledgeController {
                 submission.type().label(), submission.referenceCode(), submission.email());
 
         // Step 1: Attempt email dispatch to candidate FIRST
-        boolean delivered = emailService.sendUserAcknowledgementEmail(
-                submission.email(), submission.name(), submission.referenceCode(), submission.type().label());
+        boolean delivered = emailService.sendUserAcknowledgementEmail(submission);
 
         if (!delivered) {
             log.error("Failed to deliver acknowledgement email for {} '{}' to <{}>",

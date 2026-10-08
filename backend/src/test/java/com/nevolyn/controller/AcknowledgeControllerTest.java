@@ -15,8 +15,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.nevolyn.service.SubmissionDetails;
+import com.nevolyn.service.SubmissionType;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,6 +46,7 @@ class AcknowledgeControllerTest {
 
     @BeforeEach
     void setUp() {
+        when(emailService.sendUserAcknowledgementEmail(any(SubmissionDetails.class))).thenReturn(true);
         when(emailService.sendUserAcknowledgementEmail(any(), any(), any(), any())).thenReturn(true);
     }
 
@@ -97,12 +101,13 @@ class AcknowledgeControllerTest {
                 .andExpect(content().string(containsString("Acknowledgement Sent!")))
                 .andExpect(content().string(containsString("Alice Applicant")));
 
-        verify(emailService, times(1)).sendUserAcknowledgementEmail(
-                eq("alice@example.com"),
-                eq("Alice Applicant"),
-                eq(appId),
-                eq("Job Application")
-        );
+        verify(emailService, times(1)).sendUserAcknowledgementEmail(argThat(details ->
+                details != null &&
+                "alice@example.com".equals(details.email()) &&
+                "Alice Applicant".equals(details.name()) &&
+                appId.equals(details.referenceCode()) &&
+                details.type() == SubmissionType.JOB_APPLICATION
+        ));
     }
 
     @Test
@@ -124,12 +129,14 @@ class AcknowledgeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Acknowledgement Sent!")));
 
-        verify(emailService, times(1)).sendUserAcknowledgementEmail(
-                eq("bob@example.com"),
-                eq("Bob Inquirer"),
-                eq(inqId),
-                eq("Contact Inquiry")
-        );
+        verify(emailService, times(1)).sendUserAcknowledgementEmail(argThat(details ->
+                details != null &&
+                "bob@example.com".equals(details.email()) &&
+                "Bob Inquirer".equals(details.name()) &&
+                inqId.equals(details.referenceCode()) &&
+                "Test Subject".equals(details.subject()) &&
+                details.type() == SubmissionType.CONTACT_INQUIRY
+        ));
 
         // Second POST - must be idempotent!
         mockMvc.perform(post("/api/v1/acknowledge").param("trackingId", inqId))
@@ -137,7 +144,7 @@ class AcknowledgeControllerTest {
                 .andExpect(content().string(containsString("Already Acknowledged")));
 
         // Verify still called exactly once!
-        verify(emailService, times(1)).sendUserAcknowledgementEmail(any(), any(), any(), any());
+        verify(emailService, times(1)).sendUserAcknowledgementEmail(any(SubmissionDetails.class));
     }
 
     @Test
@@ -160,12 +167,14 @@ class AcknowledgeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Acknowledgement Sent!")));
 
-        verify(emailService, times(1)).sendUserAcknowledgementEmail(
-                eq("carol@example.com"),
-                eq("Carol Inquirer"),
-                eq(inqId),
-                eq("Contact Inquiry")
-        );
+        verify(emailService, times(1)).sendUserAcknowledgementEmail(argThat(details ->
+                details != null &&
+                "carol@example.com".equals(details.email()) &&
+                "Carol Inquirer".equals(details.name()) &&
+                inqId.equals(details.referenceCode()) &&
+                "Partnership".equals(details.subject()) &&
+                details.type() == SubmissionType.CONTACT_INQUIRY
+        ));
     }
 
     @Test
@@ -196,6 +205,7 @@ class AcknowledgeControllerTest {
                 .build();
         applicationRepository.save(app);
 
+        when(emailService.sendUserAcknowledgementEmail(any(SubmissionDetails.class))).thenReturn(false);
         when(emailService.sendUserAcknowledgementEmail(any(), any(), any(), any())).thenReturn(false);
 
         mockMvc.perform(post("/api/v1/acknowledge").param("trackingId", appId))

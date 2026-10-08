@@ -302,13 +302,21 @@ public class EmailService {
     }
 
     public boolean sendUserAcknowledgementEmail(String recipientEmail, String name, String trackingId, String formType) {
+        return sendUserAcknowledgementEmail(recipientEmail, name, trackingId, formType, null);
+    }
+
+    public boolean sendUserAcknowledgementEmail(String recipientEmail, String name, String trackingId, String formType, String subject) {
         boolean isApp = formType != null && formType.toLowerCase().contains("application");
+        String effectiveSubject = (subject != null && !subject.isBlank())
+                ? subject.trim()
+                : (isApp ? "Job Application Submission" : "General Inquiry");
+
         SubmissionDetails details = new SubmissionDetails(
                 isApp ? SubmissionType.JOB_APPLICATION : SubmissionType.CONTACT_INQUIRY,
                 trackingId,
                 name,
                 recipientEmail,
-                null,
+                effectiveSubject,
                 null,
                 null,
                 null,
