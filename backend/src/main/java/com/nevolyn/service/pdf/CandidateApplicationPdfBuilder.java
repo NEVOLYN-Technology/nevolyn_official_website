@@ -541,12 +541,6 @@ public class CandidateApplicationPdfBuilder {
         cell.setPaddingLeft(12f);
         cell.setPaddingRight(12f);
 
-        // NEVOLYN Brand Line
-        Paragraph nevBrand = new Paragraph();
-        nevBrand.add(new Chunk("NEVOLYN", font(9.5f, Font.BOLD, COLOR_PRIMARY)));
-        nevBrand.setSpacingAfter(4f);
-        cell.addElement(nevBrand);
-
         // 4 Links Row: Website, Email, LinkedIn, Facebook
         PdfPTable nevLinks = new PdfPTable(new float[] { 26f, 26f, 24f, 24f });
         nevLinks.setWidthPercentage(100);
