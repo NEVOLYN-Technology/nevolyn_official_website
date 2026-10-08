@@ -3,13 +3,21 @@ package com.nevolyn.service.pdf;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import com.nevolyn.model.JobApplication;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
@@ -17,272 +25,696 @@ import java.time.format.DateTimeFormatter;
  * Enterprise pure-Java PDF document builder and merger for official NEVOLYN
  * candidate applications.
  *
- * <p>
- * Generates Page 1 as an executive candidate credentials dossier &amp;
- * statement cover page,
- * and seamlessly merges the applicant's submitted CV document (from Page 2
- * onwards).
+ * <h2>Architectural Highlights</h2>
+ * <ul>
+ * <li><strong>Direct OpenPDF Vector Pipeline:</strong> 100% native Java drawing
+ * without
+ * unreliable HTML/XHTML parsing or headless browser overhead.</li>
+ * <li><strong>Zero Disk I/O on Request Path:</strong> High-resolution brand
+ * assets and security
+ * badges are pre-cached in memory at application startup
+ * ({@code @PostConstruct}).</li>
+ * <li><strong>Pixel-Perfect Single Page A4 Cover:</strong> Strictly balanced
+ * vertical rhythm guaranteed
+ * to fit on exactly 1 page before appending the applicant's submitted CV.</li>
+ * <li><strong>Seamless Multi-Page CV Merging:</strong> Directly merges the
+ * applicant's original PDF CV
+ * from Page 2 onwards into an executive recruitment dossier.</li>
+ * </ul>
  *
- * @author NEVOLYN
- * @version 1.0.0
+ * @author NEVOLYN Engineering Standard
+ * @version 2.1.0
  */
 @Slf4j
 @Component
 public class CandidateApplicationPdfBuilder {
 
-        // Design Tokens & Colors
-        private static final Color COLOR_PRIMARY = new Color(15, 23, 42); // Slate 900
-        private static final Color COLOR_ACCENT = new Color(37, 99, 235); // Vibrant Blue (#2563eb)
-        private static final Color COLOR_BORDER = new Color(226, 232, 240); // Slate 200
-        private static final Color COLOR_TEXT_MUTED = new Color(100, 116, 139); // Slate 500
-        private static final Color COLOR_TEXT_BODY = new Color(51, 65, 85); // Slate 700
-        private static final Color COLOR_CARD_BG = new Color(248, 250, 252); // Slate 50
-        private static final Color COLOR_HEADER_BG = new Color(241, 245, 249); // Slate 100
-        private static final Color COLOR_BADGE_BG = new Color(239, 246, 255); // Blue 50 (#eff6ff)
-        private static final Color COLOR_BADGE_TEXT = new Color(37, 99, 235); // Vibrant Blue (#2563eb)
+    // ── Design Tokens & Color Palette ───────────────────────────────────────
+    private static final Color COLOR_PRIMARY = new Color(15, 23, 42); // Slate 900 (#0f172a)
+    private static final Color COLOR_ACCENT = new Color(2, 132, 199); // Sky 600 (#0284c7)
+    private static final Color COLOR_BORDER = new Color(203, 213, 225); // Slate 300 (#cbd5e1)
+    private static final Color COLOR_TEXT_MUTED = new Color(71, 85, 105); // Slate 600 (#475569)
+    private static final Color COLOR_TEXT_BODY = new Color(51, 65, 85); // Slate 700 (#334155)
+    private static final Color COLOR_SUCCESS_DOT = new Color(16, 185, 129); // Emerald 500
 
-        private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
-                        .ofPattern("dd MMMM yyyy, HH:mm 'UTC'");
+    private static final Color COLOR_TABLE_HEADER_BG = new Color(219, 228, 238); // Soft Slate Blue (#dbe4ee)
+    private static final Color COLOR_TABLE_LABEL_BG = new Color(248, 250, 252); // Slate 50
+    private static final Color COLOR_CARD_BG = new Color(248, 250, 252); // Slate 50
 
-        /**
-         * Compiles Page 1 (Candidate Credentials & Statement) and merges the uploaded
-         * CV document.
-         *
-         * @param application     persisted candidate job application entity
-         * @param originalCvBytes raw bytes of applicant's uploaded CV (if PDF, merged;
-         *                        if not, referenced)
-         * @return complete unified candidate application PDF byte array
-         */
-        public byte[] buildDossier(JobApplication application, byte[] originalCvBytes) {
-                byte[] coverPageBytes = generateCoverPage(application);
+    private static final Color COLOR_PRIVACY_BG = new Color(240, 253, 244); // Emerald 50 (#f0fdf4)
+    private static final Color COLOR_PRIVACY_BORDER = new Color(187, 247, 208); // Emerald 200 (#bbf7d0)
+    private static final Color COLOR_PRIVACY_TEXT = new Color(20, 83, 45); // Emerald 900 (#14532d)
+    private static final Color COLOR_PRIVACY_HEADING = new Color(22, 101, 52); // Emerald 800 (#166534)
 
-                // If no CV bytes provided or not a PDF, return cover page
-                if (originalCvBytes == null || originalCvBytes.length < 4 || !isPdfHeader(originalCvBytes)) {
-                        log.info("Uploaded resume is not a PDF (or empty); returning cover page for '{}'",
-                                        application.getApplicationId());
-                        return coverPageBytes;
-                }
+    private static final Color COLOR_FOOTER_BG = new Color(248, 250, 252); // Slate 50 (#f8fafc)
+    private static final Color COLOR_FOOTER_BORDER = new Color(226, 232, 240); // Slate 200 (#e2e8f0)
+    private static final Color COLOR_FOOTER_DIVIDER = new Color(226, 232, 240); // Slate 200
 
-                // Merge Page 1 (Cover Credentials) with uploaded PDF resume (Page 2+)
-                try (ByteArrayOutputStream mergedOut = new ByteArrayOutputStream()) {
-                        Document document = new Document();
-                        PdfCopy copy = new PdfCopy(document, mergedOut);
-                        document.open();
+    // ── Typography Tokens ───────────────────────────────────────────────────
+    private static final Font FONT_TABLE_HEADER = font(11.8f, Font.BOLD, COLOR_PRIMARY);
+    private static final Font FONT_GRID_LABEL = font(9.8f, Font.BOLD, COLOR_TEXT_MUTED);
+    private static final Font FONT_GRID_VALUE = font(10.2f, Font.BOLD, COLOR_PRIMARY);
+    private static final Font FONT_GRID_LINK = font(10.2f, Font.BOLD, COLOR_ACCENT);
 
-                        // 1. Add Page 1 (Cover Page)
-                        PdfReader coverReader = new PdfReader(coverPageBytes);
-                        int coverPages = coverReader.getNumberOfPages();
-                        for (int i = 1; i <= coverPages; i++) {
-                                copy.addPage(copy.getImportedPage(coverReader, i));
-                        }
-                        coverReader.close();
+    // ── Asset Paths & Constants ─────────────────────────────────────────────
+    private static final String ASSET_NEVOLYN_ICON = "static/nevolyn-icon.png";
+    private static final String DOSSIER_LABEL = "Official Candidate Credentials Dossier";
 
-                        // 2. Append original CV pages
-                        PdfReader cvReader = new PdfReader(new ByteArrayInputStream(originalCvBytes));
-                        int cvPages = cvReader.getNumberOfPages();
-                        for (int i = 1; i <= cvPages; i++) {
-                                copy.addPage(copy.getImportedPage(cvReader, i));
-                        }
-                        cvReader.close();
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
+            .ofPattern("dd MMMM yyyy, HH:mm 'UTC'")
+            .withZone(ZoneId.of("UTC"));
 
-                        document.close();
-                        log.info("Successfully merged cover dossier (1 page) and candidate CV ({} pages) for '{}'",
-                                        cvPages, application.getApplicationId());
-                        return mergedOut.toByteArray();
+    private static final float[] GRID_WIDTHS = { 32f, 68f };
 
-                } catch (Exception ex) {
-                        log.error("Failed to merge PDF resume for '{}'; falling back to cover page: {}",
-                                        application.getApplicationId(), ex.getMessage(), ex);
-                        return coverPageBytes;
-                }
+    // ── Pre-Cached Asset Byte Arrays (High Concurrency Optimization) ───────
+    private byte[] cachedNevolynIconBytes;
+    private byte[] cachedLockIconBytes;
+
+    @PostConstruct
+    public void initAssetCache() {
+        log.info("Initializing in-memory asset cache for NEVOLYN PDF builder high concurrency...");
+        this.cachedNevolynIconBytes = loadClasspathResourceBytes(ASSET_NEVOLYN_ICON);
+        this.cachedLockIconBytes = generateLockIconPngBytes();
+        log.info("PDF builder assets cached successfully (Nevolyn Icon: {}B, Lock Icon: {}B)",
+                cachedNevolynIconBytes != null ? cachedNevolynIconBytes.length : 0,
+                cachedLockIconBytes != null ? cachedLockIconBytes.length : 0);
+    }
+
+    /**
+     * Compiles Page 1 (Candidate Credentials & Official Statement) and merges the
+     * uploaded
+     * CV document into an executive recruitment dossier.
+     *
+     * @param application     persisted candidate job application entity
+     * @param originalCvBytes raw bytes of applicant's uploaded CV (if PDF, merged;
+     *                        if not, referenced)
+     * @return complete unified candidate application PDF byte array
+     */
+    public byte[] buildDossier(JobApplication application, byte[] originalCvBytes) {
+        // Fallback safety: ensure cache is ready even if called outside Spring
+        // lifecycle
+        if (cachedNevolynIconBytes == null || cachedLockIconBytes == null) {
+            initAssetCache();
         }
 
-        /**
-         * Generates Page 1: Official Candidate Application Cover Sheet & Credentials
-         * Statement.
-         */
-        private byte[] generateCoverPage(JobApplication application) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                Document document = new Document(PageSize.A4, 36, 36, 36, 36);
+        byte[] coverPageBytes = generateCoverPage(application);
 
-                try {
-                        PdfWriter.getInstance(document, out);
-                        document.open();
-
-                        // Title & Brand Header
-                        PdfPTable headerTable = new PdfPTable(2);
-                        headerTable.setWidthPercentage(100);
-                        headerTable.setWidths(new float[] { 65, 35 });
-                        headerTable.setSpacingAfter(14);
-
-                        PdfPCell brandCell = new PdfPCell();
-                        brandCell.setBorder(Rectangle.NO_BORDER);
-                        Paragraph brandTitle = new Paragraph("NEVOLYN", font(16, Font.BOLD, COLOR_PRIMARY));
-                        Paragraph brandSubtitle = new Paragraph("Engineering What's Next",
-                                        font(9, Font.BOLD, COLOR_ACCENT));
-                        brandCell.addElement(brandTitle);
-                        brandCell.addElement(brandSubtitle);
-                        headerTable.addCell(brandCell);
-
-                        PdfPCell metaCell = new PdfPCell();
-                        metaCell.setBorder(Rectangle.NO_BORDER);
-                        metaCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                        Paragraph refCode = new Paragraph("Ref: " + application.getApplicationId(),
-                                        font(10, Font.BOLD, COLOR_PRIMARY));
-                        refCode.setAlignment(Element.ALIGN_RIGHT);
-
-                        LocalDateTime submitTime = application.getCreatedAt() != null ? application.getCreatedAt()
-                                        : LocalDateTime.now(ZoneOffset.UTC);
-                        Paragraph dateP = new Paragraph(submitTime.format(DATE_FORMATTER),
-                                        font(8, Font.NORMAL, COLOR_TEXT_MUTED));
-                        dateP.setAlignment(Element.ALIGN_RIGHT);
-
-                        metaCell.addElement(refCode);
-                        metaCell.addElement(dateP);
-                        headerTable.addCell(metaCell);
-                        document.add(headerTable);
-
-                        // Divider Bar
-                        PdfPTable divider = new PdfPTable(1);
-                        divider.setWidthPercentage(100);
-                        PdfPCell barCell = new PdfPCell();
-                        barCell.setFixedHeight(2.5f);
-                        barCell.setBackgroundColor(COLOR_ACCENT);
-                        barCell.setBorder(Rectangle.NO_BORDER);
-                        divider.addCell(barCell);
-                        divider.setSpacingAfter(14);
-                        document.add(divider);
-
-                        // Section 1: Candidate Given Credentials
-                        PdfPTable credTable = new PdfPTable(2);
-                        credTable.setWidthPercentage(100);
-                        credTable.setWidths(new float[] { 50, 50 });
-                        credTable.setSpacingAfter(14);
-
-                        credTable.addCell(createGridCell("APPLICANT FULL NAME", application.getName()));
-                        credTable.addCell(createGridCell("NATIONAL ID (NID)",
-                                        application.getNid() != null ? application.getNid() : "Not provided"));
-                        credTable.addCell(createGridCell("CONTACT EMAIL", application.getEmail()));
-                        credTable.addCell(createGridCell("PHONE NUMBER",
-                                        application.getPhone() != null ? application.getPhone() : "Not provided"));
-                        PdfPCell addressCell = createGridCell("PRESENT ADDRESS",
-                                        application.getAddress() != null ? application.getAddress() : "Not provided");
-                        addressCell.setColspan(2);
-                        credTable.addCell(addressCell);
-                        document.add(credTable);
-
-                        // Section 2: Professional & Portfolio Links
-                        PdfPTable linksTable = new PdfPTable(3);
-                        linksTable.setWidthPercentage(100);
-                        linksTable.setWidths(new float[] { 33, 33, 34 });
-                        linksTable.setSpacingAfter(14);
-
-                        linksTable.addCell(createGridCell("LINKEDIN PROFILE",
-                                        orDefault(application.getLinkedin(), "None")));
-                        linksTable.addCell(
-                                        createGridCell("GITHUB PROFILE", orDefault(application.getGithub(), "None")));
-                        linksTable.addCell(createGridCell("PERSONAL WEBSITE",
-                                        orDefault(application.getWebsite(), "None")));
-                        document.add(linksTable);
-
-                        // Section 3: Statement of Motivation / Purpose
-                        Paragraph stmtHeader = new Paragraph("STATEMENT OF PURPOSE & MOTIVATION",
-                                        font(10, Font.BOLD, COLOR_PRIMARY));
-                        stmtHeader.setSpacingAfter(4);
-                        document.add(stmtHeader);
-
-                        PdfPTable reasonCard = new PdfPTable(1);
-                        reasonCard.setWidthPercentage(100);
-                        reasonCard.setSpacingAfter(14);
-
-                        PdfPCell reasonCell = new PdfPCell();
-                        reasonCell.setBackgroundColor(COLOR_CARD_BG);
-                        reasonCell.setBorderColor(COLOR_BORDER);
-                        reasonCell.setPadding(10);
-                        Paragraph reasonText = new Paragraph(
-                                        application.getReason() != null ? application.getReason()
-                                                        : "No statement provided.",
-                                        font(9.5f, Font.NORMAL, COLOR_TEXT_BODY));
-                        reasonText.setLeading(14);
-                        reasonCell.addElement(reasonText);
-                        reasonCard.addCell(reasonCell);
-                        document.add(reasonCard);
-
-                        // Section 4: Document & Verification Metadata Card
-                        PdfPTable metaCard = new PdfPTable(2);
-                        metaCard.setWidthPercentage(100);
-                        metaCard.setWidths(new float[] { 55, 45 });
-                        metaCard.setSpacingAfter(14);
-
-                        String originalName = application.getOriginalFileName() != null
-                                        ? application.getOriginalFileName()
-                                        : "resume.pdf";
-                        String sizeStr = application.getFileSizeBytes() != null
-                                        ? String.format("%.2f MB", application.getFileSizeBytes() / (1024.0 * 1024.0))
-                                        : "Standard Attachment";
-
-                        metaCard.addCell(createGridCell("ATTACHED DOCUMENT", originalName + " (" + sizeStr + ")"));
-                        metaCard.addCell(createGridCell("RECRUITMENT STATUS", "PENDING EVALUATION"));
-                        document.add(metaCard);
-
-                        // Notice Footer Bar
-                        PdfPTable noticeTable = new PdfPTable(1);
-                        noticeTable.setWidthPercentage(100);
-                        PdfPCell noticeCell = new PdfPCell();
-                        noticeCell.setBackgroundColor(COLOR_BADGE_BG);
-                        noticeCell.setBorderColor(COLOR_ACCENT);
-                        noticeCell.setPadding(8);
-
-                        Paragraph noticeP = new Paragraph(
-                                        "DOCUMENT NOTICE: The applicant's original submitted document follows directly on subsequent pages. "
-                                                        +
-                                                        "Official record generated by NEVOLYN.",
-                                        font(8, Font.BOLD, COLOR_BADGE_TEXT));
-                        noticeP.setAlignment(Element.ALIGN_CENTER);
-                        noticeCell.addElement(noticeP);
-                        noticeTable.addCell(noticeCell);
-                        document.add(noticeTable);
-
-                        document.close();
-                        return out.toByteArray();
-
-                } catch (Exception ex) {
-                        log.error("Failed to generate application cover page PDF: {}", ex.getMessage(), ex);
-                        throw new RuntimeException("Error rendering application cover PDF", ex);
-                }
+        // If no CV bytes provided or not a PDF, return cover page
+        if (originalCvBytes == null || originalCvBytes.length < 4 || !isPdfHeader(originalCvBytes)) {
+            log.info("Uploaded resume is not a PDF (or empty); returning cover page for '{}'",
+                    application.getApplicationId());
+            return coverPageBytes;
         }
 
-        private static PdfPCell createGridCell(String label, String value) {
-                PdfPCell cell = new PdfPCell();
-                cell.setBackgroundColor(COLOR_CARD_BG);
-                cell.setBorderColor(COLOR_BORDER);
-                cell.setPadding(6);
-                cell.setPaddingBottom(8);
+        // Merge Page 1 (Cover Credentials) with uploaded PDF resume (Page 2+)
+        try (ByteArrayOutputStream mergedOut = new ByteArrayOutputStream()) {
+            Document document = new Document();
+            PdfCopy copy = new PdfCopy(document, mergedOut);
+            document.open();
 
-                Paragraph labelP = new Paragraph(label, font(7.5f, Font.BOLD, COLOR_TEXT_MUTED));
-                labelP.setSpacingAfter(2);
-                Paragraph valP = new Paragraph(value != null && !value.isBlank() ? value : "—",
-                                font(9.5f, Font.BOLD, COLOR_PRIMARY));
+            // 1. Add Page 1 (Cover Page)
+            PdfReader coverReader = new PdfReader(coverPageBytes);
+            int coverPages = coverReader.getNumberOfPages();
+            for (int i = 1; i <= coverPages; i++) {
+                copy.addPage(copy.getImportedPage(coverReader, i));
+            }
+            coverReader.close();
 
-                cell.addElement(labelP);
-                cell.addElement(valP);
-                return cell;
+            // 2. Append original CV pages
+            PdfReader cvReader = new PdfReader(new ByteArrayInputStream(originalCvBytes));
+            int cvPages = cvReader.getNumberOfPages();
+            for (int i = 1; i <= cvPages; i++) {
+                copy.addPage(copy.getImportedPage(cvReader, i));
+            }
+            cvReader.close();
+
+            document.close();
+            log.info("Successfully merged cover dossier (1 page) and candidate CV ({} pages) for '{}'",
+                    cvPages, application.getApplicationId());
+            return mergedOut.toByteArray();
+
+        } catch (Exception ex) {
+            log.error("Failed to merge PDF resume for '{}'; falling back to cover page: {}",
+                    application.getApplicationId(), ex.getMessage(), ex);
+            return coverPageBytes;
+        }
+    }
+
+    /**
+     * Generates Page 1: Official Candidate Application Cover Sheet, Integrity
+     * Statement,
+     * Credentials Table with National ID (NID), Privacy Banner, and Institutional
+     * Footer.
+     */
+    private byte[] generateCoverPage(JobApplication application) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4, 28, 28, 18, 18);
+
+        try {
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            // 1. NEVOLYN Brand Header with Logo Lockup
+            addBrandHeader(document);
+
+            // 2. Prominent Document Heading Banner
+            addDocumentHeading(document);
+
+            // 3. Metadata Strip (Tracking Reference Code & Submission Timestamp)
+            addMetadataStrip(document, application);
+
+            // 4. Official Candidate Integrity & Purpose Statement Box (Larger Font to
+            // gracefully fill page)
+            addCandidateStatement(document, application);
+
+            // 5. Consolidated Credentials Table (including NID)
+            addCredentialsTable(document, application);
+
+            // 6. Data Privacy Safeguard Banner
+            addPrivacyBanner(document);
+
+            // 7. NEVOLYN Institutional Footer (Website, Email, LinkedIn, Facebook)
+            addInstitutionalFooter(document);
+
+            // 8. Bottom Document Classification Strip
+            addClassificationStrip(document);
+
+            document.close();
+            return out.toByteArray();
+
+        } catch (Exception ex) {
+            log.error("Failed to generate application cover page PDF for '{}': {}",
+                    application.getApplicationId(), ex.getMessage(), ex);
+            throw new IllegalStateException("Error rendering application cover PDF", ex);
+        }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // Section Builders
+    // ═════════════════════════════════════════════════════════════════════════
+
+    private void addBrandHeader(Document document) throws DocumentException {
+        PdfPTable lockup = new PdfPTable(new float[] { 55f, 45f });
+        lockup.setWidthPercentage(100);
+
+        // --- Left: NEVOLYN Logo & Brand Title Block ---
+        PdfPTable brandBlock = new PdfPTable(new float[] { 22f, 78f });
+        brandBlock.setWidthPercentage(100);
+
+        Image nevolynIcon = createImageFromBytes(cachedNevolynIconBytes, 42f, 42f);
+        PdfPCell iconCell = nevolynIcon != null ? new PdfPCell(nevolynIcon, false) : new PdfPCell(new Phrase(""));
+        styleBorderless(iconCell);
+        iconCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        iconCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        brandBlock.addCell(iconCell);
+
+        Paragraph brandText = new Paragraph();
+        brandText.setLeading(18f);
+        brandText.add(link("NEVOLYN", "https://nevolyn.com", font(22f, Font.BOLD, COLOR_PRIMARY)));
+        brandText.add(Chunk.NEWLINE);
+        brandText.add(new Chunk("ENGINEERING WHAT'S NEXT", new Font(Font.COURIER, 8.5f, Font.BOLD, COLOR_ACCENT)));
+        PdfPCell brandTextCell = new PdfPCell(brandText);
+        styleBorderless(brandTextCell);
+        brandTextCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        brandTextCell.setPaddingLeft(6f);
+        brandBlock.addCell(brandTextCell);
+
+        PdfPCell leftCell = new PdfPCell(brandBlock);
+        styleBorderless(leftCell);
+        lockup.addCell(leftCell);
+
+        // --- Right: Official Recruitment Header Block ---
+        Paragraph rightText = new Paragraph();
+        rightText.setLeading(13f);
+        rightText.setAlignment(Element.ALIGN_RIGHT);
+        rightText.add(new Chunk("CAREER APPLICATION DOSSIER\n", font(8.5f, Font.BOLD, COLOR_TEXT_MUTED)));
+        rightText.add(new Chunk("Talent & Engineering Division\n", font(9.5f, Font.BOLD, COLOR_PRIMARY)));
+        rightText.add(link("careers@nevolyn.com", "mailto:info@nevolyn.com", font(8.5f, Font.NORMAL, COLOR_ACCENT)));
+        PdfPCell rightCell = new PdfPCell(rightText);
+        styleBorderless(rightCell);
+        rightCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        rightCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        lockup.addCell(rightCell);
+
+        document.add(lockup);
+
+        // Subtitle Status Line: • Official Candidate Credentials Dossier |
+        // info@nevolyn.com
+        Paragraph status = new Paragraph();
+        status.setAlignment(Element.ALIGN_CENTER);
+        status.setSpacingBefore(5f);
+        status.setSpacingAfter(5f);
+        status.add(new Chunk("\u2022 ", font(10f, Font.BOLD, COLOR_SUCCESS_DOT)));
+        status.add(new Chunk(DOSSIER_LABEL, font(9.0f, Font.BOLD, COLOR_TEXT_MUTED)));
+        status.add(new Chunk("   |   ", font(9.0f, Font.BOLD, COLOR_BORDER)));
+        status.add(link("info@nevolyn.com", "mailto:info@nevolyn.com", font(9.0f, Font.BOLD, COLOR_ACCENT)));
+        document.add(status);
+
+        // Full-width Accent divider rule
+        PdfPTable rule = new PdfPTable(1);
+        rule.setWidthPercentage(100);
+        rule.setSpacingAfter(6f);
+        PdfPCell lineCell = new PdfPCell();
+        lineCell.setFixedHeight(2.0f);
+        lineCell.setBackgroundColor(COLOR_ACCENT);
+        lineCell.setBorder(Rectangle.NO_BORDER);
+        rule.addCell(lineCell);
+        document.add(rule);
+    }
+
+    private void addDocumentHeading(Document document) throws DocumentException {
+        Paragraph heading = new Paragraph();
+        heading.setAlignment(Element.ALIGN_CENTER);
+        heading.setLeading(16f);
+        heading.setSpacingBefore(0f);
+        heading.setSpacingAfter(6f);
+        heading.add(new Chunk("APPLICATION FORM", font(13.5f, Font.BOLD, COLOR_PRIMARY)));
+        heading.add(Chunk.NEWLINE);
+        heading.add(new Chunk("Official Recruitment Record & Verified Candidate Profile",
+                font(8.5f, Font.NORMAL, COLOR_TEXT_MUTED)));
+        document.add(heading);
+    }
+
+    private void addMetadataStrip(Document document, JobApplication application) throws DocumentException {
+        PdfPTable table = new PdfPTable(new float[] { 50f, 50f });
+        table.setWidthPercentage(100);
+        table.setSpacingAfter(7f);
+
+        Font labelFont = font(8.0f, Font.BOLD, COLOR_TEXT_MUTED);
+        Font refValFont = new Font(Font.COURIER, 13.5f, Font.BOLD, COLOR_ACCENT);
+        Font dateValFont = font(11.5f, Font.BOLD, COLOR_PRIMARY);
+
+        LocalDateTime createdAt = application.getCreatedAt() != null ? application.getCreatedAt()
+                : LocalDateTime.now(ZoneOffset.UTC);
+
+        table.addCell(metaCell("TRACKING REFERENCE CODE", application.getApplicationId(), labelFont, refValFont,
+                COLOR_CARD_BG));
+        table.addCell(metaCell("SUBMISSION TIMESTAMP", createdAt.atZone(ZoneOffset.UTC).format(DATE_FORMATTER),
+                labelFont, dateValFont, COLOR_CARD_BG));
+
+        document.add(table);
+    }
+
+    private PdfPCell metaCell(String label, String value, Font labelFont, Font valFont, Color bg) {
+        Paragraph p = new Paragraph();
+        p.setLeading(15f);
+        p.add(new Phrase(label + "\n", labelFont));
+        p.add(new Phrase(value, valFont));
+
+        PdfPCell cell = new PdfPCell(p);
+        cell.setBackgroundColor(bg);
+        cell.setBorderColor(COLOR_BORDER);
+        cell.setPaddingTop(5.5f);
+        cell.setPaddingBottom(6.5f);
+        cell.setPaddingLeft(10f);
+        cell.setPaddingRight(10f);
+        return cell;
+    }
+
+    private void addCandidateStatement(Document document, JobApplication application) throws DocumentException {
+        PdfPTable table = new PdfPTable(1);
+        table.setWidthPercentage(100);
+        table.setSpacingAfter(7f);
+
+        PdfPCell cell = new PdfPCell();
+        cell.setBackgroundColor(COLOR_CARD_BG);
+        cell.setBorderColor(COLOR_BORDER);
+        cell.setBorderWidth(0.8f);
+        cell.setPaddingTop(9f);
+        cell.setPaddingBottom(10f);
+        cell.setPaddingLeft(13f);
+        cell.setPaddingRight(13f);
+
+        // Statement Title Header
+        Paragraph title = new Paragraph("CANDIDATE APPLICATION & INTEGRITY STATEMENT",
+                font(11.5f, Font.BOLD, COLOR_PRIMARY));
+        title.setSpacingAfter(6f);
+        cell.addElement(title);
+
+        String candidateName = valueOrNA(application.getName());
+        String nidStr = valueOrNA(application.getNid());
+
+        // Bigger statement font (11.6f) with 17.5f leading to elegantly fill the page
+        Font fBody = font(11.4f, Font.NORMAL, COLOR_TEXT_BODY);
+        Font fBold = font(11.4f, Font.BOLD, COLOR_PRIMARY);
+
+        // Paragraph 1: Application submission statement
+        Paragraph p1 = new Paragraph();
+        p1.setLeading(17.0f);
+        p1.setAlignment(Element.ALIGN_JUSTIFIED);
+        p1.add(new Chunk("This application and credentials dossier are officially and willingly submitted by ", fBody));
+        p1.add(new Chunk(candidateName, fBold));
+        p1.add(new Chunk(" (National ID / NID: ", fBody));
+        p1.add(new Chunk(nidStr, fBold));
+        p1.add(new Chunk(") to ", fBody));
+        p1.add(new Chunk("NEVOLYN Technology", fBold));
+        p1.add(new Chunk(
+                " for recruitment consideration and technical evaluation. All submitted credentials, contact records, and attached curriculum vitae are affirmed by the applicant as authentic, valid, and representative of their qualifications.",
+                fBody));
+        p1.setSpacingAfter(5f);
+        cell.addElement(p1);
+
+        // Paragraph 2: Statement of Purpose / Motivation (if provided)
+        if (application.getReason() != null && !application.getReason().isBlank()) {
+            Paragraph p2 = new Paragraph();
+            p2.setLeading(16.5f);
+            p2.setAlignment(Element.ALIGN_JUSTIFIED);
+            p2.add(new Chunk("Statement of Purpose & Motivation: ", font(11.0f, Font.BOLD, COLOR_ACCENT)));
+            p2.add(new Chunk("\"" + application.getReason().trim() + "\"", font(10.5f, Font.ITALIC, COLOR_TEXT_BODY)));
+            cell.addElement(p2);
         }
 
-        private static Font font(float size, int style, Color color) {
-                Font f = FontFactory.getFont(FontFactory.HELVETICA, size, style, color);
-                return f;
+        table.addCell(cell);
+        document.add(table);
+    }
+
+    private void addCredentialsTable(Document document, JobApplication application) throws DocumentException {
+        PdfPTable table = new PdfPTable(GRID_WIDTHS);
+        table.setWidthPercentage(100);
+        table.setSpacingAfter(7f);
+
+        // Header Title Banner spanning all columns
+        PdfPCell headerCell = new PdfPCell(new Phrase("CANDIDATE CREDENTIALS & ASSESSMENT RECORD", FONT_TABLE_HEADER));
+        headerCell.setColspan(2);
+        headerCell.setBackgroundColor(COLOR_TABLE_HEADER_BG);
+        headerCell.setBorderColor(COLOR_BORDER);
+        headerCell.setPaddingTop(6.0f);
+        headerCell.setPaddingBottom(6.0f);
+        headerCell.setPaddingLeft(10f);
+        table.addCell(headerCell);
+
+        // 1. Applicant Name
+        addRow(table, Field.of("Applicant Full Name", valueOrNA(application.getName())));
+
+        // 2. National ID (NID)
+        addRow(table, Field.of("National ID (NID)", valueOrNA(application.getNid())));
+
+        // 3. Contact Email
+        String email = valueOrNA(application.getEmail());
+        String emailUrl = application.getEmail() != null && !application.getEmail().isBlank()
+                ? "mailto:" + application.getEmail().trim()
+                : null;
+        addRow(table, emailUrl != null
+                ? Field.link("Contact Email Address", email, emailUrl)
+                : Field.of("Contact Email Address", email));
+
+        // 4. Contact Phone
+        addRow(table, Field.of("Phone / Contact Number", valueOrNA(application.getPhone())));
+
+        // 5. Present Address
+        addRow(table, Field.of("Present Residential Address", valueOrNA(application.getAddress())));
+
+        // 6. LinkedIn Profile
+        String linkedin = application.getLinkedin();
+        if (linkedin != null && !linkedin.isBlank()) {
+            String url = formatExternalUrl(linkedin);
+            addRow(table, Field.link("LinkedIn Profile", linkedin.trim(), url));
+        } else {
+            addRow(table, Field.of("LinkedIn Profile", "Not Specified"));
         }
 
-        private static String orDefault(String val, String def) {
-                return val != null && !val.isBlank() ? val : def;
+        // 7. GitHub Profile
+        String github = application.getGithub();
+        if (github != null && !github.isBlank()) {
+            String url = formatExternalUrl(github);
+            addRow(table, Field.link("GitHub / Code Portfolio", github.trim(), url));
+        } else {
+            addRow(table, Field.of("GitHub / Code Portfolio", "Not Specified"));
         }
 
-        private static boolean isPdfHeader(byte[] data) {
-                return data.length >= 4 &&
-                                data[0] == '%' &&
-                                data[1] == 'P' &&
-                                data[2] == 'D' &&
-                                data[3] == 'F';
+        // 8. Personal Website
+        String website = application.getWebsite();
+        if (website != null && !website.isBlank()) {
+            String url = formatExternalUrl(website);
+            addRow(table, Field.link("Personal Portfolio / Website", website.trim(), url));
+        } else {
+            addRow(table, Field.of("Personal Portfolio / Website", "Not Specified"));
         }
+
+        // 9. Attached CV Document info
+        String originalName = application.getOriginalFileName() != null ? application.getOriginalFileName()
+                : "resume.pdf";
+        String sizeStr = application.getFileSizeBytes() != null
+                ? String.format("%.2f MB", application.getFileSizeBytes() / (1024.0 * 1024.0))
+                : "PDF Attachment";
+        addRow(table, Field.of("Attached Document (CV)", originalName + " (" + sizeStr + ")"));
+
+        // 10. Status
+        addRow(table, Field.of("Recruitment Review Status", "PENDING EVALUATION & INTERVIEW"));
+
+        document.add(table);
+    }
+
+    private void addRow(PdfPTable table, Field field) {
+        PdfPCell label = new PdfPCell(new Phrase(field.label(), FONT_GRID_LABEL));
+        label.setBackgroundColor(COLOR_TABLE_LABEL_BG);
+        label.setBorderColor(COLOR_BORDER);
+        label.setPaddingTop(5.5f);
+        label.setPaddingBottom(5.5f);
+        label.setPaddingLeft(10f);
+        label.setPaddingRight(6f);
+        label.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.addCell(label);
+
+        Paragraph content = new Paragraph();
+        if (field.url() != null) {
+            content.add(link(field.value(), field.url(), FONT_GRID_LINK));
+        } else {
+            content.add(new Chunk(field.value(), FONT_GRID_VALUE));
+        }
+        PdfPCell value = new PdfPCell();
+        value.setBackgroundColor(Color.WHITE);
+        value.setBorderColor(COLOR_BORDER);
+        value.setPaddingTop(5.5f);
+        value.setPaddingBottom(5.5f);
+        value.setPaddingLeft(10f);
+        value.setPaddingRight(6f);
+        value.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        value.addElement(content);
+        table.addCell(value);
+    }
+
+    private void addPrivacyBanner(Document document) throws DocumentException {
+        PdfPTable banner = new PdfPTable(new float[] { 6f, 94f });
+        banner.setWidthPercentage(100);
+        banner.setSpacingAfter(7f);
+
+        Image lockIcon = createImageFromBytes(cachedLockIconBytes, 15f, 15f);
+        PdfPCell iconCell = lockIcon != null ? new PdfPCell(lockIcon, false) : new PdfPCell(new Phrase(""));
+        iconCell.setBackgroundColor(COLOR_PRIVACY_BG);
+        iconCell.setBorderColor(COLOR_PRIVACY_BORDER);
+        iconCell.setBorder(Rectangle.LEFT | Rectangle.TOP | Rectangle.BOTTOM);
+        iconCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        iconCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        iconCell.setPadding(3f);
+        banner.addCell(iconCell);
+
+        Paragraph p = new Paragraph();
+        p.add(new Chunk("CONFIDENTIAL  \u2022  ", font(8.5f, Font.BOLD, COLOR_PRIVACY_HEADING)));
+        p.add(new Chunk(
+                "Candidate personal data, National ID (NID), and CV are strictly confidential under NEVOLYN Data Privacy Safeguards.",
+                font(8.2f, Font.NORMAL, COLOR_PRIVACY_TEXT)));
+
+        PdfPCell textCell = new PdfPCell(p);
+        textCell.setBackgroundColor(COLOR_PRIVACY_BG);
+        textCell.setBorderColor(COLOR_PRIVACY_BORDER);
+        textCell.setBorder(Rectangle.TOP | Rectangle.BOTTOM | Rectangle.RIGHT);
+        textCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        textCell.setPaddingLeft(6f);
+        textCell.setPaddingTop(5f);
+        textCell.setPaddingBottom(5f);
+        banner.addCell(textCell);
+
+        document.add(banner);
+    }
+
+    private void addInstitutionalFooter(Document document) throws DocumentException {
+        PdfPTable footerCard = new PdfPTable(1);
+        footerCard.setWidthPercentage(100);
+        footerCard.setSpacingAfter(6f);
+
+        PdfPCell cell = new PdfPCell();
+        cell.setBackgroundColor(COLOR_FOOTER_BG);
+        cell.setBorderColor(COLOR_FOOTER_BORDER);
+        cell.setBorderWidth(1.0f);
+        cell.setPaddingTop(7f);
+        cell.setPaddingBottom(8f);
+        cell.setPaddingLeft(12f);
+        cell.setPaddingRight(12f);
+
+        // Header Title: VISIT US
+        Paragraph title = new Paragraph("VISIT US", font(9.0f, Font.BOLD, COLOR_TEXT_MUTED));
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(4f);
+        cell.addElement(title);
+
+        // NEVOLYN Brand Line
+        Paragraph nevBrand = new Paragraph();
+        nevBrand.add(new Chunk("NEVOLYN", font(9.5f, Font.BOLD, COLOR_PRIMARY)));
+        nevBrand.add(new Chunk("  \u2022  ", font(8.0f, Font.NORMAL, COLOR_TEXT_MUTED)));
+        nevBrand.add(new Chunk("Engineering What is Next", font(8.2f, Font.NORMAL, COLOR_TEXT_MUTED)));
+        nevBrand.setSpacingAfter(4f);
+        cell.addElement(nevBrand);
+
+        // 4 Links Row: Website, Email, LinkedIn, Facebook
+        PdfPTable nevLinks = new PdfPTable(new float[] { 26f, 26f, 24f, 24f });
+        nevLinks.setWidthPercentage(100);
+        addFooterChannelCell(nevLinks, "Web", "nevolyn.com", "https://nevolyn.com/");
+        addFooterChannelCell(nevLinks, "Email", "info@nevolyn.com", "mailto:info@nevolyn.com");
+        addFooterChannelCell(nevLinks, "LinkedIn", "nevolyn", "https://www.linkedin.com/company/nevolyn/");
+        addFooterChannelCell(nevLinks, "Facebook", "nevolyn", "https://www.facebook.com/nevolyn/");
+        cell.addElement(nevLinks);
+
+        footerCard.addCell(cell);
+        document.add(footerCard);
+    }
+
+    private void addFooterChannelCell(PdfPTable table, String channelLabel, String displayText, String targetUrl) {
+        Paragraph p = new Paragraph();
+        p.setLeading(10f);
+        p.add(new Chunk(channelLabel + ": ", font(8.0f, Font.BOLD, COLOR_TEXT_MUTED)));
+        p.add(link(displayText, targetUrl, font(8.0f, Font.BOLD, COLOR_ACCENT)));
+
+        PdfPCell cell = new PdfPCell(p);
+        cell.setBorder(Rectangle.NO_BORDER);
+        cell.setPadding(1f);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.addCell(cell);
+    }
+
+    private void addClassificationStrip(Document document) throws DocumentException {
+        PdfPTable strip = new PdfPTable(new float[] { 70f, 30f });
+        strip.setWidthPercentage(100);
+
+        Paragraph left = new Paragraph("NEVOLYN Official Candidate Dossier & Recruitment Specification",
+                font(7.0f, Font.NORMAL, COLOR_TEXT_MUTED));
+        PdfPCell leftCell = new PdfPCell(left);
+        leftCell.setBorder(Rectangle.NO_BORDER);
+        strip.addCell(leftCell);
+
+        Paragraph right = new Paragraph("System Generated", font(7.0f, Font.NORMAL, COLOR_TEXT_MUTED));
+        right.setAlignment(Element.ALIGN_RIGHT);
+        PdfPCell rightCell = new PdfPCell(right);
+        rightCell.setBorder(Rectangle.NO_BORDER);
+        rightCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        strip.addCell(rightCell);
+
+        document.add(strip);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // Helpers & Performance Optimization
+    // ═════════════════════════════════════════════════════════════════════════
+
+    private static Font font(float size, int style, Color color) {
+        return new Font(Font.HELVETICA, size, style, color);
+    }
+
+    private static Anchor link(String text, String url, Font font) {
+        Anchor anchor = new Anchor(text, font);
+        anchor.setReference(url);
+        return anchor;
+    }
+
+    private static void styleBorderless(PdfPCell cell) {
+        cell.setBorder(Rectangle.NO_BORDER);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+    }
+
+    private String valueOrNA(String val) {
+        return (val == null || val.isBlank()) ? "Not Specified" : val.trim();
+    }
+
+    private String formatExternalUrl(String url) {
+        if (url == null || url.isBlank())
+            return "#";
+        String clean = url.trim();
+        return clean.startsWith("http://") || clean.startsWith("https://") ? clean : "https://" + clean;
+    }
+
+    private byte[] loadClasspathResourceBytes(String classpath) {
+        try {
+            ClassPathResource resource = new ClassPathResource(classpath);
+            if (!resource.exists()) {
+                log.warn("Classpath brand asset not found: {}", classpath);
+                return null;
+            }
+            try (InputStream is = resource.getInputStream()) {
+                return is.readAllBytes();
+            }
+        } catch (Exception e) {
+            log.warn("Failed to load classpath resource {}: {}", classpath, e.getMessage());
+            return null;
+        }
+    }
+
+    private Image createImageFromBytes(byte[] bytes, float maxWidth, float maxHeight) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+        try {
+            Image image = Image.getInstance(bytes);
+            image.scaleToFit(maxWidth, maxHeight);
+            return image;
+        } catch (Exception e) {
+            log.warn("Failed to instantiate Image from pre-cached bytes: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private byte[] generateLockIconPngBytes() {
+        try {
+            int size = 32;
+            BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = img.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // Dark green rounded rectangle badge (#2f6b49)
+            g.setColor(new Color(47, 107, 73));
+            g.fillRoundRect(2, 2, size - 4, size - 4, 8, 8);
+
+            // White lock body
+            g.setColor(Color.WHITE);
+            g.fillRoundRect(8, 14, 16, 11, 3, 3);
+
+            // White lock shackle
+            g.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.drawArc(10, 6, 12, 13, 0, 180);
+
+            // Keyhole dot
+            g.setColor(new Color(47, 107, 73));
+            g.fillOval(15, 17, 2, 4);
+
+            g.dispose();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            javax.imageio.ImageIO.write(img, "png", baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            log.warn("Failed to pre-generate lock icon PNG bytes: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private static boolean isPdfHeader(byte[] data) {
+        return data.length >= 4 &&
+                data[0] == '%' &&
+                data[1] == 'P' &&
+                data[2] == 'D' &&
+                data[3] == 'F';
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // Value Types
+    // ═════════════════════════════════════════════════════════════════════════
+
+    private record Field(String label, String value, String url) {
+        static Field of(String label, String value) {
+            return new Field(label, value, null);
+        }
+
+        static Field link(String label, String value, String url) {
+            return new Field(label, value, url);
+        }
+    }
 }

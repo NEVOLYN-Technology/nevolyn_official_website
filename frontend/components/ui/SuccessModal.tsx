@@ -79,19 +79,21 @@ export const SuccessModal = ({
 
             {/* Target Email Callout */}
             {email && (
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 mb-6 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400 shrink-0">
-                    <Mail className="w-5 h-5" />
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:p-4 mb-6 text-left">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400 shrink-0">
+                      <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] sm:text-xs text-slate-400 font-medium">Receipt Sent to</p>
+                      <p className="text-xs sm:text-sm font-semibold text-slate-200 break-all sm:truncate">{email}</p>
+                    </div>
                   </div>
-                  <div className="truncate text-left">
-                    <p className="text-xs text-slate-400 font-medium">Receipt Sent to</p>
-                    <p className="text-sm font-semibold text-slate-200 truncate">{email}</p>
-                  </div>
+                  <span className="self-start sm:self-auto inline-flex items-center text-[11px] sm:text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 shrink-0">
+                    Confirmation Sent
+                  </span>
                 </div>
-                <span className="inline-flex items-center text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 shrink-0">
-                  Confirmation Sent
-                </span>
               </div>
             )}
 

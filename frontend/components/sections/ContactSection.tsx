@@ -150,7 +150,7 @@ export const ContactSection = (): JSX.Element => {
           {/* Top Multi-Chromatic Accent Beam */}
           <div className="h-1.5 w-full bg-gradient-to-r from-sky-400 via-emerald-400 to-rose-400" />
 
-          <div className="p-6 sm:p-10">
+          <div className="p-4 sm:p-10">
             {errorMessage && !isSuccess && (
               <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-600 text-sm">
                 {errorMessage}
@@ -165,43 +165,43 @@ export const ContactSection = (): JSX.Element => {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.96 }}
                   transition={{ duration: 0.25 }}
-                  className="space-y-6 text-center py-2"
+                  className="space-y-4 sm:space-y-6 text-center py-1 sm:py-2"
                 >
                   {/* Glowing Icon Header */}
                   <div className="flex justify-center">
                     <div className="relative">
                       <div className="absolute inset-0 bg-emerald-500/25 rounded-full blur-xl animate-pulse" />
                       <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                        <CheckCircle2 className="w-9 h-9 sm:w-10 sm:h-10 text-white stroke-[2.4]" />
+                        <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-white stroke-[2.4]" />
                       </div>
                     </div>
                   </div>
 
                   {/* Header Content */}
-                  <div className="space-y-2">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <h3 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                       Inquiry Received!
                     </h3>
-                    <p className="text-sm sm:text-base text-emerald-700 font-medium max-w-lg mx-auto">
+                    <p className="text-xs sm:text-base text-emerald-700 font-medium max-w-lg mx-auto px-1 sm:px-0">
                       {successMessage || 'Thank you for reaching out to NEVOLYN. Your message has been safely logged.'}
                     </p>
                   </div>
 
                   {/* Tracking Reference Code Pill (if present) */}
                   {inquiryId && (
-                    <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/70 p-4 max-w-md mx-auto">
+                    <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/70 p-3.5 sm:p-4 max-w-md mx-auto">
                       <span className="text-[11px] font-mono uppercase tracking-widest text-slate-500 font-bold block mb-1">
                         Tracking Reference Code
                       </span>
-                      <div className="flex items-center justify-center gap-2.5">
-                        <span className="font-mono text-lg sm:text-xl font-black tracking-wider text-emerald-800 select-all">
+                      <div className="flex items-center justify-center gap-2 sm:gap-2.5 flex-wrap">
+                        <span className="font-mono text-base sm:text-xl font-black tracking-wider text-emerald-800 select-all break-all">
                           {inquiryId}
                         </span>
                         <button
                           onClick={() => handleCopyCode(inquiryId)}
                           type="button"
                           title="Copy Reference Code"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-emerald-400/40 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all text-xs font-bold active:scale-95 shadow-2xs cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-emerald-400/40 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all text-xs font-bold active:scale-95 shadow-2xs cursor-pointer shrink-0"
                         >
                           {copiedCode ? (
                             <>
@@ -221,40 +221,42 @@ export const ContactSection = (): JSX.Element => {
 
                   {/* Target Email Callout */}
                   {submittedEmail && (
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 max-w-md mx-auto flex items-center justify-between gap-3 text-left">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-600 shrink-0">
-                          <Mail className="w-5 h-5" />
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5 sm:p-4 max-w-md mx-auto text-left">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+                        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                          <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-600 shrink-0">
+                            <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] sm:text-xs text-slate-500 font-medium">Receipt Sent to</p>
+                            <p className="text-xs sm:text-sm font-semibold text-slate-900 break-all sm:truncate">{submittedEmail}</p>
+                          </div>
                         </div>
-                        <div className="truncate">
-                          <p className="text-xs text-slate-500 font-medium">Receipt Sent to</p>
-                          <p className="text-sm font-semibold text-slate-900 truncate">{submittedEmail}</p>
-                        </div>
+                        <span className="self-start sm:self-auto inline-flex items-center text-[11px] sm:text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-300 shrink-0">
+                          Confirmation Sent
+                        </span>
                       </div>
-                      <span className="inline-flex items-center text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-300 shrink-0">
-                        Confirmation Sent
-                      </span>
                     </div>
                   )}
 
                   {/* Step-by-Step Instructions ("What happens next") */}
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 text-left max-w-lg mx-auto space-y-3">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 sm:p-5 text-left max-w-lg mx-auto space-y-2.5 sm:space-y-3">
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
                       What happens next:
                     </p>
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2.5 sm:gap-3">
                       <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                         1
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-700">
+                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                         Check your email inbox for your submission receipt and tracking reference code.
                       </p>
                     </div>
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2.5 sm:gap-3">
                       <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                         2
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-700">
+                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                         Our team will evaluate your inquiry and send you an email acknowledging its receipt.
                       </p>
                     </div>
@@ -265,7 +267,7 @@ export const ContactSection = (): JSX.Element => {
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-500 hover:brightness-105 text-white px-8 py-3.5 text-sm font-bold shadow-lg shadow-sky-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-500 hover:brightness-105 text-white px-8 py-3.5 text-sm font-bold shadow-lg shadow-sky-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 cursor-pointer"
                     >
                       <span>Send Another Message</span>
                     </button>
