@@ -173,7 +173,8 @@ public class CandidateApplicationPdfBuilder {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            // 1. NEVOLYN Brand Header with Logo Lockup (Left: Logo + NEVOLYN, Right: Career Application Form + info@nevolyn.com)
+            // 1. NEVOLYN Brand Header with Logo Lockup (Left: Logo + NEVOLYN, Right: Career
+            // Application Form + info@nevolyn.com)
             addBrandHeader(document);
 
             // 2. Metadata Strip (Tracking Reference Code & Submission Timestamp)
@@ -210,18 +211,20 @@ public class CandidateApplicationPdfBuilder {
     // ═════════════════════════════════════════════════════════════════════════
 
     private void addBrandHeader(Document document) throws DocumentException {
-        PdfPTable lockup = new PdfPTable(new float[] { 60f, 40f });
+        PdfPTable lockup = new PdfPTable(new float[] { 52f, 48f });
         lockup.setWidthPercentage(100);
 
         // --- Left: NEVOLYN Logo & Brand Title Block ---
-        PdfPTable brandBlock = new PdfPTable(new float[] { 22f, 78f });
+        // Tight ratio so 40pt icon and NEVOLYN wordmark are closer together
+        PdfPTable brandBlock = new PdfPTable(new float[] { 42f, 240f });
         brandBlock.setWidthPercentage(100);
 
-        Image nevolynIcon = createImageFromBytes(cachedNevolynIconBytes, 42f, 42f);
+        Image nevolynIcon = createImageFromBytes(cachedNevolynIconBytes, 40f, 40f);
         PdfPCell iconCell = nevolynIcon != null ? new PdfPCell(nevolynIcon, false) : new PdfPCell(new Phrase(""));
         styleBorderless(iconCell);
-        iconCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        iconCell.setHorizontalAlignment(Element.ALIGN_LEFT);
         iconCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        iconCell.setPadding(0f);
         brandBlock.addCell(iconCell);
 
         Paragraph brandText = new Paragraph();
@@ -232,11 +235,12 @@ public class CandidateApplicationPdfBuilder {
         PdfPCell brandTextCell = new PdfPCell(brandText);
         styleBorderless(brandTextCell);
         brandTextCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        brandTextCell.setPaddingLeft(6f);
+        brandTextCell.setPaddingLeft(4f);
         brandBlock.addCell(brandTextCell);
 
         PdfPCell leftCell = new PdfPCell(brandBlock);
         styleBorderless(leftCell);
+        leftCell.setPadding(0f);
         lockup.addCell(leftCell);
 
         // --- Right: Career Application Form Header Block ---
@@ -307,56 +311,78 @@ public class CandidateApplicationPdfBuilder {
     private void addCandidateStatement(Document document, JobApplication application) throws DocumentException {
         PdfPTable table = new PdfPTable(1);
         table.setWidthPercentage(100);
-        table.setSpacingAfter(7f);
+        table.setSpacingAfter(6f);
 
         PdfPCell cell = new PdfPCell();
         cell.setBackgroundColor(COLOR_CARD_BG);
         cell.setBorderColor(COLOR_BORDER);
         cell.setBorderWidth(0.8f);
-        cell.setPaddingTop(9f);
-        cell.setPaddingBottom(10f);
-        cell.setPaddingLeft(13f);
-        cell.setPaddingRight(13f);
+        cell.setPaddingTop(7f);
+        cell.setPaddingBottom(8f);
+        cell.setPaddingLeft(12f);
+        cell.setPaddingRight(12f);
 
         // Statement Title Header
-        Paragraph title = new Paragraph("CANDIDATE APPLICATION & INTEGRITY STATEMENT",
-                font(11.5f, Font.BOLD, COLOR_PRIMARY));
-        title.setSpacingAfter(6f);
+        Paragraph title = new Paragraph("APPLICATION STATEMENT",
+                font(11.0f, Font.BOLD, COLOR_PRIMARY));
+        title.setSpacingAfter(4f);
         cell.addElement(title);
 
         String candidateName = valueOrNA(application.getName());
         String nidStr = valueOrNA(application.getNid());
 
-        // Bigger statement font (11.6f) with 17.5f leading to elegantly fill the page
-        Font fBody = font(11.4f, Font.NORMAL, COLOR_TEXT_BODY);
-        Font fBold = font(11.4f, Font.BOLD, COLOR_PRIMARY);
+        Font fBody = font(10.6f, Font.NORMAL, COLOR_TEXT_BODY);
+        Font fBold = font(10.6f, Font.BOLD, COLOR_PRIMARY);
 
         // Paragraph 1: Application submission statement
         Paragraph p1 = new Paragraph();
-        p1.setLeading(17.0f);
+        p1.setLeading(15.5f);
         p1.setAlignment(Element.ALIGN_JUSTIFIED);
-        p1.add(new Chunk("This application and submitted credentials are officially and willingly submitted by ",
+        p1.add(new Chunk("This application is officially submitted by ",
                 fBody));
         p1.add(new Chunk(candidateName, fBold));
         p1.add(new Chunk(" (National ID / NID: ", fBody));
         p1.add(new Chunk(nidStr, fBold));
         p1.add(new Chunk(") to ", fBody));
-        p1.add(new Chunk("NEVOLYN Technology", fBold));
+        p1.add(new Chunk("NEVOLYN", fBold));
         p1.add(new Chunk(
                 " for recruitment consideration and technical evaluation. All submitted credentials, contact records, and attached curriculum vitae are affirmed by the applicant as authentic, valid, and representative of their qualifications.",
                 fBody));
-        p1.setSpacingAfter(5f);
         cell.addElement(p1);
 
-        // Paragraph 2: Statement of Purpose / Motivation (if provided)
-        if (application.getReason() != null && !application.getReason().isBlank()) {
-            Paragraph p2 = new Paragraph();
-            p2.setLeading(16.5f);
-            p2.setAlignment(Element.ALIGN_JUSTIFIED);
-            p2.add(new Chunk("Statement of Purpose & Motivation: ", font(11.0f, Font.BOLD, COLOR_ACCENT)));
-            p2.add(new Chunk("\"" + application.getReason().trim() + "\"", font(10.5f, Font.ITALIC, COLOR_TEXT_BODY)));
-            cell.addElement(p2);
-        }
+        table.addCell(cell);
+        document.add(table);
+
+        // --- Dedicated Statement of Purpose & Motivation Box ---
+        addStatementOfPurposeBox(document, application);
+    }
+
+    private void addStatementOfPurposeBox(Document document, JobApplication application) throws DocumentException {
+        PdfPTable table = new PdfPTable(1);
+        table.setWidthPercentage(100);
+        table.setSpacingAfter(6f);
+
+        PdfPCell cell = new PdfPCell();
+        cell.setBackgroundColor(COLOR_CARD_BG);
+        cell.setBorderColor(COLOR_BORDER);
+        cell.setBorderWidth(0.8f);
+        cell.setPaddingTop(8f);
+        cell.setPaddingBottom(9f);
+        cell.setPaddingLeft(12f);
+        cell.setPaddingRight(12f);
+
+        Paragraph sopTitle = new Paragraph("STATEMENT OF PURPOSE", font(10.8f, Font.BOLD, COLOR_ACCENT));
+        sopTitle.setSpacingAfter(5f);
+        cell.addElement(sopTitle);
+
+        String statementText = (application.getReason() != null && !application.getReason().isBlank())
+                ? application.getReason().trim()
+                : "No statement provided.";
+
+        Paragraph stmtP = new Paragraph(statementText, font(10.4f, Font.NORMAL, COLOR_TEXT_BODY));
+        stmtP.setLeading(15.2f);
+        stmtP.setAlignment(Element.ALIGN_JUSTIFIED);
+        cell.addElement(stmtP);
 
         table.addCell(cell);
         document.add(table);
@@ -484,7 +510,6 @@ public class CandidateApplicationPdfBuilder {
         banner.addCell(iconCell);
 
         Paragraph p = new Paragraph();
-        p.add(new Chunk("CONFIDENTIAL  \u2022  ", font(8.5f, Font.BOLD, COLOR_PRIVACY_HEADING)));
         p.add(new Chunk(
                 "Candidate personal data, National ID (NID), and CV are strictly confidential under NEVOLYN Data Privacy Safeguards.",
                 font(8.2f, Font.NORMAL, COLOR_PRIVACY_TEXT)));
@@ -516,16 +541,9 @@ public class CandidateApplicationPdfBuilder {
         cell.setPaddingLeft(12f);
         cell.setPaddingRight(12f);
 
-        // Header Title: VISIT US
-        Paragraph title = new Paragraph("VISIT US", font(9.0f, Font.BOLD, COLOR_TEXT_MUTED));
-        title.setAlignment(Element.ALIGN_CENTER);
-        title.setSpacingAfter(4f);
-        cell.addElement(title);
-
         // NEVOLYN Brand Line
         Paragraph nevBrand = new Paragraph();
         nevBrand.add(new Chunk("NEVOLYN", font(9.5f, Font.BOLD, COLOR_PRIMARY)));
-        nevBrand.add(new Chunk("  \u2022  ", font(8.0f, Font.NORMAL, COLOR_TEXT_MUTED)));
         nevBrand.add(new Chunk("Engineering What is Next", font(8.2f, Font.NORMAL, COLOR_TEXT_MUTED)));
         nevBrand.setSpacingAfter(4f);
         cell.addElement(nevBrand);
