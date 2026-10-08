@@ -207,7 +207,7 @@
       padding: 12px 16px;
       margin-bottom: 22px;
       font-size: 12.5px;
-      color: #1e40af;
+      color: #1d4ed8;
       line-height: 1.5;
       display: flex;
       align-items: flex-start;
@@ -294,10 +294,6 @@
     <div class="main-card">
       <div class="content-body">
         <h1 class="page-title">Confirm Application Evaluation</h1>
-        <p class="page-subtitle">
-          Review candidate credentials and preview the outgoing notification before acknowledging this application.
-        </p>
-
         <div class="details-panel">
           <div class="panel-header">
             <span>Candidate Application Record</span>
@@ -320,9 +316,21 @@
               <span class="detail-label">Phone</span>
               <span class="detail-val">{{phone}}</span>
             </div>
+            <div class="detail-item">
+              <span class="detail-label">LinkedIn</span>
+              <span class="detail-val">{{linkedin}}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">GitHub</span>
+              <span class="detail-val">{{github}}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Portfolio / Website</span>
+              <span class="detail-val">{{website}}</span>
+            </div>
             <div class="detail-item full-width">
-              <span class="detail-label">Attached Resume / CV</span>
-              <span class="detail-val">&#128206;&nbsp; {{resumeFileName}}</span>
+              <span class="detail-label">Application</span>
+              <span class="detail-val">&#128206;&nbsp; Application Document ({{resumeFileName}})</span>
             </div>
           </div>
         </div>
@@ -338,18 +346,40 @@
           <div class="preview-card-body">
             <div class="preview-meta-strip">
               <div class="preview-meta-row"><strong>To:</strong> {{email}}</div>
-              <div class="preview-meta-row"><strong>Subject:</strong> [NEVOLYN] Application Under Review
-                [{{referenceCode}}]</div>
+              <div class="preview-meta-row"><strong>Subject:</strong> [NEVOLYN] Application Under Review [Ref:
+                {{referenceCode}}]</div>
               <div class="preview-meta-row"><strong>From:</strong> NEVOLYN &lt;info@nevolyn.com&gt;</div>
             </div>
-            <p style="margin-bottom: 8px;"><strong>Dear {{name}},</strong></p>
-            <p style="margin-bottom: 10px;">
-              Your job application has been reviewed and is now <strong>under active evaluation</strong> by the NEVOLYN
-              team.
+
+            <div
+              style="display:inline-block; background-color:#dcfce7; color:#047857; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; border:1px solid #a7f3d0; margin-bottom:14px;">
+              &#10003;&nbsp; Application Under Active Review
+            </div>
+
+            <p style="margin:0 0 10px 0; font-size:14px; font-weight:600; color:#080d16;">
+              Dear {{name}},
             </p>
-            <p style="margin-bottom: 10px; font-size: 12.5px; color: #475569;">
-              If your background matches our technical roadmap, our recruiting team will reach out directly.
+
+            <p style="margin:0 0 14px 0; font-size:13px; color:#334155; line-height:1.6;">
+              Your job application (Tracking Reference Code: <span class="ref-pill">{{referenceCode}}</span>) has been
+              evaluated and is currently under active consideration.
             </p>
+
+            <div
+              style="background-color:#f0fdf4; border:1px solid #a7f3d0; border-left:4px solid #059669; padding:12px 14px; border-radius:6px; margin:14px 0;">
+              <div style="font-size:12.5px; font-weight:700; color:#047857; margin-bottom:4px;">
+                &#128172;&nbsp; Next Steps in our Selection Process
+              </div>
+              <p style="margin:0; font-size:12px; color:#14532d; line-height:1.5;">
+                If your background matches our technical roadmap and current openings, our recruiting team will reach
+                out directly to schedule an introductory conversation.
+              </p>
+            </div>
+
+            <div style="font-size:12px; color:#64748b; margin-top:14px; line-height:1.5;">
+              Warm regards,<br />
+              <strong style="color:#0f172a;">NEVOLYN</strong>
+            </div>
           </div>
         </div>
 
@@ -365,12 +395,9 @@
           <form id="ackForm" method="POST" action="{{actionUrl}}" onsubmit="handleFormSubmit(event)">
             <button type="submit" id="submitBtn" class="btn-submit">
               <span class="spinner" id="btnSpinner"></span>
-              <span id="btnText">&#10003;&nbsp; Confirm &amp; Dispatch Acknowledgement</span>
+              <span id="btnText">&#10003;&nbsp; Confirm &amp; Acknowledge</span>
             </button>
           </form>
-          <div class="action-subtext">
-            Protected single-dispatch flow &bull; Scanner-safe pre-flight
-          </div>
         </div>
       </div>
     </div>

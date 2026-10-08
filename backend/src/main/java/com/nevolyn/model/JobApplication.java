@@ -33,6 +33,9 @@ public class JobApplication {
     @Column(nullable = false, length = 30)
     private String phone;
 
+    @Column(nullable = false, length = 50)
+    private String nid;
+
     @Column(nullable = false, length = 250)
     private String address;
 

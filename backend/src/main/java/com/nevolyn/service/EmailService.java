@@ -99,6 +99,7 @@ public class EmailService {
 
         if (details.type() == SubmissionType.JOB_APPLICATION) {
             values.put("resumeFileName", details.resumeFileName() != null ? details.resumeFileName() : "Uploaded Resume / CV");
+            values.put("nid", details.nid() != null && !details.nid().isBlank() ? details.nid() : "N/A");
         } else {
             values.put("subject", details.subject() != null ? details.subject() : "General Inquiry");
             values.put("message", details.message() != null ? details.message() : "Your inquiry has been successfully registered.");
@@ -187,9 +188,13 @@ public class EmailService {
         values.put("submittedAt", nowStr);
 
         if (details.type() == SubmissionType.JOB_APPLICATION) {
-            values.put("phone", details.phone() != null ? details.phone() : "Not provided");
-            values.put("address", details.address() != null ? details.address() : "Not provided");
-            values.put("links", details.links() != null && !details.links().isBlank() ? details.links() : "None provided");
+            values.put("phone", details.phone() != null && !details.phone().isBlank() ? details.phone() : "N/A");
+            values.put("address", details.address() != null && !details.address().isBlank() ? details.address() : "N/A");
+            values.put("nid", details.nid() != null && !details.nid().isBlank() ? details.nid() : "N/A");
+            values.put("linkedin", formatSocialUrl(details.linkedin()));
+            values.put("github", formatSocialUrl(details.github()));
+            values.put("website", formatSocialUrl(details.website()));
+            values.put("links", details.links() != null && !details.links().isBlank() ? details.links() : "N/A");
             values.put("reason", details.message() != null ? details.message() : "");
             values.put("resumeFileName", details.resumeFileName() != null ? details.resumeFileName() : (attachment != null ? attachment.getName() : "None"));
         } else {
@@ -197,7 +202,7 @@ public class EmailService {
             values.put("message", details.message() != null ? details.message() : "");
         }
 
-        String htmlBody = templateRenderer.render(templatePath, values, Set.of("acknowledgeUrl"));
+        String htmlBody = templateRenderer.render(templatePath, values, Set.of("acknowledgeUrl", "linkedin", "github", "website"));
         String plainText = templateRenderer.generatePlainText(htmlBody);
 
         String subjectLine = (details.type() == SubmissionType.JOB_APPLICATION)
@@ -347,11 +352,7 @@ public class EmailService {
             helper.setTo(message.to());
             helper.setSubject(message.subject());
 
-            if (message.hasPlainText()) {
-                helper.setText(message.plainTextBody(), message.htmlBody());
-            } else {
-                helper.setText(message.htmlBody(), true);
-            }
+            helper.setText(message.htmlBody(), true);
 
             if (message.hasReplyTo()) {
                 helper.setReplyTo(message.replyTo());
@@ -395,5 +396,16 @@ public class EmailService {
             return "***" + (at >= 0 ? email.substring(at) : "");
         }
         return email.charAt(0) + "***" + email.substring(at);
+    }
+
+    private static String formatSocialUrl(String url) {
+        if (url == null || url.trim().isBlank()) {
+            return "N/A";
+        }
+        String cleanUrl = url.trim();
+        String href = cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")
+                ? cleanUrl
+                : "https://" + cleanUrl;
+        return "<a href=\"" + href + "\" target=\"_blank\" style=\"color:#0284c7; font-weight:600; text-decoration:underline; word-break:break-all;\">" + cleanUrl + "</a>";
     }
 }

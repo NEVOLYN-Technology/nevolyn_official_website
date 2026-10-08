@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -73,14 +74,18 @@ public class AcknowledgeController {
             return alreadyAcknowledged(submission);
         }
 
-        Map<String, String> values = Map.of(
-                "actionUrl", ACKNOWLEDGE_PATH + "?trackingId=" + submission.referenceCode(),
-                "referenceCode", submission.referenceCode(),
-                "name", submission.name(),
-                "email", submission.email(),
-                "subject", submission.subject(),
-                "phone", orDefault(submission.phone(), "Not provided"),
-                "resumeFileName", orDefault(submission.resumeFileName(), "resume.pdf"));
+        Map<String, String> values = new java.util.HashMap<>();
+        values.put("actionUrl", ACKNOWLEDGE_PATH + "?trackingId" + "=" + submission.referenceCode());
+        values.put("referenceCode", submission.referenceCode());
+        values.put("name", submission.name());
+        values.put("email", submission.email());
+        values.put("subject", submission.subject());
+        values.put("phone", orDefault(submission.phone(), "N/A"));
+        values.put("address", orDefault(submission.address(), "N/A"));
+        values.put("resumeFileName", orDefault(submission.resumeFileName(), "resume.pdf"));
+        values.put("linkedin", orDefault(submission.linkedin(), "N/A"));
+        values.put("github", orDefault(submission.github(), "N/A"));
+        values.put("website", orDefault(submission.website(), "N/A"));
 
         return html(templateRenderer.render(submission.type().confirmTemplate(), values, Set.of("actionUrl")));
     }
@@ -149,7 +154,7 @@ public class AcknowledgeController {
 
     private ResponseEntity<String> html(String body) {
         return ResponseEntity.ok()
-                .contentType(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8))
+                .contentType(Objects.requireNonNull(new MediaType(Objects.requireNonNull(MediaType.TEXT_HTML), StandardCharsets.UTF_8)))
                 .body(body);
     }
 

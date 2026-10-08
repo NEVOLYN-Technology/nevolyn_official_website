@@ -70,28 +70,6 @@ SUPPORTED PLACEHOLDERS:
       border: 1px solid #e2e8f0;
     }
 
-    .header {
-      background: #0f172a;
-      padding: 28px 32px;
-      color: #ffffff;
-      border-bottom: 3px solid #0ea5e9;
-    }
-
-    .brand-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 0 0 4px 0;
-      color: #ffffff;
-      letter-spacing: -0.5px;
-    }
-
-    .brand-sub {
-      color: #38bdf8;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
     .body-content {
       padding: 32px;
     }
@@ -167,25 +145,23 @@ SUPPORTED PLACEHOLDERS:
   </style>
 </head>
 
-<body>
+<body
+  style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 30px 15px;">
   <!-- Hidden Preheader -->
   <div
     style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
     New contact inquiry from {{name}} regarding "{{subject}}" [Tracking Reference Code: {{referenceCode}}].
   </div>
 
-  <div class="wrapper">
-    <div class="header">
-      <div class="brand-title">NEVOLYN</div>
-      <div class="brand-sub">Internal Operational Alert &bull; Contact Inquiry</div>
-    </div>
-
-    <div class="body-content">
-      <div class="ref-badge">
+  <div class="wrapper"
+    style="max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);">
+    <div class="body-content" style="padding: 32px;">
+      <div class="ref-badge"
+        style="display: inline-block; background-color: #e0f2fe; color: #0369a1; font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #bae6fd;">
         Tracking Reference Code: {{referenceCode}}
       </div>
 
-      <p style="margin-top:0; font-size:15px; color:#334155;">
+      <p style="margin-top:0; font-size:15px; color:#334155; line-height: 1.6;">
         A new contact inquiry has been received. Reply directly to this email to reach the visitor, or click the button
         below to formally acknowledge the inquiry.
       </p>
@@ -194,22 +170,38 @@ SUPPORTED PLACEHOLDERS:
         style="font-size:13px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin:24px 0 12px; border-bottom:1px solid #f1f5f9; padding-bottom:6px;">
         Visitor Details
       </div>
-      <table class="info-grid">
+      <table class="info-grid" cellpadding="0" cellspacing="0" border="0"
+        style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
         <tr>
-          <td class="label">Name</td>
-          <td><strong>{{name}}</strong></td>
+          <td class="label"
+            style="font-weight: 600; color: #64748b; width: 35%; background-color: #fafafa; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px;">
+            Name</td>
+          <td
+            style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b;">
+            <strong>{{name}}</strong></td>
         </tr>
         <tr>
-          <td class="label">Email</td>
-          <td><a href="mailto:{{email}}" style="color:#0284c7; font-weight: 600;">{{email}}</a></td>
+          <td class="label"
+            style="font-weight: 600; color: #64748b; width: 35%; background-color: #fafafa; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px;">
+            Email</td>
+          <td style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px;"><a href="mailto:{{email}}"
+              style="color:#0284c7; font-weight: 600; text-decoration: none;">{{email}}</a></td>
         </tr>
         <tr>
-          <td class="label">Subject</td>
-          <td>{{subject}}</td>
+          <td class="label"
+            style="font-weight: 600; color: #64748b; width: 35%; background-color: #fafafa; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px;">
+            Subject</td>
+          <td
+            style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b;">
+            {{subject}}</td>
         </tr>
         <tr>
-          <td class="label">Submitted At</td>
-          <td>{{submittedAt}}</td>
+          <td class="label"
+            style="font-weight: 600; color: #64748b; width: 35%; background-color: #fafafa; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px;">
+            Submitted At</td>
+          <td
+            style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b;">
+            {{submittedAt}}</td>
         </tr>
       </table>
 
@@ -217,12 +209,14 @@ SUPPORTED PLACEHOLDERS:
         style="font-size:13px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin:20px 0 10px; border-bottom:1px solid #f1f5f9; padding-bottom:6px;">
         Message
       </div>
-      <div class="message-box">
+      <div class="message-box"
+        style="background-color: #f8fafc; border-left: 4px solid #0ea5e9; padding: 16px 20px; border-radius: 0 8px 8px 0; font-size: 14px; color: #334155; margin: 15px 0 25px 0; white-space: pre-wrap; word-break: break-word; line-height: 1.6;">
         {{message}}
       </div>
 
-      <div class="cta-container">
-        <a href="{{acknowledgeUrl}}" class="btn-acknowledge">
+      <div class="cta-container" style="text-align: center; margin: 32px 0 20px 0;">
+        <a href="{{acknowledgeUrl}}" class="btn-acknowledge"
+          style="display: inline-block; background: #0284c7; color: #ffffff !important; font-weight: 700; font-size: 15px; padding: 14px 28px; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); text-align: center;">
           &#10003; Acknowledge Inquiry
         </a>
       </div>

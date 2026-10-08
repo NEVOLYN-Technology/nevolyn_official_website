@@ -104,6 +104,6 @@ public interface ContactInquiryRepository extends JpaRepository<ContactInquiry, 
      * @return number of rows updated (1 if first acknowledgement, 0 if already acknowledged)
      */
     @org.springframework.data.jpa.repository.Modifying
-    @org.springframework.data.jpa.repository.Query("UPDATE ContactInquiry c SET c.acknowledgedAt = :now WHERE c.inquiryId = :inquiryId AND c.acknowledgedAt IS NULL")
+    @org.springframework.data.jpa.repository.Query("UPDATE ContactInquiry c SET c.acknowledgedAt = :now, c.isAcknowledged = true WHERE c.inquiryId = :inquiryId AND c.acknowledgedAt IS NULL")
     int markAcknowledged(@org.springframework.data.repository.query.Param("inquiryId") String inquiryId, @org.springframework.data.repository.query.Param("now") java.time.LocalDateTime now);
 }

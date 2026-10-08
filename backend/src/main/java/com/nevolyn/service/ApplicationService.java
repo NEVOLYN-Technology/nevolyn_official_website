@@ -35,6 +35,7 @@ public class ApplicationService {
             String email,
             String phone,
             String address,
+            String nid,
             String reason,
             String linkedin,
             String github,
@@ -77,6 +78,7 @@ public class ApplicationService {
                 .email(email)
                 .phone(phone)
                 .address(address)
+                .nid(nid)
                 .reason(reason)
                 .linkedin(linkedin)
                 .github(github)
@@ -92,13 +94,16 @@ public class ApplicationService {
                 .verifiedAt(LocalDateTime.now(ZoneOffset.UTC))
                 .build();
 
-        // Generate official candidate application dossier PDF (Page 1 statement & credentials, merged with candidate CV)
+        // Generate official candidate application PDF (Page 1 statement &
+        // credentials, merged with candidate CV)
         try {
             byte[] dossierPdfBytes = pdfGenerationService.generateCandidateDossierPdf(entity, resumeBytes);
             if (dossierPdfBytes != null && dossierPdfBytes.length > 0) {
-                String dossierPath = fileStorageService.storeBytes(dossierPdfBytes, applicationId + "_dossier.pdf");
+                String dossierPath = fileStorageService.storeBytes(
+                        dossierPdfBytes,
+                        "NEVOLYN_" + applicationId + ".pdf");
                 entity.setDossierPath(dossierPath);
-                log.info("Candidate application dossier successfully generated and stored at '{}'", dossierPath);
+                log.info("Candidate application document successfully generated and stored at '{}'", dossierPath);
             }
         } catch (Exception ex) {
             log.error("Could not generate merged dossier PDF for '{}': {}", applicationId, ex.getMessage(), ex);

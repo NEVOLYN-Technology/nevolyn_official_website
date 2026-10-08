@@ -3,8 +3,10 @@ package com.nevolyn.controller;
 import com.nevolyn.dto.ApiResponse;
 import com.nevolyn.dto.ApplicationResponse;
 import com.nevolyn.service.ApplicationService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +74,7 @@ public class ApplicationController {
                         @RequestParam("email") String email,
                         @RequestParam("phone") String phone,
                         @RequestParam("address") String address,
+                        @RequestParam("nid") String nid,
                         @RequestParam("reason") String reason,
                         @RequestParam(value = "linkedin", required = false) String linkedin,
                         @RequestParam(value = "github", required = false) String github,
@@ -82,7 +85,7 @@ public class ApplicationController {
                                 name, email, resume.getOriginalFilename(), resume.getSize(), resume.getContentType());
 
                 ApplicationResponse responseData = applicationService.processApplication(
-                                name, email, phone, address, reason, linkedin, github, website, honeypot, resume);
+                                name, email, phone, address, nid, reason, linkedin, github, website, honeypot, resume);
 
                 log.debug("Successfully processed job application, assigned ID: {}", responseData.getApplicationId());
 
@@ -111,7 +114,8 @@ public class ApplicationController {
         }
 
         /**
-         * Serves the official application dossier PDF inline for browser preview and download.
+         * Serves the official application dossier PDF inline for browser preview and
+         * download.
          *
          * @param applicationId application tracking ID (e.g. APP-2026-X8K2M9PQ)
          * @return PDF binary stream with inline content disposition header
@@ -120,11 +124,12 @@ public class ApplicationController {
         public ResponseEntity<byte[]> getApplicationPdf(@PathVariable("applicationId") String applicationId) {
                 log.info("Received GET /api/v1/applications/{}/pdf request", applicationId);
                 byte[] pdfBytes = applicationService.getApplicationPdfBytes(applicationId);
-                String filename = "NEVOLYN_Application_" + applicationId + ".pdf";
+                String filename = "NEVOLYN_" + applicationId + ".pdf";
 
                 return ResponseEntity.ok()
-                                .contentType(MediaType.APPLICATION_PDF)
-                                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                                .contentType(Objects.requireNonNull(MediaType.APPLICATION_PDF))
+                                .header(HttpHeaders.CONTENT_DISPOSITION,
+                                                "inline; filename=\"" + filename + "\"")
                                 .body(pdfBytes);
         }
 }

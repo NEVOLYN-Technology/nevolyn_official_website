@@ -37,12 +37,22 @@ export function useContactForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [inquiryId, setInquiryId] = useState<string | null>(null)
+
+  const resetForm = () => {
+    setIsSuccess(false)
+    setInquiryId(null)
+    setSuccessMessage(null)
+    setErrorMessage(null)
+    setFieldErrors({})
+  }
 
   const submitContactForm = async (payload: ContactPayload): Promise<boolean> => {
     // Honeypot: a filled hidden field means a bot. Show the normal success state
     // so the bot cannot tell it was caught, and never call the API.
     if (payload.honeypot && payload.honeypot.trim() !== '') {
       setIsSuccess(true)
+      setInquiryId('INQ-2026-DEMO0001')
       setSuccessMessage('Thank you! Your message has been received.')
       return true
     }
@@ -52,12 +62,14 @@ export function useContactForm() {
     setErrorMessage(null)
     setSuccessMessage(null)
     setIsSuccess(false)
+    setInquiryId(null)
 
     try {
       const response = await apiClient.post<ContactResult>('/contact', payload)
 
       if (response.success || response.status === 'success') {
         setIsSuccess(true)
+        setInquiryId(response.data?.inquiryId || null)
         setSuccessMessage(response.message || 'Thank you! Your message has been received and a confirmation receipt has been sent to your email.')
         return true
       }
@@ -84,5 +96,5 @@ export function useContactForm() {
     }
   }
 
-  return { submitContactForm, isLoading, isSuccess, successMessage, errorMessage, fieldErrors }
+  return { submitContactForm, resetForm, isLoading, isSuccess, inquiryId, successMessage, errorMessage, fieldErrors }
 }

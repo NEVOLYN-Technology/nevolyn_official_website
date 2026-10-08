@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS job_applications
     email              VARCHAR(150) NOT NULL,
     phone              VARCHAR(30)  NOT NULL,
     address            VARCHAR(250) NOT NULL,
+    nid                VARCHAR(50)  NOT NULL,
     reason             TEXT         NOT NULL,
 
     -- Professional profile links
@@ -52,6 +53,9 @@ CREATE TABLE IF NOT EXISTS job_applications
 
 CREATE INDEX IF NOT EXISTS idx_job_applications_app_id
     ON job_applications (application_id);
+
+CREATE INDEX IF NOT EXISTS idx_job_applications_nid
+    ON job_applications (nid);
 
 CREATE INDEX IF NOT EXISTS idx_job_applications_verification_token
     ON job_applications (verification_token);

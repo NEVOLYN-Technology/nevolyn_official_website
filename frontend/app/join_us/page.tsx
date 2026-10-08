@@ -38,6 +38,7 @@ export default function JoinPage(): JSX.Element {
     email: '',
     phone: '',
     address: '',
+    nid: '',
     reason: '',
     linkedin: '',
     github: '',
@@ -83,13 +84,18 @@ export default function JoinPage(): JSX.Element {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
+    if (!formData.nid.trim()) {
+      setLocalError('Please enter your National ID (NID).')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
     if (!formData.address.trim()) {
       setLocalError('Please enter your location or address.')
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
     if (!formData.reason.trim()) {
-      setLocalError('Please share why you wish to join NEVOLYN Technology.')
+      setLocalError('Please share why you wish to join NEVOLYN.')
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
@@ -137,6 +143,7 @@ export default function JoinPage(): JSX.Element {
       email: '',
       phone: '',
       address: '',
+      nid: '',
       reason: '',
       linkedin: '',
       github: '',
@@ -226,7 +233,7 @@ export default function JoinPage(): JSX.Element {
               <button
                 type="button"
                 onClick={handleBack}
-                className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-sky-500 mb-8 transition-colors cursor-pointer"
+                className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 mb-8 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Go Back
@@ -279,7 +286,7 @@ export default function JoinPage(): JSX.Element {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className={cn(
-                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm',
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm',
                           fieldErrors.name ? 'border-rose-500' : 'border-slate-200'
                         )}
                         placeholder="John Doe"
@@ -299,7 +306,7 @@ export default function JoinPage(): JSX.Element {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className={cn(
-                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm',
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm',
                           fieldErrors.email ? 'border-rose-500' : 'border-slate-200'
                         )}
                         placeholder="john@example.com"
@@ -308,7 +315,7 @@ export default function JoinPage(): JSX.Element {
                     </div>
                   </div>
 
-                  {/* Phone & Address */}
+                  {/* Phone & National ID (NID) */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="join-phone" className="text-sm font-medium text-slate-700">
@@ -322,7 +329,7 @@ export default function JoinPage(): JSX.Element {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         className={cn(
-                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm',
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm',
                           fieldErrors.phone ? 'border-rose-500' : 'border-slate-200'
                         )}
                         placeholder="+88017XXXXXXXX"
@@ -330,6 +337,29 @@ export default function JoinPage(): JSX.Element {
                       {fieldErrors.phone && <p className="text-xs text-rose-500 mt-1">{fieldErrors.phone}</p>}
                     </div>
 
+                    <div className="space-y-2">
+                      <label htmlFor="join-nid" className="text-sm font-medium text-slate-700">
+                        National ID (NID) <span className="text-blue-600">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="join-nid"
+                        name="nid"
+                        required
+                        value={formData.nid}
+                        onChange={(e) => setFormData({ ...formData, nid: e.target.value })}
+                        className={cn(
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm font-mono',
+                          fieldErrors.nid ? 'border-rose-500' : 'border-slate-200'
+                        )}
+                        placeholder="e.g. 199XXXXXXXXXX or NID number"
+                      />
+                      {fieldErrors.nid && <p className="text-xs text-rose-500 mt-1">{fieldErrors.nid}</p>}
+                    </div>
+                  </div>
+
+                  {/* Address & Portfolio / Website */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="join-address" className="text-sm font-medium text-slate-700">
                         Residential Address / Location <span className="text-blue-600">*</span>
@@ -342,17 +372,32 @@ export default function JoinPage(): JSX.Element {
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                         className={cn(
-                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm',
+                          'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm',
                           fieldErrors.address ? 'border-rose-500' : 'border-slate-200'
                         )}
                         placeholder="Dhaka, Bangladesh"
                       />
                       {fieldErrors.address && <p className="text-xs text-rose-500 mt-1">{fieldErrors.address}</p>}
                     </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="join-website" className="text-sm font-medium text-slate-700">
+                        Personal Website / Portfolio <span className="text-slate-400 font-normal">(Optional)</span>
+                      </label>
+                      <input
+                        type="url"
+                        id="join-website"
+                        name="website"
+                        value={formData.website}
+                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm"
+                        placeholder="https://portfolio.me"
+                      />
+                    </div>
                   </div>
 
                   {/* LinkedIn & GitHub */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="join-linkedin" className="text-sm font-medium text-slate-700">
                         LinkedIn Profile <span className="text-slate-400 font-normal">(Optional)</span>
@@ -363,7 +408,7 @@ export default function JoinPage(): JSX.Element {
                         name="linkedin"
                         value={formData.linkedin}
                         onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm"
+                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm"
                         placeholder="https://linkedin.com/in/username"
                       />
                     </div>
@@ -378,26 +423,10 @@ export default function JoinPage(): JSX.Element {
                         name="github"
                         value={formData.github}
                         onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm"
+                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm"
                         placeholder="https://github.com/username"
                       />
                     </div>
-                  </div>
-
-                  {/* Website / Portfolio */}
-                  <div className="space-y-2">
-                    <label htmlFor="join-website" className="text-sm font-medium text-slate-700">
-                      Personal Website / Portfolio <span className="text-slate-400 font-normal">(Optional)</span>
-                    </label>
-                    <input
-                      type="url"
-                      id="join-website"
-                      name="website"
-                      value={formData.website}
-                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm"
-                      placeholder="https://portfolio.me"
-                    />
                   </div>
 
                   {/* Statement of Purpose */}
@@ -418,10 +447,10 @@ export default function JoinPage(): JSX.Element {
                       value={formData.reason}
                       onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                       className={cn(
-                        'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 transition-all text-sm resize-none',
+                        'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm resize-none',
                         fieldErrors.reason || isOverWordLimit ? 'border-rose-500' : 'border-slate-200'
                       )}
-                      placeholder="Tell us about your passions, achievements, and what makes you want to build the future with NEVOLYN Technology..."
+                      placeholder="What makes you think to build the future with NEVOLYN..."
                     />
                     {isOverWordLimit && (
                       <p className="text-xs text-rose-500 mt-1">
@@ -455,7 +484,7 @@ export default function JoinPage(): JSX.Element {
                             <div className="flex text-sm text-slate-600 justify-center">
                               <label
                                 htmlFor="join-file-upload"
-                                className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-sky-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500"
+                                className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-sky-500"
                               >
                                 <span>Upload a file</span>
                                 <input
@@ -487,7 +516,7 @@ export default function JoinPage(): JSX.Element {
                         'w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-full shadow-md text-sm font-bold text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
                         isOverWordLimit
                           ? 'bg-slate-400 cursor-not-allowed opacity-60'
-                          : 'bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 hover:brightness-105 shadow-blue-700/20 active:scale-95'
+                          : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20 active:scale-95'
                       )}
                     >
                       <span>Review Application</span>

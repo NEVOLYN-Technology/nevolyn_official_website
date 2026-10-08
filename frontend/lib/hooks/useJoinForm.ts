@@ -7,6 +7,7 @@ export interface JoinPayload {
   email: string
   phone: string
   address: string
+  nid: string
   reason: string
   linkedin?: string
   github?: string
@@ -81,6 +82,7 @@ export function useJoinForm() {
     formData.append('email', payload.email)
     formData.append('phone', payload.phone)
     formData.append('address', payload.address)
+    formData.append('nid', payload.nid)
     formData.append('reason', payload.reason)
     if (payload.linkedin) formData.append('linkedin', payload.linkedin)
     if (payload.github) formData.append('github', payload.github)

@@ -11,11 +11,10 @@
 
 import type { JSX } from 'react'
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { fadeUpProps } from '@/lib/animations'
-import { Sparkles, ArrowRight } from 'lucide-react'
-import { SuccessModal } from '@/components/ui/SuccessModal'
+import { Sparkles, ArrowRight, CheckCircle2, Mail, Copy, Check } from 'lucide-react'
 import { useContactForm } from '@/lib/hooks/useContactForm'
 import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 import { SECTION_BG } from '@/lib/constants/theme'
@@ -27,7 +26,7 @@ import { SECTION_BG } from '@/lib/constants/theme'
  * @returns Rendered contact section component
  */
 export const ContactSection = (): JSX.Element => {
-  const { submitContactForm, isLoading, isSuccess, successMessage, errorMessage, fieldErrors } = useContactForm()
+  const { submitContactForm, resetForm, isLoading, isSuccess, inquiryId, successMessage, errorMessage, fieldErrors } = useContactForm()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -38,11 +37,24 @@ export const ContactSection = (): JSX.Element => {
   })
 
   const [submittedEmail, setSubmittedEmail] = useState('')
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [copiedCode, setCopiedCode] = useState(false)
 
   const MAX_WORDS = 500
   const wordCount = formData.message.trim() ? formData.message.trim().split(/\s+/).length : 0
   const isOverWordLimit = wordCount > MAX_WORDS
+
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code)
+    setCopiedCode(true)
+    setTimeout(() => setCopiedCode(false), 2000)
+  }
+
+  const handleReset = () => {
+    resetForm()
+    setFormData({ name: '', email: '', subject: '', message: '', honeypot: '' })
+    setSubmittedEmail('')
+    setCopiedCode(false)
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -51,23 +63,12 @@ export const ContactSection = (): JSX.Element => {
     const success = await submitContactForm(formData)
     if (success) {
       setSubmittedEmail(emailToSave)
-      setIsModalOpen(true)
       setFormData({ name: '', email: '', subject: '', message: '', honeypot: '' })
     }
   }
 
   return (
     <section id="contact" className={`py-16 sm:py-20 ${SECTION_BG.border} ${SECTION_BG.alternate} relative overflow-hidden`}>
-      {/* Animated Success Popup Modal */}
-      <SuccessModal
-        isOpen={isModalOpen && isSuccess}
-        onClose={() => setIsModalOpen(false)}
-        title="Inquiry Received!"
-        message={successMessage}
-        email={submittedEmail}
-        formType="contact"
-      />
-
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* ── Section Header ──────────────────────────────────────── */}
         <SectionHeader
@@ -150,127 +151,252 @@ export const ContactSection = (): JSX.Element => {
           <div className="h-1.5 w-full bg-gradient-to-r from-sky-400 via-emerald-400 to-rose-400" />
 
           <div className="p-6 sm:p-10">
-            {errorMessage && (
+            {errorMessage && !isSuccess && (
               <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-600 text-sm">
                 {errorMessage}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-              {/* Honeypot anti-spam field (hidden from real users) */}
-              <div className="hidden" aria-hidden="true">
-                <label htmlFor="contact-hp">Do not fill this out</label>
-                <input
-                  id="contact-hp"
-                  type="text"
-                  name="hp"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={formData.honeypot}
-                  onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
-                />
-              </div>
+            <AnimatePresence mode="wait">
+              {isSuccess ? (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-6 text-center py-2"
+                >
+                  {/* Glowing Icon Header */}
+                  <div className="flex justify-center">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-emerald-500/25 rounded-full blur-xl animate-pulse" />
+                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                        <CheckCircle2 className="w-9 h-9 sm:w-10 sm:h-10 text-white stroke-[2.4]" />
+                      </div>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label htmlFor="contact-name" className="text-sm font-medium text-slate-700">
-                    Full Name <span className="text-sky-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="contact-name"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className={`w-full bg-slate-50 border ${fieldErrors.name ? 'border-rose-500' : 'border-slate-300'
-                      } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors`}
-                    placeholder="Your Name"
-                  />
-                  {fieldErrors.name && <p className="text-xs text-rose-500 mt-1">{fieldErrors.name}</p>}
-                </div>
+                  {/* Header Content */}
+                  <div className="space-y-2">
+                    <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                      Inquiry Received!
+                    </h3>
+                    <p className="text-sm sm:text-base text-emerald-700 font-medium max-w-lg mx-auto">
+                      {successMessage || 'Thank you for reaching out to NEVOLYN. Your message has been safely logged.'}
+                    </p>
+                  </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="contact-email" className="text-sm font-medium text-slate-700">
-                    Email Address <span className="text-sky-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="contact-email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className={`w-full bg-slate-50 border ${fieldErrors.email ? 'border-rose-500' : 'border-slate-300'
-                      } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors`}
-                    placeholder="name@example.com"
-                  />
-                  {fieldErrors.email && <p className="text-xs text-rose-500 mt-1">{fieldErrors.email}</p>}
-                </div>
-              </div>
+                  {/* Tracking Reference Code Pill (if present) */}
+                  {inquiryId && (
+                    <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/70 p-4 max-w-md mx-auto">
+                      <span className="text-[11px] font-mono uppercase tracking-widest text-slate-500 font-bold block mb-1">
+                        Tracking Reference Code
+                      </span>
+                      <div className="flex items-center justify-center gap-2.5">
+                        <span className="font-mono text-lg sm:text-xl font-black tracking-wider text-emerald-800 select-all">
+                          {inquiryId}
+                        </span>
+                        <button
+                          onClick={() => handleCopyCode(inquiryId)}
+                          type="button"
+                          title="Copy Reference Code"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-emerald-400/40 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all text-xs font-bold active:scale-95 shadow-2xs cursor-pointer"
+                        >
+                          {copiedCode ? (
+                            <>
+                              <Check className="h-3.5 w-3.5 text-emerald-600 group-hover:text-white" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3.5 w-3.5" />
+                              <span>Copy</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-              <div className="space-y-2">
-                  <label htmlFor="contact-subject" className="text-sm font-medium text-slate-700">
-                    Subject <span className="text-sky-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="contact-subject"
-                    name="subject"
-                    required
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className={`w-full bg-slate-50 border ${fieldErrors.subject ? 'border-rose-500' : 'border-slate-300'
-                    } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors`}
-                    placeholder="How can we help?"
-                  />
-                {fieldErrors.subject && <p className="text-xs text-rose-500 mt-1">{fieldErrors.subject}</p>}
-              </div>
+                  {/* Target Email Callout */}
+                  {submittedEmail && (
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 max-w-md mx-auto flex items-center justify-between gap-3 text-left">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-600 shrink-0">
+                          <Mail className="w-5 h-5" />
+                        </div>
+                        <div className="truncate">
+                          <p className="text-xs text-slate-500 font-medium">Receipt Sent to</p>
+                          <p className="text-sm font-semibold text-slate-900 truncate">{submittedEmail}</p>
+                        </div>
+                      </div>
+                      <span className="inline-flex items-center text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-300 shrink-0">
+                        Confirmation Sent
+                      </span>
+                    </div>
+                  )}
 
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label htmlFor="contact-message" className="text-sm font-medium text-slate-700">
-                    Message <span className="text-sky-500">*</span>
-                  </label>
-                  <span className={`text-xs font-semibold ${isOverWordLimit ? 'text-rose-500 font-bold' : 'text-slate-400'}`}>
-                    {wordCount} / {MAX_WORDS} words
-                  </span>
-                </div>
-                <textarea
-                  id="contact-message"
-                  name="message"
-                  rows={5}
-                  required
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className={`w-full bg-slate-50 border ${fieldErrors.message || isOverWordLimit ? 'border-rose-500' : 'border-slate-300'
-                    } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors resize-none`}
-                  placeholder="Write your message here (max 500 words)..."
-                ></textarea>
-                {isOverWordLimit && (
-                  <p className="text-xs text-rose-500 mt-1 font-semibold">Message cannot exceed {MAX_WORDS} words.</p>
-                )}
-                {fieldErrors.message && !isOverWordLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.message}</p>}
-              </div>
+                  {/* Step-by-Step Instructions ("What happens next") */}
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 text-left max-w-lg mx-auto space-y-3">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                      What happens next:
+                    </p>
+                    <div className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        1
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-700">
+                        Check your email inbox for your submission receipt and tracking reference code.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        2
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-700">
+                        Our team will evaluate your inquiry and send you an email acknowledging its receipt.
+                      </p>
+                    </div>
+                  </div>
 
-              <button
-                type="submit"
-                disabled={isLoading || isOverWordLimit}
-                className="w-full rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-500 px-6 py-3.5 font-semibold text-white shadow-lg shadow-sky-400/25 transition-all duration-300 hover:shadow-sky-400/40 hover:brightness-105 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Sending Message...</span>
-                  </>
-                ) : (
-                  'Send Message'
-                )}
-              </button>
-            </form>
+                  {/* Reset Action Button */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={handleReset}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
+                    >
+                      <span>Send Another Message</span>
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.form
+                  key="form"
+                  onSubmit={handleSubmit}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-6"
+                  noValidate
+                >
+                  {/* Honeypot anti-spam field (hidden from real users) */}
+                  <div className="hidden" aria-hidden="true">
+                    <label htmlFor="contact-hp">Do not fill this out</label>
+                    <input
+                      id="contact-hp"
+                      type="text"
+                      name="hp"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={formData.honeypot}
+                      onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label htmlFor="contact-name" className="text-sm font-medium text-slate-700">
+                        Full Name <span className="text-sky-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="contact-name"
+                        name="name"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className={`w-full bg-slate-50 border ${fieldErrors.name ? 'border-rose-500' : 'border-slate-300'
+                          } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors`}
+                        placeholder="Your Name"
+                      />
+                      {fieldErrors.name && <p className="text-xs text-rose-500 mt-1">{fieldErrors.name}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="contact-email" className="text-sm font-medium text-slate-700">
+                        Email Address <span className="text-sky-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        id="contact-email"
+                        name="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className={`w-full bg-slate-50 border ${fieldErrors.email ? 'border-rose-500' : 'border-slate-300'
+                          } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors`}
+                        placeholder="name@example.com"
+                      />
+                      {fieldErrors.email && <p className="text-xs text-rose-500 mt-1">{fieldErrors.email}</p>}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="contact-subject" className="text-sm font-medium text-slate-700">
+                      Subject <span className="text-sky-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="contact-subject"
+                      name="subject"
+                      required
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      className={`w-full bg-slate-50 border ${fieldErrors.subject ? 'border-rose-500' : 'border-slate-300'
+                        } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors`}
+                      placeholder="How can we help?"
+                    />
+                    {fieldErrors.subject && <p className="text-xs text-rose-500 mt-1">{fieldErrors.subject}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="contact-message" className="text-sm font-medium text-slate-700">
+                        Message <span className="text-sky-500">*</span>
+                      </label>
+                      <span className={`text-xs font-semibold ${isOverWordLimit ? 'text-rose-500 font-bold' : 'text-slate-400'}`}>
+                        {wordCount} / {MAX_WORDS} words
+                      </span>
+                    </div>
+                    <textarea
+                      id="contact-message"
+                      name="message"
+                      rows={5}
+                      required
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      className={`w-full bg-slate-50 border ${fieldErrors.message || isOverWordLimit ? 'border-rose-500' : 'border-slate-300'
+                        } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors resize-none`}
+                      placeholder="Write your message here (max 500 words)..."
+                    ></textarea>
+                    {isOverWordLimit && (
+                      <p className="text-xs text-rose-500 mt-1 font-semibold">Message cannot exceed {MAX_WORDS} words.</p>
+                    )}
+                    {fieldErrors.message && !isOverWordLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.message}</p>}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading || isOverWordLimit}
+                    className="w-full rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-500 px-6 py-3.5 font-semibold text-white shadow-lg shadow-sky-400/25 transition-all duration-300 hover:shadow-sky-400/40 hover:brightness-105 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Sending Message...</span>
+                      </>
+                    ) : (
+                      'Send Message'
+                    )}
+                  </button>
+                </motion.form>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
       </div>

@@ -77,6 +77,7 @@ The transactional architecture enforces strict separation of concerns across 5 d
 2. **Non-blocking asynchronous dispatch:** All external messaging calls must execute asynchronously (`@Async`) so client response latency remains under `< 100ms`, regardless of SMTP or network delays.
 3. **Persistence isolation:** Mail delivery errors must never roll back already-committed database transactions or return HTTP 500 errors to visitors.
 4. **Idempotent state transitions:** Automated email security scanners (SafeLinks, Proofpoint, Mimecast) aggressively perform HTTP `GET` requests on links inside emails. `GET` routes must be strictly read-only. State mutation and email triggers must belong exclusively to `POST`.
+5. **Post-Commit Dispatch Order:** All file storage operations, PDF compilation, and database transactions must fully succeed and commit BEFORE any transactional email is dispatched. No phantom emails are ever emitted.
 
 ---
 
@@ -167,10 +168,43 @@ To guarantee that an applicant or visitor never receives duplicate acknowledgeme
   - Confirmation button protected by browser confirmation dialog (`onsubmit="return confirm(...)"`).
 - Only `POST /{id}/acknowledge` triggers the state change and fires downstream mail events.
 
-### 5.3 PDF Generation Standard
-- Generator returns raw `byte[]` via a dedicated document service (e.g. iText 8).
-- Standardized attachment naming:  
-  `[PRODUCT]_Deployment_Assessment-{{referenceCode}}.pdf`
+### 5.3 Application Document & PDF Compilation Standard
+- **Nomenclature Mandate:**
+  - In all public interfaces, emails, and admin panels, use **"Application"** for section titles and **"Application Document"** for the document itself. Never use "Uploaded Resume", "Attached CV", or "Dossier" in user-facing contexts.
+- **Merged File Naming Contract:**
+  ```text
+  [COMPANY/PRODUCT]_Application_Document_<trackingReferenceCode>.pdf
+  ```
+  *Production Example:* `NEVOLYN_Application_Document_APP-2026-X8K2M9PQ.pdf`
+- **PDF Compilation Architecture:**
+  - Page 1: Official cover page dynamically generated with candidate credentials, statement of purpose/motivation, professional links (LinkedIn, GitHub, Website), and tracking reference code.
+  - Page 2+: Original uploaded PDF pages appended via PDF merger (e.g. OpenPDF / iText). If the uploaded file is non-PDF (DOC/DOCX), the cover page is preserved and served.
+- **Dual-Storage Database Model:**
+  - **Candidate Credentials:** Stored in dedicated database columns (`name`, `email`, `phone`, `address`, `reason`, `linkedin`, `github`, `website`).
+  - **Original Uploaded CV:** Stored permanently on server disk under a dedicated upload path and tracked via `resume_path`, `original_file_name`, `file_size_bytes`, `file_content_type`.
+  - **Merged Application Document:** Stored permanently as a separate file on server disk and tracked via `dossier_path` (or `application_document_path`).
+  - *Rule:* Both files must be retained independently in storage and referenced in separate database columns.
+
+### 5.4 Screening & Shortlisting Decision Contract for Admin Acknowledgement
+- **Functional Purpose:**
+  - The immediate receipt is sent automatically to the candidate upon form submission.
+  - The admin notification email is an **initial screening tool**.
+  - Clicking the **Acknowledge Application** button confirms that the applicant's credentials and Application Document have been reviewed, found suitable, and shortlisted for the next phase.
+- **Copywriting Standard:**
+  - *Admin Alert Email:* "Review their credentials and the attached Application Document. If the candidate is deemed suitable and shortlisted for the next phase, click the Acknowledge Application button below to notify them that their application has successfully passed initial screening and is under active review."
+  - *Web Pre-Flight Page:* "By confirming, you verify that this candidate meets initial eligibility requirements and is shortlisted for active review. A formal acknowledgement email will be dispatched to candidate."
+- **100% Visual Parity in Pre-Flight Email Previews:**
+  - The pre-flight review screen (`<entity>-acknowledge-confirm.html`) must **100% mirror** the actual outgoing email template (`<entity>-acknowledgement-email.html`) in subject line, status badges, greeting, reference pills, commitment/next-steps cards, and sign-offs. Placeholder or generic preview text is strictly prohibited.
+
+### 5.5 Multi-Step Frontend UX Workflow (FABINS Standard)
+1. **Step 1 — Interactive Form:** Real-time field validation, drag-and-drop file upload, file size & MIME restrictions.
+2. **Step 2 — Pre-Flight Review Screen (`*PreviewView.tsx`):**
+   - Displays all filled credentials, motivation statement, and an "Application Document" card showing attached file name and size with "Ready for Compilation" status.
+   - Dual actions: "Edit Details" (returns to Step 1 without data loss) and "Submit Application" (triggers dispatch).
+3. **Step 3 — Success Screen (`*SuccessView.tsx`):**
+   - Displays Tracking Reference Code with 1-click copy button.
+   - **Single Primary Action:** "Download Application PDF" button triggering download of `[COMPANY]_Application_Document_<referenceCode>.pdf`.
+   - Secondary button to submit another application.
 
 ---
 

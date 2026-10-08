@@ -98,6 +98,6 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
      * @return number of rows updated (1 if first acknowledgement, 0 if already acknowledged)
      */
     @org.springframework.data.jpa.repository.Modifying
-    @org.springframework.data.jpa.repository.Query("UPDATE JobApplication j SET j.acknowledgedAt = :now WHERE j.applicationId = :applicationId AND j.acknowledgedAt IS NULL")
+    @org.springframework.data.jpa.repository.Query("UPDATE JobApplication j SET j.acknowledgedAt = :now, j.isAcknowledged = true WHERE j.applicationId = :applicationId AND j.acknowledgedAt IS NULL")
     int markAcknowledged(@org.springframework.data.repository.query.Param("applicationId") String applicationId, @org.springframework.data.repository.query.Param("now") java.time.LocalDateTime now);
 }
