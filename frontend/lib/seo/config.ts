@@ -78,7 +78,15 @@ export const NEVOLYN_BRAND_ALIASES = [
   'নিভলিন',
   'নিভলিন টেকনোলজি',
 
-  // ── English Phonetic Vowel & Spelling Variations (dropped vowels, etc.) ──
+  // ── English Phonetic Vowel & Spelling Variations (i for y, dropped vowels) ──
+  'Nevolin',
+  'nevolin',
+  'NEVOLIN',
+  'Nevolin Technology',
+  'nevolin technology',
+  'Nevolin Automation',
+  'nevolin automation',
+  'Nevolin Bangladesh',
   'Nevlyn',
   'nevlyn',
   'NEVLYN',
