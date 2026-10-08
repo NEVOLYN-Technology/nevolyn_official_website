@@ -39,6 +39,7 @@ class ApplicationControllerTest {
                         .param("name", "Jane Doe")
                         .param("email", "jane.doe@example.com")
                         .param("phone", "1712345678")
+                        .param("nid", "1994123456789")
                         .param("address", "Dhaka, Bangladesh")
                         .param("reason", "I am passionate about building computer vision systems for textile automation.")
                         .param("linkedin", "https://linkedin.com/in/janedoe")

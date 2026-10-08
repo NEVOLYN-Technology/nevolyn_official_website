@@ -265,7 +265,7 @@ export const ContactSection = (): JSX.Element => {
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-500 hover:brightness-105 text-white px-8 py-3.5 text-sm font-bold shadow-lg shadow-sky-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 cursor-pointer"
                     >
                       <span>Send Another Message</span>
                     </button>

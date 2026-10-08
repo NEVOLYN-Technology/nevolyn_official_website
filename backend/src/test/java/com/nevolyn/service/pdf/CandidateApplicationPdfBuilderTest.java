@@ -17,7 +17,7 @@ class CandidateApplicationPdfBuilderTest {
     private final CandidateApplicationPdfBuilder builder = new CandidateApplicationPdfBuilder();
 
     @Test
-    @DisplayName("Should generate Page 1 cover dossier and merge with applicant PDF CV")
+    @DisplayName("Should generate and merge CV")
     void buildDossier_WithValidPdfResume_MergesCoverAndCv() throws Exception {
         // Create a real mini valid PDF to simulate candidate CV
         ByteArrayOutputStream cvOut = new ByteArrayOutputStream();
@@ -34,6 +34,7 @@ class CandidateApplicationPdfBuilderTest {
                 .email("john@example.com")
                 .phone("+8801700000000")
                 .address("Dhaka, Bangladesh")
+                .nid("1994123456789")
                 .reason("I want to pioneer AI in industrial inspection.")
                 .linkedin("https://linkedin.com/in/johndoe")
                 .github("https://github.com/johndoe")
@@ -63,6 +64,7 @@ class CandidateApplicationPdfBuilderTest {
                 .email("jane@example.com")
                 .phone("+8801800000000")
                 .address("Chittagong, Bangladesh")
+                .nid("1994123456789")
                 .reason("Excited to contribute to software automation.")
                 .originalFileName("janedoe_cv.docx")
                 .createdAt(LocalDateTime.now())

@@ -65,6 +65,7 @@ class SubmissionServiceTest {
                 .email("bob@example.com")
                 .phone("1234567890")
                 .address("City")
+                .nid("1234567890")
                 .reason("Looking for role")
                 .resumePath("/path/to/resume.pdf")
                 .originalFileName("resume.pdf")

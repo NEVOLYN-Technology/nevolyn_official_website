@@ -68,6 +68,7 @@ services:
       APP_CORS_ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
       # Origin used to build verification links in outgoing email.
       APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:3000}
+      APP_BACKEND_URL: ${APP_BACKEND_URL:-http://localhost:8080}
 
       SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-mail.nevolyn.com}
       SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-465}
