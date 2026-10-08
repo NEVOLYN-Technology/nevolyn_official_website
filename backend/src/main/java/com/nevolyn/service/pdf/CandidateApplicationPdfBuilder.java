@@ -78,7 +78,6 @@ public class CandidateApplicationPdfBuilder {
 
     // ── Asset Paths & Constants ─────────────────────────────────────────────
     private static final String ASSET_NEVOLYN_ICON = "static/nevolyn-icon.png";
-    private static final String DOSSIER_LABEL = "Official Candidate Credentials Dossier";
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
             .ofPattern("dd MMMM yyyy, HH:mm 'UTC'")
@@ -174,13 +173,10 @@ public class CandidateApplicationPdfBuilder {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            // 1. NEVOLYN Brand Header with Logo Lockup
+            // 1. NEVOLYN Brand Header with Logo Lockup (Left: Logo + NEVOLYN, Right: Career Application Form + info@nevolyn.com)
             addBrandHeader(document);
 
-            // 2. Prominent Document Heading Banner
-            addDocumentHeading(document);
-
-            // 3. Metadata Strip (Tracking Reference Code & Submission Timestamp)
+            // 2. Metadata Strip (Tracking Reference Code & Submission Timestamp)
             addMetadataStrip(document, application);
 
             // 4. Official Candidate Integrity & Purpose Statement Box (Larger Font to
@@ -214,7 +210,7 @@ public class CandidateApplicationPdfBuilder {
     // ═════════════════════════════════════════════════════════════════════════
 
     private void addBrandHeader(Document document) throws DocumentException {
-        PdfPTable lockup = new PdfPTable(new float[] { 55f, 45f });
+        PdfPTable lockup = new PdfPTable(new float[] { 60f, 40f });
         lockup.setWidthPercentage(100);
 
         // --- Left: NEVOLYN Logo & Brand Title Block ---
@@ -243,13 +239,14 @@ public class CandidateApplicationPdfBuilder {
         styleBorderless(leftCell);
         lockup.addCell(leftCell);
 
-        // --- Right: Official Recruitment Header Block ---
+        // --- Right: Career Application Form Header Block ---
         Paragraph rightText = new Paragraph();
-        rightText.setLeading(13f);
+        rightText.setLeading(16f);
         rightText.setAlignment(Element.ALIGN_RIGHT);
-        rightText.add(new Chunk("CAREER APPLICATION DOSSIER\n", font(8.5f, Font.BOLD, COLOR_TEXT_MUTED)));
-        rightText.add(new Chunk("Talent & Engineering Division\n", font(9.5f, Font.BOLD, COLOR_PRIMARY)));
-        rightText.add(link("careers@nevolyn.com", "mailto:info@nevolyn.com", font(8.5f, Font.NORMAL, COLOR_ACCENT)));
+        rightText.add(new Chunk("Career Application Form", font(14.5f, Font.BOLD, COLOR_PRIMARY)));
+        rightText.add(Chunk.NEWLINE);
+        rightText.add(link("info@nevolyn.com", "mailto:info@nevolyn.com", font(9.5f, Font.BOLD, COLOR_ACCENT)));
+
         PdfPCell rightCell = new PdfPCell(rightText);
         styleBorderless(rightCell);
         rightCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -258,41 +255,17 @@ public class CandidateApplicationPdfBuilder {
 
         document.add(lockup);
 
-        // Subtitle Status Line: • Official Candidate Credentials Dossier |
-        // info@nevolyn.com
-        Paragraph status = new Paragraph();
-        status.setAlignment(Element.ALIGN_CENTER);
-        status.setSpacingBefore(5f);
-        status.setSpacingAfter(5f);
-        status.add(new Chunk("\u2022 ", font(10f, Font.BOLD, COLOR_SUCCESS_DOT)));
-        status.add(new Chunk(DOSSIER_LABEL, font(9.0f, Font.BOLD, COLOR_TEXT_MUTED)));
-        status.add(new Chunk("   |   ", font(9.0f, Font.BOLD, COLOR_BORDER)));
-        status.add(link("info@nevolyn.com", "mailto:info@nevolyn.com", font(9.0f, Font.BOLD, COLOR_ACCENT)));
-        document.add(status);
-
         // Full-width Accent divider rule
         PdfPTable rule = new PdfPTable(1);
         rule.setWidthPercentage(100);
-        rule.setSpacingAfter(6f);
+        rule.setSpacingBefore(5f);
+        rule.setSpacingAfter(7f);
         PdfPCell lineCell = new PdfPCell();
         lineCell.setFixedHeight(2.0f);
         lineCell.setBackgroundColor(COLOR_ACCENT);
         lineCell.setBorder(Rectangle.NO_BORDER);
         rule.addCell(lineCell);
         document.add(rule);
-    }
-
-    private void addDocumentHeading(Document document) throws DocumentException {
-        Paragraph heading = new Paragraph();
-        heading.setAlignment(Element.ALIGN_CENTER);
-        heading.setLeading(16f);
-        heading.setSpacingBefore(0f);
-        heading.setSpacingAfter(6f);
-        heading.add(new Chunk("APPLICATION FORM", font(13.5f, Font.BOLD, COLOR_PRIMARY)));
-        heading.add(Chunk.NEWLINE);
-        heading.add(new Chunk("Official Recruitment Record & Verified Candidate Profile",
-                font(8.5f, Font.NORMAL, COLOR_TEXT_MUTED)));
-        document.add(heading);
     }
 
     private void addMetadataStrip(Document document, JobApplication application) throws DocumentException {
@@ -362,7 +335,8 @@ public class CandidateApplicationPdfBuilder {
         Paragraph p1 = new Paragraph();
         p1.setLeading(17.0f);
         p1.setAlignment(Element.ALIGN_JUSTIFIED);
-        p1.add(new Chunk("This application and credentials dossier are officially and willingly submitted by ", fBody));
+        p1.add(new Chunk("This application and submitted credentials are officially and willingly submitted by ",
+                fBody));
         p1.add(new Chunk(candidateName, fBold));
         p1.add(new Chunk(" (National ID / NID: ", fBody));
         p1.add(new Chunk(nidStr, fBold));
@@ -586,7 +560,7 @@ public class CandidateApplicationPdfBuilder {
         PdfPTable strip = new PdfPTable(new float[] { 70f, 30f });
         strip.setWidthPercentage(100);
 
-        Paragraph left = new Paragraph("NEVOLYN Official Candidate Dossier & Recruitment Specification",
+        Paragraph left = new Paragraph("NEVOLYN Official Candidate Application Record",
                 font(7.0f, Font.NORMAL, COLOR_TEXT_MUTED));
         PdfPCell leftCell = new PdfPCell(left);
         leftCell.setBorder(Rectangle.NO_BORDER);
