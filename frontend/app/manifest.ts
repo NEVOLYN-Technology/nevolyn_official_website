@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'NEVOLYN Technology',
     short_name: 'NEVOLYN',
-    description: 'NEVOLYN Technology — AI, deep-tech, intelligent systems, automation, and next-generation engineering solutions.',
+    description: 'NEVOLYN - Next-generation engineering solutions.',
     start_url: '/',
     display: 'standalone',
     background_color: '#020914',

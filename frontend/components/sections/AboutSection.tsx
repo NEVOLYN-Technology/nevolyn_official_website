@@ -53,7 +53,7 @@ export const AboutSection = (): JSX.Element => {
               <GradText variant="emerald">Elevate.</GradText>
             </>
           }
-          description="NEVOLYN is an advanced engineering company. We research, develop, and deploy production-ready software solutions and hardware automation systems built to solve complex industrial and technical challenges."
+          description="NEVOLYN is a deep-tech organization building AI-powered, automated, and intelligent engineering solutions for real-world industries. From research and applied engineering to industrial deployment, we build production-ready systems for complex real-world challenges."
         />
 
         {/* ── 3 Action Pillars: Innovate · Automate · Elevate (1 col on mobile & vertical iPad, 3 cols on rotated iPad & web) ───────── */}

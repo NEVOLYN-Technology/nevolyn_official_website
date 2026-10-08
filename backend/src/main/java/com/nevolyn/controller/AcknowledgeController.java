@@ -97,21 +97,41 @@ public class AcknowledgeController {
         }
         SubmissionDetails submission = found.get();
 
-        // Atomically transition state in database
+        if (submission.acknowledged()) {
+            return alreadyAcknowledged(submission);
+        }
+
+        log.info("Dispatching candidate acknowledgement email for {} '{}' to <{}>",
+                submission.type().label(), submission.referenceCode(), submission.email());
+
+        // Step 1: Attempt email dispatch to candidate FIRST
+        boolean delivered = emailService.sendUserAcknowledgementEmail(
+                submission.email(), submission.name(), submission.referenceCode(), submission.type().label());
+
+        if (!delivered) {
+            log.error("Failed to deliver acknowledgement email for {} '{}' to <{}>",
+                    submission.type().label(), submission.referenceCode(), submission.email());
+            return result(submission,
+                    "Acknowledgement Email Delivery Failed",
+                    "DELIVERY FAILED",
+                    "The acknowledgement email could NOT be sent to " + submission.name() + " (" + submission.email() + ").",
+                    "Please verify your mail server configuration and internet connectivity. " +
+                    "The submission has NOT been marked as acknowledged in the system so that you can safely retry.");
+        }
+
+        // Step 2: Only atomically transition state in database once email is confirmed sent!
         boolean updated = submissionService.markAcknowledged(submission);
         if (!updated) {
             return alreadyAcknowledged(submission);
         }
 
-        log.info("Dispatching acknowledgement for {} '{}'",
-                submission.type().label(), submission.referenceCode());
-        emailService.sendUserAcknowledgementEmail(
-                submission.email(), submission.name(), submission.referenceCode(), submission.type().label());
+        log.info("Successfully marked {} '{}' acknowledged after confirmed email transmission to <{}>",
+                submission.type().label(), submission.referenceCode(), submission.email());
 
         return result(submission,
                 "Acknowledgement Sent!",
                 "ACKNOWLEDGED",
-                "The official receipt email has been automatically transmitted to " + submission.name() + ".",
+                "The official receipt email has been automatically transmitted to " + submission.name() + " (" + submission.email() + ").",
                 submission.type() == SubmissionType.JOB_APPLICATION
                         ? "Application has been moved to active review and the candidate has been notified."
                         : "Contact inquiry has been marked as acknowledged and the visitor has been notified.");
@@ -129,27 +149,30 @@ public class AcknowledgeController {
 
     private ResponseEntity<String> result(SubmissionDetails submission, String title, String badge,
                                           String message, String detailNote) {
+        String iconSymbol = badge.contains("FAILED") ? "&#10007;" : (badge.contains("ALREADY") ? "&#8505;" : "&#10003;");
         Map<String, String> values = Map.of(
                 "title", title,
                 "statusBadge", badge,
+                "iconSymbol", iconSymbol,
                 "referenceCode", submission.referenceCode(),
                 "name", submission.name(),
                 "email", submission.email(),
                 "message", message,
                 "detailNote", detailNote);
-        return html(templateRenderer.render(submission.type().resultTemplate(), values));
+        return html(templateRenderer.render(submission.type().resultTemplate(), values, Set.of("iconSymbol")));
     }
 
     private ResponseEntity<String> notFound(String code) {
         Map<String, String> values = Map.of(
                 "title", "Reference Code Not Found",
                 "statusBadge", "NOT FOUND",
+                "iconSymbol", "&#10007;",
                 "referenceCode", code.isEmpty() ? "N/A" : code,
                 "name", "Unknown",
                 "email", "N/A",
                 "message", "Could not locate an active submission for the given reference code.",
                 "detailNote", "Please verify the reference code, or contact NEVOLYN administration.");
-        return html(templateRenderer.render(NOT_FOUND_TEMPLATE, values));
+        return html(templateRenderer.render(NOT_FOUND_TEMPLATE, values, Set.of("iconSymbol")));
     }
 
     private ResponseEntity<String> html(String body) {

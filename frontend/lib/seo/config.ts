@@ -78,15 +78,7 @@ export const NEVOLYN_BRAND_ALIASES = [
   'নিভলিন',
   'নিভলিন টেকনোলজি',
 
-  // ── English Phonetic Vowel & Spelling Variations (i for y, dropped vowels) ──
-  'Nevolin',
-  'nevolin',
-  'NEVOLIN',
-  'Nevolin Technology',
-  'nevolin technology',
-  'Nevolin Automation',
-  'nevolin automation',
-  'Nevolin Bangladesh',
+  // ── English Phonetic Vowel & Spelling Variations (dropped vowels, etc.) ──
   'Nevlyn',
   'nevlyn',
   'NEVLYN',
@@ -301,7 +293,7 @@ export const NEVOLYN_SEO_CONFIG = {
   fabinsUrl: 'https://fabins.nevolyn.com',
   title: 'NEVOLYN',
   description:
-    'NEVOLYN Technology is an advanced engineering and deep-tech company building intelligent systems, applied AI, computer vision, and industrial automation platforms.',
+    'NEVOLYN is an advanced engineering and deep-tech company building intelligent systems, applied AI, computer vision, and industrial automation platforms.',
   brandName: 'NEVOLYN Technology',
   productBrandName: 'FABINS Automation',
   social: {

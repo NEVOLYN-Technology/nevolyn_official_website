@@ -3,7 +3,7 @@
  * Latest News (vertical scroll timeline showing 4 news at once, scrolling row-by-row).
  *
  * Ordering:
- * - Featured Milestones: Newest (Award/Prize) -> Earliest (First POC at Saturn)
+ * - Featured Milestones: Newest (Award/Prize) -> Earliest (First Industrial Deployment)
  * - Latest News: Reverse chronological order (Newest -> Top, Oldest -> Bottom)
  *   with vertical row-by-row scrolling (4 news visible at once).
  *

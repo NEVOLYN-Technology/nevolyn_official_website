@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,6 +40,11 @@ class AcknowledgeControllerTest {
 
     @MockitoBean
     private EmailService emailService;
+
+    @BeforeEach
+    void setUp() {
+        when(emailService.sendUserAcknowledgementEmail(any(), any(), any(), any())).thenReturn(true);
+    }
 
     @Test
     @DisplayName("GET /api/v1/acknowledge - Anti-scanner safety: should render pre-flight confirmation page without dispatching email")
@@ -169,6 +176,36 @@ class AcknowledgeControllerTest {
                 .andExpect(content().string(containsString("Reference Code Not Found")));
 
         verifyNoInteractions(emailService);
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/acknowledge - Delivery failure: should render error page and NOT mark acknowledged in DB")
+    void postAcknowledge_DeliveryFailure_DoesNotMarkAcknowledged() throws Exception {
+        String appId = "APP-FAIL-005";
+        JobApplication app = JobApplication.builder()
+                .applicationId(appId)
+                .name("Dave Candidate")
+                .email("dave@example.com")
+                .phone("1234567890")
+                .address("Dhaka")
+                .nid("1994123456789")
+                .reason("Test reason")
+                .resumePath("/tmp/resume.pdf")
+                .originalFileName("resume.pdf")
+                .isVerified(true)
+                .build();
+        applicationRepository.save(app);
+
+        when(emailService.sendUserAcknowledgementEmail(any(), any(), any(), any())).thenReturn(false);
+
+        mockMvc.perform(post("/api/v1/acknowledge").param("trackingId", appId))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("DELIVERY FAILED")))
+                .andExpect(content().string(containsString("The acknowledgement email could NOT be sent to Dave Candidate")));
+
+        JobApplication fresh = applicationRepository.findByApplicationId(appId).orElseThrow();
+        org.assertj.core.api.Assertions.assertThat(fresh.getIsAcknowledged()).isFalse();
+        org.assertj.core.api.Assertions.assertThat(fresh.getAcknowledgedAt()).isNull();
     }
 
     @Test

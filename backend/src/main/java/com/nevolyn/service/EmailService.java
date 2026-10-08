@@ -268,8 +268,7 @@ public class EmailService {
     // Step 3 — User acknowledgement follow-up
     // ------------------------------------------------------------------
 
-    @Async
-    public void sendUserAcknowledgementEmail(SubmissionDetails details) {
+    public boolean sendUserAcknowledgementEmail(SubmissionDetails details) {
         log.info("Preparing User Acknowledgement Email for '{}' [Ref: {}]",
                 maskEmail(details.email()), details.referenceCode());
 
@@ -299,11 +298,10 @@ public class EmailService {
                 .replyTo(adminEmail)
                 .build();
 
-        dispatch(message);
+        return dispatch(message);
     }
 
-    @Async
-    public void sendUserAcknowledgementEmail(String recipientEmail, String name, String trackingId, String formType) {
+    public boolean sendUserAcknowledgementEmail(String recipientEmail, String name, String trackingId, String formType) {
         boolean isApp = formType != null && formType.toLowerCase().contains("application");
         SubmissionDetails details = new SubmissionDetails(
                 isApp ? SubmissionType.JOB_APPLICATION : SubmissionType.CONTACT_INQUIRY,
@@ -320,28 +318,33 @@ public class EmailService {
                 null,
                 false
         );
-        sendUserAcknowledgementEmail(details);
+        return sendUserAcknowledgementEmail(details);
     }
 
     // ------------------------------------------------------------------
     // Transport & Dispatch
     // ------------------------------------------------------------------
 
-    private void dispatch(EmailMessage message) {
+    private boolean dispatch(EmailMessage message) {
         if (mailCredential == null || mailCredential.isBlank()) {
-            log.info("[WEBMAIL SIMULATED] To: {} | Subject: '{}' | Attachment: {} - set SPRING_MAIL_PASSWORD to send for real",
-                    maskEmail(message.to()), message.subject(),
-                    message.hasAttachment() ? message.attachmentFilename() : "None");
-            return;
+            if (environment != null && environment.acceptsProfiles(org.springframework.core.env.Profiles.of("test", "default", "local"))) {
+                log.info("[WEBMAIL SIMULATED] To: {} | Subject: '{}' | Attachment: {} - set SPRING_MAIL_PASSWORD to send for real",
+                        maskEmail(message.to()), message.subject(),
+                        message.hasAttachment() ? message.attachmentFilename() : "None");
+                return true;
+            }
+            log.warn("[WEBMAIL NOT SENT] To: {} | Subject: '{}' - SPRING_MAIL_PASSWORD is not configured, email was NOT sent",
+                    maskEmail(message.to()), message.subject());
+            return false;
         }
 
-        sendViaSmtp(message);
+        return sendViaSmtp(message);
     }
 
-    private void sendViaSmtp(EmailMessage message) {
+    private boolean sendViaSmtp(EmailMessage message) {
         if (mailSender == null) {
             log.error("Cannot send email to {}: JavaMailSender bean is unavailable.", maskEmail(message.to()));
-            return;
+            return false;
         }
 
         try {
@@ -364,9 +367,11 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
             log.info("Webmail SMTP delivered email to {} [Subject: '{}']", maskEmail(message.to()), message.subject());
+            return true;
 
         } catch (Exception e) {
             log.error("SMTP delivery failed for {} [Subject: '{}']: {}", maskEmail(message.to()), message.subject(), e.getMessage(), e);
+            return false;
         }
     }
 
