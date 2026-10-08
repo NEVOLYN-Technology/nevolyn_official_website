@@ -247,7 +247,7 @@ public class CandidateApplicationPdfBuilder {
         Paragraph rightText = new Paragraph();
         rightText.setLeading(16f);
         rightText.setAlignment(Element.ALIGN_RIGHT);
-        rightText.add(new Chunk("Career Application Form", font(14.5f, Font.BOLD, COLOR_PRIMARY)));
+        rightText.add(new Chunk("Application Form", font(14.5f, Font.BOLD, COLOR_PRIMARY)));
         rightText.add(Chunk.NEWLINE);
         rightText.add(link("info@nevolyn.com", "mailto:info@nevolyn.com", font(9.5f, Font.BOLD, COLOR_ACCENT)));
 
@@ -544,7 +544,6 @@ public class CandidateApplicationPdfBuilder {
         // NEVOLYN Brand Line
         Paragraph nevBrand = new Paragraph();
         nevBrand.add(new Chunk("NEVOLYN", font(9.5f, Font.BOLD, COLOR_PRIMARY)));
-        nevBrand.add(new Chunk("Engineering What is Next", font(8.2f, Font.NORMAL, COLOR_TEXT_MUTED)));
         nevBrand.setSpacingAfter(4f);
         cell.addElement(nevBrand);
 
