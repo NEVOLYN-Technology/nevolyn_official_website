@@ -1,5 +1,6 @@
 package com.nevolyn.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,34 +14,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * HTTP Basic auth security for NEVOLYN Technology REST API.
- *
- * <h2>Access model</h2>
- * <ul>
- *   <li>POST /api/v1/contact and POST /api/v1/applications are public — they
- *       back the public homepage forms.</li>
- *   <li>GET/PATCH/DELETE on those resources require ADMIN role — they expose
- *       visitor PII (name, email, phone, NID) and must not be public.</li>
- *   <li>/api/v1/acknowledge is public — the UUID in the URL acts as the bearer
- *       token for one-click admin email acknowledgement links.</li>
- *   <li>/actuator/health is public for load-balancer probes.</li>
- * </ul>
- *
- * <h2>Why HTTP Basic and not JWT</h2>
- * There is exactly one admin account. Basic auth over HTTPS is the right amount
- * of machinery for this. Swapping to OAuth2 or JWT later means changing only
- * this class.
- *
- * @author NEVOLYN Technology Engineering
- * @version 0.4.0
+ * Access control and CORS rules, mirroring the architecture in Fabins.
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final AdminProperties adminProperties;
+
+    @Value("${app.cors.allowed-origins:https://nevolyn.com,https://www.nevolyn.com,http://localhost:3000}")
+    private List<String> allowedOrigins;
 
     public SecurityConfig(AdminProperties adminProperties) {
         this.adminProperties = adminProperties;
@@ -49,65 +40,42 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // CORS is handled by CorsConfig / CorsConfigurer bean.
-                // Spring Security must be told to delegate to the MVC CORS config
-                // so that it applies to preflight requests too.
-                .cors(Customizer.withDefaults())
-
-                // CSRF is disabled: this is a stateless API authenticated per-request
-                // with an Authorization header, not with a session cookie.
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-
-                // No server-side session is created or consulted.
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
                 .authorizeHttpRequests(auth -> auth
-                        // Public: homepage contact form and job application form
+                        // Public: CORS preflight requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Public: website contact form and job application form
                         .requestMatchers(HttpMethod.POST, "/api/v1/contact").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/contact/verify").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/applications").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/applications/verify").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/applications/*/pdf").permitAll()
 
-                        // Public: one-click acknowledge links sent in admin notification emails.
-                        // The reference code in the URL is the bearer token.
+                        // One-click acknowledge links sent in admin notification emails
                         .requestMatchers("/api/v1/acknowledge/**").permitAll()
 
-                        // Public: static assets for emails and favicon
+                        // Public: static images and assets
                         .requestMatchers("/nevolyn-logo*.png", "/*.png", "/favicon.ico", "/static/**").permitAll()
 
-                        // Public: liveness probe for load balancers / Docker healthcheck
+                        // Public: liveness probe for Docker healthcheck
                         .requestMatchers("/actuator/health/**").permitAll()
 
-                        // Dev-only H2 console; disabled in prod via application-prod.yml
+                        // Dev-only H2 console
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        // Everything else — admin GET/PATCH/DELETE routes — requires ADMIN role
+                        // Everything else - admin routes - requires ADMIN role
                         .anyRequest().hasRole("ADMIN")
                 )
-
-                // H2 console uses frames — sameOrigin allows it; harmless in prod
-                // because the console is disabled there.
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-
-                // Custom entry point suppresses the native browser HTTP Basic login dialog,
-                // allowing our React frontend login modal to handle authentication feedback cleanly.
-                .httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Invalid administrator credentials\"}");
-                }));
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
 
-    /**
-     * The single admin account, loaded from {@code app.admin.*} configuration.
-     *
-     * <p>In-memory is appropriate while there is one operator. Replace with a
-     * database-backed {@code UserDetailsService} when real user management is needed.
-     */
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         return new InMemoryUserDetailsManager(
@@ -118,12 +86,37 @@ public class SecurityConfig {
         );
     }
 
-    /**
-     * BCrypt hashing — deliberately slow to make offline brute-force impractical.
-     * Never store or compare a password in plain text.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        List<String> origins = new ArrayList<>();
+        origins.add("https://nevolyn.com");
+        origins.add("https://www.nevolyn.com");
+        origins.add("https://*.nevolyn.com");
+        origins.add("https://*.vercel.app");
+        origins.add("http://localhost:3000");
+        origins.add("http://127.0.0.1:3000");
+
+        if (allowedOrigins != null) {
+            origins.addAll(allowedOrigins);
+        }
+
+        configuration.setAllowedOriginPatterns(origins);
+        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+        configuration.setExposedHeaders(List.of("Location", "Authorization"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }

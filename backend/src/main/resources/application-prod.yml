@@ -172,8 +172,8 @@ logging:
 
 app:
   admin:
-    username: ${NEVOLYN_ADMIN_USERNAME:admin}
-    password: ${NEVOLYN_ADMIN_PASSWORD:}
+    username: ${NEVOLYN_ADMIN_USERNAME:${ADMIN_USERNAME:admin}}
+    password: ${NEVOLYN_ADMIN_PASSWORD:${ADMIN_PASSWORD:}}
 
   backend-url: ${APP_BACKEND_URL:https://api.nevolyn.com}
   frontend-url: ${APP_FRONTEND_URL:https://nevolyn.com}

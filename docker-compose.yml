@@ -24,7 +24,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
       POSTGRES_USER: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-nevolyn_secret_pass}}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -52,12 +52,12 @@ services:
       SERVER_PORT: 8080
       DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
       DATABASE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-nevolyn_secret_pass}}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-nevolyn_secret_pass}}
-      NEVOLYN_ADMIN_USERNAME: ${NEVOLYN_ADMIN_USERNAME:-${ADMIN_USER:-admin}}
-      NEVOLYN_ADMIN_PASSWORD: ${NEVOLYN_ADMIN_PASSWORD:-${ADMIN_PASS:-admin123}}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
+      NEVOLYN_ADMIN_USERNAME: ${NEVOLYN_ADMIN_USERNAME:-${ADMIN_USERNAME:-admin}}
+      NEVOLYN_ADMIN_PASSWORD: ${NEVOLYN_ADMIN_PASSWORD:-${ADMIN_PASSWORD:-}}
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-${ALLOWED_ORIGINS:-http://localhost:3000,https://nevolyn.com,https://www.nevolyn.com}}
       APP_BACKEND_URL: ${APP_BACKEND_URL:-${NEVOLYN_BACKEND_URL:-http://localhost:8080}}
       APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:3000}
