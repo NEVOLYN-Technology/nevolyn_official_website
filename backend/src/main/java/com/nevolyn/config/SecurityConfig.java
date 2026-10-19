@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,20 +21,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Access control and CORS rules, mirroring the architecture in Fabins.
+ * Access control and CORS rules matching the production architecture in Fabins.
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AdminProperties adminProperties;
+    @Value("${NEVOLYN_ADMIN_USERNAME:${ADMIN_USERNAME:${app.admin.username:admin}}}")
+    private String adminUsername;
+
+    @Value("${NEVOLYN_ADMIN_PASSWORD:${ADMIN_PASSWORD:${app.admin.password:}}}")
+    private String adminPassword;
 
     @Value("${app.cors.allowed-origins:https://nevolyn.com,https://www.nevolyn.com,http://localhost:3000}")
     private List<String> allowedOrigins;
-
-    public SecurityConfig(AdminProperties adminProperties) {
-        this.adminProperties = adminProperties;
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -71,7 +70,12 @@ public class SecurityConfig {
                         .anyRequest().hasRole("ADMIN")
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-                .httpBasic(Customizer.withDefaults());
+                // Suppress WWW-Authenticate header to prevent native browser "Sign in" popup
+                .httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Invalid administrator credentials\"}");
+                }));
 
         return http.build();
     }
@@ -79,8 +83,8 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         return new InMemoryUserDetailsManager(
-                User.withUsername(adminProperties.getUsername())
-                        .password(passwordEncoder.encode(adminProperties.getPassword()))
+                User.withUsername(adminUsername)
+                        .password(passwordEncoder.encode(adminPassword))
                         .roles("ADMIN")
                         .build()
         );
