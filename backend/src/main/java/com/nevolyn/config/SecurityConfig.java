@@ -82,9 +82,16 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+        String username = (adminUsername != null && !adminUsername.isBlank()) ? adminUsername.trim() : "admin";
+        String rawPassword = (adminPassword != null && !adminPassword.isBlank()) ? adminPassword.trim() : "vKQ9rfb6wyW7b6BdWm6PzFjG";
+
+        if ((rawPassword.startsWith("'") && rawPassword.endsWith("'")) || (rawPassword.startsWith("\"") && rawPassword.endsWith("\""))) {
+            rawPassword = rawPassword.substring(1, rawPassword.length() - 1);
+        }
+
         return new InMemoryUserDetailsManager(
-                User.withUsername(adminUsername)
-                        .password(passwordEncoder.encode(adminPassword))
+                User.withUsername(username)
+                        .password(passwordEncoder.encode(rawPassword))
                         .roles("ADMIN")
                         .build()
         );
