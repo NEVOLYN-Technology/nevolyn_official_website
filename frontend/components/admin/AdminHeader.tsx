@@ -22,7 +22,7 @@ export function AdminHeader({ username, isLoading, onRefresh, onLogout }: AdminH
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Lockup */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
+          <Link href="/" className="inline-flex items-center shrink-0 transition-opacity hover:opacity-80">
             <BrandWordmark size="sm" />
           </Link>
           <div className="h-5 w-px bg-border hidden sm:block" />

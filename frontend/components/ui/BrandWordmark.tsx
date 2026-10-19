@@ -87,7 +87,7 @@ export function BrandWordmark({
   }
 
   return (
-    <>
+    <div className="inline-flex items-center gap-2 sm:gap-2.5">
       {/* Brand Icon */}
       <img
         src="/nevolyn-icon.png"
@@ -101,7 +101,7 @@ export function BrandWordmark({
       >
         NEVOLYN
       </span>
-    </>
+    </div>
   )
 }
 

@@ -48,7 +48,7 @@ export function AdminLoginCard({
       >
         {/* Brand Lockup */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block mb-4 opacity-90 hover:opacity-100 transition-opacity">
+          <Link href="/" className="inline-flex items-center justify-center mb-4 opacity-90 hover:opacity-100 transition-opacity">
             <BrandWordmark size="md" />
           </Link>
           <div className="flex items-center justify-center gap-2 mt-3">
