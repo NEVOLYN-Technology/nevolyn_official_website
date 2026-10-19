@@ -24,8 +24,8 @@ import java.util.Optional;
  *
  * <pre>{@code
  * ContactInquiry inquiry = repository.findByVerificationToken(token)
- *         .orElseThrow(() -> new ResourceNotFoundException(
- *                 "Invalid or expired verification token: " + token));
+ *                 .orElseThrow(() -> new ResourceNotFoundException(
+ *                                 "Invalid or expired verification token: " + token));
  * }</pre>
  *
  * @author NEVOLYN Technology Engineering
@@ -34,76 +34,100 @@ import java.util.Optional;
 @Repository
 public interface ContactInquiryRepository extends JpaRepository<ContactInquiry, Long> {
 
-    /**
-     * Looks an inquiry up by its public reference code, e.g.
-     * {@code INQ-2026-0042}.
-     *
-     * <h2>What it is for</h2>
-     * {@code inquiryId} is the only identifier a visitor ever sees — it appears
-     * in the acknowledgement email and on the verification screen. The numeric
-     * primary key is internal and is never exposed. So whenever a human quotes a
-     * reference, this is the method that resolves it.
-     *
-     * <h2>How to use it</h2>
-     * <pre>{@code
-     * // Support lookup: "I submitted INQ-2026-0042 and heard nothing."
-     * ContactInquiry inquiry = repository.findByInquiryId(reference)
-     *         .orElseThrow(() -> new ResourceNotFoundException(
-     *                 "No inquiry found for reference " + reference));
-     *
-     * if (!inquiry.getIsVerified()) {
-     *     // Never reached the R&D team — the visitor never clicked the link.
-     * }
-     * }</pre>
-     *
-     * <p>
-     * The column is {@code UNIQUE}, so at most one row can ever match.
-     *
-     * <p>
-     * No caller in the current codebase — this is the intended entry point for a
-     * status-tracking or admin endpoint. Authenticate any endpoint built on it:
-     * reference codes are guessable, and this returns the full submission
-     * including the sender's email address and message body.
-     *
-     * @param inquiryId public reference code, e.g. {@code INQ-2026-0042}
-     * @return the matching inquiry, or empty if no row carries that code
-     */
-    Optional<ContactInquiry> findByInquiryId(String inquiryId);
+        /**
+         * Looks an inquiry up by its public reference code, e.g.
+         * {@code INQ-2026-0042}.
+         *
+         * <h2>What it is for</h2>
+         * {@code inquiryId} is the only identifier a visitor ever sees — it appears
+         * in the acknowledgement email and on the verification screen. The numeric
+         * primary key is internal and is never exposed. So whenever a human quotes a
+         * reference, this is the method that resolves it.
+         *
+         * <h2>How to use it</h2>
+         * 
+         * <pre>{@code
+         * // Support lookup: "I submitted INQ-2026-0042 and heard nothing."
+         * ContactInquiry inquiry = repository.findByInquiryId(reference)
+         *                 .orElseThrow(() -> new ResourceNotFoundException(
+         *                                 "No inquiry found for reference " + reference));
+         *
+         * if (!inquiry.getIsVerified()) {
+         *         // Never reached the R&D team — the visitor never clicked the link.
+         * }
+         * }</pre>
+         *
+         * <p>
+         * The column is {@code UNIQUE}, so at most one row can ever match.
+         *
+         * <p>
+         * No caller in the current codebase — this is the intended entry point for a
+         * status-tracking or admin endpoint. Authenticate any endpoint built on it:
+         * reference codes are guessable, and this returns the full submission
+         * including the sender's email address and message body.
+         *
+         * @param inquiryId public reference code, e.g. {@code INQ-2026-0042}
+         * @return the matching inquiry, or empty if no row carries that code
+         */
+        Optional<ContactInquiry> findByInquiryId(String inquiryId);
 
-    /**
-     * Finds the inquiry awaiting confirmation for a verification token.
-     *
-     * <h2>What it is for</h2>
-     * Step 2 of the email pipeline. When a visitor opens the link in the
-     * verification email, {@code ContactService.verifyInquiry} calls this to
-     * resolve the token back to the pending submission, marks it verified, and
-     * only then notifies the R&D team.
-     *
-     * <h2>How to use it</h2>
-     * <pre>{@code
-     * ContactInquiry inquiry = repository.findByVerificationToken(token)
-     *         .orElseThrow(() -> new ResourceNotFoundException(
-     *                 "Invalid or expired verification token: " + token));
-     * }</pre>
-     *
-     * <p>
-     * An empty result means the token is unknown, already consumed, or
-     * fabricated. Treat all three identically — returning distinct messages
-     * would tell an attacker which tokens exist.
-     *
-     * @param verificationToken single-use token from the verification email
-     * @return the matching inquiry, or empty if no row holds that token
-     */
-    Optional<ContactInquiry> findByVerificationToken(String verificationToken);
+        /**
+         * Finds the inquiry awaiting confirmation for a verification token.
+         *
+         * <h2>What it is for</h2>
+         * Step 2 of the email pipeline. When a visitor opens the link in the
+         * verification email, {@code ContactService.verifyInquiry} calls this to
+         * resolve the token back to the pending submission, marks it verified, and
+         * only then notifies the R&D team.
+         *
+         * <h2>How to use it</h2>
+         * 
+         * <pre>{@code
+         * ContactInquiry inquiry = repository.findByVerificationToken(token)
+         *                 .orElseThrow(() -> new ResourceNotFoundException(
+         *                                 "Invalid or expired verification token: " + token));
+         * }</pre>
+         *
+         * <p>
+         * An empty result means the token is unknown, already consumed, or
+         * fabricated. Treat all three identically — returning distinct messages
+         * would tell an attacker which tokens exist.
+         *
+         * @param verificationToken single-use token from the verification email
+         * @return the matching inquiry, or empty if no row holds that token
+         */
+        Optional<ContactInquiry> findByVerificationToken(String verificationToken);
 
-    /**
-     * Atomically marks an inquiry as acknowledged if not already acknowledged.
-     *
-     * @param inquiryId the public inquiry reference code
-     * @param now       timestamp when acknowledged
-     * @return number of rows updated (1 if first acknowledgement, 0 if already acknowledged)
-     */
-    @org.springframework.data.jpa.repository.Modifying
-    @org.springframework.data.jpa.repository.Query("UPDATE ContactInquiry c SET c.acknowledgedAt = :now, c.isAcknowledged = true WHERE c.inquiryId = :inquiryId AND c.acknowledgedAt IS NULL")
-    int markAcknowledged(@org.springframework.data.repository.query.Param("inquiryId") String inquiryId, @org.springframework.data.repository.query.Param("now") java.time.LocalDateTime now);
+        /**
+         * Atomically marks an inquiry as acknowledged if not already acknowledged.
+         *
+         * @param inquiryId the public inquiry reference code
+         * @param now       timestamp when acknowledged
+         * @return number of rows updated (1 if first acknowledgement, 0 if already
+         *         acknowledged)
+         */
+        @org.springframework.data.jpa.repository.Modifying
+        @org.springframework.data.jpa.repository.Query("UPDATE ContactInquiry c SET c.acknowledgedAt = :now, c.isAcknowledged = true WHERE c.inquiryId = :inquiryId AND c.acknowledgedAt IS NULL")
+        int markAcknowledged(@org.springframework.data.repository.query.Param("inquiryId") String inquiryId,
+                        @org.springframework.data.repository.query.Param("now") java.time.LocalDateTime now);
+
+        /**
+         * Dynamic filter search for admin dashboard.
+         */
+        @org.springframework.data.jpa.repository.Query("SELECT c FROM ContactInquiry c WHERE " +
+                "(:status IS NULL OR c.status = :status) AND " +
+                "(:search IS NULL OR LOWER(c.inquiryId) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+                " LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+                " LOWER(c.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+                " LOWER(c.subject) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+                " LOWER(c.message) LIKE LOWER(CONCAT('%', :search, '%')))")
+        org.springframework.data.domain.Page<ContactInquiry> searchInquiries(
+                @org.springframework.data.repository.query.Param("status") String status,
+                @org.springframework.data.repository.query.Param("search") String search,
+                org.springframework.data.domain.Pageable pageable);
+
+        /**
+         * Counts inquiries matching a status.
+         */
+        long countByStatus(String status);
 }

@@ -8,7 +8,9 @@ import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEven
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableAsync;
+import com.nevolyn.config.AdminProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,7 @@ import java.util.Map;
  * @version 0.3.0
  */
 @EnableAsync
+@EnableConfigurationProperties(AdminProperties.class)
 @SpringBootApplication
 public class NevolynApplication {
 
