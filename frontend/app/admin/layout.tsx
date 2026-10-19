@@ -1,14 +1,18 @@
 import type { Metadata } from 'next'
+import { adminSiteMetadata, buildAdminSchemaGraph } from '@/lib/seo/config'
 
-export const metadata: Metadata = {
-  title: 'Operations Dashboard | NEVOLYN Technology',
-  description: 'Executive administration, inquiries and candidate applications operations console.',
-  robots: {
-    index: false,
-    follow: false,
-  },
-}
+export const metadata: Metadata = adminSiteMetadata
+
+const adminSchemaGraph = buildAdminSchemaGraph()
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(adminSchemaGraph) }}
+      />
+      {children}
+    </>
+  )
 }
