@@ -1,17 +1,5 @@
 # ==============================================================================
-# NEVOLYN Technology — full local stack
-# ==============================================================================
-#   docker compose up --build
-#
-# Brings up Postgres + the Spring Boot API + the Next.js frontend, mirroring the
-# production topology closely enough to catch profile and wiring mistakes that
-# an H2-backed `mvnw spring-boot:run` cannot.
-#
-# Override any default by exporting the variable first, or with a .env file
-# alongside this file.
-#
-# NOTE: the `version:` key was intentionally dropped — Compose v2 ignores it and
-# warns that it is obsolete.
+# NEVOLYN Technology — full stack compose
 # ==============================================================================
 
 services:
@@ -22,16 +10,18 @@ services:
     image: postgres:16-alpine
     container_name: nevolyn_db
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-nevolyn_db}
-      POSTGRES_USER: ${POSTGRES_USER:-nevolyn_admin}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
+      POSTGRES_USER: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nevolyn_admin} -d ${POSTGRES_DB:-nevolyn_db}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}} -d ${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -45,33 +35,35 @@ services:
       dockerfile: Dockerfile
     container_name: nevolyn_backend
     restart: always
+    env_file:
+      - .env
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8080
 
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-nevolyn_db}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-nevolyn_admin}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
 
-      NEVOLYN_ADMIN_USERNAME: ${NEVOLYN_ADMIN_USERNAME:-admin}
-      NEVOLYN_ADMIN_PASSWORD: ${NEVOLYN_ADMIN_PASSWORD}
+      NEVOLYN_ADMIN_USERNAME: ${NEVOLYN_ADMIN_USERNAME:-${ADMIN_USER:-admin}}
+      NEVOLYN_ADMIN_PASSWORD: ${NEVOLYN_ADMIN_PASSWORD:-${ADMIN_PASS:-}}
 
-      APP_CORS_ALLOWED_ORIGINS: ${NEVOLYN_ALLOWED_ORIGIN:-https://nevolyn.com,https://www.nevolyn.com}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-${ALLOWED_ORIGINS:-${NEVOLYN_ALLOWED_ORIGIN:-https://nevolyn.com,https://www.nevolyn.com}}}
       APP_FRONTEND_URL: ${APP_FRONTEND_URL:-https://nevolyn.com}
-      APP_BACKEND_URL: ${NEVOLYN_BACKEND_URL:-https://nevolyn.com}
+      APP_BACKEND_URL: ${APP_BACKEND_URL:-${NEVOLYN_BACKEND_URL:-https://nevolyn.com}}
 
       SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-mail.nevolyn.com}
       SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-465}
       SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-info@nevolyn.com}
       SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
-      SPRING_MAIL_FROM: ${SPRING_MAIL_FROM:-info@nevolyn.com}
+      SPRING_MAIL_FROM: ${SPRING_MAIL_FROM:-${APP_EMAIL_FROM:-info@nevolyn.com}}
       SPRING_MAIL_SSL_ENABLE: ${SPRING_MAIL_SSL_ENABLE:-true}
       SPRING_MAIL_STARTTLS_ENABLE: ${SPRING_MAIL_STARTTLS_ENABLE:-false}
-      APP_EMAIL_ADMIN: ${NEVOLYN_ADMIN_ADDRESS:-info@nevolyn.com}
-      APP_EMAIL_FROM: ${SPRING_MAIL_FROM:-info@nevolyn.com}
-      APP_EMAIL_SENDER_NAME: ${NEVOLYN_MAIL_SENDER_NAME:-NEVOLYN Technology}
+      APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-${NEVOLYN_ADMIN_ADDRESS:-info@nevolyn.com}}
+      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-${SPRING_MAIL_FROM:-info@nevolyn.com}}
+      APP_EMAIL_SENDER_NAME: ${APP_EMAIL_SENDER_NAME:-${NEVOLYN_MAIL_SENDER_NAME:-NEVOLYN Technology}}
 
       APP_UPLOAD_DIR: /app/uploads/resumes
     depends_on:
@@ -91,6 +83,8 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-${NEXT_PUBLIC_API_BASE_URL:-https://nevolyn.com/api/v1}}
     container_name: nevolyn_frontend
     restart: always
+    env_file:
+      - .env
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     environment:
