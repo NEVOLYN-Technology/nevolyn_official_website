@@ -91,7 +91,13 @@ public class SecurityConfig {
                 // because the console is disabled there.
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
 
-                .httpBasic(Customizer.withDefaults());
+                // Custom entry point suppresses the native browser HTTP Basic login dialog,
+                // allowing our React frontend login modal to handle authentication feedback cleanly.
+                .httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Invalid administrator credentials\"}");
+                }));
 
         return http.build();
     }

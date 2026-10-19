@@ -171,6 +171,10 @@ logging:
     org.hibernate.SQL: WARN
 
 app:
+  admin:
+    username: ${NEVOLYN_ADMIN_USERNAME:admin}
+    password: ${NEVOLYN_ADMIN_PASSWORD:}
+
   backend-url: ${APP_BACKEND_URL:https://api.nevolyn.com}
   frontend-url: ${APP_FRONTEND_URL:https://nevolyn.com}
 

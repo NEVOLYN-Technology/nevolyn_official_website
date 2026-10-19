@@ -149,6 +149,10 @@ logging:
 # Application-specific settings
 # ==============================================================================
 app:
+  admin:
+    username: ${NEVOLYN_ADMIN_USERNAME:${ADMIN_USERNAME:admin}}
+    password: ${NEVOLYN_ADMIN_PASSWORD:${ADMIN_PASSWORD:change-me-in-production}}
+
   backend-url: ${APP_BACKEND_URL:http://localhost:8080}
   frontend-url: ${APP_FRONTEND_URL:http://localhost:3000}
 

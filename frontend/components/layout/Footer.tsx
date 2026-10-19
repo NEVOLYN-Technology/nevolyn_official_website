@@ -16,7 +16,7 @@
 import React from 'react'
 import type { JSX } from 'react'
 import Link from 'next/link'
-import { Mail, MapPin, Phone, Compass, ChevronRight } from 'lucide-react'
+import { Mail, MapPin, Phone, Compass, ChevronRight, Lock } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
 import { CONTACT } from '@/lib/constants/contact'
 import { scrollToSection } from '@/lib/scroll'
@@ -249,12 +249,22 @@ export const Footer = (): JSX.Element => {
         {/* Bottom Section */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] sm:text-xs text-slate-500">
           <p>© 2026 NEVOLYN Technology. All rights reserved.</p>
-          <div className="flex items-center gap-2 text-slate-500 font-medium">
+          <div className="flex items-center gap-3 text-slate-500 font-medium">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
             <span>Dhaka, Bangladesh</span>
+            <span className="text-slate-300">•</span>
+            <Link
+              href="/admin"
+              rel="nofollow"
+              className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-sky-600 transition-colors"
+              title="Operational Staff Portal"
+            >
+              <Lock className="w-3 h-3 opacity-70" />
+              <span>Admin Panel</span>
+            </Link>
           </div>
         </div>
       </div>
