@@ -1,98 +1,111 @@
-# ==============================================================================
-# NEVOLYN Technology — full stack compose
-# ==============================================================================
+# =============================================================================
+# NEVOLYN — Full Stack Docker Compose Local & Production Stack
+#
+# Launches:
+#   1. PostgreSQL 16 DB (Port 5432)
+#   2. Spring Boot 3 REST API (Port 8080)
+#   3. Next.js 16 Web App (Port 3000)
+#
+# Quick Start Commands:
+#   - Start full stack:        docker compose up --build
+#   - Run in background (-d):   docker compose up -d --build
+#   - View live logs:          docker compose logs -f
+#   - Stop stack & volumes:    docker compose down -v
+# =============================================================================
 
 services:
-  # ----------------------------------------------------------------------------
-  # PostgreSQL
-  # ----------------------------------------------------------------------------
-  db:
+  # ---------------------------------------------------------------------------
+  # 1. DATABASE SERVICE — PostgreSQL 16
+  # ---------------------------------------------------------------------------
+  postgres:
     image: postgres:16-alpine
-    container_name: nevolyn_db
-    restart: always
-    env_file:
-      - .env
+    container_name: nevolyn-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
       POSTGRES_USER: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-nevolyn_secret_pass}}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}} -d ${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}} -d ${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 5
 
-  # ----------------------------------------------------------------------------
-  # Spring Boot REST API
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # 2. BACKEND SERVICE — Spring Boot REST API
+  # ---------------------------------------------------------------------------
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: nevolyn_backend
-    restart: always
-    env_file:
-      - .env
-    ports:
-      - "${BACKEND_PORT:-8080}:8080"
+    container_name: nevolyn-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8080
-
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
+      DATABASE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-nevolyn_secret_pass}}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
-
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-nevolyn_secret_pass}}
       NEVOLYN_ADMIN_USERNAME: ${NEVOLYN_ADMIN_USERNAME:-${ADMIN_USER:-admin}}
-      NEVOLYN_ADMIN_PASSWORD: ${NEVOLYN_ADMIN_PASSWORD:-${ADMIN_PASS:-}}
-
-      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-${ALLOWED_ORIGINS:-${NEVOLYN_ALLOWED_ORIGIN:-https://nevolyn.com,https://www.nevolyn.com}}}
-      APP_FRONTEND_URL: ${APP_FRONTEND_URL:-https://nevolyn.com}
-      APP_BACKEND_URL: ${APP_BACKEND_URL:-${NEVOLYN_BACKEND_URL:-https://nevolyn.com}}
-
+      NEVOLYN_ADMIN_PASSWORD: ${NEVOLYN_ADMIN_PASSWORD:-${ADMIN_PASS:-admin123}}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-${ALLOWED_ORIGINS:-http://localhost:3000,https://nevolyn.com,https://www.nevolyn.com}}
+      APP_BACKEND_URL: ${APP_BACKEND_URL:-${NEVOLYN_BACKEND_URL:-http://localhost:8080}}
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:3000}
       SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-mail.nevolyn.com}
       SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-465}
       SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-info@nevolyn.com}
       SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
       SPRING_MAIL_FROM: ${SPRING_MAIL_FROM:-${APP_EMAIL_FROM:-info@nevolyn.com}}
-      SPRING_MAIL_SSL_ENABLE: ${SPRING_MAIL_SSL_ENABLE:-true}
-      SPRING_MAIL_STARTTLS_ENABLE: ${SPRING_MAIL_STARTTLS_ENABLE:-false}
       APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-${NEVOLYN_ADMIN_ADDRESS:-info@nevolyn.com}}
       APP_EMAIL_FROM: ${APP_EMAIL_FROM:-${SPRING_MAIL_FROM:-info@nevolyn.com}}
-      APP_EMAIL_SENDER_NAME: ${APP_EMAIL_SENDER_NAME:-${NEVOLYN_MAIL_SENDER_NAME:-NEVOLYN Technology}}
-
       APP_UPLOAD_DIR: /app/uploads/resumes
-    depends_on:
-      db:
-        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
     volumes:
       - resume_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # ----------------------------------------------------------------------------
-  # Next.js frontend
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # 3. FRONTEND SERVICE — Next.js 16 Web Application
+  # ---------------------------------------------------------------------------
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-${NEXT_PUBLIC_API_BASE_URL:-https://nevolyn.com/api/v1}}
-    container_name: nevolyn_frontend
-    restart: always
-    env_file:
-      - .env
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+    container_name: nevolyn-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
     environment:
+      NODE_ENV: production
       PORT: 3000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-${NEXT_PUBLIC_API_BASE_URL:-https://nevolyn.com/api/v1}}
-    depends_on:
-      - backend
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-${NEXT_PUBLIC_API_URL:-https://nevolyn.com/api/v1}}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
 
+# -----------------------------------------------------------------------------
+# PERSISTENT VOLUMES
+# -----------------------------------------------------------------------------
 volumes:
   postgres_data:
+    driver: local
   resume_uploads:
+    driver: local
