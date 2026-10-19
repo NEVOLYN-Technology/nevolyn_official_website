@@ -111,20 +111,11 @@ public interface ContactInquiryRepository extends JpaRepository<ContactInquiry, 
         int markAcknowledged(@org.springframework.data.repository.query.Param("inquiryId") String inquiryId,
                         @org.springframework.data.repository.query.Param("now") java.time.LocalDateTime now);
 
+
         /**
-         * Dynamic filter search for admin dashboard.
+         * Finds inquiries by status with pagination.
          */
-        @org.springframework.data.jpa.repository.Query("SELECT c FROM ContactInquiry c WHERE " +
-                "(:status IS NULL OR c.status = :status) AND " +
-                "(:search IS NULL OR LOWER(c.inquiryId) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(c.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(c.subject) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(c.message) LIKE LOWER(CONCAT('%', :search, '%')))")
-        org.springframework.data.domain.Page<ContactInquiry> searchInquiries(
-                @org.springframework.data.repository.query.Param("status") String status,
-                @org.springframework.data.repository.query.Param("search") String search,
-                org.springframework.data.domain.Pageable pageable);
+        org.springframework.data.domain.Page<ContactInquiry> findByStatus(String status, org.springframework.data.domain.Pageable pageable);
 
         /**
          * Counts inquiries matching a status.

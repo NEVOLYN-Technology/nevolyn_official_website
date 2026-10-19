@@ -78,10 +78,9 @@ public class AdminController {
         Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
-        String statusParam = "ALL".equals(status) ? null : status;
-        String searchParam = search.isBlank() ? null : search;
-
-        var inquiryPage = contactInquiryRepository.searchInquiries(statusParam, searchParam, pageRequest);
+        org.springframework.data.domain.Page<ContactInquiry> inquiryPage = (status == null || "ALL".equalsIgnoreCase(status) || status.isBlank())
+                ? contactInquiryRepository.findAll(pageRequest)
+                : contactInquiryRepository.findByStatus(status, pageRequest);
         var response = PageResponse.from(inquiryPage, this::toInquiryResponse);
         return ResponseEntity.ok(response);
     }
@@ -149,10 +148,9 @@ public class AdminController {
         Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
-        String statusParam = "ALL".equals(status) ? null : status;
-        String searchParam = search.isBlank() ? null : search;
-
-        var appPage = jobApplicationRepository.searchApplications(statusParam, searchParam, pageRequest);
+        org.springframework.data.domain.Page<JobApplication> appPage = (status == null || "ALL".equalsIgnoreCase(status) || status.isBlank())
+                ? jobApplicationRepository.findAll(pageRequest)
+                : jobApplicationRepository.findBySelectionStatus(status, pageRequest);
         var response = PageResponse.from(appPage, this::toApplicationResponse);
         return ResponseEntity.ok(response);
     }

@@ -106,21 +106,11 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
         int markAcknowledged(@org.springframework.data.repository.query.Param("applicationId") String applicationId,
                         @org.springframework.data.repository.query.Param("now") java.time.LocalDateTime now);
 
+
         /**
-         * Dynamic filter search for admin dashboard.
+         * Finds applications by selection status with pagination.
          */
-        @org.springframework.data.jpa.repository.Query("SELECT j FROM JobApplication j WHERE " +
-                "(:status IS NULL OR j.selectionStatus = :status) AND " +
-                "(:search IS NULL OR LOWER(j.applicationId) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(j.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(j.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(j.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(j.reason) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-                " LOWER(j.nid) LIKE LOWER(CONCAT('%', :search, '%')))")
-        org.springframework.data.domain.Page<JobApplication> searchApplications(
-                @org.springframework.data.repository.query.Param("status") String status,
-                @org.springframework.data.repository.query.Param("search") String search,
-                org.springframework.data.domain.Pageable pageable);
+        org.springframework.data.domain.Page<JobApplication> findBySelectionStatus(String selectionStatus, org.springframework.data.domain.Pageable pageable);
 
         /**
          * Counts applications matching a selection status.
