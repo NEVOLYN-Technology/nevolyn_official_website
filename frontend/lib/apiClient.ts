@@ -26,8 +26,10 @@ export interface ApiFieldError {
 /** Standard failure envelope. Always the rejection value of an api call. */
 export interface ApiErrorResponse {
   success: false
+  status?: string
   statusCode: number
-  errorCode: string
+  code?: number
+  errorCode?: string
   message: string
   errors?: ApiFieldError[]
   meta?: ApiMeta
@@ -101,11 +103,12 @@ function transportError(statusCode: number, errorCode: string, message: string):
 
 /** Narrows an unknown thrown value to the API's error envelope. */
 function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
+  if (typeof value !== 'object' || value === null) return false
+  const obj = value as Record<string, unknown>
   return (
-    typeof value === 'object' &&
-    value !== null &&
-    'success' in value &&
-    (value as { success: unknown }).success === false
+    obj.success === false ||
+    obj.status === 'error' ||
+    (Array.isArray(obj.errors) && obj.errors.length > 0)
   )
 }
 
@@ -131,14 +134,26 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
     if (!response.ok) {
       if (isApiErrorResponse(body)) {
-        throw body
+        const errObj = body as unknown as Record<string, unknown>
+        throw {
+          ...errObj,
+          success: false,
+          statusCode: typeof errObj.code === 'number' ? errObj.code : response.status,
+          errorCode: typeof errObj.errorCode === 'string' ? errObj.errorCode : `HTTP_${response.status}`,
+          message: typeof errObj.message === 'string' ? errObj.message : 'Server error occurred.',
+          errors: Array.isArray(errObj.errors) ? (errObj.errors as ApiFieldError[]) : undefined,
+        }
       }
       if (body && typeof body === 'object' && 'message' in body && typeof (body as { message: unknown }).message === 'string') {
-        throw transportError(
-          response.status,
-          `HTTP_${response.status}`,
-          (body as { message: string }).message,
-        )
+        const rawBody = body as Record<string, unknown>
+        throw {
+          success: false,
+          statusCode: response.status,
+          errorCode: `HTTP_${response.status}`,
+          message: rawBody.message as string,
+          errors: Array.isArray(rawBody.errors) ? (rawBody.errors as ApiFieldError[]) : undefined,
+          meta: { timestamp: new Date().toISOString() },
+        }
       }
       throw transportError(
         response.status,

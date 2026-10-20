@@ -3,7 +3,7 @@
 import type { JSX } from 'react'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ArrowRight, UploadCloud, FileText } from 'lucide-react'
+import { ArrowLeft, ArrowRight, UploadCloud, FileText, AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { PageShell } from '@/components/layout/PageShell'
 import { cn } from '@/lib/utils'
@@ -49,9 +49,8 @@ export default function JoinPage(): JSX.Element {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [submittedEmail, setSubmittedEmail] = useState('')
 
-  const MAX_WORDS = 500
-  const wordCount = formData.reason.trim() ? formData.reason.trim().split(/\s+/).length : 0
-  const isOverWordLimit = wordCount > MAX_WORDS
+  const MAX_REASON_CHARS = 5000
+  const isOverReasonLimit = formData.reason.length > MAX_REASON_CHARS
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -99,8 +98,8 @@ export default function JoinPage(): JSX.Element {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
-    if (isOverWordLimit) {
-      setLocalError(`Statement exceeds ${MAX_WORDS} words limit.`)
+    if (isOverReasonLimit) {
+      setLocalError(`Statement exceeds ${MAX_REASON_CHARS.toLocaleString()} characters limit.`)
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
@@ -255,8 +254,20 @@ export default function JoinPage(): JSX.Element {
                 </div>
 
                 {errorMessage && (
-                  <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-500 text-sm">
-                    {errorMessage}
+                  <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-500 text-sm flex items-start gap-2.5">
+                    <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="font-semibold">{errorMessage}</p>
+                      {Object.keys(fieldErrors).length > 0 && (
+                        <ul className="list-disc list-inside text-xs text-rose-500/90 space-y-0.5">
+                          {Object.entries(fieldErrors).map(([field, msg]) => (
+                            <li key={field}>
+                              <span className="font-medium capitalize">{field}</span>: {msg}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -435,8 +446,8 @@ export default function JoinPage(): JSX.Element {
                       <label htmlFor="join-reason" className="text-sm font-medium text-slate-700">
                         Why do you want to join us? <span className="text-blue-600">*</span>
                       </label>
-                      <span className={cn('text-xs', isOverWordLimit ? 'text-rose-500 font-bold' : 'text-slate-400')}>
-                        {wordCount}/{MAX_WORDS} words
+                      <span className={cn('text-xs font-semibold', isOverReasonLimit ? 'text-rose-500 font-bold' : 'text-slate-400')}>
+                        {formData.reason.length} / {MAX_REASON_CHARS.toLocaleString()} characters
                       </span>
                     </div>
                     <textarea
@@ -444,20 +455,21 @@ export default function JoinPage(): JSX.Element {
                       name="reason"
                       required
                       rows={5}
+                      maxLength={MAX_REASON_CHARS}
                       value={formData.reason}
                       onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                       className={cn(
                         'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm resize-none',
-                        fieldErrors.reason || isOverWordLimit ? 'border-rose-500' : 'border-slate-200'
+                        fieldErrors.reason || isOverReasonLimit ? 'border-rose-500' : 'border-slate-200'
                       )}
-                      placeholder="What makes you think to build the future with NEVOLYN..."
+                      placeholder={`What makes you think to build the future with NEVOLYN (max ${MAX_REASON_CHARS.toLocaleString()} characters)...`}
                     />
-                    {isOverWordLimit && (
-                      <p className="text-xs text-rose-500 mt-1">
-                        Your statement exceeds the 500-word limit. Please shorten it to continue.
+                    {isOverReasonLimit && (
+                      <p className="text-xs text-rose-500 mt-1 font-semibold">
+                        Your statement exceeds the {MAX_REASON_CHARS.toLocaleString()}-character limit. Please shorten it to continue.
                       </p>
                     )}
-                    {fieldErrors.reason && <p className="text-xs text-rose-500 mt-1">{fieldErrors.reason}</p>}
+                    {fieldErrors.reason && !isOverReasonLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.reason}</p>}
                   </div>
 
                   {/* CV Upload */}
@@ -511,10 +523,10 @@ export default function JoinPage(): JSX.Element {
                   <div className="pt-4">
                     <button
                       type="submit"
-                      disabled={isOverWordLimit}
+                      disabled={isOverReasonLimit}
                       className={cn(
                         'w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-full shadow-md text-sm font-bold text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
-                        isOverWordLimit
+                        isOverReasonLimit
                           ? 'bg-slate-400 cursor-not-allowed opacity-60'
                           : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20 active:scale-95'
                       )}

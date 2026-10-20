@@ -24,6 +24,9 @@ public class ApiResponse<T> {
     /** Status indicator: "success" or "error" */
     private String status;
 
+    /** Boolean success flag for frontend consistency */
+    private Boolean success;
+
     /** HTTP status code (e.g. 200, 201, 400, 500) */
     private int code;
 
@@ -43,6 +46,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> success(int code, String message, T data) {
         return ApiResponse.<T>builder()
                 .status("success")
+                .success(true)
                 .code(code)
                 .message(message)
                 .data(data)
@@ -53,6 +57,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> error(int code, String message, List<FieldErrorDto> errors) {
         return ApiResponse.<T>builder()
                 .status("error")
+                .success(false)
                 .code(code)
                 .message(message)
                 .errors(errors)

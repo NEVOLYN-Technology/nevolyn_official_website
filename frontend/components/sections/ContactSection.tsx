@@ -14,7 +14,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { fadeUpProps } from '@/lib/animations'
-import { Sparkles, ArrowRight, CheckCircle2, Mail, Copy, Check } from 'lucide-react'
+import { Sparkles, ArrowRight, CheckCircle2, Mail, Copy, Check, AlertCircle } from 'lucide-react'
 import { useContactForm } from '@/lib/hooks/useContactForm'
 import { SectionHeader, GradText } from '@/components/ui/SectionHeader'
 import { SECTION_BG } from '@/lib/constants/theme'
@@ -39,9 +39,10 @@ export const ContactSection = (): JSX.Element => {
   const [submittedEmail, setSubmittedEmail] = useState('')
   const [copiedCode, setCopiedCode] = useState(false)
 
-  const MAX_WORDS = 500
-  const wordCount = formData.message.trim() ? formData.message.trim().split(/\s+/).length : 0
-  const isOverWordLimit = wordCount > MAX_WORDS
+  const MAX_SUBJECT_CHARS = 200
+  const MAX_MESSAGE_CHARS = 5000
+  const isOverSubjectLimit = formData.subject.length > MAX_SUBJECT_CHARS
+  const isOverMessageLimit = formData.message.length > MAX_MESSAGE_CHARS
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
@@ -58,7 +59,7 @@ export const ContactSection = (): JSX.Element => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (isOverWordLimit) return
+    if (isOverSubjectLimit || isOverMessageLimit) return
     const emailToSave = formData.email
     const success = await submitContactForm(formData)
     if (success) {
@@ -152,8 +153,20 @@ export const ContactSection = (): JSX.Element => {
 
           <div className="p-4 sm:p-10">
             {errorMessage && !isSuccess && (
-              <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-600 text-sm">
-                {errorMessage}
+              <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-600 text-sm flex items-start gap-2.5">
+                <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-semibold">{errorMessage}</p>
+                  {Object.keys(fieldErrors).length > 0 && (
+                    <ul className="list-disc list-inside text-xs text-rose-600/90 space-y-0.5">
+                      {Object.entries(fieldErrors).map(([field, msg]) => (
+                        <li key={field}>
+                          <span className="font-medium capitalize">{field}</span>: {msg}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             )}
 
@@ -336,21 +349,30 @@ export const ContactSection = (): JSX.Element => {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="contact-subject" className="text-sm font-medium text-slate-700">
-                      Subject <span className="text-sky-500">*</span>
-                    </label>
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="contact-subject" className="text-sm font-medium text-slate-700">
+                        Subject <span className="text-sky-500">*</span>
+                      </label>
+                      <span className={`text-xs font-semibold ${isOverSubjectLimit ? 'text-rose-500 font-bold' : 'text-slate-400'}`}>
+                        {formData.subject.length} / {MAX_SUBJECT_CHARS} characters
+                      </span>
+                    </div>
                     <input
                       type="text"
                       id="contact-subject"
                       name="subject"
                       required
+                      maxLength={MAX_SUBJECT_CHARS}
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className={`w-full bg-slate-50 border ${fieldErrors.subject ? 'border-rose-500' : 'border-slate-300'
+                      className={`w-full bg-slate-50 border ${fieldErrors.subject || isOverSubjectLimit ? 'border-rose-500' : 'border-slate-300'
                         } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors`}
                       placeholder="How can we help?"
                     />
-                    {fieldErrors.subject && <p className="text-xs text-rose-500 mt-1">{fieldErrors.subject}</p>}
+                    {isOverSubjectLimit && (
+                      <p className="text-xs text-rose-500 mt-1 font-semibold">Subject cannot exceed {MAX_SUBJECT_CHARS} characters.</p>
+                    )}
+                    {fieldErrors.subject && !isOverSubjectLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.subject}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -358,8 +380,8 @@ export const ContactSection = (): JSX.Element => {
                       <label htmlFor="contact-message" className="text-sm font-medium text-slate-700">
                         Message <span className="text-sky-500">*</span>
                       </label>
-                      <span className={`text-xs font-semibold ${isOverWordLimit ? 'text-rose-500 font-bold' : 'text-slate-400'}`}>
-                        {wordCount} / {MAX_WORDS} words
+                      <span className={`text-xs font-semibold ${isOverMessageLimit ? 'text-rose-500 font-bold' : 'text-slate-400'}`}>
+                        {formData.message.length} / {MAX_MESSAGE_CHARS.toLocaleString()} characters
                       </span>
                     </div>
                     <textarea
@@ -367,21 +389,22 @@ export const ContactSection = (): JSX.Element => {
                       name="message"
                       rows={5}
                       required
+                      maxLength={MAX_MESSAGE_CHARS}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className={`w-full bg-slate-50 border ${fieldErrors.message || isOverWordLimit ? 'border-rose-500' : 'border-slate-300'
+                      className={`w-full bg-slate-50 border ${fieldErrors.message || isOverMessageLimit ? 'border-rose-500' : 'border-slate-300'
                         } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors resize-none`}
-                      placeholder="Write your message here (max 500 words)..."
+                      placeholder={`Write your message here (max ${MAX_MESSAGE_CHARS.toLocaleString()} characters)...`}
                     ></textarea>
-                    {isOverWordLimit && (
-                      <p className="text-xs text-rose-500 mt-1 font-semibold">Message cannot exceed {MAX_WORDS} words.</p>
+                    {isOverMessageLimit && (
+                      <p className="text-xs text-rose-500 mt-1 font-semibold">Message cannot exceed {MAX_MESSAGE_CHARS.toLocaleString()} characters.</p>
                     )}
-                    {fieldErrors.message && !isOverWordLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.message}</p>}
+                    {fieldErrors.message && !isOverMessageLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.message}</p>}
                   </div>
 
                   <button
                     type="submit"
-                    disabled={isLoading || isOverWordLimit}
+                    disabled={isLoading || isOverSubjectLimit || isOverMessageLimit}
                     className="w-full rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-500 px-6 py-3.5 font-semibold text-white shadow-lg shadow-sky-400/25 transition-all duration-300 hover:shadow-sky-400/40 hover:brightness-105 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {isLoading ? (
