@@ -25,7 +25,7 @@ export interface InquiryRecord {
   verifiedAt: string | null
   isAcknowledged: boolean
   acknowledgedAt: string | null
-  status: 'NEW' | 'IN_REVIEW' | 'CONTACTED' | 'CLOSED'
+  status: 'NEW' | 'ACKNOWLEDGED' | 'REPLIED' | 'IN_REVIEW' | 'CONTACTED' | 'CLOSED'
   createdAt: string
 }
 

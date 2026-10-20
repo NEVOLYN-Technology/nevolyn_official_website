@@ -1,14 +1,13 @@
 'use client'
 
 import React from 'react'
-import { Inbox, Copy, Check, Mail, Eye, Trash2 } from 'lucide-react'
+import { Inbox, Copy, Check, Mail, Eye, Trash2, Send } from 'lucide-react'
 import { type InquiryRecord } from '@/lib/api/admin'
 
 const INQUIRY_STATUS_OPTIONS: Array<InquiryRecord['status']> = [
   'NEW',
-  'IN_REVIEW',
-  'CONTACTED',
-  'CLOSED',
+  'ACKNOWLEDGED',
+  'REPLIED',
 ]
 
 interface InquiriesTableProps {
@@ -115,11 +114,11 @@ export function InquiriesTable({
                     className={`text-xs px-2.5 py-1 rounded-lg border font-semibold focus:outline-none cursor-pointer transition-colors ${
                       i.status === 'NEW'
                         ? 'bg-rose-50 text-rose-800 border-rose-300'
-                        : i.status === 'IN_REVIEW'
-                        ? 'bg-amber-50 text-amber-800 border-amber-300'
-                        : i.status === 'CONTACTED'
+                        : i.status === 'ACKNOWLEDGED'
                         ? 'bg-sky-50 text-sky-800 border-sky-300'
-                        : 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                        : i.status === 'REPLIED'
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                        : 'bg-slate-50 text-slate-800 border-slate-300'
                     }`}
                   >
                     {INQUIRY_STATUS_OPTIONS.map((opt) => (
@@ -153,14 +152,14 @@ export function InquiriesTable({
                     </button>
                     <a
                       href={`mailto:${i.email}?subject=RE: ${encodeURIComponent(i.subject)} [Ref: ${i.inquiryId}]`}
-                      className="p-1.5 rounded-lg border border-border bg-card hover:bg-muted text-primary hover:text-primary transition-colors inline-flex items-center"
+                      className="p-1.5 rounded-lg border border-sky-200 bg-sky-50 text-sky-600 hover:bg-sky-100 hover:border-sky-300 transition-colors inline-flex items-center"
                       title="Reply via email client"
                     >
-                      <Mail className="w-3.5 h-3.5" />
+                      <Send className="w-3.5 h-3.5" />
                     </a>
                     <button
                       onClick={() => onDelete(i.id, i.inquiryId)}
-                      className="p-1.5 rounded-lg border border-border bg-card hover:bg-rose-50 text-muted-foreground hover:text-rose-600 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-colors cursor-pointer"
                       title="Delete inquiry"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

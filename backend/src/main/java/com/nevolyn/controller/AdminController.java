@@ -218,6 +218,8 @@ public class AdminController {
 
         long totalInquiries = contactInquiryRepository.count();
         long newInquiries = contactInquiryRepository.countByStatus("NEW");
+        long acknowledgedInquiries = contactInquiryRepository.countByStatus("ACKNOWLEDGED");
+        long repliedInquiries = contactInquiryRepository.countByStatus("REPLIED");
         long inReviewInquiries = contactInquiryRepository.countByStatus("IN_REVIEW");
         long contactedInquiries = contactInquiryRepository.countByStatus("CONTACTED");
         long closedInquiries = contactInquiryRepository.countByStatus("CLOSED");
@@ -229,18 +231,20 @@ public class AdminController {
         long rejectedApplications = jobApplicationRepository.countBySelectionStatus("REJECTED");
         long hiredApplications = jobApplicationRepository.countBySelectionStatus("HIRED");
 
-        var stats = java.util.Map.of(
-                "totalInquiries", totalInquiries,
-                "newInquiries", newInquiries,
-                "inReviewInquiries", inReviewInquiries,
-                "contactedInquiries", contactedInquiries,
-                "closedInquiries", closedInquiries,
-                "totalApplications", totalApplications,
-                "pendingApplications", pendingApplications,
-                "inReviewApplications", inReviewApplications,
-                "shortlistedApplications", shortlistedApplications,
-                "rejectedApplications", rejectedApplications
-        );
+        java.util.Map<String, Long> stats = new java.util.HashMap<>();
+        stats.put("totalInquiries", totalInquiries);
+        stats.put("newInquiries", newInquiries);
+        stats.put("acknowledgedInquiries", acknowledgedInquiries);
+        stats.put("repliedInquiries", repliedInquiries);
+        stats.put("inReviewInquiries", inReviewInquiries);
+        stats.put("contactedInquiries", contactedInquiries);
+        stats.put("closedInquiries", closedInquiries);
+        stats.put("totalApplications", totalApplications);
+        stats.put("pendingApplications", pendingApplications);
+        stats.put("inReviewApplications", inReviewApplications);
+        stats.put("shortlistedApplications", shortlistedApplications);
+        stats.put("rejectedApplications", rejectedApplications);
+        stats.put("hiredApplications", hiredApplications);
 
         return ResponseEntity.ok(stats);
     }

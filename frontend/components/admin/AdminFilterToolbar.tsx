@@ -3,7 +3,7 @@
 import React from 'react'
 import { Users, Inbox, ArrowUpDown, Search, Filter, X } from 'lucide-react'
 
-const INQUIRY_STATUS_OPTIONS = ['NEW', 'IN_REVIEW', 'CONTACTED', 'CLOSED'] as const
+const INQUIRY_STATUS_OPTIONS = ['NEW', 'ACKNOWLEDGED', 'REPLIED'] as const
 const APPLICATION_STATUS_OPTIONS = ['PENDING', 'IN_REVIEW', 'SHORTLISTED', 'REJECTED', 'HIRED'] as const
 
 interface AdminFilterToolbarProps {

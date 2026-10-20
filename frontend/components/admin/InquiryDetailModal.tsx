@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Mail, ShieldCheck, CheckCircle2, Clock } from 'lucide-react'
+import { X, Mail, ShieldCheck, CheckCircle2, Clock, Send } from 'lucide-react'
 import { type InquiryRecord } from '@/lib/api/admin'
 
 interface InquiryDetailModalProps {
@@ -36,11 +36,11 @@ export function InquiryDetailModal({ inquiry, onClose }: InquiryDetailModalProps
                     className={`text-[10px] px-2 py-0.5 rounded-md font-semibold ${
                       inquiry.status === 'NEW'
                         ? 'bg-rose-50 text-rose-800 border border-rose-300'
-                        : inquiry.status === 'IN_REVIEW'
-                        ? 'bg-amber-50 text-amber-800 border border-amber-300'
-                        : inquiry.status === 'CONTACTED'
+                        : inquiry.status === 'ACKNOWLEDGED'
                         ? 'bg-sky-50 text-sky-800 border border-sky-300'
-                        : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                        : inquiry.status === 'REPLIED'
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                        : 'bg-slate-50 text-slate-800 border border-slate-300'
                     }`}
                   >
                     {inquiry.status}
@@ -120,7 +120,7 @@ export function InquiryDetailModal({ inquiry, onClose }: InquiryDetailModalProps
                 href={`mailto:${inquiry.email}?subject=RE: ${encodeURIComponent(inquiry.subject)} [Ref: ${inquiry.inquiryId}]`}
                 className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold inline-flex items-center gap-2 transition-colors shadow-xs"
               >
-                <Mail className="w-3.5 h-3.5" />
+                <Send className="w-3.5 h-3.5" />
                 <span>Reply to Visitor</span>
               </a>
 
