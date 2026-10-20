@@ -447,7 +447,7 @@ export default function JoinPage(): JSX.Element {
                         Why do you want to join us? <span className="text-blue-600">*</span>
                       </label>
                       <span className={cn('text-xs font-semibold', isOverReasonLimit ? 'text-rose-500 font-bold' : 'text-slate-400')}>
-                        {formData.reason.length} / {MAX_REASON_CHARS.toLocaleString()} characters
+                        {formData.reason.length.toLocaleString()} / {MAX_REASON_CHARS.toLocaleString()} characters
                       </span>
                     </div>
                     <textarea
@@ -455,18 +455,17 @@ export default function JoinPage(): JSX.Element {
                       name="reason"
                       required
                       rows={5}
-                      maxLength={MAX_REASON_CHARS}
                       value={formData.reason}
                       onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                       className={cn(
                         'w-full px-4 py-3 rounded-xl bg-slate-50 border focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-blue-500 text-slate-900 transition-all text-sm resize-none',
-                        fieldErrors.reason || isOverReasonLimit ? 'border-rose-500' : 'border-slate-200'
+                        fieldErrors.reason || isOverReasonLimit ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200'
                       )}
                       placeholder={`What makes you think to build the future with NEVOLYN (max ${MAX_REASON_CHARS.toLocaleString()} characters)...`}
                     />
                     {isOverReasonLimit && (
                       <p className="text-xs text-rose-500 mt-1 font-semibold">
-                        Your statement exceeds the {MAX_REASON_CHARS.toLocaleString()}-character limit. Please shorten it to continue.
+                        Your statement exceeds the {MAX_REASON_CHARS.toLocaleString()}-character limit (currently {formData.reason.length.toLocaleString()} characters). Please shorten it to continue.
                       </p>
                     )}
                     {fieldErrors.reason && !isOverReasonLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.reason}</p>}

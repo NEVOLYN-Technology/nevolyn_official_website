@@ -120,7 +120,7 @@ Processes visitor inquiries submitted from the website contact section.
   - `name`: Required, max 100 characters.
   - `email`: Required, valid email format.
   - `subject`: Required, max 200 characters.
-  - `message`: Required, max 10,000 characters.
+  - `message`: Required, max 5,000 characters.
 
 ---
 

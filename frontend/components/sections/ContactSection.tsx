@@ -362,15 +362,16 @@ export const ContactSection = (): JSX.Element => {
                       id="contact-subject"
                       name="subject"
                       required
-                      maxLength={MAX_SUBJECT_CHARS}
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className={`w-full bg-slate-50 border ${fieldErrors.subject || isOverSubjectLimit ? 'border-rose-500' : 'border-slate-300'
+                      className={`w-full bg-slate-50 border ${fieldErrors.subject || isOverSubjectLimit ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300'
                         } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors`}
                       placeholder="How can we help?"
                     />
                     {isOverSubjectLimit && (
-                      <p className="text-xs text-rose-500 mt-1 font-semibold">Subject cannot exceed {MAX_SUBJECT_CHARS} characters.</p>
+                      <p className="text-xs text-rose-500 mt-1 font-semibold">
+                        Subject cannot exceed {MAX_SUBJECT_CHARS} characters (currently {formData.subject.length} characters).
+                      </p>
                     )}
                     {fieldErrors.subject && !isOverSubjectLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.subject}</p>}
                   </div>
@@ -381,7 +382,7 @@ export const ContactSection = (): JSX.Element => {
                         Message <span className="text-sky-500">*</span>
                       </label>
                       <span className={`text-xs font-semibold ${isOverMessageLimit ? 'text-rose-500 font-bold' : 'text-slate-400'}`}>
-                        {formData.message.length} / {MAX_MESSAGE_CHARS.toLocaleString()} characters
+                        {formData.message.length.toLocaleString()} / {MAX_MESSAGE_CHARS.toLocaleString()} characters
                       </span>
                     </div>
                     <textarea
@@ -389,15 +390,16 @@ export const ContactSection = (): JSX.Element => {
                       name="message"
                       rows={5}
                       required
-                      maxLength={MAX_MESSAGE_CHARS}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className={`w-full bg-slate-50 border ${fieldErrors.message || isOverMessageLimit ? 'border-rose-500' : 'border-slate-300'
+                      className={`w-full bg-slate-50 border ${fieldErrors.message || isOverMessageLimit ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300'
                         } rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition-colors resize-none`}
                       placeholder={`Write your message here (max ${MAX_MESSAGE_CHARS.toLocaleString()} characters)...`}
                     ></textarea>
                     {isOverMessageLimit && (
-                      <p className="text-xs text-rose-500 mt-1 font-semibold">Message cannot exceed {MAX_MESSAGE_CHARS.toLocaleString()} characters.</p>
+                      <p className="text-xs text-rose-500 mt-1 font-semibold">
+                        Message cannot exceed {MAX_MESSAGE_CHARS.toLocaleString()} characters (currently {formData.message.length.toLocaleString()} characters).
+                      </p>
                     )}
                     {fieldErrors.message && !isOverMessageLimit && <p className="text-xs text-rose-500 mt-1">{fieldErrors.message}</p>}
                   </div>

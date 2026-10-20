@@ -111,7 +111,7 @@ Processes website visitor contact inquiries.
 | `name` | String | Yes | Max 100 chars | Visitor's full name |
 | `email` | String | Yes | Valid Email format | Visitor's email address |
 | `subject` | String | Yes | Max 200 chars | Inquiry subject line |
-| `message` | String | Yes | Max 10,000 chars | Main inquiry message |
+| `message` | String | Yes | Max 5,000 chars | Main inquiry message |
 
 #### 5-Layer Code Flow
 1. **DTO Validation (`ContactRequest.java`)**: Validates `@NotBlank` and `@Email`.
