@@ -102,6 +102,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Illegal argument or invalid manual state transition — returns 400.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.warn("IllegalArgumentException caught: {}", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                null));
+    }
+
+    /**
      * Unmapped endpoint or static resource requested by a client/bot — returns 404 quietly.
      */
     @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)

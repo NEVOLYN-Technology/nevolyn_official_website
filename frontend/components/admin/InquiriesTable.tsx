@@ -4,11 +4,6 @@ import React from 'react'
 import { Inbox, Copy, Check, Mail, Eye, Trash2, Send } from 'lucide-react'
 import { type InquiryRecord } from '@/lib/api/admin'
 
-const INQUIRY_STATUS_OPTIONS: Array<InquiryRecord['status']> = [
-  'NEW',
-  'ACKNOWLEDGED',
-  'REPLIED',
-]
 
 interface InquiriesTableProps {
   inquiries: InquiryRecord[]
@@ -106,27 +101,41 @@ export function InquiriesTable({
 
                 {/* Status Selector */}
                 <td className="py-3.5 px-4 whitespace-nowrap">
-                  <select
-                    value={i.status}
-                    onChange={(e) =>
-                      onStatusChange(i.id, e.target.value as InquiryRecord['status'])
-                    }
-                    className={`text-xs px-2.5 py-1 rounded-lg border font-semibold focus:outline-none cursor-pointer transition-colors ${
-                      i.status === 'NEW'
-                        ? 'bg-rose-50 text-rose-800 border-rose-300'
-                        : i.status === 'ACKNOWLEDGED'
-                        ? 'bg-sky-50 text-sky-800 border-sky-300'
-                        : i.status === 'REPLIED'
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                        : 'bg-slate-50 text-slate-800 border-slate-300'
-                    }`}
-                  >
-                    {INQUIRY_STATUS_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt} className="bg-card text-foreground">
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
+                  {(() => {
+                    const effectiveStatus = (i.status === 'NEW' && i.isAcknowledged) ? 'ACKNOWLEDGED' : i.status
+                    return (
+                      <select
+                        value={effectiveStatus}
+                        onChange={(e) => {
+                          if (e.target.value === 'REPLIED') {
+                            onStatusChange(i.id, 'REPLIED')
+                          }
+                        }}
+                        disabled={effectiveStatus === 'REPLIED'}
+                        className={`text-xs px-2.5 py-1 rounded-lg border font-semibold focus:outline-none transition-colors ${
+                          effectiveStatus === 'REPLIED'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 cursor-default'
+                            : effectiveStatus === 'ACKNOWLEDGED'
+                            ? 'bg-sky-50 text-sky-800 border-sky-300 cursor-pointer hover:bg-sky-100/70'
+                            : 'bg-rose-50 text-rose-800 border-rose-300 cursor-pointer hover:bg-rose-100/70'
+                        }`}
+                        title={
+                          effectiveStatus === 'REPLIED'
+                            ? 'Inquiry already marked as replied'
+                            : 'Select REPLIED once response is sent'
+                        }
+                      >
+                        {effectiveStatus !== 'REPLIED' && (
+                          <option value={effectiveStatus} disabled className="bg-card text-foreground">
+                            {effectiveStatus}
+                          </option>
+                        )}
+                        <option value="REPLIED" className="bg-card text-foreground font-semibold">
+                          REPLIED
+                        </option>
+                      </select>
+                    )
+                  })()}
                 </td>
 
                 {/* Timestamp */}

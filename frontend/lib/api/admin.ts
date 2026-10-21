@@ -68,6 +68,8 @@ export interface PageResult<T> {
 export interface AdminStats {
   totalInquiries: number
   newInquiries: number
+  acknowledgedInquiries?: number
+  repliedInquiries?: number
   inReviewInquiries: number
   contactedInquiries: number
   closedInquiries: number
@@ -76,6 +78,7 @@ export interface AdminStats {
   inReviewApplications: number
   shortlistedApplications: number
   rejectedApplications: number
+  hiredApplications?: number
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

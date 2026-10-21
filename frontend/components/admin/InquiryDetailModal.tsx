@@ -32,19 +32,24 @@ export function InquiryDetailModal({ inquiry, onClose }: InquiryDetailModalProps
                   <span className="text-xs font-mono font-bold text-primary">
                     {inquiry.inquiryId}
                   </span>
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-md font-semibold ${
-                      inquiry.status === 'NEW'
-                        ? 'bg-rose-50 text-rose-800 border border-rose-300'
-                        : inquiry.status === 'ACKNOWLEDGED'
-                        ? 'bg-sky-50 text-sky-800 border border-sky-300'
-                        : inquiry.status === 'REPLIED'
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
-                        : 'bg-slate-50 text-slate-800 border border-slate-300'
-                    }`}
-                  >
-                    {inquiry.status}
-                  </span>
+                  {(() => {
+                    const effectiveStatus = (inquiry.status === 'NEW' && inquiry.isAcknowledged) ? 'ACKNOWLEDGED' : inquiry.status
+                    return (
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-md font-semibold ${
+                          effectiveStatus === 'NEW'
+                            ? 'bg-rose-50 text-rose-800 border border-rose-300'
+                            : effectiveStatus === 'ACKNOWLEDGED'
+                            ? 'bg-sky-50 text-sky-800 border border-sky-300'
+                            : effectiveStatus === 'REPLIED'
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                            : 'bg-slate-50 text-slate-800 border border-slate-300'
+                        }`}
+                      >
+                        {effectiveStatus}
+                      </span>
+                    )
+                  })()}
                 </div>
                 <h3 className="text-base font-bold text-foreground mt-1">
                   {inquiry.subject}

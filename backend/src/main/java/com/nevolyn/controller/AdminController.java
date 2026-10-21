@@ -110,7 +110,12 @@ public class AdminController {
         ContactInquiry inquiry = contactInquiryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Contact inquiry not found: " + id));
 
-        inquiry.setStatus(request.getStatus());
+        String targetStatus = request.getStatus().trim().toUpperCase();
+        if ("NEW".equals(targetStatus) || "ACKNOWLEDGED".equals(targetStatus)) {
+            throw new IllegalArgumentException("NEW and ACKNOWLEDGED statuses are automated and cannot be set manually.");
+        }
+
+        inquiry.setStatus(targetStatus);
         contactInquiryRepository.save(inquiry);
         return ResponseEntity.ok(toInquiryResponse(inquiry));
     }

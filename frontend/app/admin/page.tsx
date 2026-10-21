@@ -167,7 +167,7 @@ export default function AdminDashboardPage() {
         text: `Application ${updated.applicationId} updated to ${newStatus}`,
       })
       // Refresh stats in background
-      fetchAdminStats(credentials).then(setStats).catch(() => {})
+      fetchAdminStats(credentials).then(setStats).catch(() => { })
     } catch {
       setToastMessage({ type: 'error', text: 'Could not update application status.' })
     }
@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
         text: `Inquiry ${updated.inquiryId} updated to ${newStatus}`,
       })
       // Refresh stats in background
-      fetchAdminStats(credentials).then(setStats).catch(() => {})
+      fetchAdminStats(credentials).then(setStats).catch(() => { })
     } catch {
       setToastMessage({ type: 'error', text: 'Could not update inquiry status.' })
     }
@@ -202,7 +202,7 @@ export default function AdminDashboardPage() {
       setApplications((prev) => prev.filter((item) => item.id !== id))
       if (selectedApplication?.id === id) setSelectedApplication(null)
       setToastMessage({ type: 'success', text: `Application ${ref} deleted.` })
-      fetchAdminStats(credentials).then(setStats).catch(() => {})
+      fetchAdminStats(credentials).then(setStats).catch(() => { })
     } catch {
       setToastMessage({ type: 'error', text: 'Failed to delete application.' })
     }
@@ -217,7 +217,7 @@ export default function AdminDashboardPage() {
       setInquiries((prev) => prev.filter((item) => item.id !== id))
       if (selectedInquiry?.id === id) setSelectedInquiry(null)
       setToastMessage({ type: 'success', text: `Inquiry ${ref} deleted.` })
-      fetchAdminStats(credentials).then(setStats).catch(() => {})
+      fetchAdminStats(credentials).then(setStats).catch(() => { })
     } catch {
       setToastMessage({ type: 'error', text: 'Failed to delete inquiry.' })
     }
@@ -256,7 +256,8 @@ export default function AdminDashboardPage() {
   const filteredInquiries = useMemo(() => {
     return inquiries
       .filter((i) => {
-        const matchesStatus = inquiryStatusFilter === 'ALL' || i.status === inquiryStatusFilter
+        const effectiveStatus = (i.status === 'NEW' && i.isAcknowledged) ? 'ACKNOWLEDGED' : i.status
+        const matchesStatus = inquiryStatusFilter === 'ALL' || effectiveStatus === inquiryStatusFilter
         const q = searchTerm.toLowerCase().trim()
         const matchesSearch =
           !q ||
@@ -300,19 +301,32 @@ export default function AdminDashboardPage() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* KPI Metrics */}
+        {/* Context-Aware Interactive KPI Metrics */}
         <AdminMetricsBanner
+          activeTab={activeTab}
+          applications={applications}
+          inquiries={inquiries}
           stats={stats}
-          inquiriesCount={inquiries.length}
-          applicationsCount={applications.length}
+          activeStatusFilter={activeTab === 'applications' ? applicationStatusFilter : inquiryStatusFilter}
+          onStatusFilterSelect={(status) => {
+            if (activeTab === 'applications') {
+              setApplicationStatusFilter(status)
+            } else {
+              setInquiryStatusFilter(status)
+            }
+          }}
         />
 
         {/* Toolbar & Filter Switchers */}
         <AdminFilterToolbar
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          applicationsCount={applications.length}
-          inquiriesCount={inquiries.length}
+          setActiveTab={(tab) => {
+            setActiveTab(tab)
+            setSearchTerm('')
+          }}
+          applications={applications}
+          inquiries={inquiries}
+          filteredCount={activeTab === 'applications' ? filteredApplications.length : filteredInquiries.length}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           applicationStatusFilter={applicationStatusFilter}
@@ -368,11 +382,10 @@ export default function AdminDashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg border flex items-center gap-2.5 text-xs font-semibold backdrop-blur-md ${
-              toastMessage.type === 'success'
+            className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg border flex items-center gap-2.5 text-xs font-semibold backdrop-blur-md ${toastMessage.type === 'success'
                 ? 'bg-emerald-50/95 border-emerald-300 text-emerald-900'
                 : 'bg-rose-50/95 border-rose-300 text-rose-900'
-            }`}
+              }`}
           >
             {toastMessage.type === 'success' ? (
               <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
