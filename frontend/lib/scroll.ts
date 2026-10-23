@@ -38,12 +38,15 @@ export function scrollToSection(sectionId: string): void {
     return
   }
 
-  const element = document.getElementById(sectionId)
+  const element =
+    document.getElementById(sectionId) ||
+    (sectionId === 'latest-news' ? document.getElementById('news') : null) ||
+    (sectionId === 'news' ? document.getElementById('latest-news') : null)
   if (!element) return
 
   // getBoundingClientRect() is viewport-relative, so add the current scroll
   // position to convert it to a document-absolute coordinate.
-  const targetTop = element.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET_PX
+  const targetTop = Math.max(0, element.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET_PX)
 
   window.scrollTo({ top: targetTop, behavior: 'smooth' })
 }

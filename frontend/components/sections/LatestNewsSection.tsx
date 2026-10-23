@@ -143,7 +143,9 @@ export const LatestNewsSection = (): JSX.Element => {
   }
 
   return (
-    <section id="news" className={`relative py-16 sm:py-20 ${SECTION_BG.primary} ${SECTION_BG.border} overflow-hidden`}>
+    <section id="latest-news" className={`relative py-16 sm:py-20 ${SECTION_BG.primary} ${SECTION_BG.border} overflow-hidden`}>
+      {/* Anchor for backward-compatible #news navigation */}
+      <div id="news" className="absolute -top-24 left-0" />
       {/* Background Ambient Glow Orbs - Multi-chromatic Soft Aura with zero blur overhead */}
       <div
         className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] rounded-full pointer-events-none z-0"
