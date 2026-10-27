@@ -100,7 +100,7 @@ export const teamDepartments: Department[] = [
         id: 'chagla',
         name: 'Chagla Amanullah',
         title: 'Managing Director',
-        bio: 'Providing strategic leadership, driving innovation and engineering excellence.',
+        bio: 'Providing strategic leadership, driving innovation and engineering excellence at NEVOLYN.',
 
         extendedBio: [
           'Amanullah Chagla provides the strategic leadership for NEVOLYN, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and engineering excellence work together to create lasting industrial value.',
@@ -125,7 +125,7 @@ export const teamDepartments: Department[] = [
         id: 'lutfar',
         name: 'Md Lutfar Rahman',
         title: 'Director of Finance & Operations',
-        bio: 'Driving operational execution and financial discipline to support the growth and development.',
+        bio: 'Driving operational execution and financial discipline to support the growth and development at NEVOLYN.',
 
         extendedBio: [
           'Md Lutfar Rahman provides broad operational and execution-focused leadership at NEVOLYN Technology, supporting the organization’s day-to-day execution, financial coordination, administrative functions, and strategic initiatives. As Executive Director, he works closely with the leadership team to ensure that NEVOLYN’s business, technology, and operational priorities are effectively translated into structured execution and sustainable organizational growth.',
@@ -155,7 +155,7 @@ export const teamDepartments: Department[] = [
         id: 'rahin',
         name: 'Md Rahinur Rahman',
         title: 'Founder & AI Systems Engineer',
-        bio: 'Design and development of industrial AI and automation platforms.',
+        bio: 'Designing and engineering industrial AI systems and automation platforms at NEVOLYN.',
         extendedBio: [
           'Rahin leads the design and development of AI-powered industrial automation solutions at NEVOLYN, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
           'He graduated in Electrical and Electronic Engineering (EEE) from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools, with a specialization in Communication and Signal Processing (CSP). His academic foundation provided a solid basis in digital signal processing, mathematical modeling, and pattern recognition, bridging deep engineering theory with practical AI systems.',
@@ -180,7 +180,7 @@ export const teamDepartments: Department[] = [
         id: 'ninad',
         name: 'Mohammad Ninad Mahmud Nobo',
         title: 'Co-Founder & AI Software Engineer',
-        bio: 'Full-stack web development and machine learning model integration.',
+        bio: 'Engineering applied computer vision architectures and scalable full-stack web platforms at NEVOLYN.',
         extendedBio: [
           'Ninad leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
           'He graduated in Computer Science and Engineering from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools. There, he explored how AI could tackle complex, real-world challenges, from automated software testing to medical image analysis to Bangla speech processing. That foundation of rigorous research and hands-on building led him to industrial AI, where the software challenges are just as demanding, but the impact is immediate and visible on the factory floor.',
@@ -203,6 +203,33 @@ export const teamDepartments: Department[] = [
         },
         image: '/ninad-photo.png',
       },
+      {
+        id: 'afzal',
+        name: 'Afzal Hossan',
+        title: 'AI Software Engineer',
+        bio: 'Engineering applied computer vision architectures and scalable full-stack web platforms at NEVOLYN.',
+        extendedBio: [
+          'Afzal leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
+          'He completed his undergraduate degree in Computer Science and Engineering at Bangladesh University of Engineering and Technology (BUET), where he developed a strong foundation in algorithms, computational methods, and software engineering. His academic achievements include a Dean’s List Award and the University Merit Scholarship. His undergraduate thesis introduced him to research-driven problem solving, strengthening his ability to analyze complex datasets, develop computational methods, and conduct systematic experiments.',
+          'His research focuses on Bioinformatics and Computational Biology, particularly the application of artificial intelligence and machine learning to biological data analysis. His work includes INCENT, a hierarchical optimal transport framework for aligning spatial transcriptomics data to investigate cellular correspondences and spatial tissue organization. Through his research and teaching, he aims to advance computational biology, contribute to scientific discovery, and help students develop the knowledge and problem-solving skills needed to address real-world challenges.'
+        ],
+        email: 'afzalhossan80@gmail.com',
+        responsibilities: [
+          'Full-stack development of NEVOLYN & FABINS web applications',
+          'Image processing, computer vision model training for FABINS',
+          'ML pipeline architecture & production deployment',
+          'API design, software quality standards, & DevOps automation'
+        ],
+        social: {
+          portfolio: 'https://afzal-hossan.me/',
+          github: 'https://github.com/AfzalHossan-2005021',
+          linkedin: 'https://www.linkedin.com/in/afzal-hossan/',
+          scholar: 'https://scholar.google.com/citations?user=Q9BkMvcAAAAJ&hl=en',
+          scholarName: 'Afzal Hossan',
+          orcid: 'https://orcid.org/0009-0008-1604-8822'
+        },
+        image: '/afzal-photo.jpg',
+      }
     ],
   },
 ]
