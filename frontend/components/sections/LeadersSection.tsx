@@ -174,7 +174,7 @@ export function LeadersSection(): JSX.Element {
             className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center"
           >
             {executiveLeaders.map((leader, idx) => (
-              <motion.div key={leader.id} variants={itemVariants} className="flex justify-center">
+              <motion.div key={leader.id} variants={itemVariants} className="flex justify-center sm:[&:last-child:nth-child(odd)]:col-span-2 sm:[&:last-child:nth-child(odd)]:w-[calc(50%-0.75rem)] sm:[&:last-child:nth-child(odd)]:justify-self-center">
                 {renderCard(leader, idx)}
               </motion.div>
             ))}
@@ -189,7 +189,7 @@ export function LeadersSection(): JSX.Element {
             className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center"
           >
             {otherLeaders.map((leader, idx) => (
-              <motion.div key={leader.id} variants={itemVariants} className="flex justify-center">
+              <motion.div key={leader.id} variants={itemVariants} className="flex justify-center sm:[&:last-child:nth-child(odd)]:col-span-2 sm:[&:last-child:nth-child(odd)]:w-[calc(50%-0.75rem)] sm:[&:last-child:nth-child(odd)]:justify-self-center">
                 {renderCard(leader, executiveLeaders.length + idx)}
               </motion.div>
             ))}
