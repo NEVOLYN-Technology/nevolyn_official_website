@@ -93,16 +93,16 @@ export const Hero = (): JSX.Element => {
             </div>
 
             {/* Client Project Inquiry Callout — Single horizontal row across phone, tablet & desktop */}
-            <div className="mt-5 sm:mt-6 inline-flex flex-row items-center justify-between gap-1.5 min-[380px]:gap-2 sm:gap-3 w-fit max-w-full rounded-2xl border border-sky-300/75 bg-gradient-to-r from-sky-50/95 via-white/95 to-emerald-50/90 px-2 py-2 min-[380px]:px-2.5 min-[380px]:py-2 sm:px-3.5 sm:py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-emerald-400/80 hover:shadow-md">
-              <div className="flex flex-row items-center gap-1.5 min-[380px]:gap-2 sm:gap-2.5 min-w-0">
-                <div className="flex h-6 w-6 min-[380px]:h-7 min-[380px]:w-7 sm:h-7.5 sm:w-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500/15 to-emerald-500/20 text-sky-700 ring-1 ring-sky-400/30">
-                  <Sparkles className="h-3 w-3 min-[380px]:h-3.5 min-[380px]:w-3.5 text-emerald-600" />
+            <div className="mt-5 sm:mt-6 inline-flex flex-row items-center justify-between gap-1.5 sm:gap-3 w-fit max-w-full rounded-2xl border border-sky-300/75 bg-gradient-to-r from-sky-50/95 via-white/95 to-emerald-50/90 px-1.5 py-1.5 min-[390px]:px-2 min-[390px]:py-2 sm:px-3.5 sm:py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-emerald-400/80 hover:shadow-md">
+              <div className="flex flex-row items-center gap-1.5 sm:gap-2.5 shrink-0">
+                <div className="flex h-5.5 w-5.5 min-[390px]:h-6 min-[390px]:w-6 sm:h-7.5 sm:w-7.5 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br from-sky-500/15 to-emerald-500/20 text-sky-700 ring-1 ring-sky-400/30">
+                  <Sparkles className="h-2.5 w-2.5 min-[390px]:h-3 min-[390px]:w-3 sm:h-3.5 sm:w-3.5 text-emerald-600" />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[8.5px] min-[360px]:text-[9px] min-[380px]:text-[9.5px] min-[410px]:text-[10.5px] sm:text-[12.5px] font-bold text-slate-900 leading-snug whitespace-nowrap">
+                <div>
+                  <p className="text-[7.5px] min-[360px]:text-[8px] min-[390px]:text-[8.5px] min-[425px]:text-[9px] sm:text-[12.5px] font-bold text-slate-900 leading-snug tracking-tight sm:tracking-normal whitespace-nowrap">
                     Have a project in mind? Build it with NEVOLYN.
                   </p>
-                  <p className="text-[7.5px] min-[360px]:text-[8px] min-[380px]:text-[8.5px] min-[410px]:text-[9.5px] sm:text-[11px] text-slate-600 leading-snug mt-0.5 whitespace-nowrap">
+                  <p className="text-[6.5px] min-[360px]:text-[7px] min-[390px]:text-[7.5px] min-[425px]:text-[8px] sm:text-[11px] text-slate-600 leading-snug tracking-tight sm:tracking-normal mt-0.5 whitespace-nowrap">
                     Custom software, smarter hardware &amp; AI-powered automation.
                   </p>
                 </div>
@@ -111,10 +111,10 @@ export const Hero = (): JSX.Element => {
               <a
                 href="/#contact"
                 onClick={handleConnectClick}
-                className="group inline-flex items-center justify-center gap-1 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 px-2 min-[380px]:px-2.5 sm:px-3.5 py-1 min-[380px]:py-1.5 sm:py-1.5 text-[9px] min-[360px]:text-[9.5px] min-[380px]:text-[10px] sm:text-xs font-bold text-white shadow-sm shadow-emerald-500/20 transition-all duration-200 hover:brightness-105 hover:-translate-y-0.5 active:scale-95 shrink-0 whitespace-nowrap"
+                className="group inline-flex items-center justify-center gap-0.5 sm:gap-1 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 px-2 sm:px-3.5 py-1 sm:py-1.5 text-[8.5px] min-[390px]:text-[9px] sm:text-xs font-bold text-white shadow-sm shadow-emerald-500/20 transition-all duration-200 hover:brightness-105 hover:-translate-y-0.5 active:scale-95 shrink-0 whitespace-nowrap"
               >
                 <span>Get in Touch</span>
-                <ArrowRight className="h-2.5 w-2.5 min-[380px]:h-3 min-[380px]:w-3 sm:h-3.5 sm:w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 shrink-0" />
+                <ArrowRight className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 shrink-0" />
               </a>
             </div>
           </motion.div>
