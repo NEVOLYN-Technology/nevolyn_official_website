@@ -5,6 +5,7 @@
  * Rendered in the "Latest News" section within `LatestNewsSection.tsx`.
  *
  * Strictly sorted in reverse chronological order (Newest -> Top, Oldest -> Bottom):
+ * 2026-10-30 — Global Change Award 2027 — Shortlisted (CARE Bangladesh & H&M Foundation)
  * 2026-10-20 — Bangladesh AI Business Summit 2026 — Selected to Showcase (DCCI & MoST)
  * 2026-09-29 — Needle Innovation Challenge 3.0 — Shortlisted (Existing Solutions)
  * 2026-09-14 — Bangladesh Innovation Fair 2026 — Award & Prize Recognition
@@ -49,6 +50,21 @@ export interface NewsItem {
  * Chronological news update feed ordered newest-first with verified NEVOLYN official links.
  */
 export const news: NewsItem[] = [
+  {
+    id: 'news-global-change-award-2027',
+    title: 'Global Change Award 2027 - Shortlisted for Final Presentation & Jury Evaluation',
+    description:
+      'FABINS has been shortlisted for the Global Change Award 2027 Final Presentation and Jury Evaluation, organized by CARE Bangladesh as an official nominator for the H&M Foundation’s Global Change Award.',
+    content:
+      'Another Exciting Milestone for FABINS | Global Change Award 2027! 🌍\n\nWe are delighted to share that FABINS (Fabric Inspection Automation) has been shortlisted for the Global Change Award 2027 Final Presentation and Jury Evaluation, organised by CARE Bangladesh as an official nominator for the H&M Foundation’s Global Change Award.\n\nThe Global Change Award focuses on bold innovations with the potential to accelerate the transition toward a more sustainable and net-zero fashion and textile industry. We are excited to present how FABINS can contribute to more efficient, responsible, and sustainable textile production.\n\n🏆 Shortlisted | Global Change Award 2027\n🏢 Organised by: CARE Bangladesh\n🌍 Award Initiative: H&M Foundation’s Global Change Award\n🎤 Event: Final Presentation and Jury Evaluation\n📅 Date: October 31, 2026\n📍 Venue: CARE Bangladesh Country Office, RAOWA Complex, Mohakhali, Dhaka\n\n🌐 FABINS | Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n🌐 NEVOLYN\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com\n\nFABINS | An Innovation by NEVOLYN',
+    category: 'Global Change Award',
+    date: '2026-10-30',
+    image: '/news_fabinsXgca.jpg',
+    images: ['/news_fabinsXgca.jpg'],
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-globalchangeaward2027-activity-7521916174830538752-Qfz_',
+    facebookUrl: 'https://www.facebook.com/share/p/1DmbkHN5tN/',
+  },
   {
     id: 'news-dcci-ai-summit-2026',
     title: 'Bangladesh AI Business Summit 2026 - Selected to Showcase',

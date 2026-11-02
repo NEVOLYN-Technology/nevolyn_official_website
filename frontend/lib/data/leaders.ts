@@ -172,7 +172,8 @@ export const teamDepartments: Department[] = [
           github: 'https://github.com/rahin11',
           linkedin: 'https://www.linkedin.com/in/rahin-rahman-94a8a0246',
           scholar: 'https://scholar.google.com/citations?user=Jq0HF_kAAAAJ',
-          scholarName: 'Md Rahinur Rahman'
+          scholarName: 'Md Rahinur Rahman',
+          orcid: 'https://orcid.org/0009-0004-8490-2358'
         },
         image: '/rahin-photo.png',
       },
@@ -229,6 +230,31 @@ export const teamDepartments: Department[] = [
           orcid: 'https://orcid.org/0009-0008-1604-8822'
         },
         image: '/afzal-photo.jpg',
+      },
+      {
+        id: 'nomrota',
+        name: 'Mobashira Mehajabin Nomrota',
+        title: 'Innovation and Systems Engineer',
+        bio: 'Contributing to engineering innovation, technical development, and strategic growth at NEVOLYN.',
+        extendedBio: [
+          'Nomrota contributes to research, innovation, and technical development at NEVOLYN, working at the intersection of electrical engineering, emerging technologies, and industrial solutions. Her role also extends to marketing and strategic communication, helping bridge technical innovation with business development and market opportunities.',
+          'She graduated in Electrical and Electronic Engineering (EEE) from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s leading engineering institutions, with a major in Electrical Energy and Power Systems. Her academic foundation provided strong knowledge of electrical power systems, renewable energy, power electronics, and energy conversion, equipping her to approach complex engineering challenges with analytical and practical perspectives.',
+          'Throughout her academic and research journey, she explored renewable energy technologies, indoor photovoltaic energy harvesting, maximum power point tracking (MPPT), and intelligent energy management systems. Beyond her technical background, her leadership experience in university organizations, debating, and volunteering has strengthened her communication, coordination, and problem-solving abilities. She brings together engineering knowledge, creative thinking, and strategic communication to contribute to innovation, technical development, and the broader growth of NEVOLYN.'
+        ],
+        email: 'mehzabinmobashira@gmail.com',
+        responsibilities: [
+          'Lead research, innovation, and technical development initiatives at NEVOLYN',
+          'Explore and develop innovative engineering solutions for industrial applications',
+          'Contribute to electrical systems design, energy solutions, and technology integration',
+          'Support product development, technical research, and process improvement initiatives',
+          'Drive marketing initiatives, brand communication, and strategic business development',
+          'Bridge technical innovation with market opportunities and business growth'
+        ],
+        social: {
+          portfolio: 'https://nomrota.vercel.app/',
+          linkedin: 'https://www.linkedin.com/in/mobashira-meh+ajabin-nomrota-2a39b9325'
+        },
+        image: '/nomrota-photo.jpg',
       }
     ],
   },
