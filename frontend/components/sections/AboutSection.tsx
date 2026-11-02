@@ -111,7 +111,7 @@ export const AboutSection = (): JSX.Element => {
               </div>
 
               <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-600 transition-colors">
-                Hardware &amp; Industrial Automation
+                Hardware Solutions
               </h3>
 
               <p className="text-sm text-slate-600 leading-relaxed mb-6 text-justify">
@@ -146,15 +146,14 @@ export const AboutSection = (): JSX.Element => {
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
-                Software &amp; Website Automation
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors whitespace-nowrap">
+                Software &amp; Web Solutions
               </h3>
 
               <p className="text-sm text-slate-600 leading-relaxed mb-6 text-justify">
                 Developing web platforms, backend services, and live dashboards that automate operations and turn data into decisions.
               </p>
             </div>
-
             <div className="pt-5 border-t border-slate-100 space-y-2.5">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
                 <CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0" />
