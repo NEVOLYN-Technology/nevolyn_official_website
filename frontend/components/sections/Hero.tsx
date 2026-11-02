@@ -2,7 +2,7 @@
  * Hero section component — the primary landing view for NEVOLYN Technology.
  *
  * Cleanly proportioned two-column layout:
- * - **Left**: status pill, 3-color headline, subtitle paragraph, CTA buttons, trust badge
+ * - **Left**: status pill, 3-color headline, CTA buttons, client inquiry callout
  * - **Right**: floating 3D presentation frame with the hero showcase image
  *
  * No data fetching — all content is static. To update copy, edit this file directly.
@@ -14,11 +14,18 @@
 import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { StatusPill } from '@/components/ui/StatusPill'
 import { SECTION_BG } from '@/lib/constants/theme'
+import { scrollToSection } from '@/lib/scroll'
 
 export const Hero = (): JSX.Element => {
+  const handleConnectClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    scrollToSection('contact')
+    window.history.replaceState(null, '', '/#contact')
+  }
+
   return (
     <section className="relative text-slate-900 overflow-hidden pt-14 sm:pt-16 lg:pt-18 pb-10 sm:pb-14">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -85,10 +92,30 @@ export const Hero = (): JSX.Element => {
               </Link>
             </div>
 
-            {/* Enterprise Trust Indicator Badge */}
-            <div className="mt-6 sm:mt-8 inline-flex items-center gap-1.5 sm:gap-2.5 rounded-full border border-blue-300/85 bg-blue-100/65 px-2.5 min-[380px]:px-3.5 sm:px-4.5 py-1.5 sm:py-2 text-[9px] min-[360px]:text-[9.5px] min-[375px]:text-[10px] min-[400px]:text-[11px] sm:text-xs md:text-sm font-medium text-slate-900 shadow-sm backdrop-blur-sm transition-all hover:bg-blue-100/85 hover:border-blue-400 max-w-full tracking-tight whitespace-nowrap">
-              <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-800 shrink-0" />
-              <span className="whitespace-nowrap">Enterprise-grade software engineering and automation solutions.</span>
+            {/* Client Project Inquiry Callout — Scrolls directly to #contact form */}
+            <div className="mt-5 sm:mt-6 w-fit max-w-full rounded-2xl border border-sky-300/75 bg-gradient-to-r from-sky-50/95 via-white/95 to-emerald-50/90 p-2.5 sm:px-3.5 sm:py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-emerald-400/80 hover:shadow-md flex flex-col min-[420px]:flex-row min-[420px]:items-center gap-2 sm:gap-3">
+              <div className="flex items-start min-[420px]:items-center gap-2 sm:gap-2.5 min-w-0">
+                <div className="flex h-7 w-7 sm:h-7.5 sm:w-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500/15 to-emerald-500/20 text-sky-700 ring-1 ring-sky-400/30">
+                  <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11.5px] sm:text-[12.5px] font-bold text-slate-900 leading-snug">
+                    Have a project in mind? Build it with NEVOLYN.
+                  </p>
+                  <p className="text-[10.5px] sm:text-[11px] text-slate-600 leading-snug mt-0.5">
+                    Custom software, smart hardware &amp; AI-powered automation.
+                  </p>
+                </div>
+              </div>
+
+              <a
+                href="/#contact"
+                onClick={handleConnectClick}
+                className="group inline-flex items-center justify-center gap-1 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 px-3 sm:px-3.5 py-1.5 sm:py-1.5 text-[11px] sm:text-xs font-bold text-white shadow-sm shadow-emerald-500/20 transition-all duration-200 hover:brightness-105 hover:-translate-y-0.5 active:scale-95 shrink-0 whitespace-nowrap"
+              >
+                <span>Get in Touch</span>
+                <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 shrink-0" />
+              </a>
             </div>
           </motion.div>
 
