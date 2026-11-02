@@ -103,7 +103,7 @@ export const Navbar = (): JSX.Element => {
     let isRafPending = false
     let rafId: number | null = null
 
-    const handleScroll = () => {
+    const updateOnScroll = (syncHash: boolean) => {
       if (isRafPending) return
       isRafPending = true
 
@@ -146,11 +146,25 @@ export const Navbar = (): JSX.Element => {
         }
 
         setActiveSection((prev) => (prev !== current ? current : prev))
+
+        // Keep URL hash in sync with the active section while scrolling
+        if (syncHash) {
+          const expectedHash = current === 'home' ? '' : `#${current}`
+          if (window.location.hash !== expectedHash) {
+            window.history.replaceState(
+              null,
+              '',
+              expectedHash ? `/${expectedHash}` : '/'
+            )
+          }
+        }
       })
     }
 
+    const handleScroll = () => updateOnScroll(true)
+
     window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
+    updateOnScroll(false)
     return () => {
       window.removeEventListener('scroll', handleScroll)
       if (rafId !== null) {
@@ -368,4 +382,3 @@ export const Navbar = (): JSX.Element => {
     </>
   )
 }
-
