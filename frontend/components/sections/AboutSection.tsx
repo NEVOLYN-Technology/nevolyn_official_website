@@ -53,7 +53,7 @@ export const AboutSection = (): JSX.Element => {
               <GradText variant="emerald">Elevate.</GradText>
             </>
           }
-          description="NEVOLYN is delivering AI, software, and hardware automation. We build intelligent, production-ready solutions for industry."
+          description="NEVOLYN builds software and web solutions, hardware solutions, and AI and automation solutions that help industries work faster, smarter, and more reliably."
         />
 
         {/* ── 3 Action Pillars: Innovate · Automate · Elevate (1 col on mobile & vertical iPad, 3 cols on rotated iPad & web) ───────── */}
@@ -211,7 +211,7 @@ export const AboutSection = (): JSX.Element => {
                     Mission Statement
                   </h5>
                   <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-normal">
-                    To build intelligent software and hardware automation that removes bottlenecks, improves efficiency, and delivers measurable industrial value.
+                    To deliver software and web solutions, hardware solutions, and AI-powered automation that remove bottlenecks and create measurable industrial value.
                   </p>
                 </div>
                 <div className="mt-3 text-[10px] sm:text-[11px] font-semibold text-emerald-700 bg-emerald-50/80 px-2.5 py-0.5 rounded-md border border-emerald-100 w-fit">
@@ -283,11 +283,11 @@ export const AboutSection = (): JSX.Element => {
                       AI &amp; Computer Vision
                     </h5>
                     <p className="text-[11.5px] sm:text-xs text-slate-600 leading-relaxed mb-3">
-                      Optical inspection and real-time defect detection.
+                      AI systems that see, learn, and decide, like spotting defects automatically from camera images.
                     </p>
                   </div>
                   <div className="text-[10px] font-semibold text-sky-700 bg-sky-50/80 px-2 py-0.5 rounded-md border border-sky-100 w-fit">
-                    Optical Rigs &bull; Edge Inference
+                    Computer Vision &bull; Machine Learning
                   </div>
                 </div>
 
@@ -301,10 +301,10 @@ export const AboutSection = (): JSX.Element => {
                       <CircuitBoard className="w-4 h-4 text-emerald-500 group-hover/card:scale-110 transition-transform" />
                     </div>
                     <h5 className="text-xs sm:text-sm font-bold text-slate-900 mb-1">
-                      Hardware Automation
+                      Hardware Solutions
                     </h5>
                     <p className="text-[11.5px] sm:text-xs text-slate-600 leading-relaxed mb-3">
-                      Microcontrollers, PLCs, and automated sorting hardware.
+                      Machines and control electronics, from sensors and microcontrollers to PLC-based automatic sorting.
                     </p>
                   </div>
                   <div className="text-[10px] font-semibold text-emerald-700 bg-emerald-50/80 px-2 py-0.5 rounded-md border border-emerald-100 w-fit">
@@ -322,10 +322,10 @@ export const AboutSection = (): JSX.Element => {
                       <Code2 className="w-4 h-4 text-indigo-500 group-hover/card:scale-110 transition-transform" />
                     </div>
                     <h5 className="text-xs sm:text-sm font-bold text-slate-900 mb-1">
-                      Software Automation
+                      Software &amp; Web Solutions
                     </h5>
                     <p className="text-[11.5px] sm:text-xs text-slate-600 leading-relaxed mb-3">
-                      Spring Boot APIs, Next.js apps, and cloud systems.
+                      Websites, web apps, and backend systems that run your business online, hosted in the cloud.
                     </p>
                   </div>
                   <div className="text-[10px] font-semibold text-indigo-700 bg-indigo-50/80 px-2 py-0.5 rounded-md border border-indigo-100 w-fit">
@@ -338,19 +338,19 @@ export const AboutSection = (): JSX.Element => {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-mono text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-100 uppercase">
-                        INDUSTRIAL
+                        AUTOMATION
                       </span>
                       <Cpu className="w-4 h-4 text-purple-500 group-hover/card:scale-110 transition-transform" />
                     </div>
                     <h5 className="text-xs sm:text-sm font-bold text-slate-900 mb-1">
-                      Industrial Solutions
+                      Industrial Automation
                     </h5>
                     <p className="text-[11.5px] sm:text-xs text-slate-600 leading-relaxed mb-3">
-                      Custom machinery and edge AI built for factory floors.
+                      Automated systems for factories that cut manual work and speed up production.
                     </p>
                   </div>
                   <div className="text-[10px] font-semibold text-purple-700 bg-purple-50/80 px-2 py-0.5 rounded-md border border-purple-100 w-fit">
-                    Proprietary Machinery &bull; Edge AI
+                    Factory Automation &bull; Custom Machines
                   </div>
                 </div>
               </div>
