@@ -68,6 +68,7 @@ spring:
     # instead of attempting to re-create those tables and failing.
     baseline-on-migrate: true
     baseline-version: 0
+    validate-on-migrate: ${FLYWAY_VALIDATE_ON_MIGRATE:false}
 
   jpa:
     # Dialect is intentionally NOT set: Hibernate detects it from the live
