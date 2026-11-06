@@ -1,0 +1,107 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.nevolyn'
+version = '2.0.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // ── Spring Boot Starters ───────────────────────────────────
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // ── OpenAPI / Swagger UI ───────────────────────────────────
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
+    // ── Database ───────────────────────────────────────────────
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+
+    // ── JWT ────────────────────────────────────────────────────
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // ── Mapping ────────────────────────────────────────────────
+    implementation 'org.mapstruct:mapstruct:1.6.2'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
+
+    // ── Observability ──────────────────────────────────────────
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+
+    // ── Utilities ─────────────────────────────────────────────
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // ── Dev Tools ─────────────────────────────────────────────
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // ── Testing ────────────────────────────────────────────────
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.mockito:mockito-core'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:1.20.1"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// Automatically load .env file from project root into bootRun environment
+tasks.named('bootRun') {
+    File envFile = file('../.env')
+    if (!envFile.exists()) {
+        envFile = file('.env')
+    }
+    if (envFile.exists()) {
+        envFile.eachLine { line ->
+            line = line.trim()
+            if (line && !line.startsWith('#') && line.contains('=')) {
+                def parts = line.split('=', 2)
+                if (parts.length == 2) {
+                    environment parts[0].trim(), parts[1].trim()
+                }
+            }
+        }
+    }
+}
+
+// Ensure MapStruct processors run before Lombok
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+        '-Amapstruct.defaultComponentModel=spring',
+        '-Amapstruct.unmappedTargetPolicy=IGNORE'
+    ]
+}
+

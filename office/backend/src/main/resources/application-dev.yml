@@ -1,0 +1,39 @@
+# ─────────────────────────────────────────────────────────────
+# application-dev.yml — Local Development Profile
+# Uses: Docker PostgreSQL (localhost:5432)
+# ─────────────────────────────────────────────────────────────
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/nevolyn_office_management}
+    username: ${SPRING_DATASOURCE_USERNAME:nevolyn}
+    password: ${SPRING_DATASOURCE_PASSWORD:nevolyn_dev_password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: NevelynDevPool
+      maximum-pool-size: 5
+      minimum-idle: 2
+      idle-timeout: 300000
+      connection-timeout: 20000
+
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev-migration
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    com.nevolyn: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:3001}
+  jwt:
+    cookie-secure: false   # HTTP allowed in dev
+  security:
+    allowed-local-prefixes: 192.168.68.,127.0.0.1,::1,0:0:0:0:0:0:0:1,172.16.,172.17.,10.

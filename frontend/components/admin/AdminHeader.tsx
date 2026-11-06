@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { RefreshCw, ExternalLink, LogOut } from 'lucide-react'
+import { RefreshCw, ExternalLink, LogOut, Building2 } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
 
 interface AdminHeaderProps {
@@ -47,6 +47,17 @@ export function AdminHeader({ username, isLoading, onRefresh, onLogout }: AdminH
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-primary' : ''}`} />
           </button>
+
+          <Link
+            href="/office"
+            target="_blank"
+            title="Open NEVOLYN Office & HRM Management Portal"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:text-white px-3 py-1.5 rounded-xl border border-emerald-300/80 bg-gradient-to-r from-emerald-50 to-teal-50/80 hover:from-emerald-500 hover:to-teal-600 hover:border-transparent transition-all shadow-sm"
+          >
+            <Building2 className="w-3.5 h-3.5 shrink-0" />
+            <span>Office Portal</span>
+            <ExternalLink className="w-3 h-3 opacity-80 hidden sm:inline shrink-0" />
+          </Link>
 
           <Link
             href="/"

@@ -5,21 +5,33 @@ frontend/out/
 frontend/.vercel/
 frontend/*.tsbuildinfo
 
+office/frontend/node_modules/
+office/frontend/.next/
+office/frontend/out/
+office/frontend/.vercel/
+office/frontend/*.tsbuildinfo
+
 # ─── Frontend — Environment variables ───────────────────────────────────────────
 # Never commit secrets. Copy .env.example → .env.local to get started.
+.env
 frontend/.env
 frontend/.env.local
 frontend/.env.development.local
 frontend/.env.test.local
 frontend/.env.production.local
+office/frontend/.env*
 
-# ─── Backend — Spring Boot / Maven ──────────────────────────────────────────────
+# ─── Backend — Spring Boot / Maven / Gradle ─────────────────────────────────────
 backend/target/
 backend/.gradle/
 backend/build/
+office/backend/target/
+office/backend/.gradle/
+office/backend/build/
 
 # ─── Backend — Uploaded resumes / files ─────────────────────────────────────────
 backend/uploads/
+office/backend/uploads/
 
 # ─── OS / Editor artifacts ──────────────────────────────────────────────────────
 .DS_Store

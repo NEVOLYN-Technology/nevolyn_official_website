@@ -286,6 +286,30 @@ export const NEVOLYN_CAREER_KEYWORDS = [
   'নেভোলিন জয়েন আস',
 ] as const
 
+/** Comprehensive list of Office, HRM, Employee Login, and Attendance search keywords */
+export const NEVOLYN_OFFICE_KEYWORDS = [
+  'nevolyn office',
+  'office nevolyn',
+  'nevolyn office login',
+  'nevolyn office management',
+  'nevolyn employee login',
+  'nevolyn staff login',
+  'nevolyn staff portal',
+  'nevolyn employee portal',
+  'nevolyn hrm',
+  'nevolyn hr portal',
+  'nevolyn attendance',
+  'nevolyn attendance login',
+  'nevolyn work log',
+  'nevolyn portal',
+  'nevolyn.com/office',
+  'নেভোলিন অফিস',
+  'নেভোলিন অফিস লগইন',
+  'নেভোলিন এমপ্লয়ী লগইন',
+  'নেভোলিন অফিস পোর্টাল',
+  'নেভোলিন অ্যাটেনডেন্স',
+] as const
+
 /** Careers / Join Us page SEO configuration */
 export const NEVOLYN_CAREERS_SEO = {
   title: 'Careers | NEVOLYN',
@@ -315,6 +339,9 @@ export const NEVOLYN_SEO_CONFIG = {
 
     // ── Career & Job Search Queries ──
     ...NEVOLYN_CAREER_KEYWORDS,
+
+    // ── Office, HRM & Employee Portal Search Queries ──
+    ...NEVOLYN_OFFICE_KEYWORDS,
 
     // ── Core Industry & Engineering Domains ──
     'Industrial Automation',
@@ -376,8 +403,8 @@ export const NEVOLYN_SEO_CONFIG = {
 } as const
 
 /**
- * Schema.org structured data (JSON-LD) establishing NEVOLYN as the parent organization
- * and FABINS as its product & subOrganization.
+ * Schema.org structured data (JSON-LD) establishing NEVOLYN as the parent organization,
+ * FABINS as its product & subOrganization, and NEVOLYN Office as its employee & HRM portal.
  */
 export const nevolynJsonLd = {
   '@context': 'https://schema.org',
@@ -455,6 +482,30 @@ export const nevolynJsonLd = {
         '@id': `${NEVOLYN_SEO_CONFIG.siteUrl}/#organization`,
       },
     },
+    {
+      '@type': 'WebPage',
+      '@id': `${NEVOLYN_SEO_CONFIG.siteUrl}/office#webpage`,
+      url: `${NEVOLYN_SEO_CONFIG.siteUrl}/office`,
+      name: 'NEVOLYN Office — Employee Login, HRM & Operations Portal',
+      alternateName: [
+        'NEVOLYN Office',
+        'NEVOLYN Office Login',
+        'NEVOLYN Office Management',
+        'NEVOLYN Employee Portal',
+        'NEVOLYN HRM',
+        'নেভোলিন অফিস',
+        'নেভোলিন অফিস লগইন',
+      ],
+      description:
+        'Official employee login, attendance, HRM, project portfolio, and daily operations portal for NEVOLYN Technology.',
+      isPartOf: {
+        '@id': `${NEVOLYN_SEO_CONFIG.siteUrl}/#website`,
+      },
+      about: {
+        '@id': `${NEVOLYN_SEO_CONFIG.siteUrl}/#organization`,
+      },
+      inLanguage: ['en', 'bn'],
+    },
   ],
 }
 
@@ -468,6 +519,7 @@ export const adminSiteMetadata: Metadata = {
     'Official administrative login and operational control center for NEVOLYN Technology. Manage job applications, candidate CV dossiers, and business inquiries.',
   keywords: [
     ...NEVOLYN_BRAND_ALIASES,
+    ...NEVOLYN_OFFICE_KEYWORDS,
     'nevolyn admin',
     'nevolyn admin login',
     'nevolyn operations portal',
@@ -541,4 +593,3 @@ export function buildAdminSchemaGraph() {
     ],
   }
 }
-

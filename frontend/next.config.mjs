@@ -94,6 +94,16 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
 ]
 
+/**
+ * Internal origin for the NEVOLYN Office & HRM Management frontend service.
+ * Defaults to http://localhost:3001 locally and http://office-frontend:3000 in Docker Compose.
+ */
+const officeFrontendOrigin = (
+  process.env.OFFICE_FRONTEND_URL ??
+  process.env.NEXT_PUBLIC_OFFICE_URL ??
+  'http://localhost:3001'
+).replace(/\/+$/, '')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -102,25 +112,9 @@ const nextConfig = {
   },
 
   /**
-   * TypeScript build errors.
-   *
-   * IMPORTANT: `ignoreBuildErrors` is intentionally disabled so that
-   * TypeScript errors surface at build time. Do NOT re-enable this flag
-   * — fix the underlying type error instead.
-   *
-   * If you need to temporarily bypass during a hotfix, re-add:
-   *   typescript: { ignoreBuildErrors: true }
-   * and open a follow-up issue immediately.
-   */
-
-  /**
    * Emits `.next/standalone` — a self-contained server bundle with only the
    * dependencies actually imported, which is what frontend/Dockerfile copies
-   * into its runtime stage. Without this the Docker build fails outright,
-   * because that directory is never produced.
-   *
-   * Harmless on Vercel: the platform uses its own build output pipeline and
-   * ignores this setting.
+   * into its runtime stage.
    */
   output: 'standalone',
 
@@ -132,9 +126,6 @@ const nextConfig = {
 
   /**
    * Applies the security headers above to every route.
-   *
-   * NOTE: `headers()` has no effect on a fully static export. It works here
-   * because the site is served by Vercel's Next.js runtime.
    */
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }]
@@ -149,6 +140,24 @@ const nextConfig = {
     'localhost:3000',
     '127.0.0.1:3000',
   ],
+
+  /**
+   * Multi-Zone Reverse Proxy for NEVOLYN Office & HRM Management (/office).
+   * Keeps everything strictly under https://nevolyn.com/office/* while forwarding
+   * internally to the office-frontend container/process.
+   */
+  async rewrites() {
+    return [
+      {
+        source: '/office',
+        destination: `${officeFrontendOrigin}/office`,
+      },
+      {
+        source: '/office/:path*',
+        destination: `${officeFrontendOrigin}/office/:path*`,
+      },
+    ]
+  },
 
   /**
    * Automatic SEO redirects for career and vacancy search paths (NEVOLYN & FABINS).
