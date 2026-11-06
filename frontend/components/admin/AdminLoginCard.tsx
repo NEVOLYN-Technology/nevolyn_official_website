@@ -68,9 +68,9 @@ export function AdminLoginCard({
                 <Lock className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-base font-bold text-foreground">Administrator Access</h1>
+                <h1 className="text-base font-bold text-foreground">Super Admin Access</h1>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  NEVOLYN Executive Dashboard — Restricted Area
+                  NEVOLYN Executive Dashboard — Super Admin Restricted
                 </p>
               </div>
             </div>
@@ -81,7 +81,7 @@ export function AdminLoginCard({
             {/* Username */}
             <div className="space-y-1.5">
               <label htmlFor="admin-username" className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">
-                Username
+                Super Admin Username / ID
               </label>
               <div className="relative">
                 <User className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -91,7 +91,7 @@ export function AdminLoginCard({
                   autoComplete="username"
                   value={authInput.username}
                   onChange={(e) => setAuthInput({ ...authInput, username: e.target.value })}
-                  placeholder="admin"
+                  placeholder="Enter Super Admin username or Employee ID"
                   className="w-full pl-10 pr-4 py-2.5 bg-input border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                   required
                 />

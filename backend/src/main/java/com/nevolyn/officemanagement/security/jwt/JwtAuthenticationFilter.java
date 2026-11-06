@@ -1,13 +1,15 @@
 package com.nevolyn.officemanagement.security.jwt;
 
+import com.nevolyn.officemanagement.auth.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,32 +21,33 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
-/**
- * JWT authentication filter.
- *
- * <p>Reads the JWT token from:
- * <ol>
- *   <li>HTTP-only cookie named {@code nevolyn_access_token} (primary — browser clients)</li>
- *   <li>Authorization: Bearer header (fallback — Swagger UI, API clients)</li>
- * </ol>
- *
- * <p>On a valid token, populates the Spring Security context with the session-specific
- * authorities embedded in the token (reflecting whether the user logged in with their
- * Super Admin password, Admin password, or individual Employee password).
- */
-@Slf4j
+// JWT and HTTP Basic authentication filter for Office Management and Admin Operations portals.
 @Component
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
+    private final AuthService authService;
 
     @Value("${app.jwt.cookie-name:nevolyn_access_token}")
     private String cookieName;
+
+    public JwtAuthenticationFilter(
+            JwtTokenProvider jwtTokenProvider,
+            UserDetailsService userDetailsService,
+            @Lazy AuthService authService
+    ) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
+        this.authService = authService;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -100,9 +103,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.debug("Authenticated user '{}' via JWT with activeRole='{}'", username, activeRole);
             }
+        } else {
+            // Check for HTTP Basic credentials (used by /admin Operations Dashboard)
+            UsernamePasswordAuthenticationToken basicAuth = tryAuthenticateBasicHeader(request);
+            if (basicAuth != null) {
+                basicAuth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(basicAuth);
+                log.debug("Authenticated admin user '{}' via HTTP Basic", basicAuth.getName());
+            }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private UsernamePasswordAuthenticationToken tryAuthenticateBasicHeader(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (!StringUtils.hasText(header) || !header.regionMatches(true, 0, "Basic ", 0, 6)) {
+            return null;
+        }
+        try {
+            String base64Token = header.substring(6).trim();
+            byte[] decodedBytes = Base64.getDecoder().decode(base64Token);
+            String credentials = new String(decodedBytes, StandardCharsets.UTF_8);
+            int delim = credentials.indexOf(':');
+            if (delim < 0) {
+                return null;
+            }
+            String username = credentials.substring(0, delim);
+            String password = credentials.substring(delim + 1);
+            return authService.authenticateBasicHeader(username, password);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     private String extractTokenFromCookie(HttpServletRequest request) {

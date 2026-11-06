@@ -58,15 +58,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
-      NEVOLYN_ADMIN_USERNAME: ${NEVOLYN_ADMIN_USERNAME:-${ADMIN_USERNAME:-admin}}
-      NEVOLYN_ADMIN_PASSWORD: ${NEVOLYN_ADMIN_PASSWORD:-${ADMIN_PASSWORD:-}}
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-${ALLOWED_ORIGINS:-http://localhost:3000,https://nevolyn.com,https://www.nevolyn.com}}
       APP_BACKEND_URL: ${APP_BACKEND_URL:-${NEVOLYN_BACKEND_URL:-http://localhost:8080}}
       APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:3000}
       SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-mail.nevolyn.com}
       SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-465}
       SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-info@nevolyn.com}
-      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
       SPRING_MAIL_FROM: ${SPRING_MAIL_FROM:-${APP_EMAIL_FROM:-info@nevolyn.com}}
       APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-${NEVOLYN_ADMIN_ADDRESS:-info@nevolyn.com}}
       APP_EMAIL_FROM: ${APP_EMAIL_FROM:-${SPRING_MAIL_FROM:-info@nevolyn.com}}
@@ -74,7 +71,7 @@ services:
       FILE_UPLOAD_DIR: /app/uploads/office
       JWT_SECRET: ${OFFICE_JWT_SECRET:-${JWT_SECRET:-}}
       APP_JWT_SECRET: ${JWT_SECRET:-${OFFICE_JWT_SECRET:-}}
-      # ── Shared Role-Tier Passwords & Personnel Bootstrap Accounts
+      # ── Shared Role-Tier Passwords, Mail Password & Personnel Bootstrap Accounts
       #    are loaded directly via `env_file: - .env` above.
     ports:
       - "${BACKEND_PORT:-8080}:8080"

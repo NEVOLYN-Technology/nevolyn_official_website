@@ -94,15 +94,30 @@ export const API_BASE_URL: string = (() => {
 })()
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Auth header
+// Auth header & resilient request helper (proxies via /office/api/backend first)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getAuthHeader(credentials: AdminCredentials): string {
   const token =
     typeof window !== 'undefined'
-      ? window.btoa(`${credentials.username}:${credentials.password}`)
-      : Buffer.from(`${credentials.username}:${credentials.password}`).toString('base64')
+      ? window.btoa(`${credentials.username.trim()}:${credentials.password}`)
+      : Buffer.from(`${credentials.username.trim()}:${credentials.password}`).toString('base64')
   return `Basic ${token}`
+}
+
+async function adminFetch(subPath: string, init: RequestInit): Promise<Response> {
+  const normalizedPath = subPath.startsWith('/') ? subPath : `/${subPath}`
+  if (typeof window !== 'undefined') {
+    try {
+      const res = await fetch(`/office/api/backend${normalizedPath}`, init)
+      if (res.status !== 502 && res.status !== 503 && res.status !== 504) {
+        return res
+      }
+    } catch {
+      // Fall back to direct /api/v1 path below
+    }
+  }
+  return fetch(`${API_BASE_URL}/api/v1${normalizedPath}`, init)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -111,7 +126,7 @@ function getAuthHeader(credentials: AdminCredentials): string {
 
 export async function verifyAdminCredentials(credentials: AdminCredentials): Promise<boolean> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/admin/stats`, {
+    const res = await adminFetch('/admin/stats', {
       headers: {
         Authorization: getAuthHeader(credentials),
         Accept: 'application/json',
@@ -128,7 +143,7 @@ export async function verifyAdminCredentials(credentials: AdminCredentials): Pro
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function fetchAdminStats(credentials: AdminCredentials): Promise<AdminStats> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/admin/stats`, {
+  const res = await adminFetch('/admin/stats', {
     headers: { Authorization: getAuthHeader(credentials), Accept: 'application/json' },
   })
   if (!res.ok) throw new Error(`Failed to fetch stats: HTTP ${res.status}`)
@@ -150,8 +165,8 @@ export async function fetchInquiries(
   query.set('size', String(params?.size ?? 100))
   if (params?.sort) query.set('sort', params.sort)
 
-  const url = `${API_BASE_URL}/api/v1/admin/contact-inquiries${query.size ? `?${query}` : ''}`
-  const res = await fetch(url, {
+  const url = `/admin/contact-inquiries${query.size ? `?${query}` : ''}`
+  const res = await adminFetch(url, {
     headers: { Authorization: getAuthHeader(credentials), Accept: 'application/json' },
   })
   if (!res.ok) throw new Error(`Failed to fetch inquiries: HTTP ${res.status}`)
@@ -163,7 +178,7 @@ export async function updateInquiryStatus(
   id: number,
   newStatus: InquiryRecord['status']
 ): Promise<InquiryRecord> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/admin/contact-inquiries/${id}/status`, {
+  const res = await adminFetch(`/admin/contact-inquiries/${id}/status`, {
     method: 'PATCH',
     headers: {
       Authorization: getAuthHeader(credentials),
@@ -177,7 +192,7 @@ export async function updateInquiryStatus(
 }
 
 export async function deleteInquiry(credentials: AdminCredentials, id: number): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/admin/contact-inquiries/${id}`, {
+  const res = await adminFetch(`/admin/contact-inquiries/${id}`, {
     method: 'DELETE',
     headers: { Authorization: getAuthHeader(credentials) },
   })
@@ -199,8 +214,8 @@ export async function fetchApplications(
   query.set('size', String(params?.size ?? 100))
   if (params?.sort) query.set('sort', params.sort)
 
-  const url = `${API_BASE_URL}/api/v1/admin/applications${query.size ? `?${query}` : ''}`
-  const res = await fetch(url, {
+  const url = `/admin/applications${query.size ? `?${query}` : ''}`
+  const res = await adminFetch(url, {
     headers: { Authorization: getAuthHeader(credentials), Accept: 'application/json' },
   })
   if (!res.ok) throw new Error(`Failed to fetch applications: HTTP ${res.status}`)
@@ -213,7 +228,7 @@ export async function updateApplicationStatus(
   newStatus: ApplicationRecord['selectionStatus'],
   reviewNotes?: string
 ): Promise<ApplicationRecord> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/admin/applications/${id}/status`, {
+  const res = await adminFetch(`/admin/applications/${id}/status`, {
     method: 'PATCH',
     headers: {
       Authorization: getAuthHeader(credentials),
@@ -227,7 +242,7 @@ export async function updateApplicationStatus(
 }
 
 export async function deleteApplication(credentials: AdminCredentials, id: number): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/api/v1/admin/applications/${id}`, {
+  const res = await adminFetch(`/admin/applications/${id}`, {
     method: 'DELETE',
     headers: { Authorization: getAuthHeader(credentials) },
   })
@@ -236,6 +251,6 @@ export async function deleteApplication(credentials: AdminCredentials, id: numbe
 }
 
 export function getApplicationPdfDownloadUrl(applicationId: string): string {
-  return `${API_BASE_URL}/api/v1/applications/${applicationId}/pdf`
+  return `/office/api/backend/applications/${applicationId}/pdf`
 }
 

@@ -13,14 +13,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.List;
+import java.util.Optional;
 
-// Authentication business logic supporting role-tiered password login.
+// Authentication business logic supporting role-tiered password login and Super Admin Basic Auth.
 @Service
 public class AuthService {
 
@@ -55,9 +60,7 @@ public class AuthService {
         String identifier = request.username() != null ? request.username().trim() : "";
         String rawPassword = request.password() != null ? request.password() : "";
 
-        User user = userRepository.findByUsername(identifier.toLowerCase())
-                .or(() -> userRepository.findByEmployeeId(identifier.toLowerCase()))
-                .or(() -> userRepository.findByEmployeeId(identifier))
+        User user = findUserByIdentifier(identifier)
                 .orElseThrow(() -> new BadCredentialsException("Invalid username/Employee ID or password."));
 
         if (!user.isActive()) {
@@ -67,7 +70,7 @@ public class AuthService {
         String activeRole;
         String grantedAuthorities;
 
-        // 1. Check Super Admin Password (valid for SUPER_ADMIN users)
+        // 1. Check Super Admin Password (valid strictly for SUPER_ADMIN users)
         if (user.getRole() == User.UserRole.super_admin
                 && matchesSharedTierPassword(superAdminSharedPassword, rawPassword)) {
             activeRole = "super_admin";
@@ -113,6 +116,53 @@ public class AuthService {
 
         log.info("User '{}' logged in as '{}' from IP: {}", user.getUsername(), activeRole, clientIp);
         return new AuthResult(LoginResponse.from(user, token, activeRole), token);
+    }
+
+    // Authenticate HTTP Basic credentials for the /admin Website Operations Dashboard.
+    // Strictly allows ONLY active SUPER_ADMIN users (by username or Employee ID)
+    // paired with SUPER_ADMIN_SHARED_PASSWORD.
+    @Transactional(readOnly = true)
+    public UsernamePasswordAuthenticationToken authenticateBasicHeader(String rawIdentifier, String rawPassword) {
+        if (rawIdentifier == null || rawIdentifier.isBlank() || rawPassword == null || rawPassword.isBlank()) {
+            return null;
+        }
+        String identifier = rawIdentifier.trim();
+        Optional<User> maybeUser = findUserByIdentifier(identifier);
+
+        if (maybeUser.isEmpty()) {
+            return null;
+        }
+
+        User user = maybeUser.get();
+        if (!user.isActive() || user.getRole() != User.UserRole.super_admin) {
+            return null;
+        }
+
+        if (!matchesSharedTierPassword(superAdminSharedPassword, rawPassword)) {
+            return null;
+        }
+
+        List<SimpleGrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"),
+                new SimpleGrantedAuthority("ROLE_ADMIN"),
+                new SimpleGrantedAuthority("ROLE_EMPLOYEE")
+        );
+        UserDetails principal = org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password("")
+                .authorities(authorities)
+                .build();
+        return new UsernamePasswordAuthenticationToken(principal, null, authorities);
+    }
+
+    private Optional<User> findUserByIdentifier(String identifier) {
+        if (identifier == null || identifier.isBlank()) {
+            return Optional.empty();
+        }
+        String normalized = identifier.trim();
+        return userRepository.findByUsername(normalized.toLowerCase())
+                .or(() -> userRepository.findByEmployeeId(normalized.toLowerCase()))
+                .or(() -> userRepository.findByEmployeeId(normalized));
     }
 
     // Get the authenticated user's profile with their active session role.
@@ -198,7 +248,20 @@ public class AuthService {
             return true;
         }
         String unescapedSecret = cleanSecret.replace("$$", "$");
-        return constantTimeEquals(unescapedSecret, rawPassword) || constantTimeEquals(unescapedSecret, trimmedInput);
+        if (constantTimeEquals(unescapedSecret, rawPassword) || constantTimeEquals(unescapedSecret, trimmedInput)) {
+            return true;
+        }
+        // Handle the case where Docker Compose variable interpolation stripped an unescaped $VAR segment
+        // from the .env value when injecting into the container environment.
+        if (cleanSecret.length() >= 10 && trimmedInput.contains("$")) {
+            String dockerInterpolatedInput = trimmedInput.replaceAll("\\$[A-Za-z_][A-Za-z0-9_]*", "");
+            if (!dockerInterpolatedInput.isEmpty()
+                    && (constantTimeEquals(cleanSecret, dockerInterpolatedInput)
+                        || constantTimeEquals(unescapedSecret, dockerInterpolatedInput))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean matchesEmployeePassword(User user, String rawPassword) {
@@ -232,5 +295,21 @@ public class AuthService {
     }
 
     // Simple value container for login result.
-    public record AuthResult(LoginResponse user, String token) {}
+    public static final class AuthResult {
+        private final LoginResponse user;
+        private final String token;
+
+        public AuthResult(LoginResponse user, String token) {
+            this.user = user;
+            this.token = token;
+        }
+
+        public LoginResponse user() {
+            return user;
+        }
+
+        public String token() {
+            return token;
+        }
+    }
 }
