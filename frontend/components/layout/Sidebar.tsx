@@ -102,7 +102,9 @@ export function Sidebar() {
           const Icon = link.icon;
           const isActive =
             pathname === link.href ||
-            (link.href !== "/office/dashboard" && pathname.startsWith(link.href));
+            (link.href !== "/office/dashboard" &&
+              link.href !== "/office/attendance" &&
+              pathname.startsWith(`${link.href}/`));
 
           return (
             <NextLink
