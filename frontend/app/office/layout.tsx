@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { OfficeProviders } from "./providers";
 
 export const metadata: Metadata = {
-  title: "NEVOLYN Office",
+  title: {
+    absolute: "NEVOLYN Office",
+  },
   description:
     "Official NEVOLYN Technology Office Management, HRM, R&D Project Tracking, and Attendance Portal.",
 };

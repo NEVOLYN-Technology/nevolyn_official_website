@@ -74,24 +74,8 @@ services:
       FILE_UPLOAD_DIR: /app/uploads/office
       JWT_SECRET: ${OFFICE_JWT_SECRET:-${JWT_SECRET:-}}
       APP_JWT_SECRET: ${JWT_SECRET:-${OFFICE_JWT_SECRET:-}}
-      # ── Shared Role-Tier Passwords (SUPER_ADMIN & ADMIN login tiers) ──
-      SUPER_ADMIN_SHARED_PASSWORD: ${SUPER_ADMIN_SHARED_PASSWORD:-}
-      ADMIN_SHARED_PASSWORD: ${ADMIN_SHARED_PASSWORD:-}
-      # ── 1. Md Rahinur Rahman (SUPER_ADMIN + ADMIN + EMPLOYEE) ──
-      SUPER_ADMIN_1_USERNAME: ${SUPER_ADMIN_1_USERNAME:-rahinrahman}
-      SUPER_ADMIN_1_FULL_NAME: ${SUPER_ADMIN_1_FULL_NAME:-Md Rahinur Rahman}
-      SUPER_ADMIN_1_EMPLOYEE_ID: ${SUPER_ADMIN_1_EMPLOYEE_ID:-nev_rahinrahman_2026-01-15}
-      SUPER_ADMIN_1_DESIGNATION: ${SUPER_ADMIN_1_DESIGNATION:-Founder & AI Systems Engineer}
-      # ── 2. Mohammad Ninad Mahmud Nobo (SUPER_ADMIN + ADMIN + EMPLOYEE) ──
-      SUPER_ADMIN_2_USERNAME: ${SUPER_ADMIN_2_USERNAME:-mninadmnobo}
-      SUPER_ADMIN_2_FULL_NAME: ${SUPER_ADMIN_2_FULL_NAME:-Mohammad Ninad Mahmud Nobo}
-      SUPER_ADMIN_2_EMPLOYEE_ID: ${SUPER_ADMIN_2_EMPLOYEE_ID:-nev_mninadmnobo_2026-07-01}
-      SUPER_ADMIN_2_DESIGNATION: ${SUPER_ADMIN_2_DESIGNATION:-Co-Founder & AI Software Engineer}
-      # ── 3. Afzal Hossan (ADMIN + EMPLOYEE) ──
-      ADMIN_3_USERNAME: ${ADMIN_3_USERNAME:-afzalhossan}
-      ADMIN_3_FULL_NAME: ${ADMIN_3_FULL_NAME:-Afzal Hossan}
-      ADMIN_3_EMPLOYEE_ID: ${ADMIN_3_EMPLOYEE_ID:-nev_afzalhossan_2026-11-01}
-      ADMIN_3_DESIGNATION: ${ADMIN_3_DESIGNATION:-AI Software Engineer}
+      # ── Shared Role-Tier Passwords & Personnel Bootstrap Accounts
+      #    are loaded directly via `env_file: - .env` above.
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     volumes:
@@ -121,6 +105,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      OFFICE_BACKEND_API_URL: http://backend:8080/api/v1
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-${NEXT_PUBLIC_API_BASE_URL:-https://nevolyn.com/api/v1}}
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-${NEXT_PUBLIC_API_URL:-https://nevolyn.com/api/v1}}
     ports:

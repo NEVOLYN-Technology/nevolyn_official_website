@@ -3,7 +3,9 @@ import { adminSiteMetadata, buildAdminSchemaGraph } from '@/lib/seo/config'
 
 export const metadata: Metadata = {
   ...adminSiteMetadata,
-  title: 'NEVOLYN ADMIN',
+  title: {
+    absolute: 'NEVOLYN ADMIN',
+  },
 }
 
 const adminSchemaGraph = buildAdminSchemaGraph()

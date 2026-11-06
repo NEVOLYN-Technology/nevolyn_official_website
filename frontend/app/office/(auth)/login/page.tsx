@@ -132,7 +132,7 @@ export default function LoginPage() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/90 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 transition-all text-sm font-medium shadow-2xs"
-                    placeholder="e.g. rahinrahman or nev_rahinrahman_2026-01-15"
+                    placeholder="Enter username or Employee ID"
                   />
                 </div>
                 {fieldErrors.username && (

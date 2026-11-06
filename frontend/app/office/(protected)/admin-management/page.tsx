@@ -114,7 +114,7 @@ function CreateAdminModal({ onClose, onSuccess }: { onClose: () => void; onSucce
 
         <div className="grid grid-cols-2 gap-4 text-xs">
           {field("Employee ID", "employeeId", "text", "nev_<username>_<YYYY-MM-DD>")}
-          {field("Username", "username", "text", "e.g. afzalhossan")}
+          {field("Username", "username", "text", "Enter username")}
           <div className="col-span-2">
             {field("Full Name", "fullName", "text", "e.g. John Doe")}
           </div>

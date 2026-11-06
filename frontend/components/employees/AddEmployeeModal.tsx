@@ -92,7 +92,7 @@ export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) 
             <input
               type="text"
               required
-              placeholder="e.g. nomrota"
+              placeholder="Enter username"
               value={formData.username}
               onChange={(e) => {
                 const nextUsername = e.target.value;

@@ -31,7 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Finds a user by organizational employee ID code.
      *
-     * @param employeeId corporate employee identifier (e.g. "nev_rahinrahman_2026-01-15")
+     * @param employeeId corporate employee identifier (e.g. "nev_username_2026-01-01")
      * @return an {@link Optional} containing the user if found
      */
     Optional<User> findByEmployeeId(String employeeId);

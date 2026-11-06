@@ -141,19 +141,6 @@ const nextConfig = {
   ],
 
   /**
-   * API Proxy for NEVOLYN Office & HRM Management (/office/api/backend/*).
-   * All /office/* UI pages are served natively by this Next.js application.
-   */
-  async rewrites() {
-    return [
-      {
-        source: '/office/api/backend/:path*',
-        destination: `${officeBackendApiUrl}/:path*`,
-      },
-    ]
-  },
-
-  /**
    * Automatic SEO redirects for career and vacancy search paths (NEVOLYN & FABINS).
    */
   async redirects() {

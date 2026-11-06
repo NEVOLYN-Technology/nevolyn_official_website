@@ -26,10 +26,13 @@ const resolveApiBaseUrl = (): string => {
   if (process.env.NEXT_PUBLIC_OFFICE_API_URL) {
     return process.env.NEXT_PUBLIC_OFFICE_API_URL;
   }
+  if (typeof window !== "undefined") {
+    return "/office/api/backend";
+  }
   const raw =
     process.env.NEXT_PUBLIC_API_URL ??
     process.env.NEXT_PUBLIC_API_BASE_URL ??
-    (typeof window !== "undefined" ? window.location.origin : "http://localhost:8080");
+    "http://localhost:8080";
   const normalized = raw.trim().replace(/\/+$/, "").replace(/\/api\/v1$/, "");
   return `${normalized}/api/v1`;
 };
@@ -69,17 +72,36 @@ async function request<T>(
     }
   }
 
-  const res = await fetch(url, {
+  const serializedBody =
+    body === undefined
+      ? undefined
+      : isFormData
+        ? (body as FormData)
+        : JSON.stringify(body);
+
+  let res = await fetch(url, {
     method,
     headers,
     credentials: "include",
-    body:
-      body === undefined
-        ? undefined
-        : isFormData
-          ? (body as FormData)
-          : JSON.stringify(body),
+    body: serializedBody,
   });
+
+  if (
+    (res.status === 502 || res.status === 503 || res.status === 504) &&
+    typeof window !== "undefined" &&
+    baseUrl === "/office/api/backend"
+  ) {
+    const directUrl = `/api/v1${path.startsWith("/") ? "" : "/"}${path}`;
+    const fallbackRes = await fetch(directUrl, {
+      method,
+      headers,
+      credentials: "include",
+      body: serializedBody,
+    }).catch(() => null);
+    if (fallbackRes && fallbackRes.ok) {
+      res = fallbackRes;
+    }
+  }
 
   const contentType = res.headers.get("content-type") || "";
   const parsedData = contentType.includes("application/json")
