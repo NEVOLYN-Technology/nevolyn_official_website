@@ -16,7 +16,7 @@
 import React from 'react'
 import type { JSX } from 'react'
 import Link from 'next/link'
-import { Mail, MapPin, Phone, Compass, ChevronRight, Lock } from 'lucide-react'
+import { Mail, MapPin, Phone, Compass, ChevronRight, Lock, Building2 } from 'lucide-react'
 import { BrandWordmark } from '@/components/ui/BrandWordmark'
 import { CONTACT } from '@/lib/constants/contact'
 import { scrollToSection } from '@/lib/scroll'
@@ -257,10 +257,20 @@ export const Footer = (): JSX.Element => {
             <span>Dhaka, Bangladesh</span>
             <span className="text-slate-300">•</span>
             <Link
+              href="/office/login"
+              rel="nofollow"
+              className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-sky-600 transition-colors font-medium"
+              title="NEVOLYN Office Management & HRM Portal"
+            >
+              <Building2 className="w-3 h-3 text-sky-500" />
+              <span>Office Portal</span>
+            </Link>
+            <span className="text-slate-300">•</span>
+            <Link
               href="/admin"
               rel="nofollow"
               className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-sky-600 transition-colors"
-              title="Operational Staff Portal"
+              title="Website Operations & Applications"
             >
               <Lock className="w-3 h-3 opacity-70" />
               <span>Admin Panel</span>

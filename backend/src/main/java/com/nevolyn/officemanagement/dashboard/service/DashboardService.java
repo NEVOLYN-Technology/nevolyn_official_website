@@ -164,4 +164,32 @@ public class DashboardService {
                 .myWorkLogs(myLogs)
                 .build();
     }
+
+    /**
+     * Compiles a staff member's personalized workspace summary for an administrator.
+     *
+     * <p>Privilege enforcement:
+     * <ul>
+     *   <li>SUPER_ADMIN can view anyone's dashboard (super_admin, admin, employee).</li>
+     *   <li>ADMIN can view employee dashboards only (forbidden to inspect other admins or super_admins).</li>
+     * </ul>
+     *
+     * @param targetUsername the username of the staff member whose dashboard is requested
+     * @param callerUsername the username of the inspecting administrator
+     * @return an {@link EmployeeDashboardDto} populated with the target's work items
+     */
+    @Transactional(readOnly = true)
+    public EmployeeDashboardDto getEmployeeDashboardForCaller(String targetUsername, String callerUsername) {
+        User caller = userRepository.findByUsername(callerUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", callerUsername));
+        User target = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", targetUsername));
+
+        if (!caller.isSuperAdmin() && (target.isSuperAdmin() || target.isAdmin())) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Admins can only inspect employee dashboards, not other administrators.");
+        }
+
+        return getEmployeeDashboard(targetUsername);
+    }
 }

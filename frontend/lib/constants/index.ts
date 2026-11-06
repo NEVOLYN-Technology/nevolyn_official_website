@@ -59,44 +59,44 @@ export const MAX_FILE_SIZE_BYTES = 16 * 1024 * 1024; // 16MB
  */
 export const STATUS_BADGE_STYLES: Record<string, string> = {
   // Common Active / Progress
-  IN_PROGRESS: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  "In Progress": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  IN_PROGRESS: "bg-sky-50 text-sky-700 border-sky-200 font-bold",
+  "In Progress": "bg-sky-50 text-sky-700 border-sky-200 font-bold",
 
   // Success / Concluded
-  COMPLETED: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  Completed: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  CONCLUDED: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  PRESENT: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  Present: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  "On Time": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  COMPLETED: "bg-emerald-50 text-emerald-700 border-emerald-200 font-bold",
+  Completed: "bg-emerald-50 text-emerald-700 border-emerald-200 font-bold",
+  CONCLUDED: "bg-emerald-50 text-emerald-700 border-emerald-200 font-bold",
+  PRESENT: "bg-emerald-50 text-emerald-700 border-emerald-200 font-bold",
+  Present: "bg-emerald-50 text-emerald-700 border-emerald-200 font-bold",
+  "On Time": "bg-emerald-50 text-emerald-700 border-emerald-200 font-bold",
 
   // Pending / Planned / Caution
-  PENDING: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  Pending: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  PLANNED: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  Planned: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  ON_HOLD: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  "On Hold": "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  Late: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  MEDIUM: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  PENDING: "bg-amber-50 text-amber-700 border-amber-200 font-bold",
+  Pending: "bg-amber-50 text-amber-700 border-amber-200 font-bold",
+  PLANNED: "bg-amber-50 text-amber-700 border-amber-200 font-bold",
+  Planned: "bg-amber-50 text-amber-700 border-amber-200 font-bold",
+  ON_HOLD: "bg-amber-50 text-amber-700 border-amber-200 font-bold",
+  "On Hold": "bg-amber-50 text-amber-700 border-amber-200 font-bold",
+  Late: "bg-amber-50 text-amber-700 border-amber-200 font-bold",
+  MEDIUM: "bg-amber-50 text-amber-700 border-amber-200 font-bold",
 
   // Danger / Terminated / High Priority
-  CRITICAL: "bg-red-500/10 text-red-400 border-red-500/20",
-  HIGH: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-  FAILED: "bg-red-500/10 text-red-400 border-red-500/20",
-  CANCELLED: "bg-red-500/10 text-red-400 border-red-500/20",
-  Cancelled: "bg-red-500/10 text-red-400 border-red-500/20",
-  ABSENT: "bg-red-500/10 text-red-400 border-red-500/20",
-  Absent: "bg-red-500/10 text-red-400 border-red-500/20",
+  CRITICAL: "bg-rose-50 text-rose-700 border-rose-200 font-extrabold",
+  HIGH: "bg-rose-50 text-rose-700 border-rose-200 font-bold",
+  FAILED: "bg-rose-50 text-rose-700 border-rose-200 font-bold",
+  CANCELLED: "bg-rose-50 text-rose-700 border-rose-200 font-bold",
+  Cancelled: "bg-rose-50 text-rose-700 border-rose-200 font-bold",
+  ABSENT: "bg-rose-50 text-rose-700 border-rose-200 font-bold",
+  Absent: "bg-rose-50 text-rose-700 border-rose-200 font-bold",
 
   // Neutral / Low
-  LOW: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-  DEFAULT: "bg-slate-800 text-slate-300 border-slate-700",
+  LOW: "bg-slate-100 text-slate-700 border-slate-200 font-semibold",
+  DEFAULT: "bg-slate-100 text-slate-700 border-slate-200 font-semibold",
 };
 
 export const PRIORITY_BADGE_STYLES: Record<string, string> = {
-  CRITICAL: "bg-red-500/10 text-red-400 border-red-500/20 font-bold",
-  HIGH: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-  MEDIUM: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  LOW: "bg-slate-500/10 text-slate-400 border-slate-500/20",
+  CRITICAL: "bg-rose-50 text-rose-700 border-rose-200 font-extrabold",
+  HIGH: "bg-rose-50 text-rose-700 border-rose-200 font-bold",
+  MEDIUM: "bg-amber-50 text-amber-700 border-amber-200 font-bold",
+  LOW: "bg-slate-100 text-slate-700 border-slate-200 font-semibold",
 };

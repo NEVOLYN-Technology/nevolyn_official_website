@@ -155,7 +155,10 @@ export const authApi = {
 // ── Dashboards ────────────────────────────────────────────────
 export const dashboardApi = {
   getAdmin: () => api.get<AdminDashboardData>("/dashboard/admin"),
-  getEmployee: () => api.get<EmployeeDashboardData>("/dashboard/employee"),
+  getEmployee: (username?: string) =>
+    username
+      ? api.get<EmployeeDashboardData>(`/dashboard/employee/${username}`)
+      : api.get<EmployeeDashboardData>("/dashboard/employee"),
 };
 
 // ── Attendance ────────────────────────────────────────────────

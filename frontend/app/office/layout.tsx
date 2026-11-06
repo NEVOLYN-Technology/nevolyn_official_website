@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { OfficeProviders } from "./providers";
 
 export const metadata: Metadata = {
-  title: "NEVOLYN Office Management — R&D Operations & Attendance Portal",
+  title: "NEVOLYN Office",
   description:
     "Official NEVOLYN Technology Office Management, HRM, R&D Project Tracking, and Attendance Portal.",
 };
@@ -13,9 +13,8 @@ export default function OfficeRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="dark min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950">
+    <div className="office-light-portal min-h-screen bg-gradient-to-br from-[#eef4fb] via-[#f5f8fc] to-[#e6f0fa] text-slate-800 antialiased selection:bg-sky-500 selection:text-white relative">
       <OfficeProviders>{children}</OfficeProviders>
     </div>
   );
 }
-

@@ -5,7 +5,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usersApi } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { User } from "@/types";
-import { UserPlus, Edit, KeyRound, Power, Search, Crown, ShieldCheck, Landmark, Mail } from "lucide-react";
+import { UserPlus, Edit, KeyRound, Power, Search, Crown, ShieldCheck, Landmark, Mail, LayoutDashboard } from "lucide-react";
+import NextLink from "next/link";
 import { AddEmployeeModal, EditEmployeeModal, ResetPasswordModal } from "@/components/employees";
 
 /**
@@ -188,6 +189,15 @@ export default function EmployeesPage() {
                       </td>
                       <td className="py-3 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
+                          {(isSuperAdmin || u.role === "employee") && (
+                            <NextLink
+                              href={`/office/dashboard?username=${u.username}`}
+                              title="Inspect Personal Workspace Dashboard"
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 hover:text-cyan-300 transition"
+                            >
+                              <LayoutDashboard className="w-3.5 h-3.5" />
+                            </NextLink>
+                          )}
                           <button
                             onClick={() => setEditingUser(u)}
                             title="Edit Profile & Bank Details"

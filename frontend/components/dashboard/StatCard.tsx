@@ -19,38 +19,47 @@ interface StatCardProps {
 }
 
 /**
- * Metric summary card component displaying an interactive KPI counter with hover transitions and link navigation.
+ * Metric summary card component — Light Glassmorphism 2.0 Edition.
  */
 export function StatCard({ title, value, icon: Icon, color, link }: StatCardProps) {
-  // Map gradient/color to signature left accent stripe
   let stripeClass = "metric-stripe-blue";
-  let textColor = "text-sky-400";
-  let iconBg = "bg-sky-500/10 text-sky-400 border-sky-500/20";
+  let textColor = "text-sky-700";
+  let iconBg = "bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25";
 
   if (color.includes("emerald") || color.includes("green") || color.includes("teal")) {
     stripeClass = "metric-stripe-green";
-    textColor = "text-emerald-400";
-    iconBg = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+    textColor = "text-emerald-700";
+    iconBg = "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25";
   } else if (color.includes("amber") || color.includes("yellow") || color.includes("orange")) {
     stripeClass = "metric-stripe-warning";
-    textColor = "text-amber-400";
-    iconBg = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+    textColor = "text-amber-700";
+    iconBg = "bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25";
   } else if (color.includes("red") || color.includes("rose")) {
     stripeClass = "metric-stripe-red";
-    textColor = "text-red-400";
-    iconBg = "bg-red-500/10 text-red-400 border-red-500/20";
+    textColor = "text-rose-700";
+    iconBg = "bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/25";
+  } else if (color.includes("violet") || color.includes("purple")) {
+    stripeClass = "metric-stripe-blue";
+    textColor = "text-indigo-700";
+    iconBg = "bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25";
   }
 
   return (
     <NextLink
       href={link}
-      className={`p-5 rounded-2xl bg-[#111827] border border-[#374151] hover:border-slate-500 shadow-lg hover:shadow-2xl transition-all duration-200 hover:-translate-y-1 group flex items-center justify-between ${stripeClass}`}
+      className={`p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-sky-300/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-10px_rgba(14,165,233,0.16)] transition-all duration-200 hover:-translate-y-1 group flex items-center justify-between ${stripeClass}`}
     >
       <div className="pl-2">
-        <div className={`text-3xl font-extrabold tracking-tight ${textColor}`}>{value}</div>
-        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">{title}</div>
+        <div className={`text-3xl font-extrabold tracking-tight ${textColor}`}>
+          {value}
+        </div>
+        <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-1">
+          {title}
+        </div>
       </div>
-      <div className={`w-12 h-12 rounded-xl border flex items-center justify-center text-lg transition-transform group-hover:scale-110 shadow-inner ${iconBg}`}>
+      <div
+        className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg transition-transform duration-200 group-hover:scale-110 ${iconBg}`}
+      >
         <Icon className="w-5 h-5" />
       </div>
     </NextLink>

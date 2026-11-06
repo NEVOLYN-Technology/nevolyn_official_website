@@ -4,29 +4,40 @@ import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { dashboardApi, attendanceApi } from "@/lib/api";
 import NextLink from "next/link";
-import { CheckSquare, FlaskConical } from "lucide-react";
+import { CheckSquare, FlaskConical, FileText, Eye, Edit, KeyRound, ArrowLeft } from "lucide-react";
 
 /**
  * Props for the {@link EmployeeDashboard} component.
  */
 interface EmployeeDashboardProps {
-  /** Username of the authenticated employee. */
+  /** Username of the authenticated employee or inspected personnel. */
   username: string;
+  /** Whether an administrator is inspecting this personal dashboard. */
+  isInspecting?: boolean;
+  /** Callback to trigger profile/banking edit modal. */
+  onEditProfile?: () => void;
+  /** Callback to trigger password reset modal. */
+  onResetPassword?: () => void;
+  /** Callback to return to executive master dashboard. */
+  onBackToOverview?: () => void;
 }
 
 /**
- * Employee workspace dashboard component.
- *
- * <p>Displays time-of-day greeting, interactive check-in/out attendance controls,
- * urgent assigned task queue, responsible projects, and recent submitted work logs.</p>
+ * Employee workspace dashboard component — Light Glassmorphism 2.0 Edition.
  */
-export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
+export function EmployeeDashboard({
+  username,
+  isInspecting = false,
+  onEditProfile,
+  onResetPassword,
+  onBackToOverview,
+}: EmployeeDashboardProps) {
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["employee-dashboard", username],
+    queryKey: ["employee-dashboard", username, isInspecting],
     queryFn: async () => {
-      const res = await dashboardApi.getEmployee();
+      const res = await dashboardApi.getEmployee(isInspecting ? username : undefined);
       return res.data;
     },
   });
@@ -47,16 +58,16 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-10 w-72 bg-slate-800 rounded-xl" />
-        <div className="h-44 bg-slate-900 rounded-2xl" />
+      <div className="space-y-6 animate-pulse max-w-5xl mx-auto">
+        <div className="h-24 bg-white/80 rounded-3xl border border-slate-200/80 shadow-xs" />
+        <div className="h-48 bg-white/80 rounded-3xl border border-slate-200/80 shadow-xs" />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="p-6 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400">
+      <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 font-semibold text-sm">
         Failed to load employee dashboard.
       </div>
     );
@@ -67,33 +78,92 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
   const hasCheckedOut = !!att?.checkOutTime;
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Welcome Greeting Banner with Signature Red Top Accent */}
-      <div className="p-6 md:p-8 rounded-2xl bg-[#111827] border-t-4 border-red-500 border-x border-b border-[#374151] shadow-xl relative overflow-hidden">
+    <div className="space-y-7 max-w-5xl mx-auto">
+      {/* Administrative Inspection Banner */}
+      {isInspecting && (
+        <div className="p-4 md:p-5 rounded-3xl bg-gradient-to-r from-sky-50/95 via-indigo-50/90 to-white/95 backdrop-blur-xl border border-sky-200/90 text-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_12px_32px_-10px_rgba(14,165,233,0.15)]">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25 shrink-0">
+              <Eye className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-2 flex-wrap">
+                <span>Inspecting Personnel Workspace:</span>
+                <span className="text-sky-700">{data.fullName}</span>
+                <span className="font-mono text-[11px] px-2 py-0.5 rounded-full bg-white border border-sky-200 text-slate-600">
+                  @{username}
+                </span>
+              </p>
+              <p className="text-[11px] text-slate-600 font-medium mt-0.5">
+                Authorized administrative inspection mode. Review tasks, attendance status, and edit profile/banking records directly.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            {onEditProfile && (
+              <button
+                onClick={onEditProfile}
+                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-sky-500/25 cursor-pointer"
+              >
+                <Edit className="w-3.5 h-3.5" />
+                <span>Edit Profile &amp; Banking</span>
+              </button>
+            )}
+            {onResetPassword && (
+              <button
+                onClick={onResetPassword}
+                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition border border-slate-200/90 shadow-2xs flex items-center gap-1.5 cursor-pointer"
+              >
+                <KeyRound className="w-3.5 h-3.5 text-amber-600" />
+                <span>Reset Password</span>
+              </button>
+            )}
+            {onBackToOverview && (
+              <button
+                onClick={onBackToOverview}
+                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition border border-slate-200/90 shadow-2xs flex items-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Overview</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Welcome Greeting Banner */}
+      <div className="p-6 md:p-8 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-[0_14px_40px_-12px_rgba(14,165,233,0.12)] relative overflow-hidden">
+        <div className="h-1.5 w-full bg-gradient-to-r from-sky-400 via-blue-600 to-indigo-600 absolute top-0 left-0" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-              <span>{data.greeting}, {data.fullName}</span>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+              {data.greeting}, <span className="text-sky-700">{data.fullName}</span>
             </h1>
-            <p className="text-sm text-slate-400 mt-1 font-medium">
-              {data.designation || "R&D Staff Member"} &bull; Employee ID:{" "}
-              <span className="font-mono text-red-400 font-bold px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium flex items-center gap-2 flex-wrap">
+              <span>{data.designation || "R&D Staff Member"}</span>
+              <span>&bull;</span>
+              <span>Employee ID:</span>
+              <span className="font-mono text-sky-700 font-bold px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-xs">
                 {data.employeeId}
               </span>
             </p>
           </div>
-          <div className="text-left sm:text-right">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">Daily Schedule</span>
-            <span className="text-xs text-emerald-400 font-medium">Standard Shift 09:00 - 17:00</span>
+          <div className="text-left sm:text-right bg-emerald-50/80 border border-emerald-200/80 px-4 py-2.5 rounded-2xl">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 block">
+              Daily Schedule
+            </span>
+            <span className="text-xs text-emerald-700 font-bold">
+              Standard Shift 09:00 - 17:00
+            </span>
           </div>
         </div>
       </div>
 
       {/* Prominent Daily Attendance Station */}
-      <div className="p-6 md:p-8 rounded-2xl bg-[#111827] border border-[#374151] shadow-xl space-y-6">
-        <div className="flex items-center justify-between border-b border-[#374151] pb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-base font-bold text-white tracking-wide uppercase flex items-center gap-2">
+      <div className="p-6 md:p-8 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-[0_12px_36px_-10px_rgba(15,23,42,0.06)] space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-200/80 pb-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-base font-extrabold text-slate-900 tracking-tight uppercase flex items-center gap-2">
               <span>⏱️</span>
               <span>Daily Attendance Station</span>
             </span>
@@ -101,16 +171,16 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
           <div>
             {hasCheckedIn ? (
               hasCheckedOut ? (
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   COMPLETED TODAY
                 </span>
               ) : (
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/30 animate-pulse">
+                <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 animate-pulse">
                   IN HOUSE (ACTIVE)
                 </span>
               )
             ) : (
-              <span className="text-xs font-bold px-3 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/30">
+              <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                 NOT CHECKED IN
               </span>
             )}
@@ -119,109 +189,136 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
 
         {/* 3 Metric Stat Blocks */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-[#1f2937] border border-[#374151] text-center">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Checked In</span>
-            <span className="text-xl font-extrabold text-white font-mono mt-1 block">
+          <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 text-center shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+              Checked In
+            </span>
+            <span className="text-xl font-extrabold text-slate-900 font-mono mt-1 block">
               {att?.checkInTime || "—"}
             </span>
           </div>
-          <div className="p-4 rounded-xl bg-[#1f2937] border border-[#374151] text-center">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Checked Out</span>
-            <span className="text-xl font-extrabold text-white font-mono mt-1 block">
+          <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 text-center shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+              Checked Out
+            </span>
+            <span className="text-xl font-extrabold text-slate-900 font-mono mt-1 block">
               {att?.checkOutTime || "—"}
             </span>
           </div>
-          <div className="p-4 rounded-xl bg-[#1f2937] border border-[#374151] text-center">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Logged Hours</span>
-            <span className="text-xl font-extrabold text-emerald-400 font-mono mt-1 block">
+          <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 text-center shadow-2xs">
+            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">
+              Logged Hours
+            </span>
+            <span className="text-xl font-extrabold text-emerald-700 font-mono mt-1 block">
               {att?.totalHours ? `${att.totalHours} hrs` : "0.00 hrs"}
             </span>
           </div>
         </div>
 
-        {/* Big Action Buttons */}
-        <div>
-          {!hasCheckedIn ? (
-            <button
-              onClick={() => checkInMutation.mutate()}
-              disabled={checkInMutation.isPending}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-extrabold text-sm tracking-wide shadow-lg shadow-emerald-600/30 transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0"
-            >
-              {checkInMutation.isPending ? "REGISTERING PUNCH..." : "🟢 CHECK IN NOW"}
-            </button>
-          ) : !hasCheckedOut ? (
-            <button
-              onClick={() => checkOutMutation.mutate()}
-              disabled={checkOutMutation.isPending}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white font-extrabold text-sm tracking-wide shadow-lg shadow-amber-600/30 transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0"
-            >
-              {checkOutMutation.isPending ? "REGISTERING CHECK-OUT..." : "🔴 CHECK OUT NOW"}
-            </button>
-          ) : (
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center text-emerald-300 font-bold text-sm">
-              ✅ Attendance Completed for Today &bull;{" "}
-              <NextLink href="/office/attendance/history" className="underline hover:text-white ml-1">
-                View Full History →
-              </NextLink>
-            </div>
-          )}
-        </div>
+        {/* Big Action Buttons (shown only on own dashboard) */}
+        {!isInspecting && (
+          <div>
+            {!hasCheckedIn ? (
+              <button
+                onClick={() => checkInMutation.mutate()}
+                disabled={checkInMutation.isPending}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-sm tracking-wide shadow-lg shadow-emerald-500/25 transition-all duration-150 transform hover:-translate-y-0.5 cursor-pointer"
+              >
+                {checkInMutation.isPending ? "REGISTERING PUNCH..." : "🟢 CHECK IN NOW"}
+              </button>
+            ) : !hasCheckedOut ? (
+              <button
+                onClick={() => checkOutMutation.mutate()}
+                disabled={checkOutMutation.isPending}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-extrabold text-sm tracking-wide shadow-lg shadow-rose-500/25 transition-all duration-150 transform hover:-translate-y-0.5 cursor-pointer"
+              >
+                {checkOutMutation.isPending ? "REGISTERING CHECK-OUT..." : "🔴 CHECK OUT NOW"}
+              </button>
+            ) : (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center text-emerald-800 font-bold text-sm">
+                ✅ Attendance Completed for Today &bull;{" "}
+                <NextLink
+                  href="/office/attendance/history"
+                  className="underline text-emerald-700 hover:text-emerald-900 ml-1"
+                >
+                  View Full History →
+                </NextLink>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* 4 Interactive Quick Action Tiles (Classic Layout) */}
+      {/* 4 Interactive Quick Action Tiles */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <NextLink
           href="/office/tasks"
-          className="p-5 rounded-2xl bg-[#111827] border border-[#374151] hover:border-slate-500 shadow-md hover:shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-red flex flex-col justify-between h-32 group"
+          className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-sky-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-blue flex flex-col justify-between h-32 group"
         >
           <div>
             <span className="text-xl">📋</span>
-            <h3 className="font-extrabold text-white text-base mt-2 group-hover:text-red-400 transition-colors">My Tasks</h3>
-            <p className="text-xs text-slate-400 mt-0.5">{data.myTasks.length} Assigned Items</p>
+            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-sky-600 transition-colors">
+              My Tasks
+            </h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              {data.myTasks.length} Assigned Items
+            </p>
           </div>
-          <span className="text-xs text-red-400 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs text-sky-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Open →
           </span>
         </NextLink>
 
         <NextLink
           href="/office/work-logs"
-          className="p-5 rounded-2xl bg-[#111827] border border-[#374151] hover:border-slate-500 shadow-md hover:shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-warning flex flex-col justify-between h-32 group"
+          className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-amber-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-warning flex flex-col justify-between h-32 group"
         >
           <div>
             <span className="text-xl">✍️</span>
-            <h3 className="font-extrabold text-white text-base mt-2 group-hover:text-amber-400 transition-colors">Daily Log</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Submit Work Summary</p>
+            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-amber-600 transition-colors">
+              Daily Log
+            </h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Submit Work Summary
+            </p>
           </div>
-          <span className="text-xs text-amber-400 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs text-amber-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Log Now →
           </span>
         </NextLink>
 
         <NextLink
           href="/office/projects"
-          className="p-5 rounded-2xl bg-[#111827] border border-[#374151] hover:border-slate-500 shadow-md hover:shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-blue flex flex-col justify-between h-32 group"
+          className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-indigo-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-red flex flex-col justify-between h-32 group"
         >
           <div>
             <span className="text-xl">🔬</span>
-            <h3 className="font-extrabold text-white text-base mt-2 group-hover:text-sky-400 transition-colors">R&D Projects</h3>
-            <p className="text-xs text-slate-400 mt-0.5">{data.myProjects.length} Lead Initiatives</p>
+            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-indigo-600 transition-colors">
+              R&amp;D Projects
+            </h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              {data.myProjects.length} Lead Initiatives
+            </p>
           </div>
-          <span className="text-xs text-sky-400 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs text-indigo-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Explore →
           </span>
         </NextLink>
 
         <NextLink
           href="/office/attendance/history"
-          className="p-5 rounded-2xl bg-[#111827] border border-[#374151] hover:border-slate-500 shadow-md hover:shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-green flex flex-col justify-between h-32 group"
+          className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-emerald-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-green flex flex-col justify-between h-32 group"
         >
           <div>
             <span className="text-xl">📅</span>
-            <h3 className="font-extrabold text-white text-base mt-2 group-hover:text-emerald-400 transition-colors">History</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Punctuality & Records</p>
+            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-emerald-600 transition-colors">
+              History
+            </h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Punctuality &amp; Records
+            </p>
           </div>
-          <span className="text-xs text-emerald-400 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs text-emerald-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Audit →
           </span>
         </NextLink>
@@ -230,32 +327,37 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
       {/* Grid: Tasks & Projects */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* My Active Tasks */}
-        <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <CheckSquare className="w-4 h-4 text-cyan-400" />
+        <div className="p-6 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-sm">
+          <div className="flex items-center justify-between mb-4 border-b border-slate-200/70 pb-3">
+            <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <CheckSquare className="w-4 h-4 text-sky-600" />
               <span>Assigned Tasks</span>
             </h2>
-            <NextLink href="/office/tasks" className="text-xs text-cyan-400 hover:underline">
+            <NextLink href="/office/tasks" className="text-xs font-bold text-sky-600 hover:underline">
               View All Tasks →
             </NextLink>
           </div>
 
           <div className="space-y-3">
             {data.myTasks.length === 0 ? (
-              <p className="text-xs text-slate-500 py-4 text-center">No active tasks assigned to you right now.</p>
+              <p className="text-xs text-slate-400 py-6 text-center font-medium">
+                No active tasks assigned right now.
+              </p>
             ) : (
               data.myTasks.map((t) => (
-                <div key={t.id} className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80">
+                <div
+                  key={t.id}
+                  className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 hover:border-sky-200 transition"
+                >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="font-semibold text-xs text-white">{t.title}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold">
+                    <span className="font-bold text-xs text-slate-900">{t.title}</span>
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold">
                       {t.status}
                     </span>
                   </div>
-                  <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+                  <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 font-medium">
                     <span>Deadline: {t.deadline || "No deadline"}</span>
-                    <span>{t.progressPct}% done</span>
+                    <span className="font-bold text-emerald-700">{t.progressPct}% done</span>
                   </div>
                 </div>
               ))
@@ -264,41 +366,85 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
         </div>
 
         {/* My Projects */}
-        <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <FlaskConical className="w-4 h-4 text-cyan-400" />
+        <div className="p-6 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-sm">
+          <div className="flex items-center justify-between mb-4 border-b border-slate-200/70 pb-3">
+            <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <FlaskConical className="w-4 h-4 text-indigo-600" />
               <span>Responsible Projects</span>
             </h2>
-            <NextLink href="/office/projects" className="text-xs text-cyan-400 hover:underline">
+            <NextLink href="/office/projects" className="text-xs font-bold text-indigo-600 hover:underline">
               All Projects →
             </NextLink>
           </div>
 
           <div className="space-y-3">
             {data.myProjects.length === 0 ? (
-              <p className="text-xs text-slate-500 py-4 text-center">No projects where you are the lead responsible.</p>
+              <p className="text-xs text-slate-400 py-6 text-center font-medium">
+                No projects where this staff member is lead responsible.
+              </p>
             ) : (
               data.myProjects.map((p) => (
                 <NextLink
                   key={p.id}
                   href={`/office/projects/${p.id}`}
-                  className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80 block hover:border-slate-700 transition"
+                  className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 block hover:border-indigo-300 hover:bg-indigo-50/30 transition"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-cyan-400 font-bold text-xs">{p.code}</span>
-                    <span className="text-[10px] text-slate-400">{p.status}</span>
+                    <span className="font-mono text-indigo-700 font-extrabold text-xs">
+                      {p.code}
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">
+                      {p.status}
+                    </span>
                   </div>
-                  <p className="text-xs font-semibold text-white mt-1">{p.name}</p>
-                  <div className="mt-2 text-[11px] text-slate-500 flex justify-between">
-                    <span>Target: {p.targetDate || "N/A"}</span>
-                    <span>{p.progressPct}%</span>
+                  <p className="text-sm font-bold text-slate-900 mt-1">{p.name}</p>
+                  <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                    <span>Target: {p.targetDate || "TBD"}</span>
+                    <span className="font-bold text-sky-700">{p.progressPct}%</span>
                   </div>
                 </NextLink>
               ))
             )}
           </div>
         </div>
+      </div>
+
+      {/* Recent Work Logs */}
+      <div className="p-6 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-sm">
+        <div className="flex items-center justify-between mb-4 border-b border-slate-200/70 pb-3">
+          <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+            <FileText className="w-4 h-4 text-emerald-600" />
+            <span>Recent Work Logs</span>
+          </h2>
+          <NextLink href="/office/work-logs" className="text-xs font-bold text-emerald-600 hover:underline">
+            All Work Logs →
+          </NextLink>
+        </div>
+
+        {data.myWorkLogs.length === 0 ? (
+          <p className="text-xs text-slate-400 py-4 text-center font-medium">
+            No work logs submitted recently.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {data.myWorkLogs.map((log) => (
+              <div
+                key={log.id}
+                className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-1.5"
+              >
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-mono font-bold text-slate-700">{log.logDate}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px]">
+                    {log.timeSpentHours} hrs
+                  </span>
+                </div>
+                <p className="text-xs text-slate-700 font-medium line-clamp-2">
+                  {log.workCompleted}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import { adminSiteMetadata, buildAdminSchemaGraph } from '@/lib/seo/config'
 
-export const metadata: Metadata = adminSiteMetadata
+export const metadata: Metadata = {
+  ...adminSiteMetadata,
+  title: 'NEVOLYN ADMIN',
+}
 
 const adminSchemaGraph = buildAdminSchemaGraph()
 

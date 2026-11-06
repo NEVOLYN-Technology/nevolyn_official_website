@@ -75,7 +75,7 @@ export default function AdminDashboardPage() {
   // ── 5. Session Storage & Title Lifecycle ──
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      document.title = 'Operations Dashboard | NEVOLYN Technology'
+      document.title = 'NEVOLYN ADMIN'
       const savedAuth = sessionStorage.getItem('nevolyn_admin_auth')
       if (savedAuth) {
         try {
