@@ -37,14 +37,18 @@ async function proxyRequest(
   const search = req.nextUrl.search || "";
 
   const forwardHeaders = new Headers();
+  const incomingAuth = req.headers.get("authorization") || "";
+  const isBasicAuth = incomingAuth.trim().toLowerCase().startsWith("basic ");
   const headersToCopy = [
     "authorization",
-    "cookie",
+    ...(isBasicAuth ? [] : ["cookie"]),
     "content-type",
     "accept",
     "user-agent",
+    "cf-connecting-ip",
     "x-forwarded-for",
     "x-real-ip",
+    "x-rd-wifi-secret",
   ];
 
   for (const key of headersToCopy) {

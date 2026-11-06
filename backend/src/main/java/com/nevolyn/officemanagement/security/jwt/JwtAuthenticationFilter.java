@@ -56,6 +56,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        // 1. If the request explicitly carries an HTTP Basic Authorization header
+        //    (used by the /admin Website Operations Dashboard), always evaluate it first
+        //    so an active /office JWT cookie (e.g. an Employee or Admin session in the same browser)
+        //    never shadows or blocks /admin Super Admin Basic authentication.
+        String authHeader = request.getHeader("Authorization");
+        if (StringUtils.hasText(authHeader) && authHeader.regionMatches(true, 0, "Basic ", 0, 6)) {
+            UsernamePasswordAuthenticationToken basicAuth = tryAuthenticateBasicHeader(request);
+            if (basicAuth != null) {
+                basicAuth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(basicAuth);
+                log.debug("Authenticated admin user '{}' via HTTP Basic", basicAuth.getName());
+            }
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 2. Otherwise, resolve JWT from Authorization: Bearer header or HttpOnly cookie
         String token = extractTokenFromHeader(request);
         if (!StringUtils.hasText(token) || !jwtTokenProvider.validateToken(token)) {
             String cookieToken = extractTokenFromCookie(request);
@@ -102,14 +119,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.debug("Authenticated user '{}' via JWT with activeRole='{}'", username, activeRole);
-            }
-        } else {
-            // Check for HTTP Basic credentials (used by /admin Operations Dashboard)
-            UsernamePasswordAuthenticationToken basicAuth = tryAuthenticateBasicHeader(request);
-            if (basicAuth != null) {
-                basicAuth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(basicAuth);
-                log.debug("Authenticated admin user '{}' via HTTP Basic", basicAuth.getName());
             }
         }
 

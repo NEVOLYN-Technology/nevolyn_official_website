@@ -53,19 +53,16 @@ public class NetworkAccessFilter extends OncePerRequestFilter {
     private final String rdWifiSecret;
     private final ObjectMapper objectMapper;
 
-    /** Paths exempt from network enforcement. */
-    private static final List<String> EXEMPT_PATHS = List.of(
-            "/api/v1/auth/login",
-            "/actuator",
-            "/swagger-ui",
-            "/api-docs",
-            "/v3/api-docs"
+    /** Paths where office network verification is strictly enforced (attendance punch-in/out only). */
+    private static final List<String> ATTENDANCE_PUNCH_PATHS = List.of(
+            "/api/v1/attendance/check-in",
+            "/api/v1/attendance/check-out"
     );
 
     public NetworkAccessFilter(
-            @Value("${app.security.allowed-local-prefixes:192.168.68.,127.0.0.1,::1}") String allowedLocalPrefixesCsv,
-            @Value("${app.security.allowed-public-ips:}") String allowedPublicIpsCsv,
-            @Value("${app.security.rd-wifi-secret:}") String rdWifiSecret,
+            @Value("${app.security.allowed-local-prefixes:${ALLOWED_LOCAL_PREFIXES:192.168.68.,127.0.0.1,::1}}") String allowedLocalPrefixesCsv,
+            @Value("${app.security.allowed-public-ips:${ALLOWED_PUBLIC_IPS:${OFFICE_ALLOWED_IPS:}}}") String allowedPublicIpsCsv,
+            @Value("${app.security.rd-wifi-secret:${RD_WIFI_SECRET:}}") String rdWifiSecret,
             ObjectMapper objectMapper
     ) {
         this.allowedLocalPrefixes = Arrays.stream(allowedLocalPrefixesCsv.split(","))
@@ -91,8 +88,9 @@ public class NetworkAccessFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Exempt paths — always pass through
-        if (isExemptPath(path)) {
+        // Employees can log in and use the entire portal from any network;
+        // network restriction applies ONLY to attendance check-in and check-out.
+        if (!isAttendancePunchPath(path)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -106,7 +104,6 @@ public class NetworkAccessFilter extends OncePerRequestFilter {
         }
 
         // ADMIN and SUPER_ADMIN are always allowed — no network restrictions
-        // (SUPER_ADMIN inherits ROLE_ADMIN, so this single check covers both tiers)
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_SUPER_ADMIN"));
         if (isAdmin) {
@@ -114,7 +111,7 @@ public class NetworkAccessFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Employee — must be on authorized network
+        // Employee attendance check-in / check-out — must be on authorized office network
         String clientIp = IpUtils.extractClientIp(request);
         if (isAuthorizedNetwork(clientIp, request)) {
             filterChain.doFilter(request, response);
@@ -123,7 +120,7 @@ public class NetworkAccessFilter extends OncePerRequestFilter {
 
         // Blocked — return 403 JSON response
         String username = auth.getName();
-        log.warn("Network access denied for user '{}' from IP: {}", username, clientIp);
+        log.warn("Attendance network check denied for user '{}' on '{}' from IP: {}", username, path, clientIp);
         sendForbiddenResponse(response, clientIp);
     }
 
@@ -205,8 +202,11 @@ public class NetworkAccessFilter extends OncePerRequestFilter {
         return true;
     }
 
-    private boolean isExemptPath(String path) {
-        return EXEMPT_PATHS.stream().anyMatch(path::startsWith);
+    private boolean isAttendancePunchPath(String path) {
+        if (path == null) {
+            return false;
+        }
+        return ATTENDANCE_PUNCH_PATHS.stream().anyMatch(path::startsWith);
     }
 
     private void sendForbiddenResponse(HttpServletResponse response, String clientIp) throws IOException {
@@ -214,7 +214,7 @@ public class NetworkAccessFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(Map.of(
                 "success", false,
-                "message", "Access denied. This system is only accessible from the authorized R&D network.",
+                "message", "Attendance check-in/check-out is only allowed from the authorized office network (Current IP: " + clientIp + ").",
                 "clientIp", clientIp
         )));
     }

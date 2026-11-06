@@ -107,9 +107,14 @@ function getAuthHeader(credentials: AdminCredentials): string {
 
 async function adminFetch(subPath: string, init: RequestInit): Promise<Response> {
   const normalizedPath = subPath.startsWith('/') ? subPath : `/${subPath}`
+  const requestInit: RequestInit = {
+    ...init,
+    credentials: 'omit',
+    cache: 'no-store',
+  }
   if (typeof window !== 'undefined') {
     try {
-      const res = await fetch(`/office/api/backend${normalizedPath}`, init)
+      const res = await fetch(`/office/api/backend${normalizedPath}`, requestInit)
       if (res.status !== 502 && res.status !== 503 && res.status !== 504) {
         return res
       }
@@ -117,7 +122,7 @@ async function adminFetch(subPath: string, init: RequestInit): Promise<Response>
       // Fall back to direct /api/v1 path below
     }
   }
-  return fetch(`${API_BASE_URL}/api/v1${normalizedPath}`, init)
+  return fetch(`${API_BASE_URL}/api/v1${normalizedPath}`, requestInit)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

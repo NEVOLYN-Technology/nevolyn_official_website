@@ -12,8 +12,23 @@ public final class IpUtils {
         // Prevent instantiation
     }
 
-    // Returns the verified client IP address for the request.
+    // Returns the verified client IP address for the request, checking reverse-proxy headers first.
     public static String extractClientIp(HttpServletRequest request) {
+        String cfIp = request.getHeader("CF-Connecting-IP");
+        if (cfIp != null && !cfIp.isBlank()) {
+            return cfIp.trim();
+        }
+        String realIp = request.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isBlank()) {
+            return realIp.trim();
+        }
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            String firstHop = forwardedFor.split(",")[0].trim();
+            if (!firstHop.isEmpty()) {
+                return firstHop;
+            }
+        }
         String remoteAddr = request.getRemoteAddr();
         return remoteAddr != null ? remoteAddr.trim() : "";
     }

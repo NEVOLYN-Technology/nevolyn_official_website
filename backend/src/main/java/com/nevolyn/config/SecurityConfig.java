@@ -1,6 +1,7 @@
 package com.nevolyn.config;
 
 import com.nevolyn.officemanagement.security.jwt.JwtAuthenticationFilter;
+import com.nevolyn.officemanagement.security.network.NetworkAccessFilter;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +37,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
-            ObjectProvider<JwtAuthenticationFilter> jwtFilterProvider
+            ObjectProvider<JwtAuthenticationFilter> jwtFilterProvider,
+            ObjectProvider<NetworkAccessFilter> networkFilterProvider
     ) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -106,6 +108,11 @@ public class SecurityConfig {
         JwtAuthenticationFilter jwtAuthenticationFilter = jwtFilterProvider.getIfAvailable();
         if (jwtAuthenticationFilter != null) {
             http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        }
+
+        NetworkAccessFilter networkAccessFilter = networkFilterProvider.getIfAvailable();
+        if (networkAccessFilter != null && jwtAuthenticationFilter != null) {
+            http.addFilterAfter(networkAccessFilter, JwtAuthenticationFilter.class);
         }
 
         return http.build();
