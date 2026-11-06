@@ -54,15 +54,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#e8f1fb] via-[#f4f8fc] to-[#e2eefb] relative overflow-hidden py-12 px-4 grid-bg">
-      {/* Luminous ambient background mesh orbs */}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f4f5f7] relative overflow-hidden py-12 px-4 grid-bg">
+      {/* Subtle architectural ambient orbs */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed -top-36 left-1/2 -translate-x-1/2 w-[850px] h-[480px] rounded-full bg-gradient-to-r from-sky-400/25 via-cyan-300/20 to-indigo-400/20 blur-3xl"
+        className="pointer-events-none fixed -top-36 left-1/2 -translate-x-1/2 w-[850px] h-[480px] rounded-full bg-gradient-to-r from-emerald-400/10 via-teal-300/10 to-slate-400/10 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed -bottom-32 right-10 w-[520px] h-[420px] rounded-full bg-gradient-to-tr from-blue-400/20 to-sky-300/20 blur-3xl"
+        className="pointer-events-none fixed -bottom-32 right-10 w-[520px] h-[420px] rounded-full bg-gradient-to-tr from-slate-400/10 to-teal-300/10 blur-3xl"
       />
 
       <div className="relative w-full max-w-md z-10">
@@ -74,24 +74,24 @@ export default function LoginPage() {
           >
             <BrandWordmark size="md" />
           </Link>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/80 backdrop-blur-md border border-sky-200/80 shadow-xs mt-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
-            <span className="text-[11px] font-bold tracking-widest uppercase text-sky-900">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-slate-200/90 shadow-2xs mt-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+            <span className="text-[11px] font-bold tracking-widest uppercase text-slate-800">
               Enterprise Office &amp; R&amp;D Portal
             </span>
           </div>
         </div>
 
-        {/* Glossy Liquid Glass Card */}
-        <div className="bg-white/85 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/70 rounded-3xl shadow-[0_24px_60px_-15px_rgba(14,165,233,0.18)] overflow-hidden">
-          {/* Glossy Top Accent Bar */}
-          <div className="h-1.5 w-full bg-gradient-to-r from-sky-400 via-blue-600 to-indigo-600" />
+        {/* Architectural Card */}
+        <div className="bg-white border border-slate-200/90 rounded-3xl shadow-[0_24px_60px_-15px_rgba(15,23,42,0.1)] overflow-hidden">
+          {/* Top Accent Bar */}
+          <div className="h-1.5 w-full bg-gradient-to-r from-slate-900 via-teal-600 to-emerald-600" />
 
           {/* Card Header */}
-          <div className="px-8 pt-7 pb-5 border-b border-slate-200/70 bg-gradient-to-b from-sky-50/60 to-transparent">
+          <div className="px-8 pt-7 pb-5 border-b border-slate-200/80 bg-slate-50/50">
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/25">
-                <Lock className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-md shadow-slate-900/15">
+                <Lock className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
                 <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">
@@ -106,8 +106,8 @@ export default function LoginPage() {
 
           <div className="px-8 py-6">
             {/* Security Notice Pill */}
-            <div className="mb-5 p-3.5 rounded-2xl bg-gradient-to-r from-sky-50/90 to-indigo-50/70 border border-sky-200/70 text-slate-700 text-xs flex items-start gap-2.5 shadow-2xs">
-              <Sparkles className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+            <div className="mb-5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-slate-700 text-xs flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
               <span className="leading-relaxed font-medium">
                 Enter your <strong className="text-slate-900">Username</strong> or{" "}
                 <strong className="text-slate-900">Employee ID</strong> along with your role-tier or personal password.
@@ -131,7 +131,7 @@ export default function LoginPage() {
                     autoComplete="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/90 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 transition-all text-sm font-medium shadow-2xs"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-4 focus:ring-slate-900/10 transition-all text-sm font-medium shadow-2xs"
                     placeholder="Enter username or Employee ID"
                   />
                 </div>
@@ -156,7 +156,7 @@ export default function LoginPage() {
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/90 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 transition-all text-sm font-medium shadow-2xs"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-4 focus:ring-slate-900/10 transition-all text-sm font-medium shadow-2xs"
                     placeholder="Enter Super Admin, Admin, or Employee password"
                   />
                 </div>
@@ -181,18 +181,18 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loginMutation.isPending}
-                className="w-full py-3 px-4 bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-400 hover:via-blue-500 hover:to-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 hover:-translate-y-0.5 text-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 px-4 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 disabled:opacity-50 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-slate-900/20 hover:-translate-y-0.5 text-sm flex items-center justify-center gap-2 cursor-pointer"
                 id="login-submit-button"
               >
                 <span>{loginMutation.isPending ? "Authenticating..." : "Sign In to Portal"}</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-emerald-400" />
               </button>
             </form>
 
             {/* Footer link back to website */}
-            <div className="mt-6 pt-5 border-t border-slate-200/70 flex items-center justify-between text-xs text-slate-500">
+            <div className="mt-6 pt-5 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
               <span>NEVOLYN Security Protocol</span>
-              <Link href="/" className="font-semibold text-sky-600 hover:text-sky-700 hover:underline">
+              <Link href="/" className="font-semibold text-slate-800 hover:text-teal-700 hover:underline">
                 ← Back to nevolyn.com
               </Link>
             </div>

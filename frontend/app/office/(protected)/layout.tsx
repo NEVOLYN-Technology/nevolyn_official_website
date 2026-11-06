@@ -29,8 +29,8 @@ export default function ProtectedLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#eef4fb] via-[#f8fafc] to-[#e6f0fa] flex flex-col items-center justify-center text-slate-700">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-sky-500/25 mb-4 animate-pulse">
+      <div className="min-h-screen bg-[#f5f6f8] flex flex-col items-center justify-center text-slate-700">
+        <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center shadow-lg shadow-slate-900/15 mb-4 animate-pulse">
           <Loader2 className="w-6 h-6 text-white animate-spin" />
         </div>
         <p className="text-sm font-semibold tracking-wide text-slate-600">
@@ -45,15 +45,15 @@ export default function ProtectedLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#ecf3fa] via-[#f4f8fc] to-[#e5eff9] text-slate-800 flex relative overflow-x-hidden">
-      {/* Subtle ambient background glows */}
+    <div className="min-h-screen bg-[#f5f6f8] text-slate-900 flex relative overflow-x-hidden">
+      {/* Subtle architectural ambient glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed -top-32 left-1/3 w-[700px] h-[420px] rounded-full bg-sky-400/15 blur-3xl z-0"
+        className="pointer-events-none fixed -top-32 left-1/3 w-[700px] h-[420px] rounded-full bg-emerald-500/6 blur-3xl z-0"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed bottom-0 right-10 w-[500px] h-[380px] rounded-full bg-indigo-400/12 blur-3xl z-0"
+        className="pointer-events-none fixed bottom-0 right-10 w-[500px] h-[380px] rounded-full bg-slate-400/10 blur-3xl z-0"
       />
 
       <Sidebar />

@@ -59,8 +59,8 @@ function CreateAdminModal({ onClose, onSuccess }: { onClose: () => void; onSucce
     required = true
   ) => (
     <div>
-      <label className="block text-slate-400 mb-1 text-xs font-medium">
-        {label} {required && <span className="text-rose-400">*</span>}
+      <label className="block text-slate-600 mb-1 text-xs font-bold">
+        {label} {required && <span className="text-rose-500">*</span>}
       </label>
       <input
         type={type}
@@ -85,30 +85,30 @@ function CreateAdminModal({ onClose, onSuccess }: { onClose: () => void; onSucce
             setFormData({ ...formData, [key]: val });
           }
         }}
-        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:border-purple-500 focus:outline-none"
+        className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-slate-900 focus:outline-none"
       />
     </div>
   );
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-purple-900/50 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl shadow-purple-900/20">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <div className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-purple-400" />
-            <h2 className="text-base font-bold text-white">Create Administrator Account</h2>
+            <Crown className="w-4 h-4 text-amber-600" />
+            <h2 className="text-base font-extrabold text-slate-900">Create Administrator Account</h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs">
+        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
           <strong>⚠️ Privileged Operation:</strong> This creates an <strong>ADMIN</strong> account with full office management access. Only create accounts for trusted personnel.
         </div>
 
         {errorMsg && (
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
+          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
             {errorMsg}
           </div>
         )}
@@ -127,16 +127,16 @@ function CreateAdminModal({ onClose, onSuccess }: { onClose: () => void; onSucce
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-          <button onClick={onClose} className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+          <button onClick={onClose} className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
             Cancel
           </button>
           <button
             onClick={() => createMutation.mutate()}
             disabled={createMutation.isPending || !formData.employeeId || !formData.username || !formData.password || !formData.fullName}
-            className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-purple-600/30 flex items-center gap-2"
+            className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-slate-900/15 flex items-center gap-2"
           >
-            {createMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
+            {createMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" /> : <UserPlus className="w-3.5 h-3.5 text-emerald-400" />}
             {createMutation.isPending ? "Creating..." : "Create Administrator"}
           </button>
         </div>
@@ -160,18 +160,18 @@ function ResetPasswordModal({ admin, onClose, onSuccess }: { admin: User; onClos
   });
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-amber-900/50 rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
         <div className="flex items-center gap-2">
-          <KeyRound className="w-4 h-4 text-amber-400" />
-          <h3 className="font-bold text-white text-sm">Reset Administrator Password</h3>
+          <KeyRound className="w-4 h-4 text-amber-600" />
+          <h3 className="font-extrabold text-slate-900 text-sm">Reset Administrator Password</h3>
         </div>
-        <p className="text-slate-400 text-xs">
-          Resetting password for <strong className="text-white">{admin.fullName}</strong> ({admin.username})
+        <p className="text-slate-600 text-xs">
+          Resetting password for <strong className="text-slate-900">{admin.fullName}</strong> ({admin.username})
         </p>
 
         {errorMsg && (
-          <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">{errorMsg}</div>
+          <div className="p-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">{errorMsg}</div>
         )}
 
         <input
@@ -179,17 +179,17 @@ function ResetPasswordModal({ admin, onClose, onSuccess }: { admin: User; onClos
           placeholder="New password (min 6 characters)"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:border-amber-500 focus:outline-none"
+          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-slate-900 focus:outline-none"
         />
 
         <div className="flex gap-3 pt-1">
-          <button onClick={onClose} className="flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">
+          <button onClick={onClose} className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
             Cancel
           </button>
           <button
             onClick={() => resetMutation.mutate()}
             disabled={resetMutation.isPending || newPassword.length < 6}
-            className="flex-1 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-bold"
+            className="flex-1 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold"
           >
             {resetMutation.isPending ? "Resetting..." : "Reset Password"}
           </button>
@@ -252,12 +252,12 @@ export default function AdminManagementPage() {
   const roleBadge = (role: string) => {
     if (role === "super_admin")
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-bold">
-          <Crown className="w-2.5 h-2.5" /> SUPER ADMIN
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-300/80 text-amber-800 text-[10px] font-bold">
+          <Crown className="w-2.5 h-2.5 text-amber-600" /> SUPER ADMIN
         </span>
       );
     return (
-      <span className="px-2 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300 text-[10px] font-bold">
+      <span className="px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-300/80 text-teal-800 text-[10px] font-bold">
         ADMIN
       </span>
     );
@@ -268,34 +268,34 @@ export default function AdminManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-purple-400" />
+          <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2 tracking-tight">
+            <ShieldCheck className="w-6 h-6 text-teal-600" />
             Admin Management
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-slate-500 font-medium text-xs mt-1">
             Manage administrator accounts — Super Admin access only
           </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold shadow-lg shadow-purple-600/25 transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md shadow-slate-900/15 transition-all"
         >
-          <UserPlus className="w-4 h-4" />
+          <UserPlus className="w-4 h-4 text-emerald-400" />
           Create Administrator
         </button>
       </div>
 
       {/* Success Banner */}
       {successMsg && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-sm">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="flex items-center gap-2 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           {successMsg}
         </div>
       )}
 
       {/* Security notice */}
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 text-purple-300 text-xs">
-        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-purple-400" />
+      <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50/90 border border-amber-200/90 text-amber-900 text-xs">
+        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
         <div>
           <strong>Security Policy:</strong> SUPER_ADMIN accounts cannot be deactivated or have their passwords reset via this panel.
           Maximum 2 active Super Administrator accounts are permitted. ADMIN accounts can only be managed by Super Administrators.
@@ -303,9 +303,9 @@ export default function AdminManagementPage() {
       </div>
 
       {/* Admin accounts table */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-200">
+      <div className="bg-white border border-slate-200/90 rounded-3xl shadow-[0_10px_30px_-10px_rgba(15,23,42,0.05)] overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-200/80 bg-slate-50/70 flex items-center justify-between">
+          <h2 className="text-sm font-extrabold text-slate-900">
             Administrator Accounts ({adminUsers.length})
           </h2>
         </div>
@@ -320,29 +320,29 @@ export default function AdminManagementPage() {
             No administrator accounts found.
           </div>
         ) : (
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-slate-100">
             {adminUsers.map((admin) => {
               const isSA = admin.role === "super_admin";
               return (
                 <div
                   key={admin.id}
-                  className="px-5 py-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors"
+                  className="px-6 py-4 flex items-center justify-between hover:bg-slate-50/80 transition-colors"
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     {/* Avatar */}
                     <EmployeeAvatar user={admin} size="md" shape="circle" />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-white">{admin.fullName}</span>
+                        <span className="text-sm font-bold text-slate-900">{admin.fullName}</span>
                         {roleBadge(admin.role)}
                         {!admin.isActive && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-500/15 text-red-400 border border-red-500/25">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                             INACTIVE
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        @{admin.username} · {admin.employeeId}
+                      <p className="text-xs text-slate-500 font-medium mt-0.5">
+                        @{admin.username} · <span className="font-mono text-teal-700 font-semibold">{admin.employeeId}</span>
                         {admin.designation && ` · ${admin.designation}`}
                       </p>
                     </div>
@@ -354,7 +354,7 @@ export default function AdminManagementPage() {
                       <button
                         onClick={() => setResetTarget(admin)}
                         title="Reset password"
-                        className="p-2 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                        className="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 transition-colors"
                       >
                         <KeyRound className="w-4 h-4" />
                       </button>
@@ -362,10 +362,10 @@ export default function AdminManagementPage() {
                         onClick={() => toggleMutation.mutate(admin.id)}
                         disabled={toggleMutation.isPending}
                         title={admin.isActive ? "Deactivate account" : "Activate account"}
-                        className={`p-2 rounded-lg transition-colors ${
+                        className={`p-2 rounded-xl border transition-colors ${
                           admin.isActive
-                            ? "text-slate-400 hover:text-red-400 hover:bg-red-500/10"
-                            : "text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10"
+                            ? "bg-slate-100 text-slate-600 border-slate-200 hover:text-rose-700 hover:bg-rose-50 hover:border-rose-200"
+                            : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
                         }`}
                       >
                         <Power className="w-4 h-4" />
@@ -375,7 +375,7 @@ export default function AdminManagementPage() {
 
                   {/* SUPER_ADMIN: protected badge instead of action buttons */}
                   {isSA && (
-                    <span className="text-[10px] text-purple-400 border border-purple-700/50 rounded-lg px-2 py-1 shrink-0">
+                    <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-300/80 rounded-lg px-2.5 py-1 shrink-0">
                       Protected Account
                     </span>
                   )}

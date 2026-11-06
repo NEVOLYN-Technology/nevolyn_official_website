@@ -97,16 +97,16 @@ export function EmployeeDashboard({
     <div className="space-y-7 max-w-5xl mx-auto">
       {/* Administrative Inspection Banner */}
       {isInspecting && (
-        <div className="p-4 md:p-5 rounded-3xl bg-gradient-to-r from-sky-50/95 via-indigo-50/90 to-white/95 backdrop-blur-xl border border-sky-200/90 text-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_12px_32px_-10px_rgba(14,165,233,0.15)]">
+        <div className="p-4 md:p-5 rounded-3xl bg-white border border-slate-200/90 text-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_8px_28px_-8px_rgba(15,23,42,0.06)]">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25 shrink-0">
-              <Eye className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-md shadow-slate-900/15 shrink-0">
+              <Eye className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-2 flex-wrap">
                 <span>Inspecting Personnel Workspace:</span>
-                <span className="text-sky-700">{data.fullName}</span>
-                <span className="font-mono text-[11px] px-2 py-0.5 rounded-full bg-white border border-sky-200 text-slate-600">
+                <span className="text-teal-700">{data.fullName}</span>
+                <span className="font-mono text-[11px] px-2 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-slate-600">
                   @{username}
                 </span>
               </p>
@@ -119,9 +119,9 @@ export function EmployeeDashboard({
             {onEditProfile && (
               <button
                 onClick={onEditProfile}
-                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-sky-500/25 cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-slate-900/15 cursor-pointer"
               >
-                <Edit className="w-3.5 h-3.5" />
+                <Edit className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Edit Profile &amp; Banking</span>
               </button>
             )}
@@ -148,8 +148,8 @@ export function EmployeeDashboard({
       )}
 
       {/* Welcome Greeting Banner */}
-      <div className="p-6 md:p-8 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-[0_14px_40px_-12px_rgba(14,165,233,0.12)] relative overflow-hidden">
-        <div className="h-1.5 w-full bg-gradient-to-r from-sky-400 via-blue-600 to-indigo-600 absolute top-0 left-0" />
+      <div className="p-6 md:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_32px_-10px_rgba(15,23,42,0.06)] relative overflow-hidden">
+        <div className="h-1.5 w-full bg-gradient-to-r from-slate-900 via-teal-600 to-emerald-600 absolute top-0 left-0" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <EmployeeAvatar
@@ -159,13 +159,13 @@ export function EmployeeDashboard({
             />
             <div>
               <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-                {data.greeting}, <span className="text-sky-700">{data.fullName}</span>
+                {data.greeting}, <span className="text-teal-700">{data.fullName}</span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium flex items-center gap-2 flex-wrap">
                 <span>{data.designation || "R&D Staff Member"}</span>
                 <span>&bull;</span>
                 <span>Employee ID:</span>
-                <span className="font-mono text-sky-700 font-bold px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-xs">
+                <span className="font-mono text-teal-800 font-bold px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-xs">
                   {data.employeeId}
                 </span>
               </p>
@@ -276,72 +276,72 @@ export function EmployeeDashboard({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <NextLink
           href="/office/tasks"
-          className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-sky-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-blue flex flex-col justify-between h-32 group"
+          className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-teal-300 shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-blue flex flex-col justify-between h-32 group"
         >
           <div>
             <span className="text-xl">📋</span>
-            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-sky-600 transition-colors">
+            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-teal-700 transition-colors">
               My Tasks
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
               {myTasks.length} Assigned Items
             </p>
           </div>
-          <span className="text-xs text-sky-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs text-teal-700 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Open →
           </span>
         </NextLink>
 
         <NextLink
           href="/office/work-logs"
-          className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-amber-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-warning flex flex-col justify-between h-32 group"
+          className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-amber-300 shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-warning flex flex-col justify-between h-32 group"
         >
           <div>
             <span className="text-xl">✍️</span>
-            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-amber-600 transition-colors">
+            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-amber-700 transition-colors">
               Daily Log
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
               Submit Work Summary
             </p>
           </div>
-          <span className="text-xs text-amber-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs text-amber-700 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Log Now →
           </span>
         </NextLink>
 
         <NextLink
           href="/office/projects"
-          className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-indigo-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-red flex flex-col justify-between h-32 group"
+          className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-red flex flex-col justify-between h-32 group"
         >
           <div>
             <span className="text-xl">🔬</span>
-            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-indigo-600 transition-colors">
+            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-slate-800 transition-colors">
               R&amp;D Projects
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
               {myProjects.length} Lead Initiatives
             </p>
           </div>
-          <span className="text-xs text-indigo-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs text-slate-700 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Explore →
           </span>
         </NextLink>
 
         <NextLink
           href="/office/attendance/history"
-          className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-emerald-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-green flex flex-col justify-between h-32 group"
+          className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-300 shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-green flex flex-col justify-between h-32 group"
         >
           <div>
             <span className="text-xl">📅</span>
-            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-emerald-600 transition-colors">
+            <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-emerald-700 transition-colors">
               History
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
               Punctuality &amp; Records
             </p>
           </div>
-          <span className="text-xs text-emerald-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs text-emerald-700 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Audit →
           </span>
         </NextLink>
@@ -350,13 +350,13 @@ export function EmployeeDashboard({
       {/* Grid: Tasks & Projects */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* My Active Tasks */}
-        <div className="p-6 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-sm">
+        <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
           <div className="flex items-center justify-between mb-4 border-b border-slate-200/70 pb-3">
             <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <CheckSquare className="w-4 h-4 text-sky-600" />
+              <CheckSquare className="w-4 h-4 text-teal-600" />
               <span>Assigned Tasks</span>
             </h2>
-            <NextLink href="/office/tasks" className="text-xs font-bold text-sky-600 hover:underline">
+            <NextLink href="/office/tasks" className="text-xs font-bold text-teal-700 hover:underline">
               View All Tasks →
             </NextLink>
           </div>
@@ -370,11 +370,11 @@ export function EmployeeDashboard({
               myTasks.map((t) => (
                 <div
                   key={t.id}
-                  className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 hover:border-sky-200 transition"
+                  className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 hover:border-teal-200 transition"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span className="font-bold text-xs text-slate-900">{t.title}</span>
-                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold">
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200 font-bold">
                       {t.status}
                     </span>
                   </div>
@@ -389,13 +389,13 @@ export function EmployeeDashboard({
         </div>
 
         {/* My Projects */}
-        <div className="p-6 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-sm">
+        <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
           <div className="flex items-center justify-between mb-4 border-b border-slate-200/70 pb-3">
             <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <FlaskConical className="w-4 h-4 text-indigo-600" />
+              <FlaskConical className="w-4 h-4 text-slate-800" />
               <span>Responsible Projects</span>
             </h2>
-            <NextLink href="/office/projects" className="text-xs font-bold text-indigo-600 hover:underline">
+            <NextLink href="/office/projects" className="text-xs font-bold text-slate-700 hover:underline">
               All Projects →
             </NextLink>
           </div>
@@ -410,20 +410,20 @@ export function EmployeeDashboard({
                 <NextLink
                   key={p.id}
                   href={`/office/projects/${p.id}`}
-                  className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 block hover:border-indigo-300 hover:bg-indigo-50/30 transition"
+                  className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 block hover:border-slate-300 hover:bg-slate-100/50 transition"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-indigo-700 font-extrabold text-xs">
+                    <span className="font-mono text-teal-800 font-extrabold text-xs">
                       {p.code}
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold">
                       {p.status}
                     </span>
                   </div>
                   <p className="text-sm font-bold text-slate-900 mt-1">{p.name}</p>
                   <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 font-medium">
                     <span>Target: {p.targetDate || "TBD"}</span>
-                    <span className="font-bold text-sky-700">{p.progressPct}%</span>
+                    <span className="font-bold text-teal-700">{p.progressPct}%</span>
                   </div>
                 </NextLink>
               ))

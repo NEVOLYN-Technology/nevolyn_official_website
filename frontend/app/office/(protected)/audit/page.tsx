@@ -37,31 +37,31 @@ export default function AuditPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <ShieldAlert className="w-6 h-6 text-cyan-400" />
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            <ShieldAlert className="w-6 h-6 text-teal-600" />
             <span>Immutable System Audit Trail</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 font-medium mt-1">
             Real-time security log tracking authentication, permission checks, attendance adjustments, and entity mutations.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search username or details..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-64"
+              className="pl-9 pr-4 py-2 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 w-64 shadow-xs"
             />
           </div>
 
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 focus:outline-none"
+            className="px-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-semibold text-slate-700 focus:outline-none focus:border-slate-900 shadow-xs"
           >
             <option value="">All Action Types</option>
             <option value="LOGIN">LOGIN</option>
@@ -83,19 +83,19 @@ export default function AuditPage() {
       </div>
 
       {/* Audit Log Table */}
-      <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 shadow-xl overflow-x-auto">
-        <table className="w-full text-left text-xs text-slate-300">
-          <thead className="bg-slate-950/60 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+      <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.05)] overflow-x-auto">
+        <table className="w-full text-left text-xs text-slate-700">
+          <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-extrabold tracking-wider border-b border-slate-200/80">
             <tr>
-              <th className="py-3 px-4">Timestamp</th>
-              <th className="py-3 px-4">Operator</th>
-              <th className="py-3 px-4">Action Code</th>
-              <th className="py-3 px-4">Client IP</th>
-              <th className="py-3 px-4">Target Resource</th>
-              <th className="py-3 px-4">Audit Details</th>
+              <th className="py-3.5 px-4">Timestamp</th>
+              <th className="py-3.5 px-4">Operator</th>
+              <th className="py-3.5 px-4">Action Code</th>
+              <th className="py-3.5 px-4">Client IP</th>
+              <th className="py-3.5 px-4">Target Resource</th>
+              <th className="py-3.5 px-4">Audit Details</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+          <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
             {isLoading ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-500 font-sans">
@@ -110,25 +110,25 @@ export default function AuditPage() {
               </tr>
             ) : (
               logs.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-800/30">
-                  <td className="py-3 px-4 text-slate-400 whitespace-nowrap">
+                <tr key={log.id} className="hover:bg-slate-50/80">
+                  <td className="py-3.5 px-4 text-slate-500 whitespace-nowrap font-semibold">
                     {new Date(log.createdAt).toLocaleString()}
                   </td>
-                  <td className="py-3 px-4 font-bold text-white">
+                  <td className="py-3.5 px-4 font-bold text-slate-900">
                     {log.username || "System"}
                   </td>
-                  <td className="py-3 px-4">
-                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 text-[10px] font-bold">
+                  <td className="py-3.5 px-4">
+                    <span className="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200 text-[10px] font-bold">
                       {log.action}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-slate-400">
+                  <td className="py-3.5 px-4 text-slate-500">
                     {log.ipAddress || "LAN"}
                   </td>
-                  <td className="py-3 px-4 text-slate-300">
+                  <td className="py-3.5 px-4 text-slate-700 font-semibold">
                     {log.targetEntity ? `${log.targetEntity} #${log.targetId || ""}` : "-"}
                   </td>
-                  <td className="py-3 px-4 font-sans text-slate-300 max-w-md break-words">
+                  <td className="py-3.5 px-4 font-sans text-slate-700 font-medium max-w-md break-words">
                     {log.details || "-"}
                   </td>
                 </tr>

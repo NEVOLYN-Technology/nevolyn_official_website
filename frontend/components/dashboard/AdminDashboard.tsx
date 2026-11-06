@@ -69,16 +69,16 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-7">
-      {/* Glossy Hero Header Card */}
-      <div className="p-6 md:p-7 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-[0_14px_40px_-12px_rgba(14,165,233,0.12)] relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="h-1.5 w-full bg-gradient-to-r from-sky-400 via-blue-600 to-indigo-600 absolute top-0 left-0" />
+      {/* Executive Hero Header Card */}
+      <div className="p-6 md:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_32px_-10px_rgba(15,23,42,0.06)] relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="h-1.5 w-full bg-gradient-to-r from-slate-900 via-teal-600 to-emerald-600 absolute top-0 left-0" />
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
               Executive Operations Center
             </h1>
-            <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-extrabold uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping" />
+            <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
               Live Monitor
             </span>
           </div>
@@ -89,16 +89,16 @@ export function AdminDashboard() {
         <div className="flex items-center gap-3 shrink-0">
           <NextLink
             href="/office/attendance/qr"
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 text-xs font-bold transition shadow-2xs flex items-center gap-2"
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 text-xs font-bold transition shadow-2xs flex items-center gap-2"
           >
-            <QrCode className="w-4 h-4 text-sky-600" />
+            <QrCode className="w-4 h-4 text-teal-600" />
             <span>Entrance QR</span>
           </NextLink>
           <NextLink
             href="/office/employees"
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white text-xs font-bold hover:from-sky-400 hover:to-indigo-500 shadow-md shadow-sky-500/25 transition flex items-center gap-2"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 text-white text-xs font-bold hover:from-slate-800 hover:to-slate-700 shadow-md shadow-slate-900/15 transition flex items-center gap-2"
           >
-            <UserPlus className="w-4 h-4" />
+            <UserPlus className="w-4 h-4 text-emerald-400" />
             <span>Manage Staff</span>
           </NextLink>
         </div>
@@ -121,7 +121,7 @@ export function AdminDashboard() {
       {/* Tables Section: Live Attendance & Audit Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Today's Attendance Roster (2 Cols) */}
-        <div className="lg:col-span-2 p-6 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-[0_12px_36px_-10px_rgba(15,23,42,0.06)]">
+        <div className="lg:col-span-2 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)]">
           <div className="flex items-center justify-between mb-5 border-b border-slate-200/80 pb-4">
             <div>
               <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
@@ -134,7 +134,7 @@ export function AdminDashboard() {
             </div>
             <NextLink
               href="/office/attendance/admin"
-              className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-teal-700 hover:text-teal-800 hover:underline flex items-center gap-1"
             >
               Full Attendance Monitor →
             </NextLink>
@@ -161,7 +161,7 @@ export function AdminDashboard() {
                   </tr>
                 ) : (
                   data.todayAttendance.map((rec) => (
-                    <tr key={rec.userId} className="hover:bg-sky-50/40 transition duration-150">
+                    <tr key={rec.userId} className="hover:bg-slate-50/80 transition duration-150">
                       <td className="py-3 px-4 font-bold text-slate-900">
                         <div className="flex items-center gap-2.5">
                           <EmployeeAvatar
@@ -219,15 +219,15 @@ export function AdminDashboard() {
         </div>
 
         {/* Live Audit Stream (1 Col) */}
-        <div className="p-6 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-[0_12px_36px_-10px_rgba(15,23,42,0.06)] flex flex-col">
+        <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] flex flex-col">
           <div className="flex items-center justify-between mb-4 border-b border-slate-200/80 pb-3">
             <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-sky-600" />
+              <ShieldAlert className="w-4 h-4 text-teal-600" />
               <span>Recent Activity</span>
             </h2>
             <NextLink
               href="/office/audit"
-              className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline"
+              className="text-xs font-bold text-teal-700 hover:text-teal-800 hover:underline"
             >
               All Logs →
             </NextLink>
@@ -237,10 +237,10 @@ export function AdminDashboard() {
             {data.recentAuditLogs.slice(0, 8).map((audit) => (
               <div
                 key={audit.id}
-                className="p-3.5 rounded-2xl bg-slate-50/90 hover:bg-sky-50/50 border border-slate-200/80 text-xs transition-colors"
+                className="p-3.5 rounded-2xl bg-slate-50/90 hover:bg-slate-100/70 border border-slate-200/80 text-xs transition-colors"
               >
                 <div className="flex items-center justify-between text-[11px] mb-1">
-                  <span className="font-extrabold text-sky-700">{audit.username}</span>
+                  <span className="font-extrabold text-slate-900">{audit.username}</span>
                   <span className="text-slate-500 font-mono text-[10px]">
                     {new Date(audit.createdAt).toLocaleTimeString([], {
                       hour: "2-digit",

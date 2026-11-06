@@ -23,31 +23,31 @@ interface StatCardProps {
  */
 export function StatCard({ title, value, icon: Icon, color, link }: StatCardProps) {
   let stripeClass = "metric-stripe-blue";
-  let textColor = "text-sky-700";
-  let iconBg = "bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25";
+  let textColor = "text-slate-900";
+  let iconBg = "bg-slate-900 text-white shadow-md shadow-slate-900/15";
 
   if (color.includes("emerald") || color.includes("green") || color.includes("teal")) {
     stripeClass = "metric-stripe-green";
     textColor = "text-emerald-700";
-    iconBg = "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25";
+    iconBg = "bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md shadow-emerald-600/20";
   } else if (color.includes("amber") || color.includes("yellow") || color.includes("orange")) {
     stripeClass = "metric-stripe-warning";
     textColor = "text-amber-700";
-    iconBg = "bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25";
+    iconBg = "bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/20";
   } else if (color.includes("red") || color.includes("rose")) {
     stripeClass = "metric-stripe-red";
     textColor = "text-rose-700";
-    iconBg = "bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/25";
+    iconBg = "bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/20";
   } else if (color.includes("violet") || color.includes("purple")) {
     stripeClass = "metric-stripe-blue";
-    textColor = "text-indigo-700";
-    iconBg = "bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25";
+    textColor = "text-slate-900";
+    iconBg = "bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-md shadow-slate-900/20";
   }
 
   return (
     <NextLink
       href={link}
-      className={`p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 ring-1 ring-slate-200/80 hover:ring-sky-300/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-10px_rgba(14,165,233,0.16)] transition-all duration-200 hover:-translate-y-1 group flex items-center justify-between ${stripeClass}`}
+      className={`p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_14px_32px_-8px_rgba(15,23,42,0.1)] transition-all duration-200 hover:-translate-y-1 group flex items-center justify-between ${stripeClass}`}
     >
       <div className="pl-2">
         <div className={`text-3xl font-extrabold tracking-tight ${textColor}`}>

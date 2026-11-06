@@ -15,7 +15,7 @@ export default function OfficeRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="office-light-portal min-h-screen bg-gradient-to-br from-[#eef4fb] via-[#f5f8fc] to-[#e6f0fa] text-slate-800 antialiased selection:bg-sky-500 selection:text-white relative">
+    <div className="office-light-portal min-h-screen bg-[#f5f6f8] text-slate-900 antialiased selection:bg-slate-900 selection:text-white relative">
       <OfficeProviders>{children}</OfficeProviders>
     </div>
   );

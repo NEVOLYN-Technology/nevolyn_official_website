@@ -58,14 +58,14 @@ function DashboardContent() {
 
   return (
     <div className="space-y-6">
-      {/* Glossy Workspace Inspection Switcher Bar */}
-      <div className="p-4 md:p-5 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_10px_30px_-10px_rgba(14,165,233,0.1)]">
+      {/* Executive Workspace Switcher Bar */}
+      <div className="p-4 md:p-5 rounded-3xl bg-white border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_8px_28px_-8px_rgba(15,23,42,0.06)]">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+          <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-md shadow-slate-900/15">
             {isSuperAdmin ? (
-              <Crown className="w-5 h-5" />
+              <Crown className="w-5 h-5 text-amber-400" />
             ) : (
-              <Shield className="w-5 h-5" />
+              <Shield className="w-5 h-5 text-emerald-400" />
             )}
           </div>
           <div>
@@ -73,7 +73,7 @@ function DashboardContent() {
               <span className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
                 {isSuperAdmin ? "Super Admin Operations" : "Admin Operations"}
               </span>
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 font-bold border border-sky-200">
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 font-bold border border-teal-200">
                 {selectedUsername
                   ? "Personal Workspace Mode"
                   : "Organization Mode"}
@@ -100,7 +100,7 @@ function DashboardContent() {
                 router.push("/office/dashboard");
               }
             }}
-            className="px-4 py-2.5 rounded-2xl bg-slate-50 hover:bg-white border border-slate-200/90 text-xs font-bold text-slate-800 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 transition shadow-2xs cursor-pointer"
+            className="px-4 py-2.5 rounded-2xl bg-slate-50 hover:bg-white border border-slate-300 text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-4 focus:ring-slate-900/10 transition shadow-2xs cursor-pointer"
           >
             <option value="">⚡ Master Executive Overview</option>
             <optgroup
