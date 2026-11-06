@@ -73,6 +73,7 @@ services:
       APP_UPLOAD_DIR: /app/uploads/resumes
       FILE_UPLOAD_DIR: /app/uploads/office
       JWT_SECRET: ${OFFICE_JWT_SECRET:-${JWT_SECRET:-}}
+      APP_JWT_SECRET: ${JWT_SECRET:-${OFFICE_JWT_SECRET:-}}
       # ── Shared Role-Tier Passwords (SUPER_ADMIN & ADMIN login tiers) ──
       SUPER_ADMIN_SHARED_PASSWORD: ${SUPER_ADMIN_SHARED_PASSWORD:-}
       ADMIN_SHARED_PASSWORD: ${ADMIN_SHARED_PASSWORD:-}

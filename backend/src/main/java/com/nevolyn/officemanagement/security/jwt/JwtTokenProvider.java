@@ -28,7 +28,7 @@ public class JwtTokenProvider {
     private final JwtParser jwtParser;
 
     public JwtTokenProvider(
-            @Value("${app.jwt.secret:}") String secret,
+            @Value("${app.jwt.secret:${JWT_SECRET:${OFFICE_JWT_SECRET:}}}") String secret,
             @Value("${app.jwt.expiration-ms:28800000}") long expirationMs,
             @Value("${spring.profiles.active:}") String activeProfile
     ) {
