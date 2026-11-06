@@ -153,6 +153,11 @@ public class UserService {
                 .bankAccountNumber(request.bankAccountNumber() != null ? request.bankAccountNumber().trim() : null)
                 .bankBranch(request.bankBranch() != null ? request.bankBranch().trim() : null)
                 .bankRoutingNumber(request.bankRoutingNumber() != null ? request.bankRoutingNumber().trim() : null)
+                .secondaryBankName(request.secondaryBankName() != null ? request.secondaryBankName().trim() : null)
+                .secondaryBankAccountName(request.secondaryBankAccountName() != null ? request.secondaryBankAccountName().trim() : null)
+                .secondaryBankAccountNumber(request.secondaryBankAccountNumber() != null ? request.secondaryBankAccountNumber().trim() : null)
+                .secondaryBankBranch(request.secondaryBankBranch() != null ? request.secondaryBankBranch().trim() : null)
+                .secondaryBankRoutingNumber(request.secondaryBankRoutingNumber() != null ? request.secondaryBankRoutingNumber().trim() : null)
                 .role(targetRole)
                 .isActive(true)
                 .build();
@@ -213,6 +218,11 @@ public class UserService {
                 .bankAccountNumber(request.bankAccountNumber() != null ? request.bankAccountNumber().trim() : null)
                 .bankBranch(request.bankBranch() != null ? request.bankBranch().trim() : null)
                 .bankRoutingNumber(request.bankRoutingNumber() != null ? request.bankRoutingNumber().trim() : null)
+                .secondaryBankName(request.secondaryBankName() != null ? request.secondaryBankName().trim() : null)
+                .secondaryBankAccountName(request.secondaryBankAccountName() != null ? request.secondaryBankAccountName().trim() : null)
+                .secondaryBankAccountNumber(request.secondaryBankAccountNumber() != null ? request.secondaryBankAccountNumber().trim() : null)
+                .secondaryBankBranch(request.secondaryBankBranch() != null ? request.secondaryBankBranch().trim() : null)
+                .secondaryBankRoutingNumber(request.secondaryBankRoutingNumber() != null ? request.secondaryBankRoutingNumber().trim() : null)
                 .role(User.UserRole.super_admin)
                 .isActive(true)
                 .build();
@@ -309,6 +319,21 @@ public class UserService {
         }
         if (request.bankRoutingNumber() != null) {
             user.setBankRoutingNumber(request.bankRoutingNumber().trim());
+        }
+        if (request.secondaryBankName() != null) {
+            user.setSecondaryBankName(request.secondaryBankName().trim());
+        }
+        if (request.secondaryBankAccountName() != null) {
+            user.setSecondaryBankAccountName(request.secondaryBankAccountName().trim());
+        }
+        if (request.secondaryBankAccountNumber() != null) {
+            user.setSecondaryBankAccountNumber(request.secondaryBankAccountNumber().trim());
+        }
+        if (request.secondaryBankBranch() != null) {
+            user.setSecondaryBankBranch(request.secondaryBankBranch().trim());
+        }
+        if (request.secondaryBankRoutingNumber() != null) {
+            user.setSecondaryBankRoutingNumber(request.secondaryBankRoutingNumber().trim());
         }
         user.setRole(requestedRole);
 

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { authApi } from "@/lib/api";
 import { LoginResponse } from "@/types";
 
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<LoginResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const refreshProfile = useCallback(async () => {
     try {
@@ -108,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (identifier: string, password: string): Promise<LoginResponse> => {
     const res = await authApi.login(identifier, password);
     const userData = res.data.data!;
+    queryClient.invalidateQueries();
     setUser(userData);
     let targetRoute = "/office/dashboard";
     if (typeof window !== "undefined") {
@@ -119,8 +122,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Remove any legacy fake cookie so it never conflicts with the backend's HttpOnly cookie
       document.cookie = "nevolyn_access_token=; path=/; max-age=0; SameSite=Lax";
 
+      const isUserAdmin = userData.role === "admin" || userData.role === "super_admin";
       const fromParam = new URLSearchParams(window.location.search).get("from");
-      if (fromParam && fromParam.startsWith("/")) {
+      if (isUserAdmin && fromParam && fromParam.startsWith("/")) {
         const cleanFrom = fromParam.replace(/^\/office/, "") || "/dashboard";
         if (!cleanFrom.startsWith("/login")) {
           targetRoute = `/office${cleanFrom}`;
@@ -142,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         document.cookie = "nevolyn_session=; path=/; max-age=0; SameSite=Lax";
         document.cookie = "nevolyn_access_token=; path=/; max-age=0; SameSite=Lax";
       }
+      queryClient.invalidateQueries();
       setUser(null);
       router.push("/office/login");
     }

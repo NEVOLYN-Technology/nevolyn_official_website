@@ -102,6 +102,7 @@ public class AttendanceService {
                 .build());
 
         log.info("User '{}' checked in at {} — {}", username, now, lateStatus);
+        initializeUser(attendance);
         return attendance;
     }
 
@@ -154,6 +155,7 @@ public class AttendanceService {
                 .build());
 
         log.info("User '{}' checked out at {} — {}h — {}", username, now, totalHours, earlyCheckout);
+        initializeUser(attendance);
         return attendance;
     }
 
@@ -163,7 +165,9 @@ public class AttendanceService {
     @Transactional(readOnly = true)
     public Optional<Attendance> getTodayAttendance(String username) {
         User user = getUserByUsername(username);
-        return attendanceRepository.findByUserIdAndDate(user.getId(), LocalDate.now());
+        Optional<Attendance> att = attendanceRepository.findByUserIdAndDate(user.getId(), LocalDate.now());
+        att.ifPresent(this::initializeUser);
+        return att;
     }
 
     /**
@@ -172,7 +176,16 @@ public class AttendanceService {
     @Transactional(readOnly = true)
     public List<Attendance> getHistory(String username) {
         User user = getUserByUsername(username);
-        return attendanceRepository.findByUserIdOrderByDateDesc(user.getId());
+        List<Attendance> list = attendanceRepository.findByUserIdOrderByDateDesc(user.getId());
+        list.forEach(this::initializeUser);
+        return list;
+    }
+
+    private void initializeUser(Attendance a) {
+        if (a != null && a.getUser() != null) {
+            a.getUser().getEmployeeId();
+            a.getUser().getFullName();
+        }
     }
 
     /**

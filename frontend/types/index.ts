@@ -18,6 +18,11 @@ export interface LoginResponse {
   bankAccountNumber?: string | null;
   bankBranch?: string | null;
   bankRoutingNumber?: string | null;
+  secondaryBankName?: string | null;
+  secondaryBankAccountName?: string | null;
+  secondaryBankAccountNumber?: string | null;
+  secondaryBankBranch?: string | null;
+  secondaryBankRoutingNumber?: string | null;
   role: "super_admin" | "admin" | "employee";
   token?: string;
 }
@@ -78,6 +83,11 @@ export interface User {
   bankAccountNumber?: string | null;
   bankBranch?: string | null;
   bankRoutingNumber?: string | null;
+  secondaryBankName?: string | null;
+  secondaryBankAccountName?: string | null;
+  secondaryBankAccountNumber?: string | null;
+  secondaryBankBranch?: string | null;
+  secondaryBankRoutingNumber?: string | null;
   role: "super_admin" | "admin" | "employee";
   isActive: boolean;
   createdAt: string;

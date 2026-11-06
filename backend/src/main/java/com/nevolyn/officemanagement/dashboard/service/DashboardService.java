@@ -20,8 +20,8 @@ import com.nevolyn.officemanagement.user.entity.User;
 import com.nevolyn.officemanagement.user.repository.UserRepository;
 import com.nevolyn.officemanagement.worklog.dto.WorkLogDto;
 import com.nevolyn.officemanagement.worklog.repository.WorkLogRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,17 +30,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-/**
- * Aggregation and analytics service for executive and employee dashboard views.
- *
- * <p>Coordinates multi-domain operational metrics including workforce attendance,
- * project milestones, task delivery backlogs, and real-time security audit trails
- * without triggering transactional locks on high-velocity transactional tables.</p>
- */
-@Slf4j
+// Aggregation and analytics service for executive and employee dashboard views.
 @Service
-@RequiredArgsConstructor
 public class DashboardService {
+
+    private static final Logger log = LoggerFactory.getLogger(DashboardService.class);
 
     private final UserRepository userRepository;
     private final AttendanceRepository attendanceRepository;
@@ -50,15 +44,25 @@ public class DashboardService {
     private final WorkLogRepository workLogRepository;
     private final AuditLogRepository auditLogRepository;
 
-    /**
-     * Compiles organizational KPIs and real-time operational status for administrators.
-     *
-     * <p>Gathers headcount metrics, today's attendance snapshot (present, late, absent,
-     * currently in-house), project status distributions, task execution backlogs,
-     * full employee daily roster, and the latest 10 security audit log events.</p>
-     *
-     * @return an {@link AdminDashboardDto} containing aggregated company-wide metrics
-     */
+    public DashboardService(
+            UserRepository userRepository,
+            AttendanceRepository attendanceRepository,
+            AttendanceService attendanceService,
+            RndProjectRepository projectRepository,
+            TaskRepository taskRepository,
+            WorkLogRepository workLogRepository,
+            AuditLogRepository auditLogRepository
+    ) {
+        this.userRepository = userRepository;
+        this.attendanceRepository = attendanceRepository;
+        this.attendanceService = attendanceService;
+        this.projectRepository = projectRepository;
+        this.taskRepository = taskRepository;
+        this.workLogRepository = workLogRepository;
+        this.auditLogRepository = auditLogRepository;
+    }
+
+    // Compiles organizational KPIs and real-time operational status for administrators.
     @Transactional(readOnly = true)
     public AdminDashboardDto getAdminDashboard() {
         LocalDate today = LocalDate.now();
@@ -110,20 +114,14 @@ public class DashboardService {
                 .build();
     }
 
-    /**
-     * Compiles a personalized workspace summary for the specified employee.
-     *
-     * <p>Includes time-appropriate greetings, today's attendance status,
-     * the top 5 urgent active tasks assigned to the employee, top 5 active projects
-     * where the user is responsible, and the most recent 5 submitted work log journals.</p>
-     *
-     * @param username the username of the employee requesting their dashboard overview
-     * @return an {@link EmployeeDashboardDto} populated with user-specific work items
-     * @throws ResourceNotFoundException if no user matching {@code username} exists
-     */
+    // Compiles a personalized workspace summary for the specified employee.
     @Transactional(readOnly = true)
     public EmployeeDashboardDto getEmployeeDashboard(String username) {
-        User user = userRepository.findByUsername(username)
+        String normalized = username != null ? username.trim() : "";
+        User user = userRepository.findByUsername(normalized.toLowerCase())
+                .or(() -> userRepository.findByUsername(normalized))
+                .or(() -> userRepository.findByEmployeeId(normalized.toLowerCase()))
+                .or(() -> userRepository.findByEmployeeId(normalized))
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
         int hour = LocalTime.now().getHour();
@@ -136,22 +134,42 @@ public class DashboardService {
             greeting = "Good Evening";
         }
 
-        AttendanceResponse todayAttendance = attendanceRepository.findByUserIdAndDate(user.getId(), LocalDate.now())
-                .map(AttendanceResponse::from)
-                .orElse(null);
+        AttendanceResponse todayAttendance = null;
+        try {
+            todayAttendance = attendanceRepository.findByUserIdAndDate(user.getId(), LocalDate.now())
+                    .map(AttendanceResponse::from)
+                    .orElse(null);
+        } catch (Exception ex) {
+            log.warn("Could not load today's attendance for '{}': {}", user.getUsername(), ex.getMessage());
+        }
 
-        List<TaskDto> myTasks = taskRepository.findTop5ByAssignedToIdAndStatusInOrderByDeadlineAsc(
-                user.getId(),
-                List.of(Task.TaskStatus.PENDING, Task.TaskStatus.IN_PROGRESS)
-        ).stream().map(TaskDto::fromEntity).toList();
+        List<TaskDto> myTasks = List.of();
+        try {
+            myTasks = taskRepository.findTop5ByAssignedToIdAndStatusInOrderByDeadlineAsc(
+                    user.getId(),
+                    List.of(Task.TaskStatus.PENDING, Task.TaskStatus.IN_PROGRESS)
+            ).stream().map(TaskDto::fromEntity).toList();
+        } catch (Exception ex) {
+            log.warn("Could not load active tasks for '{}': {}", user.getUsername(), ex.getMessage());
+        }
 
-        List<ProjectDto> myProjects = projectRepository.findTop5ByResponsibleIdAndStatusInOrderByTargetDateAsc(
-                user.getId(),
-                List.of(RndProject.ProjectStatus.PENDING, RndProject.ProjectStatus.IN_PROGRESS)
-        ).stream().map(ProjectDto::fromEntity).toList();
+        List<ProjectDto> myProjects = List.of();
+        try {
+            myProjects = projectRepository.findTop5ByResponsibleIdAndStatusInOrderByTargetDateAsc(
+                    user.getId(),
+                    List.of(RndProject.ProjectStatus.PENDING, RndProject.ProjectStatus.IN_PROGRESS)
+            ).stream().map(ProjectDto::fromEntity).toList();
+        } catch (Exception ex) {
+            log.warn("Could not load active projects for '{}': {}", user.getUsername(), ex.getMessage());
+        }
 
-        List<WorkLogDto> myLogs = workLogRepository.findTop5ByUserIdOrderByLogDateDescSubmittedAtDesc(user.getId())
-                .stream().map(WorkLogDto::fromEntity).toList();
+        List<WorkLogDto> myLogs = List.of();
+        try {
+            myLogs = workLogRepository.findTop5ByUserIdOrderByLogDateDescSubmittedAtDesc(user.getId())
+                    .stream().map(WorkLogDto::fromEntity).toList();
+        } catch (Exception ex) {
+            log.warn("Could not load recent work logs for '{}': {}", user.getUsername(), ex.getMessage());
+        }
 
         return EmployeeDashboardDto.builder()
                 .greeting(greeting)
@@ -165,31 +183,26 @@ public class DashboardService {
                 .build();
     }
 
-    /**
-     * Compiles a staff member's personalized workspace summary for an administrator.
-     *
-     * <p>Privilege enforcement:
-     * <ul>
-     *   <li>SUPER_ADMIN can view anyone's dashboard (super_admin, admin, employee).</li>
-     *   <li>ADMIN can view employee dashboards only (forbidden to inspect other admins or super_admins).</li>
-     * </ul>
-     *
-     * @param targetUsername the username of the staff member whose dashboard is requested
-     * @param callerUsername the username of the inspecting administrator
-     * @return an {@link EmployeeDashboardDto} populated with the target's work items
-     */
     @Transactional(readOnly = true)
     public EmployeeDashboardDto getEmployeeDashboardForCaller(String targetUsername, String callerUsername) {
-        User caller = userRepository.findByUsername(callerUsername)
+        String callerNorm = callerUsername != null ? callerUsername.trim() : "";
+        String targetNorm = targetUsername != null ? targetUsername.trim() : "";
+
+        User caller = userRepository.findByUsername(callerNorm.toLowerCase())
+                .or(() -> userRepository.findByUsername(callerNorm))
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", callerUsername));
-        User target = userRepository.findByUsername(targetUsername)
+        User target = userRepository.findByUsername(targetNorm.toLowerCase())
+                .or(() -> userRepository.findByUsername(targetNorm))
+                .or(() -> userRepository.findByEmployeeId(targetNorm.toLowerCase()))
+                .or(() -> userRepository.findByEmployeeId(targetNorm))
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", targetUsername));
 
-        if (!caller.isSuperAdmin() && (target.isSuperAdmin() || target.isAdmin())) {
+        boolean isSelf = caller.getId().equals(target.getId());
+        if (!isSelf && !caller.isSuperAdmin() && target.isSuperAdmin()) {
             throw new org.springframework.security.access.AccessDeniedException(
-                    "Admins can only inspect employee dashboards, not other administrators.");
+                    "Admins cannot inspect Super Admin workspaces.");
         }
 
-        return getEmployeeDashboard(targetUsername);
+        return getEmployeeDashboard(target.getUsername());
     }
 }

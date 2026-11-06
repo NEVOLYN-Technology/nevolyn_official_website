@@ -43,7 +43,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
      * @param userId the primary key ID of the user
      * @return chronologically ordered list of attendance records
      */
-    List<Attendance> findByUserIdOrderByDateDesc(Long userId);
+    @Query("SELECT a FROM Attendance a JOIN FETCH a.user WHERE a.user.id = :userId ORDER BY a.date DESC")
+    List<Attendance> findByUserIdOrderByDateDesc(@Param("userId") Long userId);
 
     /**
      * Retrieves all attendance records for a specific date with associated user profiles eagerly loaded.

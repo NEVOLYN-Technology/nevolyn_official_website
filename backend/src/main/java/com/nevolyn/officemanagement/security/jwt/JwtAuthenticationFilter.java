@@ -56,11 +56,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String token = extractTokenFromCookie(request);
+        String token = extractTokenFromHeader(request);
         if (!StringUtils.hasText(token) || !jwtTokenProvider.validateToken(token)) {
-            String headerToken = extractTokenFromHeader(request);
-            if (StringUtils.hasText(headerToken) && jwtTokenProvider.validateToken(headerToken)) {
-                token = headerToken;
+            String cookieToken = extractTokenFromCookie(request);
+            if (StringUtils.hasText(cookieToken) && jwtTokenProvider.validateToken(cookieToken)) {
+                token = cookieToken;
             }
         }
 

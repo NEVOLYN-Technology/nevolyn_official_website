@@ -222,6 +222,11 @@ export const usersApi = {
     bankAccountNumber?: string;
     bankBranch?: string;
     bankRoutingNumber?: string;
+    secondaryBankName?: string;
+    secondaryBankAccountName?: string;
+    secondaryBankAccountNumber?: string;
+    secondaryBankBranch?: string;
+    secondaryBankRoutingNumber?: string;
     role: string;
   }) => api.post<User>("/users", data),
   update: (
@@ -237,6 +242,11 @@ export const usersApi = {
       bankAccountNumber?: string;
       bankBranch?: string;
       bankRoutingNumber?: string;
+      secondaryBankName?: string;
+      secondaryBankAccountName?: string;
+      secondaryBankAccountNumber?: string;
+      secondaryBankBranch?: string;
+      secondaryBankRoutingNumber?: string;
       role: string;
     }
   ) => api.patch<User>(`/users/${id}`, data),

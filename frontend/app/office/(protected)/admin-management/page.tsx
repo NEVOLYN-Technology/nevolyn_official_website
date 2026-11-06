@@ -17,6 +17,7 @@ import {
   Crown,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 
 // ── Create Admin Modal ────────────────────────────────────────────
 
@@ -329,11 +330,7 @@ export default function AdminManagementPage() {
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     {/* Avatar */}
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                      isSA ? "bg-purple-900/60 text-purple-300" : "bg-blue-900/60 text-blue-300"
-                    }`}>
-                      {admin.fullName.charAt(0).toUpperCase()}
-                    </div>
+                    <EmployeeAvatar user={admin} size="md" shape="circle" />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-semibold text-white">{admin.fullName}</span>

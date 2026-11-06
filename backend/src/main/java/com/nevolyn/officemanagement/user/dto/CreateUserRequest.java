@@ -6,10 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-/**
- * Payload record for registering a new employee or administrator account, specifying corporate ID,
- * login credentials, personal profile details, banking information, and role permissions.
- */
+// Payload record for registering a new employee or administrator account.
 public record CreateUserRequest(
         @NotBlank(message = "Employee ID is required")
         @Size(max = 50)
@@ -36,14 +33,55 @@ public record CreateUserRequest(
         String bankAccountNumber,
         String bankBranch,
         String bankRoutingNumber,
+        String secondaryBankName,
+        String secondaryBankAccountName,
+        String secondaryBankAccountNumber,
+        String secondaryBankBranch,
+        String secondaryBankRoutingNumber,
 
         @NotBlank(message = "Role is required")
         @Pattern(regexp = "super_admin|admin|employee", message = "Role must be 'super_admin', 'admin', or 'employee'")
         String role
 ) {
-    /**
-     * Convenience constructor for callers providing core fields without email/bank details.
-     */
+    public CreateUserRequest(
+            String employeeId,
+            String username,
+            String password,
+            String fullName,
+            String designation,
+            LocalDate joiningDate,
+            String phone,
+            String email,
+            String bankName,
+            String bankAccountName,
+            String bankAccountNumber,
+            String bankBranch,
+            String bankRoutingNumber,
+            String role
+    ) {
+        this(
+                employeeId,
+                username,
+                password,
+                fullName,
+                designation,
+                joiningDate,
+                phone,
+                email,
+                bankName,
+                bankAccountName,
+                bankAccountNumber,
+                bankBranch,
+                bankRoutingNumber,
+                null,
+                null,
+                null,
+                null,
+                null,
+                role
+        );
+    }
+
     public CreateUserRequest(
             String employeeId,
             String username,
@@ -62,6 +100,11 @@ public record CreateUserRequest(
                 designation,
                 joiningDate,
                 phone,
+                null,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,

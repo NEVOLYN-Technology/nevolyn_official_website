@@ -2,12 +2,7 @@ package com.nevolyn.officemanagement.auth.dto;
 
 import com.nevolyn.officemanagement.user.entity.User;
 
-/**
- * Response payload after a successful login or profile fetch.
- *
- * <p>The JWT token is also set in an HTTP-only cookie by the controller.
- * This response body provides the user info and active session role needed by the frontend.
- */
+// Response payload after a successful login or profile fetch.
 public record LoginResponse(
         Long id,
         String username,
@@ -21,6 +16,11 @@ public record LoginResponse(
         String bankAccountNumber,
         String bankBranch,
         String bankRoutingNumber,
+        String secondaryBankName,
+        String secondaryBankAccountName,
+        String secondaryBankAccountNumber,
+        String secondaryBankBranch,
+        String secondaryBankRoutingNumber,
         String role,
         String token
 ) {
@@ -50,6 +50,11 @@ public record LoginResponse(
                 user.getBankAccountNumber(),
                 user.getBankBranch(),
                 user.getBankRoutingNumber(),
+                user.getSecondaryBankName(),
+                user.getSecondaryBankAccountName(),
+                user.getSecondaryBankAccountNumber(),
+                user.getSecondaryBankBranch(),
+                user.getSecondaryBankRoutingNumber(),
                 effectiveRole,
                 token);
     }

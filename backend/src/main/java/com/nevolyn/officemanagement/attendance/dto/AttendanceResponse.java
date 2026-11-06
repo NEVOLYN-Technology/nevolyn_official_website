@@ -1,13 +1,11 @@
 package com.nevolyn.officemanagement.attendance.dto;
 
 import com.nevolyn.officemanagement.attendance.entity.Attendance;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * Attendance record response DTO.
- */
 public record AttendanceResponse(
         Long id,
         Long userId,
@@ -20,9 +18,13 @@ public record AttendanceResponse(
         String lateStatus,
         String earlyCheckout,
         String status,
-        String presenceBadge   // ABSENT | IN HOUSE | PRESENT
+        String presenceBadge
 ) {
     public static AttendanceResponse from(Attendance a) {
+        if (a == null) {
+            return null;
+        }
+
         String badge;
         if (a.getCheckInTime() == null) {
             badge = "ABSENT";
@@ -32,18 +34,32 @@ public record AttendanceResponse(
             badge = "PRESENT";
         }
 
+        Long userId = null;
+        String employeeId = "";
+        String fullName = "";
+        if (a.getUser() != null) {
+            userId = a.getUser().getId();
+            employeeId = a.getUser().getEmployeeId() != null ? a.getUser().getEmployeeId() : "";
+            fullName = a.getUser().getFullName() != null ? a.getUser().getFullName() : "";
+        }
+
+        BigDecimal totalHours = a.getTotalHours() != null ? a.getTotalHours() : BigDecimal.ZERO;
+        String lateStatus = a.getLateStatus() != null ? a.getLateStatus().getDisplayName() : "On Time";
+        String earlyCheckout = a.getEarlyCheckout() != null ? a.getEarlyCheckout().getDisplayName() : "No";
+        String status = a.getStatus() != null ? a.getStatus().name() : "PRESENT";
+
         return new AttendanceResponse(
                 a.getId(),
-                a.getUser().getId(),
-                a.getUser().getEmployeeId(),
-                a.getUser().getFullName(),
+                userId,
+                employeeId,
+                fullName,
                 a.getDate(),
                 a.getCheckInTime(),
                 a.getCheckOutTime(),
-                a.getTotalHours(),
-                a.getLateStatus().getDisplayName(),
-                a.getEarlyCheckout().getDisplayName(),
-                a.getStatus().name(),
+                totalHours,
+                lateStatus,
+                earlyCheckout,
+                status,
                 badge
         );
     }

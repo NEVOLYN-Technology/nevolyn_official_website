@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { authApi, getApiErrorMessage } from "@/lib/api";
 import { KeyRound, CheckCircle, AlertCircle, Landmark } from "lucide-react";
+import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 
 /**
  * ProfilePage component.
@@ -66,10 +67,8 @@ export default function ProfilePage() {
         {/* User Identity & Bank Details */}
         <div className="space-y-6">
           <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-4">
-            <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-base">
-                {user?.fullName?.charAt(0) || "U"}
-              </div>
+            <div className="flex items-center gap-3.5 border-b border-slate-800 pb-3">
+              <EmployeeAvatar user={user} size="lg" shape="rounded" />
               <div>
                 <h2 className="text-base font-bold text-white">{user?.fullName}</h2>
                 <p className="text-xs text-slate-400">@{user?.username}</p>
@@ -100,11 +99,11 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Bank Details Card */}
+          {/* Bank Account 1 (Primary) Card */}
           <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
               <Landmark className="w-5 h-5 text-cyan-400" />
-              <h2 className="text-base font-bold text-white">Bank &amp; Payroll Details</h2>
+              <h2 className="text-base font-bold text-white">Bank Account 1 — Primary Payroll</h2>
             </div>
 
             <div className="space-y-3 text-xs">
@@ -127,6 +126,41 @@ export default function ProfilePage() {
               <div className="flex justify-between py-1.5">
                 <span className="text-slate-500">Routing / SWIFT</span>
                 <span className="font-mono text-slate-300">{user?.bankRoutingNumber || "Not set"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bank Account 2 (Secondary) Card */}
+          <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-4">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+              <Landmark className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-base font-bold text-white">Bank Account 2 — Secondary / Alternate</h2>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
+                <span className="text-slate-500">Bank Name</span>
+                <span className="font-medium text-white">{user?.secondaryBankName || "Not set"}</span>
+              </div>
+              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
+                <span className="text-slate-500">Account Holder</span>
+                <span className="font-medium text-slate-200">
+                  {user?.secondaryBankAccountName || user?.fullName || "Not set"}
+                </span>
+              </div>
+              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
+                <span className="text-slate-500">Account Number</span>
+                <span className="font-mono font-bold text-indigo-400">
+                  {user?.secondaryBankAccountNumber || "Not set"}
+                </span>
+              </div>
+              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
+                <span className="text-slate-500">Branch Name</span>
+                <span className="font-medium text-slate-200">{user?.secondaryBankBranch || "Not set"}</span>
+              </div>
+              <div className="flex justify-between py-1.5">
+                <span className="text-slate-500">Routing / SWIFT</span>
+                <span className="font-mono text-slate-300">{user?.secondaryBankRoutingNumber || "Not set"}</span>
               </div>
             </div>
           </div>

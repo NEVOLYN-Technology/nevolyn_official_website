@@ -6,12 +6,7 @@ import lombok.Builder;
 import java.time.Instant;
 import java.time.LocalDate;
 
-/**
- * Data transfer object representing employee or administrator account details.
- *
- * <p>Excludes sensitive credentials such as password hashes while providing
- * employment identifiers, contact details, banking information, and access roles.</p>
- */
+// Data transfer object representing employee or administrator account details.
 @Builder
 public record UserDto(
         Long id,
@@ -27,6 +22,11 @@ public record UserDto(
         String bankAccountNumber,
         String bankBranch,
         String bankRoutingNumber,
+        String secondaryBankName,
+        String secondaryBankAccountName,
+        String secondaryBankAccountNumber,
+        String secondaryBankBranch,
+        String secondaryBankRoutingNumber,
         String role,
         Boolean isActive,
         Instant createdAt
@@ -47,6 +47,11 @@ public record UserDto(
                 .bankAccountNumber(user.getBankAccountNumber())
                 .bankBranch(user.getBankBranch())
                 .bankRoutingNumber(user.getBankRoutingNumber())
+                .secondaryBankName(user.getSecondaryBankName())
+                .secondaryBankAccountName(user.getSecondaryBankAccountName())
+                .secondaryBankAccountNumber(user.getSecondaryBankAccountNumber())
+                .secondaryBankBranch(user.getSecondaryBankBranch())
+                .secondaryBankRoutingNumber(user.getSecondaryBankRoutingNumber())
                 .role(user.getRole() != null ? user.getRole().name() : null)
                 .isActive(user.getIsActive())
                 .createdAt(user.getCreatedAt())

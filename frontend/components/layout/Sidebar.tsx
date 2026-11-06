@@ -5,6 +5,7 @@ import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { BrandWordmark } from "@/components/ui/BrandWordmark";
+import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 import {
   LayoutDashboard,
   Clock,
@@ -63,7 +64,7 @@ export function Sidebar() {
   const links = isAdmin ? adminLinks : employeeLinks;
 
   return (
-    <aside className="w-64 bg-white/85 backdrop-blur-2xl border-r border-slate-200/85 flex flex-col h-screen fixed left-0 top-0 z-40 text-slate-700 shadow-[4px_0_30px_-5px_rgba(14,165,233,0.08)]">
+    <aside className="w-72 bg-white/85 backdrop-blur-2xl border-r border-slate-200/85 flex flex-col h-screen fixed left-0 top-0 z-40 text-slate-700 shadow-[4px_0_30px_-5px_rgba(14,165,233,0.08)]">
       {/* Brand Header */}
       <div className="h-16 px-5 border-b border-slate-200/80 flex items-center justify-between bg-gradient-to-r from-white/95 via-sky-50/40 to-white/95">
         <NextLink href="/office/dashboard" className="flex items-center gap-2.5 group">
@@ -75,7 +76,7 @@ export function Sidebar() {
       </div>
 
       {/* Role Pill */}
-      <div className="px-4 py-3 border-b border-slate-200/75 bg-gradient-to-r from-slate-50/90 via-sky-50/50 to-indigo-50/40 flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-slate-200/75 bg-gradient-to-r from-slate-50/90 via-sky-50/50 to-indigo-50/40 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {isSuperAdmin ? (
             <Crown className="w-3.5 h-3.5 text-purple-600 shrink-0" />
@@ -86,12 +87,12 @@ export function Sidebar() {
               }`}
             />
           )}
-          <span className="text-xs font-bold text-slate-800 truncate">
+          <span className="text-xs font-bold text-slate-800 whitespace-nowrap">
             {isSuperAdmin ? "Super Admin" : isAdmin ? "Administrator" : "Staff Member"}
           </span>
         </div>
-        <span className="text-[9px] px-2 py-0.5 rounded-full bg-white border border-slate-200/90 text-slate-600 font-semibold font-mono shadow-2xs truncate max-w-[100px]">
-          {user?.username || "staff"}
+        <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white border border-slate-200/90 text-slate-600 font-semibold font-mono shadow-2xs whitespace-nowrap">
+          @{user?.username || "staff"}
         </span>
       </div>
 
@@ -124,21 +125,24 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom User Area */}
+      {/* Bottom User Area — Full name & designation never truncate out of scope */}
       <div className="p-3 border-t border-slate-200/80 bg-gradient-to-b from-slate-50/70 to-slate-100/80">
-        <div className="p-3 rounded-2xl bg-white/95 border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div className="min-w-0 pr-2">
-            <p className="text-xs font-extrabold text-slate-900 truncate">
-              {user?.fullName || "User"}
-            </p>
-            <p className="text-[11px] text-slate-500 font-medium truncate capitalize">
-              {user?.designation || user?.role}
-            </p>
+        <div className="p-3 rounded-2xl bg-white/95 border border-slate-200/90 shadow-xs flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <EmployeeAvatar user={user} size="sm" shape="circle" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[11.5px] font-extrabold text-slate-900 leading-snug break-words">
+                {user?.fullName || "User"}
+              </p>
+              <p className="text-[10.5px] text-slate-500 font-medium leading-snug break-words mt-0.5">
+                {user?.designation || user?.role}
+              </p>
+            </div>
           </div>
           <button
             onClick={logout}
             title="Sign Out"
-            className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200/70 transition-all cursor-pointer"
+            className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200/70 transition-all cursor-pointer shrink-0"
           >
             <LogOut className="w-4 h-4" />
           </button>

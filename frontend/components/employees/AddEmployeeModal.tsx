@@ -6,20 +6,11 @@ import { usersApi, getApiErrorMessage } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { X, Landmark } from "lucide-react";
 
-/**
- * Props for the {@link AddEmployeeModal} component.
- */
 interface AddEmployeeModalProps {
-  /** Callback fired when modal is dismissed. */
   onClose: () => void;
-  /** Callback fired when the new employee is successfully registered. */
   onSuccess: () => void;
 }
 
-/**
- * Modal dialog for onboarding and provisioning new employees or administrators,
- * including personal contact details and banking information.
- */
 export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) {
   const { isSuperAdmin } = useAuth();
   const [formData, setFormData] = useState({
@@ -36,6 +27,11 @@ export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) 
     bankAccountNumber: "",
     bankBranch: "",
     bankRoutingNumber: "",
+    secondaryBankName: "",
+    secondaryBankAccountName: "",
+    secondaryBankAccountNumber: "",
+    secondaryBankBranch: "",
+    secondaryBankRoutingNumber: "",
     role: "employee",
   });
   const [errorMsg, setErrorMsg] = useState("");
@@ -119,6 +115,7 @@ export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) 
                   ...formData,
                   fullName: e.target.value,
                   bankAccountName: formData.bankAccountName || e.target.value,
+                  secondaryBankAccountName: formData.secondaryBankAccountName || e.target.value,
                 })
               }
               className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-cyan-500 focus:outline-none"
@@ -199,11 +196,11 @@ export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) 
             />
           </div>
 
-          {/* Bank Details Section */}
+          {/* Bank Account 1 (Primary) */}
           <div className="sm:col-span-2 pt-3 border-t border-slate-800/80">
             <div className="flex items-center gap-2 text-cyan-400 font-semibold text-xs mb-3">
               <Landmark className="w-4 h-4" />
-              <span>Bank & Payroll Details</span>
+              <span>Bank Account 1 — Primary Payroll Account</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -254,6 +251,66 @@ export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) 
                   value={formData.bankRoutingNumber}
                   onChange={(e) => setFormData({ ...formData, bankRoutingNumber: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-cyan-500 focus:outline-none font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bank Account 2 (Secondary) */}
+          <div className="sm:col-span-2 pt-3 border-t border-slate-800/80">
+            <div className="flex items-center gap-2 text-indigo-400 font-semibold text-xs mb-3">
+              <Landmark className="w-4 h-4" />
+              <span>Bank Account 2 — Secondary / Alternate Account (Optional)</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-400 mb-1 font-medium">Bank Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Eastern Bank / Islami Bank / bKash"
+                  value={formData.secondaryBankName}
+                  onChange={(e) => setFormData({ ...formData, secondaryBankName: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-indigo-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1 font-medium">Account Holder Name</label>
+                <input
+                  type="text"
+                  placeholder="Name as on secondary bank account"
+                  value={formData.secondaryBankAccountName}
+                  onChange={(e) => setFormData({ ...formData, secondaryBankAccountName: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-indigo-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1 font-medium">Account Number</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 1041070001234"
+                  value={formData.secondaryBankAccountNumber}
+                  onChange={(e) => setFormData({ ...formData, secondaryBankAccountNumber: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-indigo-500 focus:outline-none font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1 font-medium">Branch Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Dhanmondi Branch"
+                  value={formData.secondaryBankBranch}
+                  onChange={(e) => setFormData({ ...formData, secondaryBankBranch: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-indigo-500 focus:outline-none"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-slate-400 mb-1 font-medium">Routing Number / SWIFT</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 095261186"
+                  value={formData.secondaryBankRoutingNumber}
+                  onChange={(e) => setFormData({ ...formData, secondaryBankRoutingNumber: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:border-indigo-500 focus:outline-none font-mono"
                 />
               </div>
             </div>

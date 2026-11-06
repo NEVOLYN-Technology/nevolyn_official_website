@@ -6,10 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-/**
- * Payload record for administrative updates to employee account profiles,
- * including full name, designation, department joining date, phone, email, banking details, and role.
- */
+// Payload record for administrative updates to employee account profiles.
 public record UpdateUserRequest(
         @NotBlank(message = "Full name is required")
         @Size(max = 255)
@@ -24,14 +21,16 @@ public record UpdateUserRequest(
         String bankAccountNumber,
         String bankBranch,
         String bankRoutingNumber,
+        String secondaryBankName,
+        String secondaryBankAccountName,
+        String secondaryBankAccountNumber,
+        String secondaryBankBranch,
+        String secondaryBankRoutingNumber,
 
         @NotBlank(message = "Role is required")
         @Pattern(regexp = "super_admin|admin|employee", message = "Role must be 'super_admin', 'admin', or 'employee'")
         String role
 ) {
-    /**
-     * Convenience constructor for callers providing core fields without email/bank details.
-     */
     public UpdateUserRequest(
             String fullName,
             String designation,
@@ -44,6 +43,11 @@ public record UpdateUserRequest(
                 designation,
                 joiningDate,
                 phone,
+                null,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,

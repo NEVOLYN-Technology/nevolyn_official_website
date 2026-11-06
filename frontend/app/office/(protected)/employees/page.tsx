@@ -8,6 +8,7 @@ import { User } from "@/types";
 import { UserPlus, Edit, KeyRound, Power, Search, Crown, ShieldCheck, Landmark, Mail, LayoutDashboard } from "lucide-react";
 import NextLink from "next/link";
 import { AddEmployeeModal, EditEmployeeModal, ResetPasswordModal } from "@/components/employees";
+import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 
 /**
  * Staff directory and employee administration management page.
@@ -47,7 +48,8 @@ export default function EmployeesPage() {
       u.employeeId.toLowerCase().includes(q) ||
       (u.designation && u.designation.toLowerCase().includes(q)) ||
       (u.email && u.email.toLowerCase().includes(q)) ||
-      (u.bankName && u.bankName.toLowerCase().includes(q))
+      (u.bankName && u.bankName.toLowerCase().includes(q)) ||
+      (u.secondaryBankName && u.secondaryBankName.toLowerCase().includes(q))
     );
   });
 
@@ -127,35 +129,61 @@ export default function EmployeesPage() {
                         {u.employeeId}
                       </td>
                       <td className="py-3 px-4">
-                        <div className="font-bold text-white">{u.fullName}</div>
-                        {(u.email || u.phone) && (
-                          <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
-                            {u.email && (
-                              <span className="inline-flex items-center gap-1 truncate max-w-[200px]" title={u.email}>
-                                <Mail className="w-3 h-3 text-slate-500 shrink-0" />
-                                {u.email}
-                              </span>
+                        <div className="flex items-center gap-3">
+                          <EmployeeAvatar user={u} size="sm" shape="circle" />
+                          <div>
+                            <div className="font-bold text-white">{u.fullName}</div>
+                            {(u.email || u.phone) && (
+                              <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
+                                {u.email && (
+                                  <span className="inline-flex items-center gap-1 truncate max-w-[200px]" title={u.email}>
+                                    <Mail className="w-3 h-3 text-slate-500 shrink-0" />
+                                    {u.email}
+                                  </span>
+                                )}
+                                {u.phone && <span className="font-mono text-slate-500">· {u.phone}</span>}
+                              </div>
                             )}
-                            {u.phone && <span className="font-mono text-slate-500">· {u.phone}</span>}
                           </div>
-                        )}
+                        </div>
                       </td>
                       <td className="py-3 px-4 font-mono text-slate-400">@{u.username}</td>
                       <td className="py-3 px-4">{u.designation || "-"}</td>
                       <td className="py-3 px-4">
-                        {u.bankName || u.bankAccountNumber ? (
-                          <div className="space-y-0.5">
-                            <div className="font-semibold text-slate-200 flex items-center gap-1">
-                              <Landmark className="w-3 h-3 text-cyan-400 shrink-0" />
-                              <span>{u.bankName || "Bank"}</span>
-                              {u.bankBranch && <span className="text-slate-500 font-normal">({u.bankBranch})</span>}
-                            </div>
-                            <div className="font-mono text-[11px] text-cyan-300">
-                              A/C: {u.bankAccountNumber || "Not set"}
-                              {u.bankRoutingNumber && (
-                                <span className="text-slate-500"> · RTN: {u.bankRoutingNumber}</span>
-                              )}
-                            </div>
+                        {u.bankName || u.bankAccountNumber || u.secondaryBankName || u.secondaryBankAccountNumber ? (
+                          <div className="space-y-2">
+                            {(u.bankName || u.bankAccountNumber) && (
+                              <div className="space-y-0.5">
+                                <div className="font-semibold text-slate-200 flex items-center gap-1">
+                                  <Landmark className="w-3 h-3 text-cyan-400 shrink-0" />
+                                  <span>#1 {u.bankName || "Primary Bank"}</span>
+                                  {u.bankBranch && <span className="text-slate-500 font-normal">({u.bankBranch})</span>}
+                                </div>
+                                <div className="font-mono text-[11px] text-cyan-300">
+                                  A/C: {u.bankAccountNumber || "Not set"}
+                                  {u.bankRoutingNumber && (
+                                    <span className="text-slate-500"> · RTN: {u.bankRoutingNumber}</span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            {(u.secondaryBankName || u.secondaryBankAccountNumber) && (
+                              <div className="space-y-0.5 pt-1 border-t border-slate-800/70">
+                                <div className="font-semibold text-slate-200 flex items-center gap-1">
+                                  <Landmark className="w-3 h-3 text-indigo-400 shrink-0" />
+                                  <span>#2 {u.secondaryBankName || "Secondary Bank"}</span>
+                                  {u.secondaryBankBranch && (
+                                    <span className="text-slate-500 font-normal">({u.secondaryBankBranch})</span>
+                                  )}
+                                </div>
+                                <div className="font-mono text-[11px] text-indigo-300">
+                                  A/C: {u.secondaryBankAccountNumber || "Not set"}
+                                  {u.secondaryBankRoutingNumber && (
+                                    <span className="text-slate-500"> · RTN: {u.secondaryBankRoutingNumber}</span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <span className="text-[11px] text-slate-500 italic">Not added yet</span>

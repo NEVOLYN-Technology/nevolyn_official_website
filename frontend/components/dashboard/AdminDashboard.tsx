@@ -19,6 +19,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { StatCard } from "./StatCard";
+import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 
 /**
  * Executive administrator dashboard component — Light Glassmorphism 2.0 Edition.
@@ -162,9 +163,18 @@ export function AdminDashboard() {
                   data.todayAttendance.map((rec) => (
                     <tr key={rec.userId} className="hover:bg-sky-50/40 transition duration-150">
                       <td className="py-3 px-4 font-bold text-slate-900">
-                        <div>{rec.fullName}</div>
-                        <div className="text-[10px] text-slate-500 font-mono font-normal">
-                          {rec.employeeId}
+                        <div className="flex items-center gap-2.5">
+                          <EmployeeAvatar
+                            user={{ fullName: rec.fullName, employeeId: rec.employeeId }}
+                            size="xs"
+                            shape="circle"
+                          />
+                          <div>
+                            <div>{rec.fullName}</div>
+                            <div className="text-[10px] text-slate-500 font-mono font-normal">
+                              {rec.employeeId}
+                            </div>
+                          </div>
                         </div>
                       </td>
                       <td className="py-3 px-4 font-mono font-semibold text-slate-700">

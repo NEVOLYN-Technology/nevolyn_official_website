@@ -67,6 +67,21 @@ public class User {
     @Column(name = "bank_routing_number", length = 100)
     private String bankRoutingNumber;
 
+    @Column(name = "secondary_bank_name", length = 255)
+    private String secondaryBankName;
+
+    @Column(name = "secondary_bank_account_name", length = 255)
+    private String secondaryBankAccountName;
+
+    @Column(name = "secondary_bank_account_number", length = 100)
+    private String secondaryBankAccountNumber;
+
+    @Column(name = "secondary_bank_branch", length = 255)
+    private String secondaryBankBranch;
+
+    @Column(name = "secondary_bank_routing_number", length = 100)
+    private String secondaryBankRoutingNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private UserRole role;

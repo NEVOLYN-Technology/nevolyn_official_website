@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { dashboardApi, attendanceApi } from "@/lib/api";
 import NextLink from "next/link";
 import { CheckSquare, FlaskConical, FileText, Eye, Edit, KeyRound, ArrowLeft } from "lucide-react";
+import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 
 /**
  * Props for the {@link EmployeeDashboard} component.
@@ -34,12 +35,14 @@ export function EmployeeDashboard({
 }: EmployeeDashboardProps) {
   const queryClient = useQueryClient();
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["employee-dashboard", username, isInspecting],
     queryFn: async () => {
       const res = await dashboardApi.getEmployee(isInspecting ? username : undefined);
-      return res.data;
+      const raw = (res.data as unknown as { data?: typeof res.data })?.data ?? res.data;
+      return raw;
     },
+    enabled: !isInspecting || Boolean(username),
   });
 
   const checkInMutation = useMutation({
@@ -66,9 +69,19 @@ export function EmployeeDashboard({
   }
 
   if (error || !data) {
+    const errMsg =
+      (error as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ||
+      (error as { message?: string })?.message ||
+      "Failed to load employee dashboard.";
     return (
-      <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 font-semibold text-sm">
-        Failed to load employee dashboard.
+      <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 font-semibold text-sm flex items-center justify-between gap-4">
+        <span>{errMsg}</span>
+        <button
+          onClick={() => refetch()}
+          className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition cursor-pointer shrink-0"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -76,6 +89,9 @@ export function EmployeeDashboard({
   const att = data.todayAttendance;
   const hasCheckedIn = !!att?.checkInTime;
   const hasCheckedOut = !!att?.checkOutTime;
+  const myTasks = data.myTasks ?? [];
+  const myProjects = data.myProjects ?? [];
+  const myWorkLogs = data.myWorkLogs ?? [];
 
   return (
     <div className="space-y-7 max-w-5xl mx-auto">
@@ -135,18 +151,25 @@ export function EmployeeDashboard({
       <div className="p-6 md:p-8 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-[0_14px_40px_-12px_rgba(14,165,233,0.12)] relative overflow-hidden">
         <div className="h-1.5 w-full bg-gradient-to-r from-sky-400 via-blue-600 to-indigo-600 absolute top-0 left-0" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-              {data.greeting}, <span className="text-sky-700">{data.fullName}</span>
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium flex items-center gap-2 flex-wrap">
-              <span>{data.designation || "R&D Staff Member"}</span>
-              <span>&bull;</span>
-              <span>Employee ID:</span>
-              <span className="font-mono text-sky-700 font-bold px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-xs">
-                {data.employeeId}
-              </span>
-            </p>
+          <div className="flex items-center gap-4">
+            <EmployeeAvatar
+              user={{ fullName: data.fullName, username, employeeId: data.employeeId }}
+              size="lg"
+              shape="rounded"
+            />
+            <div>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                {data.greeting}, <span className="text-sky-700">{data.fullName}</span>
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium flex items-center gap-2 flex-wrap">
+                <span>{data.designation || "R&D Staff Member"}</span>
+                <span>&bull;</span>
+                <span>Employee ID:</span>
+                <span className="font-mono text-sky-700 font-bold px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-xs">
+                  {data.employeeId}
+                </span>
+              </p>
+            </div>
           </div>
           <div className="text-left sm:text-right bg-emerald-50/80 border border-emerald-200/80 px-4 py-2.5 rounded-2xl">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 block">
@@ -261,7 +284,7 @@ export function EmployeeDashboard({
               My Tasks
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              {data.myTasks.length} Assigned Items
+              {myTasks.length} Assigned Items
             </p>
           </div>
           <span className="text-xs text-sky-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
@@ -297,7 +320,7 @@ export function EmployeeDashboard({
               R&amp;D Projects
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              {data.myProjects.length} Lead Initiatives
+              {myProjects.length} Lead Initiatives
             </p>
           </div>
           <span className="text-xs text-indigo-600 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
@@ -339,12 +362,12 @@ export function EmployeeDashboard({
           </div>
 
           <div className="space-y-3">
-            {data.myTasks.length === 0 ? (
+            {myTasks.length === 0 ? (
               <p className="text-xs text-slate-400 py-6 text-center font-medium">
                 No active tasks assigned right now.
               </p>
             ) : (
-              data.myTasks.map((t) => (
+              myTasks.map((t) => (
                 <div
                   key={t.id}
                   className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 hover:border-sky-200 transition"
@@ -378,12 +401,12 @@ export function EmployeeDashboard({
           </div>
 
           <div className="space-y-3">
-            {data.myProjects.length === 0 ? (
+            {myProjects.length === 0 ? (
               <p className="text-xs text-slate-400 py-6 text-center font-medium">
                 No projects where this staff member is lead responsible.
               </p>
             ) : (
-              data.myProjects.map((p) => (
+              myProjects.map((p) => (
                 <NextLink
                   key={p.id}
                   href={`/office/projects/${p.id}`}
@@ -421,13 +444,13 @@ export function EmployeeDashboard({
           </NextLink>
         </div>
 
-        {data.myWorkLogs.length === 0 ? (
+        {myWorkLogs.length === 0 ? (
           <p className="text-xs text-slate-400 py-4 text-center font-medium">
             No work logs submitted recently.
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {data.myWorkLogs.map((log) => (
+            {myWorkLogs.map((log) => (
               <div
                 key={log.id}
                 className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-1.5"

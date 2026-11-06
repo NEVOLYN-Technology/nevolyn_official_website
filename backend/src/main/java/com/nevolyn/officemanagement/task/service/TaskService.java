@@ -101,9 +101,6 @@ public class TaskService {
         User assignee = userRepository.findById(request.assignedToId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.assignedToId()));
 
-        if (!assignee.getRole().equals(User.UserRole.employee)) {
-            throw new BusinessRuleException("Tasks can only be assigned to employees.");
-        }
         if (!Boolean.TRUE.equals(assignee.getIsActive())) {
             throw new BusinessRuleException("Cannot assign tasks to deactivated employees.");
         }

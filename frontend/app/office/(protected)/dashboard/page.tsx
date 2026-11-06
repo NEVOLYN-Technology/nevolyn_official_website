@@ -43,10 +43,10 @@ function DashboardContent() {
 
   const staffList = usersData || [];
 
-  // Super Admin can inspect ANY personnel; Admin can only inspect EMPLOYEES
+  // Super Admin can inspect ANY personnel; Admin can inspect themselves and EMPLOYEES
   const allowedStaff = staffList.filter((s) => {
     if (isSuperAdmin) return true;
-    return s.role === "employee";
+    return s.role === "employee" || s.username === user?.username;
   });
 
   const activeTargetUser =
