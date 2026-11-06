@@ -30,8 +30,6 @@ COPY . .
 # NEXT_PUBLIC_* values and rewrite destinations are evaluated at BUILD time.
 ARG NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-ARG OFFICE_FRONTEND_URL=http://office-frontend:3000
-ENV OFFICE_FRONTEND_URL=${OFFICE_FRONTEND_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN pnpm build

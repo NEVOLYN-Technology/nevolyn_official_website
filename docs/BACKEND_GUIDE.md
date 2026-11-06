@@ -58,10 +58,22 @@ backend/
     │   ├── ApplicationService.java          # Job application & file storage orchestration
     │   ├── EmailService.java                # 3-step pipeline; Brevo REST + SMTP fallback
     │   └── FileStorageService.java          # Resume validation, path sanitization, persistence
-    └── exception/                           # Exception Handlers & Interceptors
-        ├── GlobalExceptionHandler.java      # @RestControllerAdvice transforming errors into ApiResponse
-        ├── FileStorageException.java        # Custom file operation exception
-        └── ResourceNotFoundException.java   # Custom 404 entity exception
+    ├── exception/                           # Exception Handlers & Interceptors
+    │   ├── GlobalExceptionHandler.java      # @RestControllerAdvice transforming errors into ApiResponse
+    │   ├── FileStorageException.java        # Custom file operation exception
+    │   └── ResourceNotFoundException.java   # Custom 404 entity exception
+    └── officemanagement/                    # NEVOLYN Office & HRM Management Subsystem
+        ├── auth/                            # Authentication (AuthController, JWT Tokens)
+        ├── user/                            # User & Employee Management (UserController, User Entity)
+        ├── attendance/                      # Daily & Admin Attendance (QR Kiosk, Late Policies)
+        ├── project/                         # R&D Projects Management
+        ├── task/                            # Task Delegation & Kanban Workflow
+        ├── worklog/                         # Employee Daily Activity Journaling
+        ├── training/                        # Technical Workshops & Meetings
+        ├── file/                            # Document & Attachment Storage
+        ├── report/                          # Export & Monthly Analytics
+        ├── audit/                           # Security Logs & Audit Trail
+        └── security/                        # JWT Filter, RBAC Authorities & UserDetailsService
 ```
 
 ---

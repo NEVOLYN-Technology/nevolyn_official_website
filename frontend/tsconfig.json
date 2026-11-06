@@ -25,15 +25,16 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@tanstack/react-query": [
+        "./lib/office/react-query"
       ]
     }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules"

@@ -78,9 +78,9 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob:",
+      "img-src 'self' data: blob: https://api.qrserver.com",
       "font-src 'self' data:",
-      `connect-src 'self' ${apiOrigin} https://vitals.vercel-insights.com`,
+      `connect-src 'self' ${apiOrigin} https://api.nevolyn.com https://*.nevolyn.com https://vitals.vercel-insights.com`,
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -95,13 +95,12 @@ const securityHeaders = [
 ]
 
 /**
- * Internal origin for the NEVOLYN Office & HRM Management frontend service.
- * Defaults to http://localhost:3001 locally and http://office-frontend:3000 in Docker Compose.
+ * Internal API origin for the unified NEVOLYN Spring Boot backend service.
  */
-const officeFrontendOrigin = (
-  process.env.OFFICE_FRONTEND_URL ??
-  process.env.NEXT_PUBLIC_OFFICE_URL ??
-  'http://localhost:3001'
+const officeBackendApiUrl = (
+  process.env.OFFICE_BACKEND_API_URL ??
+  process.env.INTERNAL_API_URL ??
+  `${apiOrigin}/api/v1`
 ).replace(/\/+$/, '')
 
 /** @type {import('next').NextConfig} */
@@ -142,19 +141,14 @@ const nextConfig = {
   ],
 
   /**
-   * Multi-Zone Reverse Proxy for NEVOLYN Office & HRM Management (/office).
-   * Keeps everything strictly under https://nevolyn.com/office/* while forwarding
-   * internally to the office-frontend container/process.
+   * API Proxy for NEVOLYN Office & HRM Management (/office/api/backend/*).
+   * All /office/* UI pages are served natively by this Next.js application.
    */
   async rewrites() {
     return [
       {
-        source: '/office',
-        destination: `${officeFrontendOrigin}/office`,
-      },
-      {
-        source: '/office/:path*',
-        destination: `${officeFrontendOrigin}/office/:path*`,
+        source: '/office/api/backend/:path*',
+        destination: `${officeBackendApiUrl}/:path*`,
       },
     ]
   },

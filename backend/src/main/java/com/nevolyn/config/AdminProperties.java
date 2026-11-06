@@ -20,5 +20,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "app.admin")
 public class AdminProperties {
     private String username = "admin";
-    private String password = "changeme";
+    private String password;
 }

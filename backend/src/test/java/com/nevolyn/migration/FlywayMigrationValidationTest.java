@@ -55,8 +55,21 @@ class FlywayMigrationValidationTest {
         Set<String> tables = fetchTableNames();
 
         assertThat(tables)
-                .as("all entity tables created by V1 and V2 migrations")
-                .contains("contact_inquiries", "job_applications");
+                .as("all entity tables created by V1, V2, and V4 migrations")
+                .contains(
+                        "contact_inquiries",
+                        "job_applications",
+                        "users",
+                        "attendance",
+                        "rnd_projects",
+                        "tasks",
+                        "experiments",
+                        "development_records",
+                        "work_logs",
+                        "trainings_meetings",
+                        "uploaded_files",
+                        "audit_logs"
+                );
 
         assertThat(tables)
                 .as("Flyway records applied migrations in its history table")

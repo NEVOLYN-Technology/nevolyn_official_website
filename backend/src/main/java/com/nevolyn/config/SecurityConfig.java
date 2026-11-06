@@ -1,9 +1,16 @@
 package com.nevolyn.config;
 
+import com.nevolyn.officemanagement.security.jwt.JwtAuthenticationFilter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,10 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Access control and CORS rules matching the production architecture in Fabins.
+ * Unified access control, JWT authentication, HTTP Basic authentication, and CORS rules
+ * for both the NEVOLYN official website and the NEVOLYN Office & HRM Portal.
  */
+@Slf4j
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     @Value("${NEVOLYN_ADMIN_USERNAME:${ADMIN_USERNAME:${app.admin.username:admin}}}")
@@ -37,7 +48,10 @@ public class SecurityConfig {
     private List<String> allowedOrigins;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            ObjectProvider<JwtAuthenticationFilter> jwtFilterProvider
+    ) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
@@ -57,16 +71,34 @@ public class SecurityConfig {
                         // One-click acknowledge links sent in admin notification emails
                         .requestMatchers("/api/v1/acknowledge/**").permitAll()
 
+                        // Public: Office Portal JWT authentication endpoint
+                        .requestMatchers("/api/v1/auth/login").permitAll()
+
                         // Public: static images and assets
                         .requestMatchers("/nevolyn-logo*.png", "/*.png", "/favicon.ico", "/static/**").permitAll()
 
                         // Public: liveness probe for Docker healthcheck
-                        .requestMatchers("/actuator/health/**").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
 
                         // Dev-only H2 console
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        // Everything else - admin routes - requires ADMIN role
+                        // Allow authenticated staff to read active employee summary (for project/task assignment dropdowns)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/employees").authenticated()
+
+                        // Office Super Admin routes (Admin Management)
+                        .requestMatchers("/api/v1/users/admins/**").hasRole("SUPER_ADMIN")
+
+                        // Office & Website Admin routes
+                        .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/reports/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/audit/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // All other Office API endpoints (attendance, projects, tasks, work-logs, training, profile, dashboard)
+                        .requestMatchers("/api/v1/**").authenticated()
+
+                        // Everything else requires ADMIN role
                         .anyRequest().hasRole("ADMIN")
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
@@ -77,16 +109,35 @@ public class SecurityConfig {
                     response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Invalid administrator credentials\"}");
                 }));
 
+        JwtAuthenticationFilter jwtAuthenticationFilter = jwtFilterProvider.getIfAvailable();
+        if (jwtAuthenticationFilter != null) {
+            http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        }
+
         return http.build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        String username = (adminUsername != null && !adminUsername.isBlank()) ? adminUsername.trim() : "admin";
-        String rawPassword = (adminPassword != null && !adminPassword.isBlank()) ? adminPassword.trim() : "vKQ9rfb6wyW7b6BdWm6PzFjG";
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 
-        if ((rawPassword.startsWith("'") && rawPassword.endsWith("'")) || (rawPassword.startsWith("\"") && rawPassword.endsWith("\""))) {
-            rawPassword = rawPassword.substring(1, rawPassword.length() - 1);
+    @Bean
+    @ConditionalOnMissingBean(UserDetailsService.class)
+    public UserDetailsService fallbackUserDetailsService(PasswordEncoder passwordEncoder) {
+        String username = (adminUsername != null && !adminUsername.isBlank()) ? adminUsername.trim() : "admin";
+        String rawPassword;
+        if (adminPassword != null && !adminPassword.isBlank()) {
+            rawPassword = adminPassword.trim();
+            if ((rawPassword.startsWith("'") && rawPassword.endsWith("'")) || (rawPassword.startsWith("\"") && rawPassword.endsWith("\""))) {
+                rawPassword = rawPassword.substring(1, rawPassword.length() - 1);
+            }
+        } else {
+            rawPassword = java.util.UUID.randomUUID().toString();
+            log.warn("=================================================================");
+            log.warn("SECURITY NOTICE: No NEVOLYN_ADMIN_PASSWORD provided in environment.");
+            log.warn("Generated temporary fallback admin password: {}", rawPassword);
+            log.warn("=================================================================");
         }
 
         return new InMemoryUserDetailsManager(
@@ -98,7 +149,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -119,7 +170,7 @@ public class SecurityConfig {
         }
 
         configuration.setAllowedOriginPatterns(origins);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
         configuration.setExposedHeaders(List.of("Location", "Authorization"));
         configuration.setAllowCredentials(true);

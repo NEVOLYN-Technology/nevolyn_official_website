@@ -35,7 +35,7 @@ import java.util.UUID;
  * @version 0.2.0
  */
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.nevolyn.controller")
 public class GlobalExceptionHandler {
 
     /**

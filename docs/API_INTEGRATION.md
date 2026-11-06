@@ -16,11 +16,12 @@ Managed directly in frontend code for zero database latency:
 - **News & Milestones**: [`frontend/lib/data/latest-news.ts`](../frontend/lib/data/latest-news.ts)
 
 ### Dynamic Backend APIs (Spring Boot REST Service)
-Handles dynamic database operations, visitor inquiries, and job candidate resume file uploads:
+Handles dynamic database operations, visitor inquiries, job candidate resume file uploads, and enterprise Office & HRM operations:
 1. `POST /api/v1/contact` ── Saves visitor contact form submissions & generates inquiry IDs.
 2. `GET /api/v1/contact/verify?token=` ── Confirms the sender, then notifies the R&D team.
 3. `POST /api/v1/applications` ── Saves candidate job applications + CV PDF/DOCX uploads.
 4. `GET /api/v1/applications/verify?token=` ── Confirms the candidate, emails the CV to the team.
+5. **Office & HRM Suite (`/api/v1/auth`, `/api/v1/users`, `/api/v1/attendance`, `/api/v1/tasks`, `/api/v1/projects`, `/api/v1/work-logs`, `/api/v1/reports`, `/api/v1/audit`)** ── Complete specification in [`docs/OFFICE_MANAGEMENT_SYSTEM.md`](OFFICE_MANAGEMENT_SYSTEM.md).
 
 Plus `GET /actuator/health`, a liveness probe for the hosting platform that is
 not part of the public API.

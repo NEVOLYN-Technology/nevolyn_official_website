@@ -27,8 +27,25 @@ frontend/
 │   ├── globals.css                # Global Tailwind CSS design tokens & glow utilities
 │   ├── layout.tsx                 # Root layout (Metadata, HTML dark class, ambient glow background)
 │   ├── page.tsx                   # Main scrolling homepage (/)
-│   └── join_us/
-│       └── page.tsx               # Job Application & CV upload page (/join_us)
+│   ├── join_us/
+│   │   └── page.tsx               # Job Application & CV upload page (/join_us)
+│   ├── admin/
+│   │   └── page.tsx               # Operations Dashboard (/admin) with direct Office Portal link
+│   └── office/                    # NEVOLYN Office & HRM Management Portal (/office)
+│       ├── layout.tsx             # Office shell, query client provider & auth wrapper
+│       ├── (auth)/login/page.tsx  # Secure office authentication page
+│       └── (protected)/           # Authenticated employee & administration workspace
+│           ├── dashboard/         # Role-aware employee & admin dashboard
+│           ├── employees/         # Employee roster, profile editing & bank detail views
+│           ├── admin-management/  # Super Admin administrator tier management
+│           ├── attendance/        # Personal attendance log & kiosk QR check-in
+│           ├── projects/          # R&D project tracking & milestones
+│           ├── tasks/             # Task workflow & status management
+│           ├── work-logs/         # Daily work journal submission & review
+│           ├── training/          # Technical seminars & workshop logs
+│           ├── reports/           # Attendance, task, and project reports
+│           ├── audit/             # Security & system audit trails
+│           └── profile/           # User profile & credential inspector
 ├── components/                    # Reusable React components
 │   ├── layout/                    # Site structure wrappers
 │   │   ├── Navbar.tsx             # Fixed top navbar, scroll section tracking, mobile drawer

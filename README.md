@@ -18,7 +18,9 @@ nevolyn_official_website/           ← Git root (monorepo)
 │   ├── vercel.json                 # Vercel deployment configuration
 │   ├── app/                        # App Router pages & layouts
 │   │   ├── page.tsx                # Single scrolling homepage
-│   │   └── join_us/page.tsx        # Job application page & CV upload
+│   │   ├── join_us/page.tsx        # Job application page & CV upload
+│   │   ├── admin/page.tsx          # Operations Dashboard (/admin)
+│   │   └── office/                 # NEVOLYN Office & HRM Management Portal (/office)
 │   ├── components/
 │   │   ├── layout/                 # Navbar, Footer, PageShell
 │   │   ├── sections/               # Hero, About, Leaders, Innovations, News, Contact
@@ -55,6 +57,7 @@ nevolyn_official_website/           ← Git root (monorepo)
 ├── docker-compose.yml              ← Full local stack (Postgres + Spring Boot + Next.js)
 ├── render.yaml                     ← Render Blueprint spec for Spring Boot Docker + PostgreSQL DB
 ├── docs/                           ← Project documentation
+│   ├── OFFICE_MANAGEMENT_SYSTEM.md # Office & HRM Portal architecture, 3-tier RBAC & attendance guide
 │   ├── REPORT.md                   # Zero-to-hero master educational report & engineering audit
 │   ├── CICD_AND_DEPLOYMENT.md      # Operational deployment reference, gotchas & custom domain setup
 │   ├── CICD_GUIDE.md               # Beginner intuition guide for CI/CD, Docker & domain deployment

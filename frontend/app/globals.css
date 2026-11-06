@@ -228,3 +228,102 @@
     animation-play-state: paused;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+ * Office Management Portal Accent Utilities
+ * ───────────────────────────────────────────────────────────── */
+.metric-stripe-red {
+  position: relative;
+  overflow: hidden;
+}
+.metric-stripe-red::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #ef4444;
+}
+
+.metric-stripe-green {
+  position: relative;
+  overflow: hidden;
+}
+.metric-stripe-green::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #10b981;
+}
+
+.metric-stripe-warning {
+  position: relative;
+  overflow: hidden;
+}
+.metric-stripe-warning::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #f59e0b;
+}
+
+.metric-stripe-blue {
+  position: relative;
+  overflow: hidden;
+}
+.metric-stripe-blue::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #38bdf8;
+}
+
+.action-tile-top-red::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #ef4444;
+}
+
+.action-tile-top-green::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #10b981;
+}
+
+.action-tile-top-warning::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #f59e0b;
+}
+
+.action-tile-top-blue::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #38bdf8;
+}

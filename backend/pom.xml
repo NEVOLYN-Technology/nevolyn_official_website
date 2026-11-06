@@ -26,6 +26,8 @@
             Keep this pinned until Spring Boot itself upgrades its managed version.
         -->
         <flyway.version>11.10.0</flyway.version>
+        <!-- Base Surefire JVM args; extended in the surefire plugin config below. -->
+        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -94,10 +96,27 @@
             <version>2.0.3</version>
         </dependency>
 
-        <!-- HTTP Basic protection for the admin endpoints. See SecurityConfig. -->
+        <!-- HTTP Basic & JWT protection for admin and office endpoints. See SecurityConfig. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Developer Utilities -->
@@ -120,6 +139,30 @@
 
     <build>
         <plugins>
+            <!--
+              Resolves the absolute path of every dependency into a Maven property
+              (e.g. ${org.mockito:mockito-core:jar}) so Surefire can load Mockito as
+              a proper -javaagent instead of relying on runtime self-attach, which
+              JDK 21+ warns about and which hangs in restricted environments.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

@@ -2,11 +2,9 @@
 # NEVOLYN — Full Stack Docker Compose Local & Production Stack
 #
 # Launches:
-#   1. PostgreSQL 16 DB (Port 5432) — public schema (website) + office schema (HRM)
-#   2. Website Spring Boot 3 REST API (Port 8080)
-#   3. Office / HRM Spring Boot 3 REST API (Port 8081 -> internal 8080)
-#   4. Office / HRM Next.js 16 Web App (Port 3001 -> internal 3000, basePath: /office)
-#   5. Official Website Next.js 16 Web App (Port 3000, proxies /office/* to office-frontend)
+#   1. PostgreSQL 16 DB (Port 5432) — unified schema (Website + Office / HRM)
+#   2. Unified Spring Boot 3 REST API (Port 8080) — Website + Office / HRM APIs
+#   3. Unified Next.js 16 Web App (Port 3000) — Official Website + /admin + /office
 #
 # Quick Start Commands:
 #   - Start full stack:        docker compose up --build
@@ -38,7 +36,7 @@ services:
       retries: 5
 
   # ---------------------------------------------------------------------------
-  # 2. WEBSITE BACKEND SERVICE — Spring Boot REST API
+  # 2. UNIFIED BACKEND SERVICE — Spring Boot REST API (Website + Office / HRM)
   # ---------------------------------------------------------------------------
   backend:
     build:
@@ -73,6 +71,26 @@ services:
       APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-${NEVOLYN_ADMIN_ADDRESS:-info@nevolyn.com}}
       APP_EMAIL_FROM: ${APP_EMAIL_FROM:-${SPRING_MAIL_FROM:-info@nevolyn.com}}
       APP_UPLOAD_DIR: /app/uploads/resumes
+      FILE_UPLOAD_DIR: /app/uploads/office
+      JWT_SECRET: ${OFFICE_JWT_SECRET:-${JWT_SECRET:-}}
+      # ── Shared Role-Tier Passwords (SUPER_ADMIN & ADMIN login tiers) ──
+      SUPER_ADMIN_SHARED_PASSWORD: ${SUPER_ADMIN_SHARED_PASSWORD:-}
+      ADMIN_SHARED_PASSWORD: ${ADMIN_SHARED_PASSWORD:-}
+      # ── 1. Md Rahinur Rahman (SUPER_ADMIN + ADMIN + EMPLOYEE) ──
+      SUPER_ADMIN_1_USERNAME: ${SUPER_ADMIN_1_USERNAME:-rahinrahman}
+      SUPER_ADMIN_1_FULL_NAME: ${SUPER_ADMIN_1_FULL_NAME:-Md Rahinur Rahman}
+      SUPER_ADMIN_1_EMPLOYEE_ID: ${SUPER_ADMIN_1_EMPLOYEE_ID:-nev_rahinrahman_2026-01-15}
+      SUPER_ADMIN_1_DESIGNATION: ${SUPER_ADMIN_1_DESIGNATION:-Founder & AI Systems Engineer}
+      # ── 2. Mohammad Ninad Mahmud Nobo (SUPER_ADMIN + ADMIN + EMPLOYEE) ──
+      SUPER_ADMIN_2_USERNAME: ${SUPER_ADMIN_2_USERNAME:-mninadmnobo}
+      SUPER_ADMIN_2_FULL_NAME: ${SUPER_ADMIN_2_FULL_NAME:-Mohammad Ninad Mahmud Nobo}
+      SUPER_ADMIN_2_EMPLOYEE_ID: ${SUPER_ADMIN_2_EMPLOYEE_ID:-nev_mninadmnobo_2026-07-01}
+      SUPER_ADMIN_2_DESIGNATION: ${SUPER_ADMIN_2_DESIGNATION:-Co-Founder & AI Software Engineer}
+      # ── 3. Afzal Hossan (ADMIN + EMPLOYEE) ──
+      ADMIN_3_USERNAME: ${ADMIN_3_USERNAME:-afzalhossan}
+      ADMIN_3_FULL_NAME: ${ADMIN_3_FULL_NAME:-Afzal Hossan}
+      ADMIN_3_EMPLOYEE_ID: ${ADMIN_3_EMPLOYEE_ID:-nev_afzalhossan_2026-11-01}
+      ADMIN_3_DESIGNATION: ${ADMIN_3_DESIGNATION:-AI Software Engineer}
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     volumes:
@@ -84,91 +102,7 @@ services:
       retries: 5
 
   # ---------------------------------------------------------------------------
-  # 3. OFFICE / HRM BACKEND SERVICE — Spring Boot REST API (isolated `office` schema)
-  # ---------------------------------------------------------------------------
-  office-backend:
-    build:
-      context: ./office/backend
-      dockerfile: Dockerfile
-    container_name: nevolyn-office-backend
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - .env
-    environment:
-      SPRING_PROFILES_ACTIVE: prod
-      PORT: 8080
-      OFFICE_DB_SCHEMA: office
-      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}?currentSchema=office
-      DATABASE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
-      JWT_SECRET: ${OFFICE_JWT_SECRET:-${JWT_SECRET:-nevolyn_office_production_jwt_secret_key_must_be_at_least_64_characters_long_2026}}
-      CORS_ALLOWED_ORIGINS: ${OFFICE_CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001,https://nevolyn.com,https://www.nevolyn.com}
-      FILE_UPLOAD_DIR: /app/uploads
-      ENFORCE_NETWORK_RESTRICTION: ${ENFORCE_NETWORK_RESTRICTION:-false}
-      ALLOWED_LOCAL_PREFIXES: ${ALLOWED_LOCAL_PREFIXES:-192.168.,172.,10.,127.0.0.1,::1}
-      ALLOWED_PUBLIC_IPS: ${ALLOWED_PUBLIC_IPS:-}
-      RD_WIFI_SECRET: ${RD_WIFI_SECRET:-}
-      # ── Shared Role-Tier Passwords (SUPER_ADMIN & ADMIN login tiers) ──
-      SUPER_ADMIN_SHARED_PASSWORD: ${SUPER_ADMIN_SHARED_PASSWORD:-N0b0#R@h1n!F4B1NS$$S4turn_N3v0Lyn@26}
-      ADMIN_SHARED_PASSWORD: ${ADMIN_SHARED_PASSWORD:-N3v0Lyn#Adm1n!R@h1n$$N0b0&Afz4L_2026}
-      # ── 1. Md Rahinur Rahman (SUPER_ADMIN + ADMIN + EMPLOYEE) ──
-      SUPER_ADMIN_1_USERNAME: ${SUPER_ADMIN_1_USERNAME:-rahinrahman}
-      EMPLOYEE_RAHIN_PASSWORD: ${EMPLOYEE_RAHIN_PASSWORD:-Rahin@Nev0Lyn#Emp_2026}
-      SUPER_ADMIN_1_FULL_NAME: ${SUPER_ADMIN_1_FULL_NAME:-Md Rahinur Rahman}
-      SUPER_ADMIN_1_EMPLOYEE_ID: ${SUPER_ADMIN_1_EMPLOYEE_ID:-nev_rahinrahman_2026-01-15}
-      SUPER_ADMIN_1_DESIGNATION: ${SUPER_ADMIN_1_DESIGNATION:-Founder & AI Systems Engineer}
-      # ── 2. Mohammad Ninad Mahmud Nobo (SUPER_ADMIN + ADMIN + EMPLOYEE) ──
-      SUPER_ADMIN_2_USERNAME: ${SUPER_ADMIN_2_USERNAME:-mninadmnobo}
-      EMPLOYEE_NOBO_PASSWORD: ${EMPLOYEE_NOBO_PASSWORD:-Nobo@Nev0Lyn#Emp_2026}
-      SUPER_ADMIN_2_FULL_NAME: ${SUPER_ADMIN_2_FULL_NAME:-Mohammad Ninad Mahmud Nobo}
-      SUPER_ADMIN_2_EMPLOYEE_ID: ${SUPER_ADMIN_2_EMPLOYEE_ID:-nev_mninadmnobo_2026-07-01}
-      SUPER_ADMIN_2_DESIGNATION: ${SUPER_ADMIN_2_DESIGNATION:-Co-Founder & AI Software Engineer}
-      # ── 3. Afzal Hossan (ADMIN + EMPLOYEE) ──
-      ADMIN_3_USERNAME: ${ADMIN_3_USERNAME:-afzalhossan}
-      EMPLOYEE_AFZAL_PASSWORD: ${EMPLOYEE_AFZAL_PASSWORD:-Afzal@Nev0Lyn#Emp_2026}
-      ADMIN_3_FULL_NAME: ${ADMIN_3_FULL_NAME:-Afzal Hossan}
-      ADMIN_3_EMPLOYEE_ID: ${ADMIN_3_EMPLOYEE_ID:-nev_afzalhossan_2026-11-01}
-      ADMIN_3_DESIGNATION: ${ADMIN_3_DESIGNATION:-AI Software Engineer}
-      # ── 4. Mobashira Mehajabin Nomrota (EMPLOYEE) ──
-      EMPLOYEE_NOMROTA_PASSWORD: ${EMPLOYEE_NOMROTA_PASSWORD:-Nomrota@Nev0Lyn#Emp_2026}
-    ports:
-      - "${OFFICE_BACKEND_PORT:-8081}:8080"
-    volumes:
-      - office_uploads:/app/uploads
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ---------------------------------------------------------------------------
-  # 4. OFFICE / HRM FRONTEND SERVICE — Next.js 16 Web App (basePath: /office)
-  # ---------------------------------------------------------------------------
-  office-frontend:
-    build:
-      context: ./office/frontend
-      dockerfile: Dockerfile
-      args:
-        INTERNAL_API_URL: http://office-backend:8080/api/v1
-    container_name: nevolyn-office-frontend
-    restart: unless-stopped
-    depends_on:
-      office-backend:
-        condition: service_healthy
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: production
-      PORT: 3000
-      INTERNAL_API_URL: http://office-backend:8080/api/v1
-    ports:
-      - "${OFFICE_FRONTEND_PORT:-3001}:3000"
-
-  # ---------------------------------------------------------------------------
-  # 5. OFFICIAL WEBSITE FRONTEND SERVICE — Next.js 16 Web Application
+  # 3. UNIFIED FRONTEND SERVICE — Next.js 16 Web Application (Website + /office)
   # ---------------------------------------------------------------------------
   frontend:
     build:
@@ -176,14 +110,11 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-${NEXT_PUBLIC_API_BASE_URL:-https://nevolyn.com/api/v1}}
-        OFFICE_FRONTEND_URL: http://office-frontend:3000
     container_name: nevolyn-frontend
     restart: unless-stopped
     depends_on:
       backend:
         condition: service_healthy
-      office-frontend:
-        condition: service_started
     env_file:
       - .env
     environment:
@@ -191,7 +122,6 @@ services:
       PORT: 3000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-${NEXT_PUBLIC_API_BASE_URL:-https://nevolyn.com/api/v1}}
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-${NEXT_PUBLIC_API_URL:-https://nevolyn.com/api/v1}}
-      OFFICE_FRONTEND_URL: http://office-frontend:3000
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
 
@@ -202,6 +132,4 @@ volumes:
   postgres_data:
     driver: local
   resume_uploads:
-    driver: local
-  office_uploads:
     driver: local

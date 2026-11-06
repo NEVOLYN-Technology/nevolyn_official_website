@@ -30,7 +30,7 @@ WORKDIR /app
 # /app is root-owned, so the non-root user cannot create anything inside it.
 RUN addgroup -S nevolyn \
     && adduser -S nevolyn -G nevolyn \
-    && mkdir -p /app/uploads/resumes \
+    && mkdir -p /app/uploads/resumes /app/uploads/office \
     && chown -R nevolyn:nevolyn /app
 
 COPY --from=builder --chown=nevolyn:nevolyn /app/app.jar app.jar
