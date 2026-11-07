@@ -83,10 +83,16 @@ export default function AdminAttendancePage() {
     d.setDate(d.getDate() - 2);
     return d.toISOString().split("T")[0];
   }, []);
+  const threeDaysAgoStr = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 3);
+    return d.toISOString().split("T")[0];
+  }, []);
 
   const isTodaySelected = selectedDate === todayStr;
   const isYesterdaySelected = selectedDate === yesterdayStr;
   const isTwoDaysAgoSelected = selectedDate === twoDaysAgoStr;
+  const isThreeDaysAgoSelected = selectedDate === threeDaysAgoStr;
 
   // Day Stepper Helpers
   const handlePrevDay = () => {
@@ -230,7 +236,18 @@ export default function AdminAttendancePage() {
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
-              2 Days Ago
+              2d Ago
+            </button>
+
+            <button
+              onClick={() => setDateOffset(-3)}
+              className={`hidden md:inline-block px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                isThreeDaysAgoSelected
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              3d Ago
             </button>
 
             <button
@@ -474,8 +491,8 @@ export default function AdminAttendancePage() {
         </div>
 
         {/* Desktop Tabular View: Streamlined 6-Column Layout (Never Cut Off) */}
-        <div className="hidden md:block rounded-2xl border border-slate-200/80 overflow-hidden">
-          <table className="w-full text-left text-xs text-slate-700">
+        <div className="hidden md:block rounded-2xl border border-slate-200/80 overflow-x-auto bg-white">
+          <table className="w-full min-w-[760px] text-left text-xs text-slate-700">
             <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-extrabold tracking-wider border-b border-slate-200/80">
               <tr>
                 <th className="py-3.5 px-4 w-[28%]">Employee</th>

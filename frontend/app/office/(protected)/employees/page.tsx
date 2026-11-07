@@ -2,13 +2,15 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { usersApi } from "@/lib/api";
+import { usersApi, getApiErrorMessage } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { User } from "@/types";
 import {
   UserPlus,
   Edit,
   Power,
+  Trash2,
+  AlertTriangle,
   Search,
   Crown,
   ShieldCheck,
@@ -17,6 +19,8 @@ import {
   Phone,
   LayoutDashboard,
   Calendar,
+  X,
+  Loader2,
 } from "lucide-react";
 import NextLink from "next/link";
 import { AddEmployeeModal, EditEmployeeModal } from "@/components/employees";
@@ -29,10 +33,12 @@ import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
  */
 export default function EmployeesPage() {
   const queryClient = useQueryClient();
-  const { user: currentUser, isSuperAdmin } = useAuth();
+  const { user: currentUser, isSuperAdmin, isAdmin } = useAuth();
   const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const { data: pagedData, isLoading } = useQuery({
     queryKey: ["employees-list"],
@@ -46,6 +52,18 @@ export default function EmployeesPage() {
     mutationFn: (id: number) => usersApi.toggleStatus(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employees-list"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => usersApi.delete(id),
+    onSuccess: () => {
+      setDeletingUser(null);
+      setDeleteError(null);
+      queryClient.invalidateQueries({ queryKey: ["employees-list"] });
+    },
+    onError: (err: unknown) => {
+      setDeleteError(getApiErrorMessage(err, "Failed to delete employee account."));
     },
   });
 
@@ -157,6 +175,7 @@ export default function EmployeesPage() {
             const isTargetAdmin = u.role === "admin";
             const isSelf = currentUser?.username === u.username;
             const canToggleStatus = !isTargetSuperAdmin && !isSelf && (isSuperAdmin || !isTargetAdmin);
+            const canDelete = !isSelf && !isTargetSuperAdmin && (isSuperAdmin || (isAdmin && !isTargetAdmin));
             const hasPrimaryBank = !!(u.bankName || u.bankAccountNumber);
             const hasSecondaryBank = !!(u.secondaryBankName || u.secondaryBankAccountNumber);
 
@@ -359,6 +378,20 @@ export default function EmployeesPage() {
                       <Power className="w-3.5 h-3.5" />
                     </button>
                   )}
+
+                  {canDelete && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeleteError(null);
+                        setDeletingUser(u);
+                      }}
+                      title="Delete Employee Account"
+                      className="p-2 rounded-xl border border-slate-200 hover:border-rose-300 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -371,7 +404,6 @@ export default function EmployeesPage() {
         <AddEmployeeModal
           onClose={() => setIsAddOpen(false)}
           onSuccess={() => {
-            setIsAddOpen(false);
             queryClient.invalidateQueries({ queryKey: ["employees-list"] });
           }}
         />
@@ -387,6 +419,94 @@ export default function EmployeesPage() {
             queryClient.invalidateQueries({ queryKey: ["employees-list"] });
           }}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingUser && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200/90 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5 text-rose-600 font-extrabold text-sm">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4 text-rose-600" />
+                </div>
+                <span>Confirm Account Deletion</span>
+              </div>
+              <button
+                onClick={() => {
+                  setDeletingUser(null);
+                  setDeleteError(null);
+                }}
+                disabled={deleteMutation.isPending}
+                className="text-slate-400 hover:text-slate-700 cursor-pointer disabled:opacity-50"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {deleteError && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Are you sure you want to permanently delete the account for{" "}
+                <span className="font-bold text-slate-900">{deletingUser.fullName}</span>?
+              </p>
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Username:</span>
+                  <span className="font-mono font-bold text-slate-800">@{deletingUser.username}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Employee ID:</span>
+                  <span className="font-mono text-teal-700 font-semibold">{deletingUser.employeeId}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Role:</span>
+                  <span className="font-bold uppercase text-[10px] text-slate-700">{deletingUser.role}</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-rose-600 font-medium bg-rose-50/60 border border-rose-100 p-2.5 rounded-xl">
+                ⚠️ This action cannot be undone. All linked credentials and active sessions will be terminated immediately.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setDeletingUser(null);
+                  setDeleteError(null);
+                }}
+                disabled={deleteMutation.isPending}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => deleteMutation.mutate(deletingUser.id)}
+                disabled={deleteMutation.isPending}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Account</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

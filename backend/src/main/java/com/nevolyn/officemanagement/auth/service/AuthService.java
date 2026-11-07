@@ -359,8 +359,21 @@ public class AuthService {
             return false;
         }
         String trimmedInput = rawPassword.trim();
-        return passwordEncoder.matches(rawPassword, user.getPasswordHash())
-                || passwordEncoder.matches(trimmedInput, user.getPasswordHash());
+        String hash = user.getPasswordHash().trim();
+
+        // 1. Plain text match fallback (for seed or legacy dev records)
+        if (constantTimeEquals(hash, rawPassword) || constantTimeEquals(hash, trimmedInput)) {
+            return true;
+        }
+
+        // 2. BCrypt verification with exception safety
+        try {
+            return passwordEncoder.matches(rawPassword, hash)
+                    || passwordEncoder.matches(trimmedInput, hash);
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            log.warn("Password hash format mismatch for user '{}': {}", user.getUsername(), ex.getMessage());
+            return false;
+        }
     }
 
     private static String stripQuotes(String value) {

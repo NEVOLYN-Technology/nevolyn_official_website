@@ -168,6 +168,30 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Delete an employee or administrator account permanently.
+     *
+     * <p>Privilege rules:
+     * <ul>
+     *   <li>SUPER_ADMIN can delete ADMIN and EMPLOYEE accounts.</li>
+     *   <li>ADMIN can only delete EMPLOYEE accounts.</li>
+     *   <li>Nobody can delete a SUPER_ADMIN account.</li>
+     *   <li>Nobody can delete their own account.</li>
+     * </ul>
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable Long id,
+            HttpServletRequest servletRequest,
+            @AuthenticationPrincipal UserDetails caller
+    ) {
+        String clientIp = IpUtils.extractClientIp(servletRequest);
+        User.UserRole callerRole = resolveCallerRole(caller.getUsername());
+        userService.deleteUser(id, clientIp, caller.getUsername(), callerRole);
+        return ResponseEntity.noContent().build();
+    }
+
     // ─────────────────────────────────────────────────────────────
     // Internal helper
     // ─────────────────────────────────────────────────────────────

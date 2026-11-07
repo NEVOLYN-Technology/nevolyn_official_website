@@ -448,4 +448,69 @@ public class UserService {
                 "User changed own password"
         );
     }
+
+    /**
+     * Permanently deletes a user account with strict privilege enforcement.
+     *
+     * <p><b>Privilege rules enforced:</b>
+     * <ul>
+     *   <li>SUPER_ADMIN can delete ADMIN and EMPLOYEE accounts.</li>
+     *   <li>ADMIN can only delete EMPLOYEE accounts.</li>
+     *   <li>Nobody can delete a SUPER_ADMIN account.</li>
+     *   <li>Nobody can delete their own account.</li>
+     * </ul>
+     *
+     * @param id             primary key ID of the user to delete
+     * @param clientIp       remote client IP for audit logging
+     * @param callerUsername username of the administrator
+     * @param callerRole     role of the administrator performing deletion
+     */
+    @Transactional
+    public void deleteUser(Long id, String clientIp, String callerUsername, User.UserRole callerRole) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+        // 1. Nobody can delete a SUPER_ADMIN account
+        if (user.isSuperAdmin()) {
+            throw new BusinessRuleException("SUPER_ADMIN accounts are protected and cannot be deleted.");
+        }
+
+        // 2. Nobody can delete their own account
+        if (user.getUsername().equalsIgnoreCase(callerUsername)) {
+            throw new BusinessRuleException("You cannot delete your own account.");
+        }
+
+        // 3. ADMIN can only delete EMPLOYEE accounts
+        if (callerRole == User.UserRole.admin && user.getRole() != User.UserRole.employee) {
+            throw new BusinessRuleException("Administrators can only delete Employee accounts.");
+        }
+
+        String deletedUsername = user.getUsername();
+        String deletedEmployeeId = user.getEmployeeId();
+        String deletedFullName = user.getFullName();
+        String deletedRole = user.getRole().name();
+
+        try {
+            userRepository.delete(user);
+            userRepository.flush();
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            throw new BusinessRuleException(
+                    "Cannot delete user '" + deletedFullName + "' because they have linked records (tasks, experiments, or uploaded files). " +
+                    "Please reassign or remove their records first, or deactivate the account.");
+        }
+
+        auditService.log(
+                "DELETE_USER",
+                callerUsername,
+                null,
+                clientIp,
+                "users",
+                id,
+                String.format("Permanently deleted %s account: %s (%s, @%s)",
+                        deletedRole, deletedFullName, deletedEmployeeId, deletedUsername)
+        );
+
+        log.warn("User '{}' ({}, role: {}) was permanently deleted by '{}' from IP {}",
+                deletedUsername, deletedEmployeeId, deletedRole, callerUsername, clientIp);
+    }
 }

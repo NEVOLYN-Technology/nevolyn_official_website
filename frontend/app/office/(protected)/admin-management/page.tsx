@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   UserPlus,
   Power,
+  Trash2,
   AlertTriangle,
   CheckCircle2,
   X,
@@ -523,6 +524,8 @@ export default function AdminManagementPage() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [deletingAdmin, setDeletingAdmin] = useState<User | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Redirect non-super-admins
   React.useEffect(() => {
@@ -550,6 +553,20 @@ export default function AdminManagementPage() {
       void queryClient.invalidateQueries({ queryKey: ["allUsers"] });
       setSuccessMsg("Account status updated.");
       setTimeout(() => setSuccessMsg(""), 3000);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (userId: number) => usersApi.delete(userId),
+    onSuccess: () => {
+      setDeletingAdmin(null);
+      setDeleteError(null);
+      void queryClient.invalidateQueries({ queryKey: ["allUsers"] });
+      setSuccessMsg("Administrator account deleted successfully.");
+      setTimeout(() => setSuccessMsg(""), 5000);
+    },
+    onError: (err: unknown) => {
+      setDeleteError(getApiErrorMessage(err, "Failed to delete administrator account."));
     },
   });
 
@@ -665,7 +682,7 @@ export default function AdminManagementPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => toggleMutation.mutate(admin.id)}
-                        disabled={toggleMutation.isPending}
+                        disabled={toggleMutation.isPending || deleteMutation.isPending}
                         title={admin.isActive ? "Deactivate account" : "Activate account"}
                         className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                           admin.isActive
@@ -674,6 +691,18 @@ export default function AdminManagementPage() {
                         }`}
                       >
                         <Power className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setDeleteError(null);
+                          setDeletingAdmin(admin);
+                        }}
+                        disabled={toggleMutation.isPending || deleteMutation.isPending}
+                        title="Delete administrator account"
+                        className="p-2 rounded-xl border border-slate-200 hover:border-rose-300 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   )}
@@ -695,8 +724,98 @@ export default function AdminManagementPage() {
       {showCreateModal && (
         <CreateAdminModal
           onClose={() => setShowCreateModal(false)}
-          onSuccess={() => handleSuccess("Administrator account created successfully.")}
+          onSuccess={() => {
+            void queryClient.invalidateQueries({ queryKey: ["allUsers"] });
+          }}
         />
+      )}
+
+      {/* Delete Admin Confirmation Modal */}
+      {deletingAdmin && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200/90 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5 text-rose-600 font-extrabold text-sm">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4 text-rose-600" />
+                </div>
+                <span>Confirm Admin Deletion</span>
+              </div>
+              <button
+                onClick={() => {
+                  setDeletingAdmin(null);
+                  setDeleteError(null);
+                }}
+                disabled={deleteMutation.isPending}
+                className="text-slate-400 hover:text-slate-700 cursor-pointer disabled:opacity-50"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {deleteError && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Are you sure you want to permanently delete the administrator account for{" "}
+                <span className="font-bold text-slate-900">{deletingAdmin.fullName}</span>?
+              </p>
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Username:</span>
+                  <span className="font-mono font-bold text-slate-800">@{deletingAdmin.username}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Employee ID:</span>
+                  <span className="font-mono text-teal-700 font-semibold">{deletingAdmin.employeeId}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Role:</span>
+                  <span className="font-bold uppercase text-[10px] text-teal-700">{deletingAdmin.role}</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-rose-600 font-medium bg-rose-50/60 border border-rose-100 p-2.5 rounded-xl">
+                ⚠️ All administrative privileges, login access, and session tokens will be permanently revoked immediately.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setDeletingAdmin(null);
+                  setDeleteError(null);
+                }}
+                disabled={deleteMutation.isPending}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => deleteMutation.mutate(deletingAdmin.id)}
+                disabled={deleteMutation.isPending}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Admin</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

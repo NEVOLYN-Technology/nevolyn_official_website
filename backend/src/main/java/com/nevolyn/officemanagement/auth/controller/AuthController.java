@@ -103,10 +103,12 @@ public class AuthController {
     @GetMapping({"/me", "/profile"})
     public ResponseEntity<ApiResponse<LoginResponse>> getCurrentUser(
             @AuthenticationPrincipal UserDetails userDetails,
+            java.security.Principal principal,
             HttpServletRequest httpRequest
     ) {
+        String username = resolveUsername(userDetails, principal);
         String activeRole = (String) httpRequest.getAttribute("activeRole");
-        LoginResponse profile = authService.getProfile(userDetails.getUsername(), activeRole);
+        LoginResponse profile = authService.getProfile(username, activeRole);
         return ResponseEntity.ok(ApiResponse.success(profile));
     }
 
@@ -114,11 +116,13 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponse>> updateProfile(
             @Valid @RequestBody com.nevolyn.officemanagement.auth.dto.SelfProfileUpdateRequest request,
             @AuthenticationPrincipal UserDetails userDetails,
+            java.security.Principal principal,
             HttpServletRequest httpRequest
     ) {
+        String username = resolveUsername(userDetails, principal);
         String clientIp = IpUtils.extractClientIp(httpRequest);
         String activeRole = (String) httpRequest.getAttribute("activeRole");
-        LoginResponse updated = authService.updateProfile(userDetails.getUsername(), request, clientIp, activeRole);
+        LoginResponse updated = authService.updateProfile(username, request, clientIp, activeRole);
         return ResponseEntity.ok(ApiResponse.success("Profile and banking details updated successfully", updated));
     }
 
@@ -126,10 +130,26 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @Valid @RequestBody com.nevolyn.officemanagement.auth.dto.SelfPasswordChangeRequest request,
             @AuthenticationPrincipal UserDetails userDetails,
+            java.security.Principal principal,
             HttpServletRequest httpRequest
     ) {
+        String username = resolveUsername(userDetails, principal);
         String clientIp = IpUtils.extractClientIp(httpRequest);
-        authService.changePassword(userDetails.getUsername(), request, clientIp);
+        authService.changePassword(username, request, clientIp);
         return ResponseEntity.ok(ApiResponse.success("Password updated successfully"));
+    }
+
+    private String resolveUsername(UserDetails userDetails, java.security.Principal principal) {
+        if (userDetails != null && userDetails.getUsername() != null && !userDetails.getUsername().isBlank()) {
+            return userDetails.getUsername();
+        }
+        if (principal != null && principal.getName() != null && !principal.getName().isBlank()) {
+            return principal.getName();
+        }
+        var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getName() != null && !auth.getName().isBlank()) {
+            return auth.getName();
+        }
+        throw new org.springframework.security.authentication.BadCredentialsException("Authentication required to access profile");
     }
 }

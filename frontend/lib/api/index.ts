@@ -287,6 +287,7 @@ export const usersApi = {
     }
   ) => api.patch<User>(`/users/${id}`, data),
   toggleStatus: (id: number) => api.patch<User>(`/users/${id}/toggle-status`),
+  delete: (id: number) => api.delete<void>(`/users/${id}`),
   resetPassword: (id: number, newPassword: string) =>
     api.patch<void>(`/users/${id}/reset-password`, { newPassword }),
 };
