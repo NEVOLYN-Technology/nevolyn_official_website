@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   UserPlus,
   Power,
-  KeyRound,
   AlertTriangle,
   CheckCircle2,
   X,
@@ -145,60 +144,6 @@ function CreateAdminModal({ onClose, onSuccess }: { onClose: () => void; onSucce
   );
 }
 
-// ── Reset Admin Password Modal ────────────────────────────────────
-
-function ResetPasswordModal({ admin, onClose, onSuccess }: { admin: User; onClose: () => void; onSuccess: () => void }) {
-  const [newPassword, setNewPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-
-  const resetMutation = useMutation({
-    mutationFn: () => usersApi.resetPassword(admin.id, newPassword),
-    onSuccess: () => onSuccess(),
-    onError: (err: unknown) => {
-      setErrorMsg(getApiErrorMessage(err, "Failed to reset password"));
-    },
-  });
-
-  return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-sm w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-6 space-y-4 shadow-2xl">
-        <div className="flex items-center gap-2">
-          <KeyRound className="w-4 h-4 text-amber-600" />
-          <h3 className="font-extrabold text-slate-900 text-sm">Reset Administrator Password</h3>
-        </div>
-        <p className="text-slate-600 text-xs">
-          Resetting password for <strong className="text-slate-900">{admin.fullName}</strong> ({admin.username})
-        </p>
-
-        {errorMsg && (
-          <div className="p-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">{errorMsg}</div>
-        )}
-
-        <input
-          type="password"
-          placeholder="New password (min 6 characters)"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-slate-900 focus:outline-none"
-        />
-
-        <div className="flex gap-3 pt-1">
-          <button onClick={onClose} className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
-            Cancel
-          </button>
-          <button
-            onClick={() => resetMutation.mutate()}
-            disabled={resetMutation.isPending || newPassword.length < 6}
-            className="flex-1 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold"
-          >
-            {resetMutation.isPending ? "Resetting..." : "Reset Password"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Main Admin Management Page ────────────────────────────────────
 
 export default function AdminManagementPage() {
@@ -207,7 +152,6 @@ export default function AdminManagementPage() {
   const queryClient = useQueryClient();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [resetTarget, setResetTarget] = useState<User | null>(null);
   const [successMsg, setSuccessMsg] = useState("");
 
   // Redirect non-super-admins
@@ -242,7 +186,6 @@ export default function AdminManagementPage() {
   const handleSuccess = (msg: string) => {
     void queryClient.invalidateQueries({ queryKey: ["allUsers"] });
     setShowCreateModal(false);
-    setResetTarget(null);
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(""), 3000);
   };
@@ -297,8 +240,7 @@ export default function AdminManagementPage() {
       <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50/90 border border-amber-200/90 text-amber-900 text-xs">
         <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
         <div>
-          <strong>Security Policy:</strong> SUPER_ADMIN accounts cannot be deactivated or have their passwords reset via this panel.
-          Maximum 2 active Super Administrator accounts are permitted. ADMIN accounts can only be managed by Super Administrators.
+          <strong>Security Policy:</strong> Passwords, banking credentials, and phone numbers are protected personal data maintained exclusively by account holders via the Profile &amp; Security portal. Maximum 2 active Super Administrator accounts are permitted. ADMIN accounts can be activated or deactivated by Super Administrators.
         </div>
       </div>
 
@@ -352,17 +294,10 @@ export default function AdminManagementPage() {
                   {!isSA && (
                     <div className="flex items-center gap-2 shrink-0">
                       <button
-                        onClick={() => setResetTarget(admin)}
-                        title="Reset password"
-                        className="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 transition-colors"
-                      >
-                        <KeyRound className="w-4 h-4" />
-                      </button>
-                      <button
                         onClick={() => toggleMutation.mutate(admin.id)}
                         disabled={toggleMutation.isPending}
                         title={admin.isActive ? "Deactivate account" : "Activate account"}
-                        className={`p-2 rounded-xl border transition-colors ${
+                        className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                           admin.isActive
                             ? "bg-slate-100 text-slate-600 border-slate-200 hover:text-rose-700 hover:bg-rose-50 hover:border-rose-200"
                             : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
@@ -391,13 +326,6 @@ export default function AdminManagementPage() {
         <CreateAdminModal
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => handleSuccess("Administrator account created successfully.")}
-        />
-      )}
-      {resetTarget && (
-        <ResetPasswordModal
-          admin={resetTarget}
-          onClose={() => setResetTarget(null)}
-          onSuccess={() => handleSuccess("Password reset successfully.")}
         />
       )}
     </div>

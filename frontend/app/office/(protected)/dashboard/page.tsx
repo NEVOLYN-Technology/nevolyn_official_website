@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usersApi } from "@/lib/api";
 import { AdminDashboard, EmployeeDashboard } from "@/components/dashboard";
-import { EditEmployeeModal, ResetPasswordModal } from "@/components/employees";
+import { EditEmployeeModal } from "@/components/employees";
 import { User } from "@/types";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Shield, Crown } from "lucide-react";
@@ -24,7 +24,6 @@ function DashboardContent() {
     targetUsernameQuery || null
   );
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (targetUsernameQuery) {
@@ -128,9 +127,6 @@ function DashboardContent() {
           onEditProfile={() =>
             activeTargetUser && setEditingUser(activeTargetUser)
           }
-          onResetPassword={() =>
-            activeTargetUser && setResetPasswordUser(activeTargetUser)
-          }
           onBackToOverview={() => {
             setSelectedUsername(null);
             router.push("/office/dashboard");
@@ -154,14 +150,6 @@ function DashboardContent() {
               queryKey: ["staff-directory-switcher"],
             });
           }}
-        />
-      )}
-
-      {resetPasswordUser && (
-        <ResetPasswordModal
-          user={resetPasswordUser}
-          onClose={() => setResetPasswordUser(null)}
-          onSuccess={() => setResetPasswordUser(null)}
         />
       )}
     </div>

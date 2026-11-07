@@ -299,42 +299,15 @@ public class UserService {
         if (request.joiningDate() != null) {
             user.setJoiningDate(request.joiningDate());
         }
-        if (request.phone() != null) {
-            user.setPhone(request.phone().trim());
-        }
         if (request.email() != null) {
             user.setEmail(request.email().trim());
         }
-        if (request.bankName() != null) {
-            user.setBankName(request.bankName().trim());
-        }
-        if (request.bankAccountName() != null) {
-            user.setBankAccountName(request.bankAccountName().trim());
-        }
-        if (request.bankAccountNumber() != null) {
-            user.setBankAccountNumber(request.bankAccountNumber().trim());
-        }
-        if (request.bankBranch() != null) {
-            user.setBankBranch(request.bankBranch().trim());
-        }
-        if (request.bankRoutingNumber() != null) {
-            user.setBankRoutingNumber(request.bankRoutingNumber().trim());
-        }
-        if (request.secondaryBankName() != null) {
-            user.setSecondaryBankName(request.secondaryBankName().trim());
-        }
-        if (request.secondaryBankAccountName() != null) {
-            user.setSecondaryBankAccountName(request.secondaryBankAccountName().trim());
-        }
-        if (request.secondaryBankAccountNumber() != null) {
-            user.setSecondaryBankAccountNumber(request.secondaryBankAccountNumber().trim());
-        }
-        if (request.secondaryBankBranch() != null) {
-            user.setSecondaryBankBranch(request.secondaryBankBranch().trim());
-        }
-        if (request.secondaryBankRoutingNumber() != null) {
-            user.setSecondaryBankRoutingNumber(request.secondaryBankRoutingNumber().trim());
-        }
+
+        // Personal phone numbers and banking credentials are confidential records.
+        // Administrators are strictly prohibited from modifying them on behalf of employees.
+        // Each employee securely manages their own phone and banking accounts via their
+        // self-service Profile & Security page (/api/v1/auth/profile) with cryptographic password verification.
+
         user.setRole(requestedRole);
 
         User saved = userRepository.save(user);

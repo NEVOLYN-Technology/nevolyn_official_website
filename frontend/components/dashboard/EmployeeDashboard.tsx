@@ -4,7 +4,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { dashboardApi } from "@/lib/api";
 import NextLink from "next/link";
-import { CheckSquare, FlaskConical, FileText, Eye, Edit, KeyRound, ArrowLeft } from "lucide-react";
+import { CheckSquare, FlaskConical, FileText, Eye, Edit, ArrowLeft } from "lucide-react";
 import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 
 /**
@@ -15,10 +15,8 @@ interface EmployeeDashboardProps {
   username: string;
   /** Whether an administrator is inspecting this personal dashboard. */
   isInspecting?: boolean;
-  /** Callback to trigger profile/banking edit modal. */
+  /** Callback to trigger profile/personnel edit modal. */
   onEditProfile?: () => void;
-  /** Callback to trigger password reset modal. */
-  onResetPassword?: () => void;
   /** Callback to return to executive master dashboard. */
   onBackToOverview?: () => void;
 }
@@ -30,7 +28,6 @@ export function EmployeeDashboard({
   username,
   isInspecting = false,
   onEditProfile,
-  onResetPassword,
   onBackToOverview,
 }: EmployeeDashboardProps) {
   const { data, isLoading, error, refetch } = useQuery({
@@ -92,7 +89,7 @@ export function EmployeeDashboard({
                 </span>
               </p>
               <p className="text-[11px] text-slate-600 font-medium mt-0.5">
-                Authorized administrative inspection mode. Review tasks, attendance status, and edit profile/banking records directly.
+                Authorized administrative inspection mode. Review tasks, attendance status, and manage organizational records.
               </p>
             </div>
           </div>
@@ -103,16 +100,7 @@ export function EmployeeDashboard({
                 className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-slate-900/15 cursor-pointer"
               >
                 <Edit className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Edit Profile &amp; Banking</span>
-              </button>
-            )}
-            {onResetPassword && (
-              <button
-                onClick={onResetPassword}
-                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition border border-slate-200/90 shadow-2xs flex items-center gap-1.5 cursor-pointer"
-              >
-                <KeyRound className="w-3.5 h-3.5 text-amber-600" />
-                <span>Reset Password</span>
+                <span>Edit Employee Info</span>
               </button>
             )}
             {onBackToOverview && (
