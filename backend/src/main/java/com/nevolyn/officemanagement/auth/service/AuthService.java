@@ -135,10 +135,13 @@ public class AuthService {
 
         User user = maybeUser.get();
         if (!user.isActive() || user.getRole() != User.UserRole.super_admin) {
+            log.warn("Access denied to /admin for user '{}': strictly Super Admin only", user.getUsername());
             return null;
         }
 
+        // Strictly requires Super Admin password
         if (!matchesSharedTierPassword(superAdminSharedPassword, rawPassword)) {
+            log.warn("Basic authentication failed for super admin '{}': invalid super admin password", user.getUsername());
             return null;
         }
 
@@ -147,6 +150,7 @@ public class AuthService {
                 new SimpleGrantedAuthority("ROLE_ADMIN"),
                 new SimpleGrantedAuthority("ROLE_EMPLOYEE")
         );
+
         UserDetails principal = org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password("")
@@ -211,7 +215,7 @@ public class AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
-        if (!matchesEmployeePassword(user, request.currentPassword())) {
+        if (!verifyCallerPassword(user, request.currentPassword())) {
             throw new com.nevolyn.officemanagement.common.exception.BusinessRuleException(
                     "Current employee password is incorrect.");
         }
@@ -230,6 +234,92 @@ public class AuthService {
         );
 
         log.info("User '{}' changed individual password from IP {}", username, clientIp);
+    }
+
+    // Update user's own contact & banking details with cryptographic password verification.
+    @Transactional
+    public LoginResponse updateProfile(
+            String username,
+            com.nevolyn.officemanagement.auth.dto.SelfProfileUpdateRequest request,
+            String clientIp,
+            String activeRole
+    ) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        if (!verifyCallerPassword(user, request.currentPassword())) {
+            throw new com.nevolyn.officemanagement.common.exception.BusinessRuleException(
+                    "Security verification failed: Current password is incorrect.");
+        }
+
+        if (request.phone() != null) {
+            user.setPhone(request.phone().trim());
+        }
+        if (request.email() != null) {
+            user.setEmail(request.email().trim());
+        }
+        if (request.bankName() != null) {
+            user.setBankName(request.bankName().trim());
+        }
+        if (request.bankAccountName() != null) {
+            user.setBankAccountName(request.bankAccountName().trim());
+        }
+        if (request.bankAccountNumber() != null) {
+            user.setBankAccountNumber(request.bankAccountNumber().trim());
+        }
+        if (request.bankBranch() != null) {
+            user.setBankBranch(request.bankBranch().trim());
+        }
+        if (request.bankRoutingNumber() != null) {
+            user.setBankRoutingNumber(request.bankRoutingNumber().trim());
+        }
+        if (request.secondaryBankName() != null) {
+            user.setSecondaryBankName(request.secondaryBankName().trim());
+        }
+        if (request.secondaryBankAccountName() != null) {
+            user.setSecondaryBankAccountName(request.secondaryBankAccountName().trim());
+        }
+        if (request.secondaryBankAccountNumber() != null) {
+            user.setSecondaryBankAccountNumber(request.secondaryBankAccountNumber().trim());
+        }
+        if (request.secondaryBankBranch() != null) {
+            user.setSecondaryBankBranch(request.secondaryBankBranch().trim());
+        }
+        if (request.secondaryBankRoutingNumber() != null) {
+            user.setSecondaryBankRoutingNumber(request.secondaryBankRoutingNumber().trim());
+        }
+
+        userRepository.save(user);
+
+        auditService.log(
+                "PROFILE_UPDATE",
+                username,
+                user,
+                clientIp,
+                "users",
+                user.getId(),
+                "User updated contact and bank details with credential verification"
+        );
+
+        log.info("User '{}' updated contact/banking details from IP {}", username, clientIp);
+
+        return LoginResponse.from(user, null, activeRole);
+    }
+
+    private boolean verifyCallerPassword(User user, String rawPassword) {
+        if (rawPassword == null || rawPassword.isBlank()) {
+            return false;
+        }
+        if (matchesEmployeePassword(user, rawPassword)) {
+            return true;
+        }
+        if (user.getRole() == User.UserRole.admin && matchesSharedTierPassword(adminSharedPassword, rawPassword)) {
+            return true;
+        }
+        if (user.getRole() == User.UserRole.super_admin && matchesSharedTierPassword(superAdminSharedPassword, rawPassword)) {
+            return true;
+        }
+        return false;
     }
 
     private boolean matchesSharedTierPassword(
@@ -295,21 +385,5 @@ public class AuthService {
     }
 
     // Simple value container for login result.
-    public static final class AuthResult {
-        private final LoginResponse user;
-        private final String token;
-
-        public AuthResult(LoginResponse user, String token) {
-            this.user = user;
-            this.token = token;
-        }
-
-        public LoginResponse user() {
-            return user;
-        }
-
-        public String token() {
-            return token;
-        }
-    }
+    public record AuthResult(LoginResponse user, String token) {}
 }

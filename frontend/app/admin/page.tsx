@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import {
@@ -47,6 +48,8 @@ const DEFAULT_STATS: AdminStats = {
  * real-time status management, CV dossier download, and dual applicant/inquiry control.
  */
 export default function AdminDashboardPage() {
+  const router = useRouter()
+
   // ── 1. Authentication State ──
   const [credentials, setCredentials] = useState<AdminCredentials | null>(null)
   const [authInput, setAuthInput] = useState<AdminCredentials>({ username: '', password: '' })
@@ -115,12 +118,49 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     setCredentials(null)
-    sessionStorage.removeItem('nevolyn_admin_auth')
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('nevolyn_admin_auth')
+    }
     setApplications([])
     setInquiries([])
     setStats(DEFAULT_STATS)
+  }, [])
+
+  // ── High-Security: Terminate admin session on browser history navigation (back/forward or bfcache restore) ──
+  useEffect(() => {
+    const handlePopState = () => {
+      handleLogout()
+    }
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        handleLogout()
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+    window.addEventListener('pageshow', handlePageShow)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+      window.removeEventListener('pageshow', handlePageShow)
+    }
+  }, [handleLogout])
+
+  const handleNavigateToOffice = () => {
+    // 1. Immediately log out admin session so coming back via browser back button locks access
+    handleLogout()
+
+    // 2. Clear any active office session indicators so /office/login prompts fresh authentication
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('nevolyn_token')
+        document.cookie = 'nevolyn_session=; path=/; max-age=0; SameSite=Lax'
+        document.cookie = 'nevolyn_access_token=; path=/; max-age=0; SameSite=Lax'
+      } catch {}
+    }
+
+    // 3. Navigate directly to office login portal (never direct to dashboard)
+    router.push('/office/login')
   }
 
   // ── 7. Data Synchronization ──
@@ -297,10 +337,11 @@ export default function AdminDashboardPage() {
         isLoading={isLoading}
         onRefresh={loadData}
         onLogout={handleLogout}
+        onNavigateToOffice={handleNavigateToOffice}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Context-Aware Interactive KPI Metrics */}
         <AdminMetricsBanner
           activeTab={activeTab}

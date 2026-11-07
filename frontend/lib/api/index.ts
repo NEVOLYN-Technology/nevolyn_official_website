@@ -172,6 +172,21 @@ export const authApi = {
   me: () => api.get<ApiResponse<LoginResponse>>("/auth/me"),
   changePassword: (data: { currentPassword: string; newPassword: string; confirmPassword: string }) =>
     api.patch<ApiResponse<void>>("/auth/profile/password", data),
+  updateProfile: (data: {
+    phone?: string;
+    email?: string;
+    bankName?: string;
+    bankAccountName?: string;
+    bankAccountNumber?: string;
+    bankBranch?: string;
+    bankRoutingNumber?: string;
+    secondaryBankName?: string;
+    secondaryBankAccountName?: string;
+    secondaryBankAccountNumber?: string;
+    secondaryBankBranch?: string;
+    secondaryBankRoutingNumber?: string;
+    currentPassword: string;
+  }) => api.patch<ApiResponse<LoginResponse>>("/auth/profile", data),
 };
 
 // ── Dashboards ────────────────────────────────────────────────
@@ -185,12 +200,33 @@ export const dashboardApi = {
 
 // ── Attendance ────────────────────────────────────────────────
 export const attendanceApi = {
-  checkIn: () => api.post<AttendanceRecord>("/attendance/check-in"),
-  checkOut: () => api.post<AttendanceRecord>("/attendance/check-out"),
-  getToday: () => api.get<AttendanceRecord>("/attendance/today"),
-  getHistory: () => api.get<AttendanceRecord[]>("/attendance/history"),
-  getAdminDaily: (date?: string) =>
-    api.get<AdminAttendanceRecord[]>(`/admin/attendance${date ? `?date=${date}` : ""}`),
+  checkIn: async () => {
+    const res = await api.post<any>("/attendance/check-in");
+    const raw = res.data?.data ?? res.data;
+    return { ...res, data: raw as AttendanceRecord };
+  },
+  checkOut: async () => {
+    const res = await api.post<any>("/attendance/check-out");
+    const raw = res.data?.data ?? res.data;
+    return { ...res, data: raw as AttendanceRecord };
+  },
+  getToday: async () => {
+    const res = await api.get<any>("/attendance/today");
+    const raw = res.data?.data ?? res.data;
+    return { ...res, data: raw as AttendanceRecord | null };
+  },
+  getHistory: async () => {
+    const res = await api.get<any>("/attendance/history");
+    const raw = res.data?.data ?? res.data;
+    const list = Array.isArray(raw) ? raw : [];
+    return { ...res, data: list as AttendanceRecord[] };
+  },
+  getAdminDaily: async (date?: string) => {
+    const res = await api.get<any>(`/admin/attendance${date ? `?date=${date}` : ""}`);
+    const raw = res.data?.data ?? res.data;
+    const list = Array.isArray(raw) ? raw : [];
+    return { ...res, data: list as AdminAttendanceRecord[] };
+  },
   correct: (data: {
     userId: number;
     date: string;

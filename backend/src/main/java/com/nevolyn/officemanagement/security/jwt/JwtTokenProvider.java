@@ -96,14 +96,10 @@ public class JwtTokenProvider {
         try {
             jwtParser.parseSignedClaims(token);
             return true;
-        } catch (ExpiredJwtException ex) {
-            log.debug("JWT token expired: {}", ex.getMessage());
-        } catch (MalformedJwtException ex) {
-            log.debug("JWT token malformed: {}", ex.getMessage());
-        } catch (SecurityException ex) {
-            log.debug("JWT signature invalid: {}", ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            log.debug("JWT token empty or null: {}", ex.getMessage());
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.debug("JWT token invalid or expired: {}", ex.getMessage());
+        } catch (Exception ex) {
+            log.debug("Unexpected JWT validation exception: {}", ex.getMessage());
         }
         return false;
     }

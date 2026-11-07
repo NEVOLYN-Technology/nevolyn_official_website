@@ -14,7 +14,8 @@ export default function QrDisplayPage() {
     },
   });
 
-  const attendanceUrl = qrInfo?.attendanceUrl || "https://nevolyn.com/office/attendance";
+  const rawUrl = qrInfo?.attendanceUrl || "https://nevolyn.com/office/attendance";
+  const attendanceUrl = rawUrl.includes("?") ? `${rawUrl}&punch=office_qr` : `${rawUrl}?punch=office_qr`;
   const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(attendanceUrl)}`;
 
   return (

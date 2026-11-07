@@ -62,13 +62,13 @@ export function AdminLoginCard({
         {/* Card */}
         <div className="bg-card border border-border rounded-2xl shadow-lg overflow-hidden">
           {/* Card header */}
-          <div className="px-8 pt-8 pb-6 border-b border-border bg-muted/40">
+          <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-5 sm:pb-6 border-b border-border bg-muted/40">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shrink-0">
                 <Lock className="w-5 h-5 text-primary" />
               </div>
-              <div>
-                <h1 className="text-base font-bold text-foreground">Super Admin Access</h1>
+              <div className="min-w-0">
+                <h1 className="text-base font-bold text-foreground truncate">Super Admin Access</h1>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   NEVOLYN Executive Dashboard — Super Admin Restricted
                 </p>
@@ -77,7 +77,7 @@ export function AdminLoginCard({
           </div>
 
           {/* Form */}
-          <form onSubmit={onLogin} className="px-8 py-7 space-y-5">
+          <form onSubmit={onLogin} className="px-5 sm:px-8 py-6 sm:py-7 space-y-4 sm:space-y-5">
             {/* Username */}
             <div className="space-y-1.5">
               <label htmlFor="admin-username" className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">

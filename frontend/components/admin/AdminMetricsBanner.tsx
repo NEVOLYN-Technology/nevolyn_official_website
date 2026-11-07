@@ -130,31 +130,31 @@ export function AdminMetricsBanner({
           )}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3.5">
           {cards.map((card) => {
             const isSelected = activeStatusFilter === card.id
             return (
               <button
                 key={card.id}
                 onClick={() => onStatusFilterSelect(card.id)}
-                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative group flex flex-col justify-between ${
+                className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border text-left transition-all cursor-pointer relative group flex flex-col justify-between ${
                   isSelected
                     ? 'bg-primary/5 border-primary shadow-sm ring-2 ring-primary/20'
                     : 'bg-card border-border hover:border-primary/40 hover:shadow-sm'
                 }`}
               >
                 <div>
-                  <div className="flex items-center justify-between text-muted-foreground text-xs mb-2">
-                    <span className="font-semibold truncate pr-1">{card.label}</span>
+                  <div className="flex items-center justify-between text-muted-foreground text-xs mb-1.5 sm:mb-2">
+                    <span className="font-semibold truncate pr-1 text-[11px] sm:text-xs">{card.label}</span>
                     <div className={`p-1.5 rounded-lg shrink-0 ${card.iconBg}`}>
                       {card.icon}
                     </div>
                   </div>
-                  <p className={`text-2xl font-black tracking-tight ${card.valueClass}`}>
+                  <p className={`text-xl sm:text-2xl font-black tracking-tight ${card.valueClass}`}>
                     {card.value}
                   </p>
                 </div>
-                <div className="mt-2.5 pt-2 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
+                <div className="mt-2 pt-1.5 border-t border-border/50 flex items-center justify-between text-[10px] sm:text-[11px] text-muted-foreground">
                   <span className="truncate">{card.subtitle}</span>
                   {isSelected && (
                     <span className="shrink-0 flex items-center gap-0.5 text-primary font-bold text-[10px]">
@@ -256,7 +256,7 @@ export function AdminMetricsBanner({
         )}
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3.5">
         {inquiryCards.map((card) => {
           const isSelected = activeStatusFilter === card.id
           return (
@@ -266,7 +266,7 @@ export function AdminMetricsBanner({
               onClick={() => {
                 if (card.clickable) onStatusFilterSelect(card.id)
               }}
-              className={`p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between ${
+              className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border text-left transition-all relative flex flex-col justify-between ${
                 !card.clickable
                   ? 'bg-card border-border cursor-default'
                   : isSelected
@@ -275,17 +275,17 @@ export function AdminMetricsBanner({
               }`}
             >
               <div>
-                <div className="flex items-center justify-between text-muted-foreground text-xs mb-2">
-                  <span className="font-semibold truncate pr-1">{card.label}</span>
+                <div className="flex items-center justify-between text-muted-foreground text-xs mb-1.5 sm:mb-2">
+                  <span className="font-semibold truncate pr-1 text-[11px] sm:text-xs">{card.label}</span>
                   <div className={`p-1.5 rounded-lg shrink-0 ${card.iconBg}`}>
                     {card.icon}
                   </div>
                 </div>
-                <p className={`text-2xl font-black tracking-tight ${card.valueClass}`}>
+                <p className={`text-xl sm:text-2xl font-black tracking-tight ${card.valueClass}`}>
                   {card.value}
                 </p>
               </div>
-              <div className="mt-2.5 pt-2 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
+              <div className="mt-2 pt-1.5 border-t border-border/50 flex items-center justify-between text-[10px] sm:text-[11px] text-muted-foreground">
                 <span className="truncate">{card.subtitle}</span>
                 {isSelected && (
                   <span className="shrink-0 flex items-center gap-0.5 text-primary font-bold text-[10px]">

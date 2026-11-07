@@ -70,7 +70,7 @@ export function AdminDashboard() {
   return (
     <div className="space-y-7">
       {/* Executive Hero Header Card */}
-      <div className="p-6 md:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_32px_-10px_rgba(15,23,42,0.06)] relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_32px_-10px_rgba(15,23,42,0.06)] relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="h-1.5 w-full bg-gradient-to-r from-slate-900 via-teal-600 to-emerald-600 absolute top-0 left-0" />
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
@@ -121,7 +121,7 @@ export function AdminDashboard() {
       {/* Tables Section: Live Attendance & Audit Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Today's Attendance Roster (2 Cols) */}
-        <div className="lg:col-span-2 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)]">
+        <div className="lg:col-span-2 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)]">
           <div className="flex items-center justify-between mb-5 border-b border-slate-200/80 pb-4">
             <div>
               <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
@@ -219,7 +219,7 @@ export function AdminDashboard() {
         </div>
 
         {/* Live Audit Stream (1 Col) */}
-        <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] flex flex-col">
+        <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] flex flex-col">
           <div className="flex items-center justify-between mb-4 border-b border-slate-200/80 pb-3">
             <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-teal-600" />

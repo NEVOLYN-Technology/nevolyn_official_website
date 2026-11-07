@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,11 +18,25 @@ interface LoginForm {
  * Styled in authentic NEVOLYN Light Glassmorphism 2.0 aesthetic.
  */
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated, logout } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string }>({});
   const [serverError, setServerError] = useState<string | null>(null);
+
+  // Security Protocol: Any direct arrival at /office/login resets active sessions so credentials must be re-entered
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("nevolyn_token");
+        document.cookie = "nevolyn_session=; path=/; max-age=0; SameSite=Lax";
+        document.cookie = "nevolyn_access_token=; path=/; max-age=0; SameSite=Lax";
+      } catch {}
+    }
+    if (isAuthenticated) {
+      void logout();
+    }
+  }, [isAuthenticated, logout]);
 
   const loginMutation = useMutation({
     mutationFn: ({ username: u, password: p }: LoginForm) => login(u, p),

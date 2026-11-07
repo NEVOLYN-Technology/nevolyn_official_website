@@ -18,15 +18,15 @@ export function InquiryDetailModal({ inquiry, onClose }: InquiryDetailModalProps
   return (
     <AnimatePresence>
       {inquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs">
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
-            className="w-full max-w-xl bg-card border border-border rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
+            className="w-full max-w-xl bg-card border border-border rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[92dvh]"
           >
             {/* Modal Header */}
-            <div className="p-5 border-b border-border flex items-center justify-between bg-muted/40">
+            <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/40 shrink-0">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono font-bold text-primary">
@@ -65,7 +65,7 @@ export function InquiryDetailModal({ inquiry, onClose }: InquiryDetailModalProps
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-4 text-sm">
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-sm flex-1">
               <div className="p-4 rounded-xl bg-muted/50 border border-border">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="font-bold text-foreground text-sm">{inquiry.name}</span>
@@ -120,7 +120,7 @@ export function InquiryDetailModal({ inquiry, onClose }: InquiryDetailModalProps
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-border bg-muted/40 flex items-center justify-between">
+            <div className="p-4 border-t border-border bg-muted/40 flex items-center justify-between shrink-0">
               <a
                 href={`mailto:${inquiry.email}?subject=RE: ${encodeURIComponent(inquiry.subject)} [Ref: ${inquiry.inquiryId}]`}
                 className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold inline-flex items-center gap-2 transition-colors shadow-xs"

@@ -35,8 +35,9 @@ import java.util.List;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+
     @PostMapping("/check-in")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<AttendanceResponse>> checkIn(
             @AuthenticationPrincipal UserDetails userDetails,
             HttpServletRequest request
@@ -48,8 +49,9 @@ public class AttendanceController {
         );
         return ResponseEntity.ok(ApiResponse.success("Check-in recorded", AttendanceResponse.from(attendance)));
     }
+
     @PostMapping("/check-out")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<AttendanceResponse>> checkOut(
             @AuthenticationPrincipal UserDetails userDetails,
             HttpServletRequest request
@@ -60,8 +62,9 @@ public class AttendanceController {
         );
         return ResponseEntity.ok(ApiResponse.success("Check-out recorded", AttendanceResponse.from(attendance)));
     }
+
     @GetMapping("/today")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<AttendanceResponse>> getToday(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
@@ -69,8 +72,9 @@ public class AttendanceController {
                 .map(a -> ResponseEntity.ok(ApiResponse.success(AttendanceResponse.from(a))))
                 .orElseGet(() -> ResponseEntity.ok(ApiResponse.success("No attendance record yet today", null)));
     }
+
     @GetMapping("/history")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<List<AttendanceResponse>>> getHistory(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
@@ -78,13 +82,15 @@ public class AttendanceController {
                 .stream().map(AttendanceResponse::from).toList();
         return ResponseEntity.ok(ApiResponse.success(history));
     }
+
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<List<AttendanceResponse>>> getByDate(
-            @RequestParam(defaultValue = "#{T(java.time.LocalDate).now().toString()}")
+            @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        List<AttendanceResponse> records = attendanceService.getByDate(date)
+        LocalDate queryDate = (date != null) ? date : LocalDate.now();
+        List<AttendanceResponse> records = attendanceService.getByDate(queryDate)
                 .stream().map(AttendanceResponse::from).toList();
         return ResponseEntity.ok(ApiResponse.success(records));
     }

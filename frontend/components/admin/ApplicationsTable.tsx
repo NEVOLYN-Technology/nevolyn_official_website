@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Users, Copy, Check, Mail, Phone, Eye, Download, Trash2, FileText } from 'lucide-react'
+import { Users, Copy, Check, Mail, Phone, Eye, Download, Trash2, FileText, Calendar } from 'lucide-react'
 import { type ApplicationRecord, getApplicationPdfDownloadUrl } from '@/lib/api/admin'
 
 const APPLICATION_STATUS_OPTIONS: Array<ApplicationRecord['selectionStatus']> = [
@@ -24,8 +24,8 @@ interface ApplicationsTableProps {
 }
 
 /**
- * Job Applications Data Table — NEVOLYN light theme.
- * Clean, executive card table with status badge selectors, resume download, candidate inspection, and delete.
+ * Job Applications Data Table & Mobile/iPad Card Roster — NEVOLYN light theme.
+ * Adapts between an executive desktop table and a responsive touch card layout for phones/tablets.
  */
 export function ApplicationsTable({
   applications,
@@ -39,7 +39,7 @@ export function ApplicationsTable({
 }: ApplicationsTableProps) {
   if (applications.length === 0) {
     return (
-      <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm text-center py-16 px-4">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm text-center py-12 sm:py-16 px-4">
         <div className="w-12 h-12 rounded-2xl bg-muted border border-border flex items-center justify-center mx-auto mb-3 text-muted-foreground">
           <Users className="w-6 h-6" />
         </div>
@@ -53,9 +53,151 @@ export function ApplicationsTable({
     )
   }
 
+  const getStatusBadgeStyle = (status: ApplicationRecord['selectionStatus']) => {
+    switch (status) {
+      case 'PENDING':
+        return 'bg-amber-50 text-amber-800 border-amber-300'
+      case 'IN_REVIEW':
+        return 'bg-sky-50 text-sky-800 border-sky-300'
+      case 'SHORTLISTED':
+        return 'bg-emerald-50 text-emerald-800 border-emerald-300'
+      case 'HIRED':
+        return 'bg-purple-50 text-purple-800 border-purple-300'
+      case 'REJECTED':
+      default:
+        return 'bg-rose-50 text-rose-800 border-rose-300'
+    }
+  }
+
   return (
     <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-      <div className="overflow-x-auto">
+      {/* ── MOBILE & IPAD CARD VIEW (<1024px) ── */}
+      <div className="lg:hidden divide-y divide-border">
+        {applications.map((app) => (
+          <div key={app.id} className="p-4 sm:p-5 space-y-3 hover:bg-muted/30 transition-colors">
+            {/* Top row: Tracking ID + Status dropdown */}
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={() => onCopy(app.applicationId)}
+                className="font-mono text-xs font-bold text-primary hover:underline flex items-center gap-1.5 cursor-pointer bg-primary/5 px-2.5 py-1 rounded-lg border border-primary/20"
+                title="Click to copy tracking ID"
+              >
+                <span>{app.applicationId}</span>
+                {copiedId === app.applicationId ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                )}
+              </button>
+
+              <select
+                value={app.selectionStatus}
+                onChange={(e) =>
+                  onStatusChange(app.id, e.target.value as ApplicationRecord['selectionStatus'])
+                }
+                className={`text-xs px-2.5 py-1 rounded-lg border font-bold focus:outline-none cursor-pointer transition-colors ${getStatusBadgeStyle(
+                  app.selectionStatus
+                )}`}
+              >
+                {APPLICATION_STATUS_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt} className="bg-card text-foreground">
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Candidate details */}
+            <div>
+              <p className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
+                {app.name}
+              </p>
+              <div className="flex items-center gap-3 flex-wrap mt-1 text-xs">
+                <a
+                  href={`mailto:${app.email}`}
+                  className="text-primary hover:underline flex items-center gap-1 font-medium"
+                >
+                  <Mail className="w-3.5 h-3.5 shrink-0" />
+                  <span className="break-all">{app.email}</span>
+                </a>
+                {app.phone && (
+                  <a
+                    href={`tel:${app.phone}`}
+                    className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  >
+                    <Phone className="w-3.5 h-3.5 shrink-0" />
+                    <span>{app.phone}</span>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Reason snippet & resume file */}
+            <div className="p-3 rounded-xl bg-muted/40 border border-border/80 text-xs space-y-1.5">
+              <p className="text-foreground line-clamp-2 font-medium">
+                {app.reason}
+              </p>
+              <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] pt-1 border-t border-border/50">
+                <FileText className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                <span className="truncate max-w-[220px] font-mono">
+                  {app.originalFileName || 'resume.pdf'}
+                </span>
+                {app.fileSizeBytes && (
+                  <span className="text-[10px]">
+                    ({(app.fileSizeBytes / 1024).toFixed(0)} KB)
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom row: Submitted timestamp + Actions */}
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <span className="text-[11px] text-muted-foreground flex items-center gap-1 font-medium">
+                <Calendar className="w-3 h-3 text-muted-foreground" />
+                <span>
+                  {new Date(app.createdAt).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </span>
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onSelect(app)}
+                  className="px-2.5 py-1.5 rounded-lg border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5 text-primary" />
+                  <span>Inspect</span>
+                </button>
+                <a
+                  href={getApplicationPdfDownloadUrl(app.applicationId)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-lg border border-border bg-card hover:bg-muted text-primary transition-colors inline-flex items-center shadow-2xs"
+                  title="Download Candidate Dossier PDF"
+                >
+                  <Download className="w-4 h-4" />
+                </a>
+                <button
+                  type="button"
+                  onClick={() => onDelete(app.id, app.applicationId)}
+                  className="p-1.5 rounded-lg border border-border bg-card hover:bg-rose-50 text-muted-foreground hover:text-rose-600 transition-colors shadow-2xs cursor-pointer"
+                  title="Delete application"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── DESKTOP TABULAR VIEW (>=1024px) ── */}
+      <div className="hidden lg:block overflow-x-auto">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-border bg-muted/60 text-muted-foreground font-semibold">
@@ -127,17 +269,9 @@ export function ApplicationsTable({
                     onChange={(e) =>
                       onStatusChange(app.id, e.target.value as ApplicationRecord['selectionStatus'])
                     }
-                    className={`text-xs px-2.5 py-1 rounded-lg border font-semibold focus:outline-none cursor-pointer transition-colors ${
-                      app.selectionStatus === 'PENDING'
-                        ? 'bg-amber-50 text-amber-800 border-amber-300'
-                        : app.selectionStatus === 'IN_REVIEW'
-                        ? 'bg-sky-50 text-sky-800 border-sky-300'
-                        : app.selectionStatus === 'SHORTLISTED'
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                        : app.selectionStatus === 'HIRED'
-                        ? 'bg-purple-50 text-purple-800 border-purple-300'
-                        : 'bg-rose-50 text-rose-800 border-rose-300'
-                    }`}
+                    className={`text-xs px-2.5 py-1 rounded-lg border font-semibold focus:outline-none cursor-pointer transition-colors ${getStatusBadgeStyle(
+                      app.selectionStatus
+                    )}`}
                   >
                     {APPLICATION_STATUS_OPTIONS.map((opt) => (
                       <option key={opt} value={opt} className="bg-card text-foreground">

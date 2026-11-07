@@ -62,7 +62,7 @@ export function CorrectionModal({
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-md w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-6 space-y-5 shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 pb-4">
           <div>
             <h2 className="text-base font-extrabold text-slate-900">Correct Attendance</h2>

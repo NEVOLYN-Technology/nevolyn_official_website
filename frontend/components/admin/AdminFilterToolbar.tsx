@@ -93,8 +93,8 @@ export function AdminFilterToolbar({
   return (
     <div className="space-y-4 mb-6">
       {/* Tab Navigation & Sort */}
-      <div className="flex items-center justify-between flex-wrap gap-4 border-b border-border pb-4">
-        <div className="flex items-center gap-1.5 bg-muted/80 p-1 rounded-2xl border border-border">
+      <div className="flex items-center justify-between flex-wrap gap-3 border-b border-border pb-4">
+        <div className="w-full sm:w-auto grid grid-cols-2 sm:flex items-center gap-1.5 bg-muted/80 p-1 rounded-2xl border border-border">
           {/* Applications Tab */}
           <button
             onClick={() => {
@@ -102,20 +102,20 @@ export function AdminFilterToolbar({
               setSearchTerm('')
             }}
             id="admin-tab-applications"
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center sm:justify-start gap-2 cursor-pointer ${
               activeTab === 'applications'
                 ? 'bg-card text-foreground shadow-sm border border-border/80'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Users
-              className={`w-3.5 h-3.5 ${
+              className={`w-3.5 h-3.5 shrink-0 ${
                 activeTab === 'applications' ? 'text-primary' : 'text-muted-foreground'
               }`}
             />
-            <span>Job Applications</span>
+            <span className="truncate">Applications</span>
             <span
-              className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
+              className={`px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] font-mono font-bold shrink-0 ${
                 activeTab === 'applications'
                   ? 'bg-primary/10 text-primary'
                   : 'bg-background text-muted-foreground'
@@ -132,20 +132,20 @@ export function AdminFilterToolbar({
               setSearchTerm('')
             }}
             id="admin-tab-inquiries"
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center sm:justify-start gap-2 cursor-pointer ${
               activeTab === 'inquiries'
                 ? 'bg-card text-foreground shadow-sm border border-border/80'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Inbox
-              className={`w-3.5 h-3.5 ${
+              className={`w-3.5 h-3.5 shrink-0 ${
                 activeTab === 'inquiries' ? 'text-primary' : 'text-muted-foreground'
               }`}
             />
-            <span>Contact Inquiries</span>
+            <span className="truncate">Inquiries</span>
             <span
-              className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
+              className={`px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] font-mono font-bold shrink-0 ${
                 activeTab === 'inquiries'
                   ? 'bg-primary/10 text-primary'
                   : 'bg-background text-muted-foreground'
@@ -157,10 +157,10 @@ export function AdminFilterToolbar({
         </div>
 
         {/* Right Tools: Result summary + Sort order */}
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground hidden sm:inline-block font-medium">
+        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3">
+          <span className="text-xs text-muted-foreground font-medium">
             Showing <strong className="text-foreground font-bold">{filteredCount}</strong> of{' '}
-            {activeTab === 'applications' ? applications.length : inquiries.length} records
+            {activeTab === 'applications' ? applications.length : inquiries.length}
           </span>
 
           <button
@@ -170,7 +170,7 @@ export function AdminFilterToolbar({
             title="Toggle chronological sorting"
           >
             <ArrowUpDown className="w-3.5 h-3.5 text-primary" />
-            <span>{sortOrder === 'desc' ? 'Newest First' : 'Oldest First'}</span>
+            <span>{sortOrder === 'desc' ? 'Newest' : 'Oldest'}</span>
           </button>
         </div>
       </div>

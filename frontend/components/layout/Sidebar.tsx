@@ -22,20 +22,26 @@ import {
   LogOut,
   History,
   Crown,
+  X,
 } from "lucide-react";
 
 /**
  * Primary navigation sidebar component — Light Glassmorphism 2.0 Edition.
  */
-export function Sidebar() {
+export function Sidebar({
+  open = false,
+  onClose,
+}: {
+  open?: boolean;
+  onClose?: () => void;
+}) {
   const pathname = usePathname();
   const { user, isAdmin, isSuperAdmin, logout } = useAuth();
 
   const adminLinks = [
     { label: "Dashboard", href: "/office/dashboard", icon: LayoutDashboard },
-    { label: "My Attendance", href: "/office/attendance", icon: Clock },
-    { label: "Live Attendance", href: "/office/attendance/admin", icon: Clock },
-    { label: "Attendance History", href: "/office/attendance/history", icon: History },
+    { label: "Attendance", href: "/office/attendance", icon: Clock },
+    { label: "Staff Attendance (Admin)", href: "/office/attendance/admin", icon: Users },
     { label: "Employees", href: "/office/employees", icon: Users },
     { label: "R&D Projects", href: "/office/projects", icon: FlaskConical },
     { label: "Tasks", href: "/office/tasks", icon: CheckSquare },
@@ -43,7 +49,7 @@ export function Sidebar() {
     { label: "Training & Meetings", href: "/office/training", icon: GraduationCap },
     { label: "Reports", href: "/office/reports", icon: BarChart3 },
     { label: "Audit Trail", href: "/office/audit", icon: ShieldAlert },
-    { label: "LAN QR Display", href: "/office/attendance/qr", icon: QrCode },
+    { label: "Entrance QR Display", href: "/office/attendance/qr", icon: QrCode },
     { label: "Profile & Security", href: "/office/profile", icon: UserIcon },
     ...(isSuperAdmin
       ? [{ label: "Admin Management", href: "/office/admin-management", icon: ShieldCheck }]
@@ -52,8 +58,7 @@ export function Sidebar() {
 
   const employeeLinks = [
     { label: "Dashboard", href: "/office/dashboard", icon: LayoutDashboard },
-    { label: "My Attendance", href: "/office/attendance", icon: Clock },
-    { label: "Attendance History", href: "/office/attendance/history", icon: History },
+    { label: "Attendance", href: "/office/attendance", icon: Clock },
     { label: "R&D Projects", href: "/office/projects", icon: FlaskConical },
     { label: "My Tasks", href: "/office/tasks", icon: CheckSquare },
     { label: "Work Logs", href: "/office/work-logs", icon: FileText },
@@ -64,15 +69,37 @@ export function Sidebar() {
   const links = isAdmin ? adminLinks : employeeLinks;
 
   return (
-    <aside className="w-72 bg-white border-r border-slate-200/90 flex flex-col h-screen fixed left-0 top-0 z-40 text-slate-700 shadow-[4px_0_24px_-6px_rgba(15,23,42,0.05)]">
+    <>
+    {/* Mobile / tablet backdrop */}
+    <div
+      aria-hidden="true"
+      onClick={onClose}
+      className={`fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[2px] transition-opacity duration-200 lg:hidden ${
+        open ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
+    />
+    <aside
+      className={`w-72 max-w-[85vw] bg-white border-r border-slate-200/90 flex flex-col h-dvh fixed left-0 top-0 z-50 lg:z-40 text-slate-700 shadow-[4px_0_24px_-6px_rgba(15,23,42,0.05)] transition-transform duration-200 ease-out ${
+        open ? "translate-x-0" : "-translate-x-full"
+      } lg:translate-x-0`}
+    >
       {/* Brand Header */}
-      <div className="h-16 px-5 border-b border-slate-200/80 flex items-center justify-between bg-white">
+      <div className="h-16 px-5 border-b border-slate-200/80 flex items-center justify-between bg-white shrink-0">
         <NextLink href="/office/dashboard" className="flex items-center gap-2.5 group">
           <BrandWordmark size="sm" />
         </NextLink>
-        <span className="text-[9px] px-2.5 py-0.5 rounded-full bg-slate-900 text-white font-extrabold uppercase tracking-wider">
-          Office
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] px-2.5 py-0.5 rounded-full bg-slate-900 text-white font-extrabold uppercase tracking-wider">
+            Office
+          </span>
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Role Pill */}
@@ -110,6 +137,7 @@ export function Sidebar() {
             <NextLink
               key={link.href}
               href={link.href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-[13px] transition-all duration-150 ${
                 isActive
                   ? "bg-slate-900 text-white font-bold shadow-sm shadow-slate-900/15"
@@ -151,5 +179,6 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }

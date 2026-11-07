@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
@@ -20,6 +20,13 @@ export default function ProtectedLayout({
 }) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -56,10 +63,10 @@ export default function ProtectedLayout({
         className="pointer-events-none fixed bottom-0 right-10 w-[500px] h-[380px] rounded-full bg-slate-400/10 blur-3xl z-0"
       />
 
-      <Sidebar />
-      <div className="flex-1 ml-72 flex flex-col min-h-screen relative z-10">
-        <Topbar />
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto grid-bg">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 min-w-0 lg:ml-72 flex flex-col min-h-screen relative z-10">
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
+        <main className="flex-1 min-w-0 p-3 sm:p-5 lg:p-8 overflow-x-hidden grid-bg">
           {children}
         </main>
       </div>

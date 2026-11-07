@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { dashboardApi, attendanceApi } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { dashboardApi } from "@/lib/api";
 import NextLink from "next/link";
 import { CheckSquare, FlaskConical, FileText, Eye, Edit, KeyRound, ArrowLeft } from "lucide-react";
 import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
@@ -33,8 +33,6 @@ export function EmployeeDashboard({
   onResetPassword,
   onBackToOverview,
 }: EmployeeDashboardProps) {
-  const queryClient = useQueryClient();
-
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["employee-dashboard", username, isInspecting],
     queryFn: async () => {
@@ -43,20 +41,6 @@ export function EmployeeDashboard({
       return raw;
     },
     enabled: !isInspecting || Boolean(username),
-  });
-
-  const checkInMutation = useMutation({
-    mutationFn: () => attendanceApi.checkIn(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employee-dashboard"] });
-    },
-  });
-
-  const checkOutMutation = useMutation({
-    mutationFn: () => attendanceApi.checkOut(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employee-dashboard"] });
-    },
   });
 
   if (isLoading) {
@@ -86,9 +70,6 @@ export function EmployeeDashboard({
     );
   }
 
-  const att = data.todayAttendance;
-  const hasCheckedIn = !!att?.checkInTime;
-  const hasCheckedOut = !!att?.checkOutTime;
   const myTasks = data.myTasks ?? [];
   const myProjects = data.myProjects ?? [];
   const myWorkLogs = data.myWorkLogs ?? [];
@@ -148,128 +129,27 @@ export function EmployeeDashboard({
       )}
 
       {/* Welcome Greeting Banner */}
-      <div className="p-6 md:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_32px_-10px_rgba(15,23,42,0.06)] relative overflow-hidden">
+      <div className="p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_32px_-10px_rgba(15,23,42,0.06)] relative overflow-hidden">
         <div className="h-1.5 w-full bg-gradient-to-r from-slate-900 via-teal-600 to-emerald-600 absolute top-0 left-0" />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <EmployeeAvatar
-              user={{ fullName: data.fullName, username, employeeId: data.employeeId }}
-              size="lg"
-              shape="rounded"
-            />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-                {data.greeting}, <span className="text-teal-700">{data.fullName}</span>
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium flex items-center gap-2 flex-wrap">
-                <span>{data.designation || "R&D Staff Member"}</span>
-                <span>&bull;</span>
-                <span>Employee ID:</span>
-                <span className="font-mono text-teal-800 font-bold px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-xs">
-                  {data.employeeId}
-                </span>
-              </p>
-            </div>
-          </div>
-          <div className="text-left sm:text-right bg-emerald-50/80 border border-emerald-200/80 px-4 py-2.5 rounded-2xl">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 block">
-              Daily Schedule
-            </span>
-            <span className="text-xs text-emerald-700 font-bold">
-              Standard Shift 09:00 - 17:00
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Prominent Daily Attendance Station */}
-      <div className="p-6 md:p-8 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-[0_12px_36px_-10px_rgba(15,23,42,0.06)] space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-200/80 pb-4">
-          <div className="flex items-center gap-2.5">
-            <span className="text-base font-extrabold text-slate-900 tracking-tight uppercase flex items-center gap-2">
-              <span>⏱️</span>
-              <span>Daily Attendance Station</span>
-            </span>
-          </div>
-          <div>
-            {hasCheckedIn ? (
-              hasCheckedOut ? (
-                <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  COMPLETED TODAY
-                </span>
-              ) : (
-                <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 animate-pulse">
-                  IN HOUSE (ACTIVE)
-                </span>
-              )
-            ) : (
-              <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                NOT CHECKED IN
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <EmployeeAvatar
+            user={{ fullName: data.fullName, username, employeeId: data.employeeId }}
+            size="lg"
+            shape="rounded"
+          />
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-extrabold text-teal-700 tracking-tight break-words leading-tight">
+              {data.fullName}
+            </h1>
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-1.5 font-medium flex items-center gap-x-2 gap-y-1 flex-wrap">
+              <span>{data.designation || "R&D Staff Member"}</span>
+              <span className="hidden sm:inline">&bull;</span>
+              <span className="font-mono text-teal-800 font-bold px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-[10px] sm:text-[11px] break-all">
+                {data.employeeId}
               </span>
-            )}
+            </p>
           </div>
         </div>
-
-        {/* 3 Metric Stat Blocks */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 text-center shadow-2xs">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-              Checked In
-            </span>
-            <span className="text-xl font-extrabold text-slate-900 font-mono mt-1 block">
-              {att?.checkInTime || "—"}
-            </span>
-          </div>
-          <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 text-center shadow-2xs">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-              Checked Out
-            </span>
-            <span className="text-xl font-extrabold text-slate-900 font-mono mt-1 block">
-              {att?.checkOutTime || "—"}
-            </span>
-          </div>
-          <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 text-center shadow-2xs">
-            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">
-              Logged Hours
-            </span>
-            <span className="text-xl font-extrabold text-emerald-700 font-mono mt-1 block">
-              {att?.totalHours ? `${att.totalHours} hrs` : "0.00 hrs"}
-            </span>
-          </div>
-        </div>
-
-        {/* Big Action Buttons (shown only on own dashboard) */}
-        {!isInspecting && (
-          <div>
-            {!hasCheckedIn ? (
-              <button
-                onClick={() => checkInMutation.mutate()}
-                disabled={checkInMutation.isPending}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-sm tracking-wide shadow-lg shadow-emerald-500/25 transition-all duration-150 transform hover:-translate-y-0.5 cursor-pointer"
-              >
-                {checkInMutation.isPending ? "REGISTERING PUNCH..." : "🟢 CHECK IN NOW"}
-              </button>
-            ) : !hasCheckedOut ? (
-              <button
-                onClick={() => checkOutMutation.mutate()}
-                disabled={checkOutMutation.isPending}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-extrabold text-sm tracking-wide shadow-lg shadow-rose-500/25 transition-all duration-150 transform hover:-translate-y-0.5 cursor-pointer"
-              >
-                {checkOutMutation.isPending ? "REGISTERING CHECK-OUT..." : "🔴 CHECK OUT NOW"}
-              </button>
-            ) : (
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center text-emerald-800 font-bold text-sm">
-                ✅ Attendance Completed for Today &bull;{" "}
-                <NextLink
-                  href="/office/attendance/history"
-                  className="underline text-emerald-700 hover:text-emerald-900 ml-1"
-                >
-                  View Full History →
-                </NextLink>
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* 4 Interactive Quick Action Tiles */}
@@ -329,28 +209,28 @@ export function EmployeeDashboard({
         </NextLink>
 
         <NextLink
-          href="/office/attendance/history"
+          href="/office/attendance"
           className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-300 shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-1 relative overflow-hidden action-tile-top-green flex flex-col justify-between h-32 group"
         >
           <div>
-            <span className="text-xl">📅</span>
+            <span className="text-xl">⏱️</span>
             <h3 className="font-extrabold text-slate-900 text-base mt-2 group-hover:text-emerald-700 transition-colors">
-              History
+              Attendance
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Punctuality &amp; Records
+              My Records &amp; Status
             </p>
           </div>
           <span className="text-xs text-emerald-700 font-bold self-end flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-            Audit →
+            View →
           </span>
         </NextLink>
       </div>
 
       {/* Grid: Tasks & Projects */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* My Active Tasks */}
-        <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+        <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs">
           <div className="flex items-center justify-between mb-4 border-b border-slate-200/70 pb-3">
             <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <CheckSquare className="w-4 h-4 text-teal-600" />
@@ -389,7 +269,7 @@ export function EmployeeDashboard({
         </div>
 
         {/* My Projects */}
-        <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+        <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs">
           <div className="flex items-center justify-between mb-4 border-b border-slate-200/70 pb-3">
             <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <FlaskConical className="w-4 h-4 text-slate-800" />
@@ -433,7 +313,7 @@ export function EmployeeDashboard({
       </div>
 
       {/* Recent Work Logs */}
-      <div className="p-6 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-sm">
+      <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/95 ring-1 ring-slate-200/80 shadow-sm">
         <div className="flex items-center justify-between mb-4 border-b border-slate-200/70 pb-3">
           <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
             <FileText className="w-4 h-4 text-emerald-600" />

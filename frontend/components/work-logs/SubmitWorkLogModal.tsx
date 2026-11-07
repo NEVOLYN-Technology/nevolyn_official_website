@@ -40,7 +40,7 @@ export function SubmitWorkLogModal({ onClose, onSuccess }: SubmitWorkLogModalPro
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-lg w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-6 space-y-4 shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <h2 className="text-base font-extrabold text-slate-900">Submit Daily Work Log</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
@@ -49,7 +49,7 @@ export function SubmitWorkLogModal({ onClose, onSuccess }: SubmitWorkLogModalPro
         {errorMsg && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">{errorMsg}</div>}
 
         <div className="space-y-3 text-xs">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-slate-600 font-bold mb-1">Log Date</label>
               <input

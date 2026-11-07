@@ -58,15 +58,15 @@ export function ApplicationDetailModal({
   return (
     <AnimatePresence>
       {application && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs">
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
-            className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
+            className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[92dvh]"
           >
             {/* Modal Header */}
-            <div className="p-5 border-b border-border flex items-center justify-between bg-muted/40">
+            <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/40 shrink-0">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono font-bold text-primary">
@@ -102,7 +102,7 @@ export function ApplicationDetailModal({
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 overflow-y-auto space-y-6 text-sm">
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-5 sm:space-y-6 text-sm flex-1">
               {/* Contact Information */}
               <div>
                 <h4 className="text-xs uppercase tracking-wider text-muted-foreground font-bold mb-3">
@@ -265,7 +265,7 @@ export function ApplicationDetailModal({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-border bg-muted/40 flex items-center justify-between">
+            <div className="p-4 border-t border-border bg-muted/40 flex items-center justify-between shrink-0">
               <a
                 href={getApplicationPdfDownloadUrl(application.applicationId)}
                 target="_blank"

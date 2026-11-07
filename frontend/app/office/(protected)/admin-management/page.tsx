@@ -92,7 +92,7 @@ function CreateAdminModal({ onClose, onSuccess }: { onClose: () => void; onSucce
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-lg w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-6 space-y-5 shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <div className="flex items-center gap-2">
             <Crown className="w-4 h-4 text-amber-600" />
@@ -113,7 +113,7 @@ function CreateAdminModal({ onClose, onSuccess }: { onClose: () => void; onSucce
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           {field("Employee ID", "employeeId", "text", "nev_<username>_<YYYY-MM-DD>")}
           {field("Username", "username", "text", "Enter username")}
           <div className="col-span-2">
@@ -161,7 +161,7 @@ function ResetPasswordModal({ admin, onClose, onSuccess }: { admin: User; onClos
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+      <div className="bg-white border border-slate-200/90 rounded-3xl max-w-sm w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-6 space-y-4 shadow-2xl">
         <div className="flex items-center gap-2">
           <KeyRound className="w-4 h-4 text-amber-600" />
           <h3 className="font-extrabold text-slate-900 text-sm">Reset Administrator Password</h3>

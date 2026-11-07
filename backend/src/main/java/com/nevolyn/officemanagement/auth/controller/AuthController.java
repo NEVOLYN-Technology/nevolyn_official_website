@@ -108,6 +108,19 @@ public class AuthController {
         LoginResponse profile = authService.getProfile(userDetails.getUsername(), activeRole);
         return ResponseEntity.ok(ApiResponse.success(profile));
     }
+
+    @PatchMapping("/profile")
+    public ResponseEntity<ApiResponse<LoginResponse>> updateProfile(
+            @Valid @RequestBody com.nevolyn.officemanagement.auth.dto.SelfProfileUpdateRequest request,
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest httpRequest
+    ) {
+        String clientIp = IpUtils.extractClientIp(httpRequest);
+        String activeRole = (String) httpRequest.getAttribute("activeRole");
+        LoginResponse updated = authService.updateProfile(userDetails.getUsername(), request, clientIp, activeRole);
+        return ResponseEntity.ok(ApiResponse.success("Profile and banking details updated successfully", updated));
+    }
+
     @PatchMapping("/profile/password")
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @Valid @RequestBody com.nevolyn.officemanagement.auth.dto.SelfPasswordChangeRequest request,
