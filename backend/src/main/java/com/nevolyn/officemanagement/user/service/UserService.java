@@ -429,33 +429,8 @@ public class UserService {
     @Transactional
     public void resetPassword(Long id, ResetPasswordRequest request, String clientIp,
                               String callerUsername, User.UserRole callerRole) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-
-        // SUPER_ADMIN cannot reset another SUPER_ADMIN's password via normal endpoint
-        if (user.isSuperAdmin()) {
-            throw new BusinessRuleException(
-                    "SUPER_ADMIN passwords cannot be reset via this endpoint. " +
-                    "Use the secure account-recovery process.");
-        }
-
-        // ADMIN cannot reset ADMIN passwords
-        if (callerRole == User.UserRole.admin && user.isAdmin()) {
-            throw new BusinessRuleException(
-                    "Insufficient privileges: ADMINs cannot reset other ADMIN account passwords.");
-        }
-
-        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
-        userRepository.save(user);
-
-        auditService.log(
-                AuditLog.ACTION_RESET_PASSWORD,
-                callerUsername,
-                null,
-                clientIp,
-                "users",
-                user.getId(),
-                "Admin reset password for: " + user.getUsername());
+        throw new BusinessRuleException(
+                "Employee passwords cannot be changed by administrators. Each employee must manage their own password via their Profile & Security page.");
     }
 
     /**

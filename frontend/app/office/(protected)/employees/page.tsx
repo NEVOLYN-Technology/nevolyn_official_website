@@ -5,9 +5,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usersApi } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { User } from "@/types";
-import { UserPlus, Edit, KeyRound, Power, Search, Crown, ShieldCheck, Landmark, Mail, LayoutDashboard } from "lucide-react";
+import { UserPlus, Edit, Power, Search, Crown, ShieldCheck, Landmark, Mail, Phone, LayoutDashboard } from "lucide-react";
 import NextLink from "next/link";
-import { AddEmployeeModal, EditEmployeeModal, ResetPasswordModal } from "@/components/employees";
+import { AddEmployeeModal, EditEmployeeModal } from "@/components/employees";
 import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 
 /**
@@ -22,7 +22,6 @@ export default function EmployeesPage() {
   const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [passwordResetUser, setPasswordResetUser] = useState<User | null>(null);
 
   const { data: pagedData, isLoading } = useQuery({
     queryKey: ["employees-list"],
@@ -91,26 +90,25 @@ export default function EmployeesPage() {
           <table className="w-full text-left text-xs text-slate-700">
             <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-extrabold tracking-wider border-b border-slate-200/80">
               <tr>
-                <th className="py-3.5 px-4">Employee ID</th>
-                <th className="py-3.5 px-4">Full Name &amp; Contact</th>
-                <th className="py-3.5 px-4">Username</th>
-                <th className="py-3.5 px-4">Designation</th>
-                <th className="py-3.5 px-4">Bank Details</th>
-                <th className="py-3.5 px-4">Role</th>
-                <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
+                <th className="py-3.5 px-4 whitespace-nowrap">Employee ID</th>
+                <th className="py-3.5 px-4">Employee / Contact</th>
+                <th className="py-3.5 px-4 whitespace-nowrap">Designation</th>
+                <th className="py-3.5 px-4">Bank Accounts</th>
+                <th className="py-3.5 px-4 whitespace-nowrap">Role</th>
+                <th className="py-3.5 px-4 whitespace-nowrap">Status</th>
+                <th className="py-3.5 px-4 text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-500">
+                  <td colSpan={7} className="py-8 text-center text-slate-500">
                     Loading personnel directory...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-500">
+                  <td colSpan={7} className="py-8 text-center text-slate-500">
                     No employees matching your search.
                   </td>
                 </tr>
@@ -120,73 +118,77 @@ export default function EmployeesPage() {
                   const isTargetAdmin = u.role === "admin";
                   const isSelf = currentUser?.username === u.username;
                   // Both ADMIN and SUPER_ADMIN can edit employee details (contact & bank info) for all personnel
-                  const canResetPassword = !isTargetSuperAdmin && (isSuperAdmin || !isTargetAdmin);
                   const canToggleStatus = !isTargetSuperAdmin && !isSelf && (isSuperAdmin || !isTargetAdmin);
 
                   return (
                     <tr key={u.id} className="hover:bg-slate-50/80 transition">
-                      <td className="py-3.5 px-4 font-mono font-bold text-teal-700 whitespace-nowrap">
+                      <td className="py-3.5 px-4 font-mono font-bold text-teal-700 whitespace-nowrap text-xs">
                         {u.employeeId}
                       </td>
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 min-w-[220px]">
                         <div className="flex items-center gap-3">
-                          <EmployeeAvatar user={u} size="sm" shape="circle" />
-                          <div>
-                            <div className="font-bold text-slate-900">{u.fullName}</div>
+                          <EmployeeAvatar user={u} size="md" shape="circle" />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-slate-900 text-sm whitespace-nowrap">{u.fullName}</span>
+                              <span className="font-mono text-[10px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md border border-slate-200/80">
+                                @{u.username}
+                              </span>
+                            </div>
                             {(u.email || u.phone) && (
-                              <div className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
+                              <div className="text-[11px] text-slate-500 flex items-center gap-3 mt-1 flex-wrap">
                                 {u.email && (
-                                  <span className="inline-flex items-center gap-1 truncate max-w-[200px]" title={u.email}>
+                                  <span className="inline-flex items-center gap-1 text-slate-600 truncate max-w-[200px]" title={u.email}>
                                     <Mail className="w-3 h-3 text-slate-400 shrink-0" />
                                     {u.email}
                                   </span>
                                 )}
-                                {u.phone && <span className="font-mono text-slate-500">· {u.phone}</span>}
+                                {u.phone && (
+                                  <span className="inline-flex items-center gap-1 font-mono text-slate-600 whitespace-nowrap">
+                                    <Phone className="w-3 h-3 text-slate-400 shrink-0" />
+                                    {u.phone}
+                                  </span>
+                                )}
                               </div>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-slate-600 font-semibold">@{u.username}</td>
-                      <td className="py-3.5 px-4 text-slate-700 font-medium">{u.designation || "-"}</td>
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 text-slate-700 font-medium whitespace-nowrap">
+                        {u.designation || "—"}
+                      </td>
+                      <td className="py-3.5 px-4 min-w-[230px] max-w-[280px]">
                         {u.bankName || u.bankAccountNumber || u.secondaryBankName || u.secondaryBankAccountNumber ? (
-                          <div className="space-y-2">
+                          <div className="flex flex-col gap-1.5">
                             {(u.bankName || u.bankAccountNumber) && (
-                              <div className="space-y-0.5">
-                                <div className="font-bold text-slate-800 flex items-center gap-1">
-                                  <Landmark className="w-3 h-3 text-teal-600 shrink-0" />
-                                  <span>#1 {u.bankName || "Primary Bank"}</span>
-                                  {u.bankBranch && <span className="text-slate-500 font-normal">({u.bankBranch})</span>}
+                              <div className="px-2.5 py-1.5 rounded-xl bg-teal-50/70 border border-teal-200/70">
+                                <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs truncate" title={`${u.bankName || "Primary Bank"}${u.bankBranch ? ` (${u.bankBranch})` : ""}`}>
+                                  <Landmark className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                                  <span className="truncate">{u.bankName || "Primary Bank"}</span>
+                                  {u.bankBranch && <span className="text-[10px] text-slate-500 font-normal shrink-0">({u.bankBranch})</span>}
                                 </div>
-                                <div className="font-mono text-[11px] text-teal-700 font-semibold">
-                                  A/C: {u.bankAccountNumber || "Not set"}
-                                  {u.bankRoutingNumber && (
-                                    <span className="text-slate-500 font-normal"> · RTN: {u.bankRoutingNumber}</span>
-                                  )}
+                                <div className="font-mono text-[11px] text-teal-800 font-semibold tracking-tight mt-0.5 flex items-center justify-between gap-2">
+                                  <span>A/C: {u.bankAccountNumber || "—"}</span>
+                                  {u.bankRoutingNumber && <span className="text-slate-400 font-normal text-[10px] shrink-0">RTN: {u.bankRoutingNumber}</span>}
                                 </div>
                               </div>
                             )}
                             {(u.secondaryBankName || u.secondaryBankAccountNumber) && (
-                              <div className="space-y-0.5 pt-1 border-t border-slate-200/80">
-                                <div className="font-bold text-slate-800 flex items-center gap-1">
-                                  <Landmark className="w-3 h-3 text-slate-600 shrink-0" />
-                                  <span>#2 {u.secondaryBankName || "Secondary Bank"}</span>
-                                  {u.secondaryBankBranch && (
-                                    <span className="text-slate-500 font-normal">({u.secondaryBankBranch})</span>
-                                  )}
+                              <div className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                                <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs truncate" title={`${u.secondaryBankName || "Secondary Bank"}${u.secondaryBankBranch ? ` (${u.secondaryBankBranch})` : ""}`}>
+                                  <Landmark className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                  <span className="truncate">{u.secondaryBankName || "Secondary Bank"}</span>
+                                  {u.secondaryBankBranch && <span className="text-[10px] text-slate-500 font-normal shrink-0">({u.secondaryBankBranch})</span>}
                                 </div>
-                                <div className="font-mono text-[11px] text-slate-700 font-semibold">
-                                  A/C: {u.secondaryBankAccountNumber || "Not set"}
-                                  {u.secondaryBankRoutingNumber && (
-                                    <span className="text-slate-500 font-normal"> · RTN: {u.secondaryBankRoutingNumber}</span>
-                                  )}
+                                <div className="font-mono text-[11px] text-slate-700 font-semibold tracking-tight mt-0.5 flex items-center justify-between gap-2">
+                                  <span>A/C: {u.secondaryBankAccountNumber || "—"}</span>
+                                  {u.secondaryBankRoutingNumber && <span className="text-slate-400 font-normal text-[10px] shrink-0">RTN: {u.secondaryBankRoutingNumber}</span>}
                                 </div>
                               </div>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-400 italic">Not added yet</span>
+                          <span className="text-[11px] text-slate-400 italic">Not set</span>
                         )}
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
@@ -233,15 +235,6 @@ export default function EmployeesPage() {
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
-                          {canResetPassword && (
-                            <button
-                              onClick={() => setPasswordResetUser(u)}
-                              title="Reset Individual Employee Password"
-                              className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 transition"
-                            >
-                              <KeyRound className="w-3.5 h-3.5" />
-                            </button>
-                          )}
                           {canToggleStatus && (
                             <button
                               onClick={() => toggleMutation.mutate(u.id)}
@@ -285,17 +278,6 @@ export default function EmployeesPage() {
           onSuccess={() => {
             setEditingUser(null);
             queryClient.invalidateQueries({ queryKey: ["employees-list"] });
-          }}
-        />
-      )}
-
-      {/* Reset Password Modal */}
-      {passwordResetUser && (
-        <ResetPasswordModal
-          user={passwordResetUser}
-          onClose={() => setPasswordResetUser(null)}
-          onSuccess={() => {
-            setPasswordResetUser(null);
           }}
         />
       )}

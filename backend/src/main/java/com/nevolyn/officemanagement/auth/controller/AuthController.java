@@ -125,11 +125,10 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @Valid @RequestBody com.nevolyn.officemanagement.auth.dto.SelfPasswordChangeRequest request,
             @AuthenticationPrincipal UserDetails userDetails,
-            HttpServletRequest httpRequest,
-            org.springframework.security.crypto.password.PasswordEncoder passwordEncoder
+            HttpServletRequest httpRequest
     ) {
         String clientIp = IpUtils.extractClientIp(httpRequest);
-        authService.changePassword(userDetails.getUsername(), request, clientIp, passwordEncoder);
+        authService.changePassword(userDetails.getUsername(), request, clientIp);
         return ResponseEntity.ok(ApiResponse.success("Password updated successfully"));
     }
 }

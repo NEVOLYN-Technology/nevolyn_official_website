@@ -205,8 +205,7 @@ public class AuthService {
     public void changePassword(
             String username,
             com.nevolyn.officemanagement.auth.dto.SelfPasswordChangeRequest request,
-            String clientIp,
-            PasswordEncoder encoder
+            String clientIp
     ) {
         if (!request.newPassword().equals(request.confirmPassword())) {
             throw new com.nevolyn.officemanagement.common.exception.BusinessRuleException(
@@ -220,7 +219,7 @@ public class AuthService {
                     "Current employee password is incorrect.");
         }
 
-        user.setPasswordHash(encoder.encode(request.newPassword()));
+        user.setPasswordHash(this.passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
 
         auditService.log(
