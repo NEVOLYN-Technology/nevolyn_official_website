@@ -65,26 +65,49 @@ export default function EmployeesPage() {
     );
   });
 
-  // Explicit priority ordering:
-  // 1st line: Rahin, then Nobo
-  // 2nd line: Afzal, then Nomrota
-  const getEmployeePriority = (u: User) => {
-    const uname = (u.username || "").toLowerCase();
-    const fname = (u.fullName || "").toLowerCase();
+  // Organizational Hierarchy Sorting:
+  // 1. Role: Super Admin -> Admin -> Employee
+  // 2. Designation: Founder -> Co-Founder -> other designations
+  // 3. Joining Date: Seniority / Tenure (earlier joining date first)
+  // 4. Full Name: Alphabetical fallback
+  const comparePersonnelHierarchy = (a: User, b: User): number => {
+    // 1. Role Rank
+    const getRoleRank = (role?: string) => {
+      const r = (role || "").toLowerCase();
+      if (r === "super_admin") return 1;
+      if (r === "admin") return 2;
+      return 3;
+    };
+    const roleDiff = getRoleRank(a.role) - getRoleRank(b.role);
+    if (roleDiff !== 0) return roleDiff;
 
-    if (uname.includes("rahin") || fname.includes("rahin")) return 1;
-    if (uname.includes("nobo") || uname.includes("mninad") || fname.includes("nobo") || fname.includes("ninad")) return 2;
-    if (uname.includes("afzal") || fname.includes("afzal")) return 3;
-    if (uname.includes("nomrota") || uname.includes("mehajabin") || fname.includes("nomrota") || fname.includes("mehajabin")) return 4;
-    return 99;
+    // 2. Designation Rank (Executive hierarchy: Founder -> Co-Founder -> others)
+    const getDesignationRank = (des?: string | null) => {
+      if (!des) return 99;
+      const d = des.trim().toLowerCase();
+      if (d.includes("founder") && !d.includes("co-founder")) return 1;
+      if (d.includes("co-founder")) return 2;
+      return 10;
+    };
+    const desDiff = getDesignationRank(a.designation) - getDesignationRank(b.designation);
+    if (desDiff !== 0) return desDiff;
+
+    const desA = (a.designation || "").trim().toLowerCase();
+    const desB = (b.designation || "").trim().toLowerCase();
+    const desAlpha = desA.localeCompare(desB);
+    if (desAlpha !== 0) return desAlpha;
+
+    // 3. Joining Date (Seniority by tenure: earlier date first)
+    const dateA = a.joiningDate || "9999-99-99";
+    const dateB = b.joiningDate || "9999-99-99";
+    const dateDiff = dateA.localeCompare(dateB);
+    if (dateDiff !== 0) return dateDiff;
+
+    // 4. Full name fallback
+    return (a.fullName || "").localeCompare(b.fullName || "");
   };
 
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    const pA = getEmployeePriority(a);
-    const pB = getEmployeePriority(b);
-    if (pA !== pB) return pA - pB;
-    return a.fullName.localeCompare(b.fullName);
-  });
+  const sortedUsers = [...filteredUsers].sort(comparePersonnelHierarchy);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">

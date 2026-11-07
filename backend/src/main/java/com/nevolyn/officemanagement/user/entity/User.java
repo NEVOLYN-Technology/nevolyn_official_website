@@ -119,6 +119,57 @@ public class User {
     }
 
     /**
+     * Standard organizational hierarchy comparator:
+     * 1. Role: SUPER_ADMIN (1) -> ADMIN (2) -> EMPLOYEE (3)
+     * 2. Designation hierarchy: Founder (1) -> Co-Founder (2) -> other designations
+     * 3. Joining Date: Seniority (earlier joining date first)
+     * 4. Full Name: Alphabetical fallback
+     */
+    public static final java.util.Comparator<User> HIERARCHICAL_ORDER = (a, b) -> {
+        if (a == b) return 0;
+        if (a == null) return 1;
+        if (b == null) return -1;
+
+        // 1. Role rank
+        int rankA = a.getRole() == UserRole.super_admin ? 1 : a.getRole() == UserRole.admin ? 2 : 3;
+        int rankB = b.getRole() == UserRole.super_admin ? 1 : b.getRole() == UserRole.admin ? 2 : 3;
+        if (rankA != rankB) return Integer.compare(rankA, rankB);
+
+        // 2. Designation rank
+        int desRankA = resolveDesignationRank(a.getDesignation());
+        int desRankB = resolveDesignationRank(b.getDesignation());
+        if (desRankA != desRankB) return Integer.compare(desRankA, desRankB);
+
+        String desA = a.getDesignation() != null ? a.getDesignation().trim().toLowerCase() : "";
+        String desB = b.getDesignation() != null ? b.getDesignation().trim().toLowerCase() : "";
+        int desCmp = desA.compareTo(desB);
+        if (desCmp != 0) return desCmp;
+
+        // 3. Joining Date (earlier date first)
+        if (a.getJoiningDate() != null && b.getJoiningDate() != null) {
+            int dateCmp = a.getJoiningDate().compareTo(b.getJoiningDate());
+            if (dateCmp != 0) return dateCmp;
+        } else if (a.getJoiningDate() != null) {
+            return -1;
+        } else if (b.getJoiningDate() != null) {
+            return 1;
+        }
+
+        // 4. Full Name fallback
+        String nameA = a.getFullName() != null ? a.getFullName() : "";
+        String nameB = b.getFullName() != null ? b.getFullName() : "";
+        return nameA.compareToIgnoreCase(nameB);
+    };
+
+    private static int resolveDesignationRank(String designation) {
+        if (designation == null || designation.isBlank()) return 99;
+        String d = designation.trim().toLowerCase();
+        if (d.contains("founder") && !d.contains("co-founder")) return 1;
+        if (d.contains("co-founder")) return 2;
+        return 10;
+    }
+
+    /**
      * Three-tier role model:
      * <ul>
      *   <li>{@code super_admin} — system owner; max 2 accounts; manages ADMIN accounts</li>

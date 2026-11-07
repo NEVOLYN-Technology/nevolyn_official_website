@@ -15,6 +15,8 @@ import {
   UserX,
   Download,
   Filter,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { CorrectionModal } from "@/components/attendance";
 import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
@@ -69,13 +71,60 @@ export default function AdminAttendancePage() {
     (r) => r.checkInTime && !r.checkOutTime && r.status === "Present"
   ).length;
 
+  // Date references
+  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const yesterdayStr = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().split("T")[0];
+  }, []);
+  const twoDaysAgoStr = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 2);
+    return d.toISOString().split("T")[0];
+  }, []);
+
+  const isTodaySelected = selectedDate === todayStr;
+  const isYesterdaySelected = selectedDate === yesterdayStr;
+  const isTwoDaysAgoSelected = selectedDate === twoDaysAgoStr;
+
+  // Day Stepper Helpers
+  const handlePrevDay = () => {
+    const parts = selectedDate.split("-");
+    const current = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    current.setDate(current.getDate() - 1);
+    setSelectedDate(current.toISOString().split("T")[0]);
+  };
+
+  const handleNextDay = () => {
+    if (selectedDate >= todayStr) return;
+    const parts = selectedDate.split("-");
+    const current = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    current.setDate(current.getDate() + 1);
+    setSelectedDate(current.toISOString().split("T")[0]);
+  };
+
   const setDateOffset = (offsetDays: number) => {
     const d = new Date();
     d.setDate(d.getDate() + offsetDays);
     setSelectedDate(d.toISOString().split("T")[0]);
   };
 
-  const isTodaySelected = selectedDate === new Date().toISOString().split("T")[0];
+  const formattedDateLabel = useMemo(() => {
+    try {
+      const parts = selectedDate.split("-");
+      if (parts.length === 3) {
+        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        return d.toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      }
+    } catch {}
+    return selectedDate;
+  }, [selectedDate]);
 
   const exportRosterCsv = () => {
     if (filteredRecords.length === 0) return;
@@ -135,16 +184,25 @@ export default function AdminAttendancePage() {
             <span>Staff Attendance Control</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-            Monitor real-time arrivals, workforce roster compliance, and execute audited corrections.
+            Monitor daily arrivals, workforce roster compliance, and execute audited corrections.
           </p>
         </div>
 
-        {/* Date Selector Navigation */}
+        {/* Dynamic Multi-Day Navigation Toolbar */}
         <div className="flex items-center gap-2 flex-wrap w-full lg:w-auto">
-          <div className="flex items-center rounded-xl bg-white border border-slate-200/90 p-1 shadow-2xs">
+          {/* Day Stepper & Quick Preset Chips */}
+          <div className="flex items-center rounded-2xl bg-white border border-slate-200/90 p-1 shadow-2xs">
+            <button
+              onClick={handlePrevDay}
+              title="Previous Day"
+              className="p-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
             <button
               onClick={() => setDateOffset(0)}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                 isTodaySelected
                   ? "bg-slate-900 text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -152,28 +210,60 @@ export default function AdminAttendancePage() {
             >
               Today
             </button>
+
             <button
               onClick={() => setDateOffset(-1)}
-              className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                isYesterdaySelected
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
             >
               Yesterday
             </button>
+
+            <button
+              onClick={() => setDateOffset(-2)}
+              className={`hidden sm:inline-block px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                isTwoDaysAgoSelected
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              2 Days Ago
+            </button>
+
+            <button
+              onClick={handleNextDay}
+              disabled={isTodaySelected}
+              title={isTodaySelected ? "Viewing Today" : "Next Day"}
+              className="p-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2 bg-white border border-slate-200/90 px-2.5 sm:px-3 py-1.5 rounded-xl shadow-2xs">
+          {/* Interactive Calendar Date Picker */}
+          <div className="relative flex items-center gap-2 bg-white border border-slate-200/90 px-3 py-2 rounded-2xl shadow-2xs hover:border-slate-400 transition cursor-pointer group">
             <Calendar className="w-4 h-4 text-teal-600 shrink-0" />
+            <span className="text-xs font-mono font-bold text-slate-900 select-none">
+              {formattedDateLabel}
+            </span>
             <input
               type="date"
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-transparent text-slate-900 text-xs font-mono font-bold focus:outline-none border-none cursor-pointer"
+              max={todayStr}
+              onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              title="Click to jump to any past date"
             />
           </div>
 
+          {/* Export CSV Button */}
           <button
             onClick={exportRosterCsv}
             disabled={filteredRecords.length === 0}
-            className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 text-xs font-bold shadow-2xs inline-flex items-center gap-1.5 transition cursor-pointer"
+            className="p-2 sm:px-3.5 sm:py-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 text-xs font-bold shadow-2xs inline-flex items-center gap-1.5 transition cursor-pointer"
             title="Export Roster CSV"
           >
             <Download className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -243,13 +333,13 @@ export default function AdminAttendancePage() {
           <div className="text-xl sm:text-2xl font-mono font-extrabold text-slate-700">
             {absentCount}
           </div>
-          <p className="text-[10px] text-slate-500 font-medium">Unrecorded today</p>
+          <p className="text-[10px] text-slate-500 font-medium">Unrecorded on date</p>
         </div>
       </div>
 
       {/* Roster Table Card */}
       <div className="p-5 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.05)] space-y-4">
-        {/* Search & Filter Bar */}
+        {/* Search, Filter & Date Indicator Bar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
           <div className="relative flex-1 max-w-sm">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -262,31 +352,36 @@ export default function AdminAttendancePage() {
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Filter className="w-3.5 h-3.5 text-slate-500" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
-            >
-              <option value="all">All Statuses</option>
-              <option value="Present">Present Only</option>
-              <option value="Late">Late Arrivals</option>
-              <option value="Absent">Absent Only</option>
-            </select>
+          <div className="flex items-center gap-3">
+            <span className="hidden md:inline-flex text-[11px] font-semibold text-slate-500">
+              Roster for <span className="font-bold text-slate-800 ml-1">{formattedDateLabel}</span>
+            </span>
+
+            <div className="flex items-center gap-2">
+              <Filter className="w-3.5 h-3.5 text-slate-500" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
+              >
+                <option value="all">All Statuses</option>
+                <option value="Present">Present Only</option>
+                <option value="Late">Late Arrivals</option>
+                <option value="Absent">Absent Only</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Table */}
         {/* Mobile / Small Tablet Staff Card View (<768px) */}
         <div className="md:hidden space-y-3">
           {isLoading ? (
             <div className="p-8 text-center text-slate-400 font-medium text-xs">
-              Loading daily staff attendance roster...
+              Loading staff attendance roster...
             </div>
           ) : filteredRecords.length === 0 ? (
             <div className="p-8 text-center text-slate-400 font-medium text-xs">
-              No records found matching criteria for {selectedDate}.
+              No records found matching criteria for {formattedDateLabel}.
             </div>
           ) : (
             filteredRecords.map((r) => (
@@ -349,15 +444,16 @@ export default function AdminAttendancePage() {
                 {/* Status Badges & Audit Action */}
                 <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    {r.lateStatus === "Late" ? (
+                    {r.lateStatus === "Late" && (
                       <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[9px] font-extrabold">
                         Late
                       </span>
-                    ) : r.lateStatus === "On Time" ? (
+                    )}
+                    {r.lateStatus === "On Time" && (
                       <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold">
                         On Time
                       </span>
-                    ) : null}
+                    )}
                     {r.earlyCheckout === "Yes" && (
                       <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-extrabold">
                         Early Exit
@@ -377,39 +473,38 @@ export default function AdminAttendancePage() {
           )}
         </div>
 
-        {/* Desktop / Tablet Tabular View (>=768px) */}
-        <div className="hidden md:block overflow-x-auto rounded-2xl border border-slate-200/80">
+        {/* Desktop Tabular View: Streamlined 6-Column Layout (Never Cut Off) */}
+        <div className="hidden md:block rounded-2xl border border-slate-200/80 overflow-hidden">
           <table className="w-full text-left text-xs text-slate-700">
             <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-extrabold tracking-wider border-b border-slate-200/80">
               <tr>
-                <th className="py-3.5 px-4">Employee</th>
-                <th className="py-3.5 px-4">Arrival</th>
-                <th className="py-3.5 px-4">Departure</th>
-                <th className="py-3.5 px-4">Hours</th>
-                <th className="py-3.5 px-4">Punctuality</th>
-                <th className="py-3.5 px-4">Early Departure</th>
-                <th className="py-3.5 px-4">Attendance Status</th>
-                <th className="py-3.5 px-4 text-right">Audit Action</th>
+                <th className="py-3.5 px-4 w-[28%]">Employee</th>
+                <th className="py-3.5 px-3 w-[12%] whitespace-nowrap">Arrival</th>
+                <th className="py-3.5 px-3 w-[12%] whitespace-nowrap">Departure</th>
+                <th className="py-3.5 px-3 w-[12%] whitespace-nowrap">Hours</th>
+                <th className="py-3.5 px-4 w-[20%]">Status &amp; Compliance</th>
+                <th className="py-3.5 px-4 w-[16%] text-right whitespace-nowrap">Audit Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200/70">
               {isLoading ? (
                 <tr>
-                  <td colSpan={8} className="py-10 text-center text-slate-400 font-medium">
+                  <td colSpan={6} className="py-10 text-center text-slate-400 font-medium">
                     Loading daily staff attendance roster...
                   </td>
                 </tr>
               ) : filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-10 text-center text-slate-400 font-medium">
-                    No records found matching criteria for {selectedDate}.
+                  <td colSpan={6} className="py-10 text-center text-slate-400 font-medium">
+                    No records found matching criteria for {formattedDateLabel}.
                   </td>
                 </tr>
               ) : (
                 filteredRecords.map((r) => (
                   <tr key={r.userId} className="hover:bg-slate-50/80 transition">
+                    {/* Employee Identity */}
                     <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-3 min-w-[200px]">
+                      <div className="flex items-center gap-3">
                         <EmployeeAvatar
                           user={{ fullName: r.fullName, employeeId: r.employeeId }}
                           size="sm"
@@ -423,58 +518,63 @@ export default function AdminAttendancePage() {
                         </div>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-700 whitespace-nowrap">
+
+                    {/* Check-In */}
+                    <td className="py-3.5 px-3 font-mono font-semibold text-slate-700 whitespace-nowrap">
                       {r.checkInTime || "—"}
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-700 whitespace-nowrap">
+
+                    {/* Check-Out */}
+                    <td className="py-3.5 px-3 font-mono font-semibold text-slate-700 whitespace-nowrap">
                       {r.checkOutTime || "—"}
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-teal-700 whitespace-nowrap">
+
+                    {/* Total Hours */}
+                    <td className="py-3.5 px-3 font-mono font-bold text-teal-700 whitespace-nowrap">
                       {r.totalHours ? `${r.totalHours} hrs` : "0.00 hrs"}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      {r.lateStatus === "Late" ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-extrabold">
-                          Late
+
+                    {/* Status & Compliance (Merged to eliminate horizontal overflow) */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border shrink-0 ${
+                            r.status === "Present"
+                              ? r.checkOutTime
+                                ? "bg-teal-50 text-teal-800 border-teal-200"
+                                : "bg-sky-50 text-sky-800 border-sky-200"
+                              : "bg-slate-100 text-slate-600 border-slate-200"
+                          }`}
+                        >
+                          {r.status === "Present" && !r.checkOutTime ? "In-House" : r.status}
                         </span>
-                      ) : r.lateStatus === "On Time" ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold">
-                          On Time
-                        </span>
-                      ) : (
-                        <span className="text-slate-400 font-mono text-[11px]">—</span>
-                      )}
+
+                        {r.lateStatus === "Late" && (
+                          <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[9px] font-extrabold shrink-0">
+                            Late
+                          </span>
+                        )}
+                        {r.lateStatus === "On Time" && (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold shrink-0">
+                            On Time
+                          </span>
+                        )}
+                        {r.earlyCheckout === "Yes" && (
+                          <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-extrabold shrink-0">
+                            Early Exit
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      {r.earlyCheckout === "Yes" ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-extrabold">
-                          Early Departure
-                        </span>
-                      ) : r.earlyCheckout === "No" ? (
-                        <span className="text-slate-600 font-mono text-[10px] font-semibold">Standard</span>
-                      ) : (
-                        <span className="text-slate-400 font-mono text-[11px]">—</span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${
-                          r.status === "Present"
-                            ? r.checkOutTime
-                              ? "bg-teal-50 text-teal-800 border-teal-200"
-                              : "bg-sky-50 text-sky-800 border-sky-200"
-                            : "bg-slate-100 text-slate-600 border-slate-200"
-                        }`}
-                      >
-                        {r.status === "Present" && !r.checkOutTime ? "In-House" : r.status}
-                      </span>
-                    </td>
+
+                    {/* Audit Action Button (Always in-view, never clipped) */}
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       <button
                         onClick={() => setEditingRecord(r)}
-                        className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition cursor-pointer shadow-2xs hover:shadow-md"
+                        className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition cursor-pointer shadow-xs hover:shadow-md"
+                        title="Audit & Correct Record"
                       >
-                        <Edit3 className="w-3 h-3 text-emerald-400" />
+                        <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Audit / Correct</span>
                       </button>
                     </td>

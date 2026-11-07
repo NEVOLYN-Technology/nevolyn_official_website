@@ -60,11 +60,17 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public Page<UserDto> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable).map(UserDto::fromEntity);
+        Page<User> page = userRepository.findAll(pageable);
+        List<UserDto> sortedList = page.getContent().stream()
+                .sorted(User.HIERARCHICAL_ORDER)
+                .map(UserDto::fromEntity)
+                .toList();
+        return new org.springframework.data.domain.PageImpl<>(sortedList, pageable, page.getTotalElements());
     }
 
     /**
-     * Retrieves all active team members ordered by name for dropdowns and rosters.
+     * Retrieves all active team members ordered by organizational hierarchy (Super Admin -> Admin -> Employee,
+     * then by designation and seniority/joining date).
      *
      * @return list of active employee {@link UserDto} objects
      */
@@ -72,6 +78,7 @@ public class UserService {
     public List<UserDto> getActiveEmployees() {
         return userRepository.findByIsActiveTrueOrderByFullNameAsc()
                 .stream()
+                .sorted(User.HIERARCHICAL_ORDER)
                 .map(UserDto::fromEntity)
                 .toList();
     }

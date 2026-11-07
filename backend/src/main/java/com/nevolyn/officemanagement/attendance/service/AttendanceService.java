@@ -9,7 +9,6 @@ import com.nevolyn.officemanagement.common.exception.BusinessRuleException;
 import com.nevolyn.officemanagement.common.exception.ResourceNotFoundException;
 import com.nevolyn.officemanagement.user.entity.User;
 import com.nevolyn.officemanagement.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +29,24 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
     private final UserRepository userRepository;
     private final AttendancePolicy attendancePolicy;
     private final AuditLogRepository auditLogRepository;
+
+    public AttendanceService(
+            AttendanceRepository attendanceRepository,
+            UserRepository userRepository,
+            AttendancePolicy attendancePolicy,
+            AuditLogRepository auditLogRepository
+    ) {
+        this.attendanceRepository = attendanceRepository;
+        this.userRepository = userRepository;
+        this.attendancePolicy = attendancePolicy;
+        this.auditLogRepository = auditLogRepository;
+    }
 
     /**
      * Record a check-in for an employee.
@@ -201,7 +211,10 @@ public class AttendanceService {
      */
     @Transactional(readOnly = true)
     public List<com.nevolyn.officemanagement.attendance.dto.AdminAttendanceRecordDto> getAdminDailyAttendance(LocalDate date) {
-        List<User> employees = userRepository.findByIsActiveTrueOrderByFullNameAsc();
+        List<User> employees = userRepository.findByIsActiveTrueOrderByFullNameAsc()
+                .stream()
+                .sorted(User.HIERARCHICAL_ORDER)
+                .toList();
         List<Attendance> records = attendanceRepository.findAllByDateWithUser(date);
         java.util.Map<Long, Attendance> attendanceByUser = records.stream()
                 .collect(java.util.stream.Collectors.toMap(a -> a.getUser().getId(), a -> a, (k1, k2) -> k1));
