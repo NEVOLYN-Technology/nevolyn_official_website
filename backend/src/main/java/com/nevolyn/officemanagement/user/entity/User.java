@@ -82,6 +82,9 @@ public class User {
     @Column(name = "secondary_bank_routing_number", length = 100)
     private String secondaryBankRoutingNumber;
 
+    @Column(name = "photo_url", length = 500)
+    private String photoUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private UserRole role;

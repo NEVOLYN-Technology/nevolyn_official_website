@@ -23,6 +23,7 @@ export interface LoginResponse {
   secondaryBankAccountNumber?: string | null;
   secondaryBankBranch?: string | null;
   secondaryBankRoutingNumber?: string | null;
+  photoUrl?: string | null;
   role: "super_admin" | "admin" | "employee";
   token?: string;
 }
@@ -88,6 +89,7 @@ export interface User {
   secondaryBankAccountNumber?: string | null;
   secondaryBankBranch?: string | null;
   secondaryBankRoutingNumber?: string | null;
+  photoUrl?: string | null;
   role: "super_admin" | "admin" | "employee";
   isActive: boolean;
   createdAt: string;

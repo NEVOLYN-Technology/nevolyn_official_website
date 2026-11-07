@@ -185,6 +185,7 @@ export const authApi = {
     secondaryBankAccountNumber?: string;
     secondaryBankBranch?: string;
     secondaryBankRoutingNumber?: string;
+    photoUrl?: string;
     currentPassword: string;
   }) => api.patch<ApiResponse<LoginResponse>>("/auth/profile", data),
 };

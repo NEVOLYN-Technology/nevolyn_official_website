@@ -21,6 +21,7 @@ public record LoginResponse(
         String secondaryBankAccountNumber,
         String secondaryBankBranch,
         String secondaryBankRoutingNumber,
+        String photoUrl,
         String role,
         String token
 ) {
@@ -55,6 +56,7 @@ public record LoginResponse(
                 user.getSecondaryBankAccountNumber(),
                 user.getSecondaryBankBranch(),
                 user.getSecondaryBankRoutingNumber(),
+                user.getPhotoUrl(),
                 effectiveRole,
                 token);
     }

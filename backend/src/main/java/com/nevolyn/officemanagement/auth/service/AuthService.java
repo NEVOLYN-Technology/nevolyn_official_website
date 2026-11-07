@@ -288,6 +288,9 @@ public class AuthService {
         if (request.secondaryBankRoutingNumber() != null) {
             user.setSecondaryBankRoutingNumber(request.secondaryBankRoutingNumber().trim());
         }
+        if (request.photoUrl() != null) {
+            user.setPhotoUrl(request.photoUrl().trim());
+        }
 
         userRepository.save(user);
 

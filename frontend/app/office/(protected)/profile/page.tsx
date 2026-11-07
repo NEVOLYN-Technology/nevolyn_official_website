@@ -25,6 +25,8 @@ import {
   Sparkles,
   Info,
   LogOut,
+  Camera,
+  UploadCloud,
 } from "lucide-react";
 import { EmployeeAvatar } from "@/components/shared/EmployeeAvatar";
 
@@ -43,6 +45,99 @@ export default function ProfilePage() {
   // Modals state
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+
+  // Photo upload form state (Self-service only allowed for logged-in employee)
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoPassword, setPhotoPassword] = useState("");
+  const [photoLoading, setPhotoLoading] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
+  const handleOpenPhotoModal = () => {
+    setPhotoError(null);
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setPhotoPassword("");
+    setIsPhotoModalOpen(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhotoError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)) {
+      setPhotoError("Please select a valid image file (JPG, PNG, or WEBP).");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoError("Image size must be less than 5MB.");
+      return;
+    }
+
+    setPhotoFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handlePhotoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPhotoError(null);
+
+    if (!photoFile) {
+      setPhotoError("Please select an image file to upload.");
+      return;
+    }
+
+    if (!photoPassword.trim()) {
+      setPhotoError("Please enter your current password to authorize this photo update.");
+      return;
+    }
+
+    setPhotoLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", photoFile);
+      formData.append("username", user?.username || "employee");
+
+      const uploadRes = await fetch("/api/upload-photo", {
+        method: "POST",
+        body: formData,
+      });
+
+      const uploadJson = await uploadRes.json();
+      if (!uploadRes.ok || !uploadJson.success) {
+        throw new Error(uploadJson.message || "Failed to upload photo to public repository.");
+      }
+
+      const finalUrl = uploadJson.cacheBustedUrl || uploadJson.url;
+
+      await authApi.updateProfile({
+        photoUrl: finalUrl,
+        currentPassword: photoPassword,
+      });
+
+      if (typeof window !== "undefined" && user?.username) {
+        localStorage.setItem(`nev_photo_${user.username.toLowerCase().trim()}`, finalUrl);
+      }
+
+      await refreshProfile();
+      setIsPhotoModalOpen(false);
+      setStatusMsg({
+        type: "success",
+        text: "Official profile photo uploaded successfully and saved to public directory.",
+      });
+    } catch (err: unknown) {
+      setPhotoError(getApiErrorMessage(err, "Failed to update profile photo."));
+    } finally {
+      setPhotoLoading(false);
+    }
+  };
 
   // Masking toggles for account numbers
   const [showPrimaryAccount, setShowPrimaryAccount] = useState(false);
@@ -452,7 +547,17 @@ export default function ProfilePage() {
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
               <div className="flex items-center gap-5">
-                <EmployeeAvatar user={user} size="lg" shape="rounded" />
+                <div className="relative group shrink-0">
+                  <EmployeeAvatar user={user} size="lg" shape="rounded" />
+                  <button
+                    type="button"
+                    onClick={handleOpenPhotoModal}
+                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-slate-900 hover:bg-teal-600 text-white flex items-center justify-center shadow-md transition cursor-pointer border-2 border-white"
+                    title="Upload or Change Official Profile Photo"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                  </button>
+                </div>
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -477,9 +582,20 @@ export default function ProfilePage() {
                         : "Staff Member"}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 font-medium mt-1">
-                    {user?.designation || "Nevolyn Core Team Member"}
-                  </p>
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    <p className="text-xs text-slate-500 font-medium">
+                      {user?.designation || "Nevolyn Core Team Member"}
+                    </p>
+                    <span className="text-slate-300 hidden sm:inline">•</span>
+                    <button
+                      type="button"
+                      onClick={handleOpenPhotoModal}
+                      className="text-[11px] font-bold text-teal-700 hover:text-teal-900 inline-flex items-center gap-1 cursor-pointer transition hover:underline"
+                    >
+                      <Camera className="w-3 h-3 text-teal-600" />
+                      <span>Upload / Edit Photo</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1234,6 +1350,111 @@ export default function ProfilePage() {
                   className="px-5 py-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 disabled:opacity-50 text-white font-bold text-xs shadow-md transition cursor-pointer"
                 >
                   {bankLoading ? "Verifying & Saving..." : "Authorize & Save Bank Info"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── PHOTO UPLOAD & EDIT MODAL (ONLY ALLOWED FOR LOGGED-IN EMPLOYEE) ──── */}
+      {isPhotoModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200/90 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-teal-600" />
+                  <span>Upload &amp; Edit Profile Photo</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  Self-service profile photo management for authenticated employee.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsPhotoModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {photoError && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{photoError}</span>
+              </div>
+            )}
+
+            <div className="p-3 rounded-xl bg-teal-50 border border-teal-200/80 text-[11px] text-teal-900 leading-relaxed">
+              <strong>Corporate Governance:</strong> Only you as the authenticated employee have the authorization to set and edit your official profile photo. Administrators cannot set or change your photo.
+            </div>
+
+            <form onSubmit={handlePhotoSubmit} className="space-y-4 text-xs">
+              {/* File upload zone */}
+              <div>
+                <label className="block text-slate-700 font-bold mb-1.5">
+                  Select Photo File (JPG, PNG, WEBP)
+                </label>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleFileChange}
+                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer border border-slate-200 rounded-xl p-1 bg-slate-50/50"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Saved into public asset repository and synchronized across all portal rosters. Maximum size 5MB.
+                </p>
+              </div>
+
+              {/* Preview */}
+              {photoPreview && (
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-teal-500/30 shrink-0 bg-white shadow-2xs">
+                    <img
+                      src={photoPreview}
+                      alt="Selected preview"
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-slate-900 truncate">{photoFile?.name}</p>
+                    <p className="text-[10px] text-slate-500">
+                      {(photoFile?.size ? (photoFile.size / 1024).toFixed(1) : "0")} KB • Ready to save
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Password authorization */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <label className="block text-slate-700 font-bold">
+                  Current Password Verification <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={photoPassword}
+                  onChange={(e) => setPhotoPassword(e.target.value)}
+                  placeholder="Enter current password to sign update"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:outline-hidden focus:ring-2 focus:ring-teal-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setIsPhotoModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={photoLoading || !photoFile}
+                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold text-xs shadow-md transition cursor-pointer flex items-center gap-1.5"
+                >
+                  {photoLoading ? "Uploading..." : "Save Photo"}
                 </button>
               </div>
             </form>

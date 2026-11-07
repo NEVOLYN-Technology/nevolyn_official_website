@@ -126,11 +126,26 @@ OFFICIAL ACCESS CREDENTIALS:
 • Designation  : ${createdAdmin.designation || "Administrator"}
 • Initial Pass : ${createdAdmin.password}
 
-MANDATORY FIRST-LOGIN ACTIONS:
-For security and privacy governance, administrators cannot set or view your personal phone number, bank accounts, or password. Please log in immediately and open "Profile & Security" to:
+MANDATORY FIRST-LOGIN ACTIONS (OFFICE PORTAL):
+For security and privacy governance, administrators cannot set or view your personal phone number, bank accounts, profile photo, or password. Please log in immediately and open "Profile & Security" to:
 1. Add your personal phone number
-2. Provide your Primary and Secondary bank details (for direct deposit payroll)
-3. Change your temporary password to a confidential password
+2. Upload your official profile photo (saved automatically as ${createdAdmin.username}-photo)
+3. Provide your Primary and Secondary bank details (for direct deposit payroll)
+4. Change your temporary password to a confidential password
+
+PUBLIC WEBSITE PROFILE DETAILS (REPLY TO THIS EMAIL):
+For your official team profile on nevolyn.com:
+• Role Overview (Paragraph 1) & Responsibilities will be assigned directly by NEVOLYN.
+• Please reply to this email with:
+  1. Bio: 1 concise sentence summary
+  2. Education & Specialization (Paragraph 2): University, degrees, core engineering background
+  3. Academic Research & Key Achievements (Paragraph 3): Thesis, papers, awards, notable projects
+  4. Professional & Research Profiles:
+     - LinkedIn: [URL]
+     - GitHub: [URL]
+     - Personal Portfolio: [URL]
+     - Google Scholar: [URL + Author Name]
+     - ORCID: [URL]
 
 Executive Office & Systems Administration
 NEVOLYN • https://nevolyn.com`;
@@ -216,10 +231,18 @@ NEVOLYN • https://nevolyn.com`;
 
             <div class="notice">
               <div class="notice-title">MANDATORY INSTRUCTIONS / নির্দেশনা:</div>
-              Office portal e nijer phone and bank details and password change er authority admin er rakha hoy nai aita employeee hisebe login korei kora lagbe including personal phone number.<br/><br/>
-              <strong>So make sure sobai kore feilen.</strong><br/>
-              Jar jar initial password sobaik provide kora hoise already.<br/>
-              And bank details duita provide koiren sobai.
+              Office portal e nijer phone, profile photo, bank details and password change er authority admin er rakha hoy nai aita individual account login korei kora lagbe.<br/><br/>
+              <strong>Action Steps on First Login:</strong><br/>
+              1. Add your verified personal phone number.<br/>
+              2. Upload your official profile photo (automatically saved as ${createdAdmin.username}-photo).<br/>
+              3. Provide both Primary and Secondary bank account details for payroll.<br/>
+              4. Change temporary initial password to your confidential password.
+            </div>
+
+            <div class="notice" style="margin-top: 12px; background: #f0fdf4; border-color: #bbf7d0;">
+              <div class="notice-title" style="color: #166534;">WEBSITE PUBLIC PROFILE SUBMISSION / ওয়েবসাইটের তথ্যের জন্য:</div>
+              NEVOLYN will provide your Role Overview (Paragraph 1) and Key Responsibilities.<br/>
+              Please reply to your onboarding email with: 1-sentence Bio, Education & Specialization (Paragraph 2), Research & Achievements (Paragraph 3), and professional links (LinkedIn, GitHub, Portfolio, Google Scholar, ORCID).
             </div>
 
             <div class="url-row">
@@ -321,9 +344,21 @@ NEVOLYN • https://nevolyn.com`;
                     To: {createdAdmin.email || "admin@nevolyn.com"}
                   </span>
                 </div>
-                <span className="text-[10px] text-amber-800 font-bold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md shrink-0">
-                  Admin Onboarding Slip
-                </span>
+                <button
+                  type="button"
+                  onClick={handleCopyMessage}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 transition cursor-pointer shadow-2xs shrink-0"
+                  title="Copy message to clipboard"
+                >
+                  {copiedType === "msg" ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700 text-[11px] font-bold">Copied</span>
+                    </>
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 text-slate-500" />
+                  )}
+                </button>
               </div>
 
               <pre className="text-[11px] font-sans text-slate-800 whitespace-pre-wrap leading-relaxed bg-white p-3.5 rounded-xl border border-slate-200">
@@ -331,55 +366,40 @@ NEVOLYN • https://nevolyn.com`;
               </pre>
             </div>
 
-            {/* Handout Action Buttons (Equal-width 4-column balanced grid) */}
-            <div className="pt-3 border-t border-slate-200">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {/* Handout Action Buttons */}
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-200">
+              <div className="flex items-center gap-2">
                 {/* 1. PDF Slip */}
                 <button
                   type="button"
                   onClick={handlePrintSlip}
-                  className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-300 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  className="py-2.5 px-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-300 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                   title="Print or Save as PDF Slip"
                 >
                   <Printer className="w-3.5 h-3.5 text-slate-600 shrink-0" />
-                  <span className="truncate">Print / PDF</span>
+                  <span>Print / PDF</span>
                 </button>
 
                 {/* 2. Mail Option */}
                 <button
                   type="button"
                   onClick={handleOpenEmailClient}
-                  className="w-full py-2.5 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  className="py-2.5 px-3.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                   title="Open in your default email application"
                 >
                   <Mail className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                  <span className="truncate">Open Mail</span>
-                </button>
-
-                {/* 3. Copy Option */}
-                <button
-                  type="button"
-                  onClick={handleCopyMessage}
-                  className="w-full py-2.5 px-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-sm shadow-teal-600/20 flex items-center justify-center gap-1.5 transition cursor-pointer"
-                  title="Copy full onboarding message to clipboard"
-                >
-                  {copiedType === "msg" ? (
-                    <Check className="w-3.5 h-3.5 text-white shrink-0" />
-                  ) : (
-                    <Copy className="w-3.5 h-3.5 text-white shrink-0" />
-                  )}
-                  <span className="truncate">{copiedType === "msg" ? "Copied!" : "Copy Msg"}</span>
-                </button>
-
-                {/* 4. Done & Close */}
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm flex items-center justify-center transition cursor-pointer"
-                >
-                  <span className="truncate">Done</span>
+                  <span>Open Mail</span>
                 </button>
               </div>
+
+              {/* 3. Done & Close */}
+              <button
+                type="button"
+                onClick={onClose}
+                className="py-2.5 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition cursor-pointer"
+              >
+                Done
+              </button>
             </div>
           </div>
         ) : (

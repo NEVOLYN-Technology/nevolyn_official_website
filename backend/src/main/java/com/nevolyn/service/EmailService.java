@@ -362,25 +362,40 @@ OFFICIAL ACCESS CREDENTIALS:
 • Designation  : %s
 • Initial Pass : %s
 
-MANDATORY FIRST-LOGIN ACTIONS:
-For personal data privacy, administrators cannot set or view your phone number, bank details, or password. Please log in immediately and open "Profile & Security" to:
+MANDATORY FIRST-LOGIN ACTIONS (OFFICE PORTAL):
+For personal data privacy, administrators cannot set or view your phone number, bank details, profile photo, or password. Please log in immediately and open "Profile & Security" to:
 1. Add your personal phone number
-2. Provide your Primary and Secondary bank details (for direct deposit payroll)
-3. Change your temporary password to a confidential password
+2. Upload your official profile photo (saved automatically as %s-photo)
+3. Provide your Primary and Secondary bank details (for direct deposit payroll)
+4. Change your temporary password to a confidential password
+
+PUBLIC WEBSITE PROFILE DETAILS (REPLY TO THIS EMAIL):
+For your official team profile on nevolyn.com:
+• Role Overview (Paragraph 1) & Responsibilities will be assigned directly by NEVOLYN.
+• Please reply to this email with:
+  1. Bio: 1 concise sentence summary
+  2. Education & Specialization (Paragraph 2): University, degrees, core engineering background
+  3. Academic Research & Key Achievements (Paragraph 3): Thesis, papers, awards, notable projects
+  4. Professional & Research Profiles:
+     - LinkedIn: [URL]
+     - GitHub: [URL]
+     - Personal Portfolio: [URL]
+     - Google Scholar: [URL + Author Name]
+     - ORCID: [URL]
 
 Operations & Personnel Administration
 NEVOLYN • https://nevolyn.com
 """,
                 fullName, portalUrl, username, employeeId,
                 designation != null ? designation : "Staff Member",
-                initialPassword);
+                initialPassword, username);
 
         String htmlBody = String.format("""
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"/><style>
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; color: #0f172a; margin: 0; padding: 24px; background: #f8fafc; }
-.card { max-width: 540px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+.card { max-width: 560px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
 .header { border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; }
 .logo { font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; }
 .sub { font-size: 11px; text-transform: uppercase; color: #0d9488; font-weight: 700; margin-top: 2px; }
@@ -391,8 +406,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .val { font-family: monospace; font-weight: 700; color: #0f172a; }
 .pass-pill { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 8px 12px; border-radius: 8px; font-family: monospace; font-size: 15px; font-weight: 900; color: #047857; margin-top: 10px; text-align: center; }
 .notice { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px; font-size: 12px; color: #92400e; margin: 16px 0; line-height: 1.5; }
-.steps { margin: 10px 0; padding-left: 20px; font-size: 12px; color: #334155; }
-.steps li { margin-bottom: 4px; }
+.profile-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px; font-size: 12px; color: #166534; margin: 16px 0; line-height: 1.5; }
+.steps { margin: 8px 0; padding-left: 20px; font-size: 12px; }
+.steps li { margin-bottom: 3px; }
 .btn { display: inline-block; background: #0f172a; color: #ffffff !important; padding: 10px 20px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 13px; margin: 14px 0; }
 .footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; }
 </style></head>
@@ -413,11 +429,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <center><a href="%s" class="btn">Log In to Office Portal</a></center>
   <div class="notice">
     <strong>Mandatory First-Login Actions:</strong><br/>
-    For your personal data privacy, administrators cannot set or view your phone number, bank details, or password. Please log in immediately and open <strong>Profile &amp; Security</strong> to:
+    For personal data privacy, administrators cannot set or view your phone number, bank details, profile photo, or password. Please log in immediately and open <strong>Profile &amp; Security</strong> to:
     <ol class="steps">
       <li>Add your personal phone number.</li>
+      <li>Upload your official profile photo (saved as %s-photo).</li>
       <li>Provide your Primary and Secondary bank details for payroll.</li>
       <li>Update your temporary password.</li>
+    </ol>
+  </div>
+  <div class="profile-box">
+    <strong>Official Website Profile Submission (Reply to this Email):</strong><br/>
+    NEVOLYN will provide your Role Overview (Paragraph 1) and Key Responsibilities.<br/>
+    Please reply to this email with:
+    <ol class="steps">
+      <li>1-sentence Bio summary</li>
+      <li>Education &amp; Specialization (Paragraph 2)</li>
+      <li>Academic Research &amp; Key Achievements (Paragraph 3)</li>
+      <li>Profiles: LinkedIn, GitHub, Portfolio, Google Scholar, ORCID</li>
     </ol>
   </div>
   <div class="footer">

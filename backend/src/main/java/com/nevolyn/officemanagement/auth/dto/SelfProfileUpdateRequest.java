@@ -47,6 +47,9 @@ public record SelfProfileUpdateRequest(
         @Size(max = 100, message = "Secondary bank routing number cannot exceed 100 characters")
         String secondaryBankRoutingNumber,
 
+        @Size(max = 500, message = "Photo URL cannot exceed 500 characters")
+        String photoUrl,
+
         @NotBlank(message = "Current password is required to verify your identity")
         String currentPassword
 ) {}

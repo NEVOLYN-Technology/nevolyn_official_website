@@ -8,10 +8,22 @@ export interface EmployeeIdentity {
   username?: string | null;
   email?: string | null;
   employeeId?: string | null;
+  photoUrl?: string | null;
 }
 
 export function resolveEmployeePhoto(identity?: EmployeeIdentity | null): string | null {
   if (!identity) return null;
+
+  // 1. Direct photoUrl property from user entity/profile
+  if (identity.photoUrl && typeof identity.photoUrl === "string" && identity.photoUrl.trim()) {
+    return identity.photoUrl.trim();
+  }
+
+  // 2. Client-side localStorage cache for immediately uploaded photo
+  if (typeof window !== "undefined" && identity.username) {
+    const cached = localStorage.getItem(`nev_photo_${identity.username.toLowerCase().trim()}`);
+    if (cached) return cached;
+  }
 
   const fullName = (identity.fullName || "").trim().toLowerCase();
   const username = (identity.username || "").trim().toLowerCase();

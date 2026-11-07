@@ -27,6 +27,7 @@ public record UserDto(
         String secondaryBankAccountNumber,
         String secondaryBankBranch,
         String secondaryBankRoutingNumber,
+        String photoUrl,
         String role,
         Boolean isActive,
         Instant createdAt
@@ -52,6 +53,7 @@ public record UserDto(
                 .secondaryBankAccountNumber(user.getSecondaryBankAccountNumber())
                 .secondaryBankBranch(user.getSecondaryBankBranch())
                 .secondaryBankRoutingNumber(user.getSecondaryBankRoutingNumber())
+                .photoUrl(user.getPhotoUrl())
                 .role(user.getRole() != null ? user.getRole().name() : null)
                 .isActive(user.getIsActive())
                 .createdAt(user.getCreatedAt())
