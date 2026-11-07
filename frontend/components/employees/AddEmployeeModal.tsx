@@ -115,43 +115,23 @@ export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) 
 
     return `Dear ${createdAccount.fullName},
 
-On behalf of NEVOLYN Technology, we are pleased to welcome you to the team. Your dedicated employee workspace on the NEVOLYN Office Portal has been provisioned.
+Welcome to NEVOLYN. Your official Office Portal account has been provisioned.
 
 OFFICIAL ACCESS CREDENTIALS:
-─────────────────────────────────────────────────────────────
-• Office Portal Login : ${portalUrl}
-• Username             : ${createdAccount.username}
-• Employee ID          : ${createdAccount.employeeId}
-• Designation          : ${createdAccount.designation || "R&D Staff Member"}
-• Effective Date       : ${createdAccount.joiningDate}
-• Initial Password     : ${createdAccount.password}
-─────────────────────────────────────────────────────────────
+• Portal Login : ${portalUrl}
+• Username     : ${createdAccount.username}
+• Employee ID  : ${createdAccount.employeeId}
+• Designation  : ${createdAccount.designation || "Staff Member"}
+• Initial Pass : ${createdAccount.password}
 
-MANDATORY FIRST-LOGIN SETUP & PRIVACY POLICY:
-In strict compliance with company data privacy governance and compensation compliance:
-• System administrators DO NOT hold permission to set or edit your personal phone number, banking accounts, or passwords.
-• For your privacy and direct deposit payroll security, you must log in directly to complete these records.
-
-IMMEDIATE ACTION CHECKLIST:
-1. Log in to the Office Portal at: ${portalUrl}
-2. Open your "Profile & Security" dashboard.
-3. Update your verified personal contact phone number.
-4. Input both your Primary and Secondary bank account details for direct deposit payroll.
-5. Change your temporary initial password to a strong, confidential password.
-
-SECURITY RECOMMENDATIONS:
-• Never share your credentials with colleagues or external individuals.
-• Lock your workstation (Windows + L) whenever stepping away.
-• If you encounter any access difficulties, please notify the administration desk.
-
-We look forward to your contributions and wish you a successful journey with NEVOLYN!
-
-Warm regards,
+MANDATORY FIRST-LOGIN ACTIONS:
+For personal data privacy, administrators cannot set or view your phone number, bank details, or password. Please log in immediately and open "Profile & Security" to:
+1. Add your personal phone number
+2. Provide your Primary and Secondary bank details (for direct deposit payroll)
+3. Change your temporary password to a confidential password
 
 Operations & Personnel Administration
-NEVOLYN Technology
-Official Website: https://nevolyn.com
-Office Portal: ${portalUrl}`;
+NEVOLYN • https://nevolyn.com`;
   };
 
   const handleCopyMessage = async () => {
@@ -344,74 +324,76 @@ Office Portal: ${portalUrl}`;
               </div>
             </div>
 
-            {/* Personalized Onboarding Email Preview */}
-            <div className="space-y-3">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs space-y-2.5">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                  <div className="min-w-0">
-                    <span className="font-extrabold text-xs text-slate-900 block truncate">
-                      Subject: {getEmailSubject()}
-                    </span>
-                    <span className="text-[11px] text-slate-500 font-mono mt-0.5 block truncate">
-                      To: {createdAccount.email || "employee@nevolyn.com"}
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-teal-800 font-bold bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-md shrink-0">
-                    Official Onboarding Email
+            {/* Personalized Onboarding Message Preview */}
+            <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/80 space-y-2.5">
+              <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
+                <div className="min-w-0 pr-2">
+                  <span className="font-extrabold text-xs text-slate-900 block truncate">
+                    Subject: {getEmailSubject()}
+                  </span>
+                  <span className="text-[11px] text-slate-500 font-mono mt-0.5 block truncate">
+                    To: {createdAccount.email || "employee@nevolyn.com"}
                   </span>
                 </div>
-
-                <pre className="text-[11px] font-sans text-slate-800 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto pr-1 bg-white p-3.5 rounded-xl border border-slate-200">
-                  {buildEmailBody()}
-                </pre>
+                <span className="text-[10px] text-teal-800 font-bold bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md shrink-0">
+                  Onboarding Slip
+                </span>
               </div>
+
+              <pre className="text-[11px] font-sans text-slate-800 whitespace-pre-wrap leading-relaxed bg-white p-3.5 rounded-xl border border-slate-200">
+                {buildEmailBody()}
+              </pre>
             </div>
 
-            {/* Handout Buttons: Copy Option, Mail Option, PDF Option, Done */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-slate-200">
-              <div className="flex flex-wrap items-center gap-2">
-                {/* 1. PDF Option */}
+            {/* Handout Action Buttons (Equal-width 4-column balanced grid) */}
+            <div className="pt-3 border-t border-slate-200">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* 1. PDF Slip */}
                 <button
                   type="button"
                   onClick={handlePrintSlip}
-                  className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-300 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-300 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                   title="Print or Save as PDF Slip"
                 >
-                  <Printer className="w-4 h-4 text-slate-700" />
-                  <span>Print / Save PDF</span>
+                  <Printer className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                  <span className="truncate">Print / PDF</span>
                 </button>
 
                 {/* 2. Mail Option */}
                 <button
                   type="button"
                   onClick={handleOpenEmailClient}
-                  className="px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 flex items-center justify-center gap-1.5 transition cursor-pointer"
-                  title="Open default email application"
+                  className="w-full py-2.5 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  title="Open in your default email application"
                 >
-                  <Mail className="w-4 h-4 text-white" />
-                  <span>Open in Mail</span>
+                  <Mail className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                  <span className="truncate">Open Mail</span>
                 </button>
 
                 {/* 3. Copy Option */}
                 <button
                   type="button"
                   onClick={handleCopyMessage}
-                  className="px-3.5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-md shadow-teal-600/20 flex items-center justify-center gap-1.5 transition cursor-pointer"
-                  title="Copy formatted email message to clipboard"
+                  className="w-full py-2.5 px-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-sm shadow-teal-600/20 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  title="Copy full onboarding message to clipboard"
                 >
-                  {copiedType === "msg" ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white" />}
-                  <span>{copiedType === "msg" ? "Copied Message!" : "Copy Message"}</span>
+                  {copiedType === "msg" ? (
+                    <Check className="w-3.5 h-3.5 text-white shrink-0" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 text-white shrink-0" />
+                  )}
+                  <span className="truncate">{copiedType === "msg" ? "Copied!" : "Copy Msg"}</span>
+                </button>
+
+                {/* 4. Done & Close */}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm flex items-center justify-center transition cursor-pointer"
+                >
+                  <span className="truncate">Done</span>
                 </button>
               </div>
-
-              {/* Done & Close */}
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer text-center"
-              >
-                Done & Close
-              </button>
             </div>
           </div>
         ) : (
