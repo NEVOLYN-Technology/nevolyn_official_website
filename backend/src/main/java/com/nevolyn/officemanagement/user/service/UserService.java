@@ -2,6 +2,7 @@ package com.nevolyn.officemanagement.user.service;
 
 import com.nevolyn.officemanagement.audit.entity.AuditLog;
 import com.nevolyn.officemanagement.audit.service.AuditService;
+import com.nevolyn.service.EmailService;
 import com.nevolyn.officemanagement.common.exception.BusinessRuleException;
 import com.nevolyn.officemanagement.common.exception.ResourceNotFoundException;
 import com.nevolyn.officemanagement.user.dto.CreateUserRequest;
@@ -51,6 +52,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
+    private final EmailService emailService;
 
     /**
      * Retrieves a paginated list of all users.
@@ -171,6 +173,22 @@ public class UserService {
 
         User saved = userRepository.save(user);
 
+        if (saved.getEmail() != null && !saved.getEmail().isBlank()) {
+            try {
+                emailService.sendOnboardingCredentialsEmail(
+                        saved.getEmail(),
+                        saved.getFullName(),
+                        saved.getUsername(),
+                        saved.getEmployeeId(),
+                        saved.getDesignation(),
+                        request.password(),
+                        saved.getJoiningDate() != null ? saved.getJoiningDate().toString() : null
+                );
+            } catch (Exception ex) {
+                log.warn("Could not dispatch automated onboarding email to '{}': {}", saved.getEmail(), ex.getMessage());
+            }
+        }
+
         auditService.log(
                 AuditLog.ACTION_CREATE_EMPLOYEE,
                 callerUsername,
@@ -235,6 +253,22 @@ public class UserService {
                 .build();
 
         User saved = userRepository.save(user);
+
+        if (saved.getEmail() != null && !saved.getEmail().isBlank()) {
+            try {
+                emailService.sendOnboardingCredentialsEmail(
+                        saved.getEmail(),
+                        saved.getFullName(),
+                        saved.getUsername(),
+                        saved.getEmployeeId(),
+                        saved.getDesignation(),
+                        request.password(),
+                        saved.getJoiningDate() != null ? saved.getJoiningDate().toString() : null
+                );
+            } catch (Exception ex) {
+                log.warn("Could not dispatch automated onboarding email to '{}': {}", saved.getEmail(), ex.getMessage());
+            }
+        }
 
         auditService.log(
                 "CREATE_SUPER_ADMIN",

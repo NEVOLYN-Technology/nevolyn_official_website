@@ -329,6 +329,144 @@ public class EmailService {
         return sendUserAcknowledgementEmail(details);
     }
 
+    /**
+     * Sends the official onboarding email with credentials and setup instructions directly to new employees/admins.
+     */
+    @Async
+    public void sendOnboardingCredentialsEmail(
+            String toEmail,
+            String fullName,
+            String username,
+            String employeeId,
+            String designation,
+            String initialPassword,
+            String joiningDate
+    ) {
+        if (toEmail == null || toEmail.isBlank()) return;
+
+        String portalUrl = (frontendUrl != null && !frontendUrl.isBlank())
+                ? frontendUrl.trim().replaceAll("/+$", "") + "/office/login"
+                : "https://nevolyn.com/office/login";
+
+        String subject = "[NEVOLYN] Welcome " + fullName + " — Your Office Portal Credentials & Setup Instructions";
+
+        String plainText = String.format("""
+Dear %s,
+
+On behalf of NEVOLYN Technology, we are pleased to welcome you to the team. Your dedicated employee workspace on the NEVOLYN Office Portal has been provisioned.
+
+OFFICIAL ACCESS CREDENTIALS:
+─────────────────────────────────────────────────────────────
+• Office Portal Login : %s
+• Username             : %s
+• Employee ID          : %s
+• Designation          : %s
+• Effective Date       : %s
+• Initial Password     : %s
+─────────────────────────────────────────────────────────────
+
+MANDATORY FIRST-LOGIN SETUP & PRIVACY POLICY:
+In strict compliance with company data privacy governance and compensation compliance:
+• System administrators DO NOT hold permission to set or edit your personal phone number, banking accounts, or passwords.
+• For your privacy and direct deposit payroll security, you must log in directly to complete these records.
+
+IMMEDIATE ACTION CHECKLIST:
+1. Log in to the Office Portal at: %s
+2. Open your "Profile & Security" dashboard.
+3. Update your verified personal contact phone number.
+4. Input both your Primary and Secondary bank account details for direct deposit payroll.
+5. Change your temporary initial password to a strong, confidential password.
+
+SECURITY RECOMMENDATIONS:
+• Never share your credentials with colleagues or external individuals.
+• Lock your workstation (Windows + L) whenever stepping away.
+• If you encounter any access difficulties, please notify the administration desk.
+
+We look forward to your contributions and wish you a successful journey with NEVOLYN!
+
+Warm regards,
+
+Operations & Personnel Administration
+NEVOLYN Technology
+Official Website: https://nevolyn.com
+Office Portal: %s
+""",
+                fullName, portalUrl, username, employeeId,
+                designation != null ? designation : "R&D Staff Member",
+                joiningDate != null ? joiningDate : "Immediate",
+                initialPassword, portalUrl, portalUrl);
+
+        String htmlBody = String.format("""
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"/><style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #0f172a; margin: 0; padding: 24px; background: #f8fafc; }
+.card { max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+.header { border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
+.logo { font-size: 22px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; }
+.sub { font-size: 11px; text-transform: uppercase; color: #0d9488; font-weight: 700; margin-top: 4px; }
+.cred-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; margin: 20px 0; }
+.row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 13px; }
+.row:last-child { border-bottom: none; }
+.label { color: #64748b; font-weight: 600; }
+.val { font-family: monospace; font-weight: 700; color: #0f172a; }
+.pass-pill { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 10px 14px; border-radius: 8px; font-family: monospace; font-size: 16px; font-weight: 900; color: #047857; margin-top: 12px; text-align: center; }
+.notice { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 16px; font-size: 12px; color: #92400e; margin: 20px 0; }
+.steps { margin: 16px 0; padding-left: 20px; font-size: 13px; color: #334155; }
+.steps li { margin-bottom: 6px; }
+.btn { display: inline-block; background: #0f172a; color: #ffffff !important; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 13px; margin: 16px 0; }
+.footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; }
+</style></head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="logo">NEVOLYN TECHNOLOGY</div>
+    <div class="sub">Official Office Portal Provisioning</div>
+  </div>
+  <p>Dear <strong>%s</strong>,</p>
+  <p>On behalf of NEVOLYN Technology, we are pleased to welcome you to the team. Your official employee workspace on the NEVOLYN Office Portal has been provisioned.</p>
+  <div class="cred-box">
+    <div class="row"><span class="label">Username:</span><span class="val">%s</span></div>
+    <div class="row"><span class="label">Employee ID:</span><span class="val">%s</span></div>
+    <div class="row"><span class="label">Designation:</span><span class="val">%s</span></div>
+    <div class="row"><span class="label">Effective Date:</span><span class="val">%s</span></div>
+    <div class="pass-pill">Temporary Password: %s</div>
+  </div>
+  <center><a href="%s" class="btn">Log In to Office Portal</a></center>
+  <div class="notice">
+    <strong>Mandatory Privacy & Security Policy:</strong><br/>
+    System administrators do not have access to view or configure your personal phone number, bank accounts, or password. You must log in directly to set these up in your private profile.
+  </div>
+  <p><strong>First-Login Action Steps:</strong></p>
+  <ol class="steps">
+    <li>Log in using the link and credentials above.</li>
+    <li>Navigate to <strong>Profile & Security</strong>.</li>
+    <li>Input your personal phone number.</li>
+    <li>Provide both Primary and Secondary bank account details for payroll.</li>
+    <li>Set a new, strong confidential password.</li>
+  </ol>
+  <div class="footer">
+    Operations & Personnel Administration &bull; NEVOLYN Technology &bull; https://nevolyn.com
+  </div>
+</div>
+</body></html>
+""",
+                fullName, username, employeeId,
+                designation != null ? designation : "R&D Staff Member",
+                joiningDate != null ? joiningDate : "Immediate",
+                initialPassword, portalUrl);
+
+        EmailMessage message = EmailMessage.builder()
+                .to(toEmail)
+                .subject(subject)
+                .htmlBody(htmlBody)
+                .plainTextBody(plainText)
+                .replyTo(adminEmail)
+                .build();
+
+        dispatch(message);
+    }
+
     // ------------------------------------------------------------------
     // Transport & Dispatch
     // ------------------------------------------------------------------
