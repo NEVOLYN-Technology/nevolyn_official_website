@@ -2,6 +2,7 @@ package com.nevolyn.officemanagement.auth.service;
 
 import com.nevolyn.officemanagement.audit.entity.AuditLog;
 import com.nevolyn.officemanagement.audit.service.AuditService;
+import com.nevolyn.officemanagement.auth.dto.AuthResult;
 import com.nevolyn.officemanagement.auth.dto.LoginRequest;
 import com.nevolyn.officemanagement.auth.dto.LoginResponse;
 import com.nevolyn.officemanagement.common.exception.ResourceNotFoundException;
@@ -382,7 +383,4 @@ public class AuthService {
                 b.getBytes(StandardCharsets.UTF_8)
         );
     }
-
-    // Simple value container for login result.
-    public record AuthResult(LoginResponse user, String token) {}
 }

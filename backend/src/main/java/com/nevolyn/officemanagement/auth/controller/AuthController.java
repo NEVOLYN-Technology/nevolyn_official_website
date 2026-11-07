@@ -1,5 +1,6 @@
 package com.nevolyn.officemanagement.auth.controller;
 
+import com.nevolyn.officemanagement.auth.dto.AuthResult;
 import com.nevolyn.officemanagement.auth.dto.LoginRequest;
 import com.nevolyn.officemanagement.auth.dto.LoginResponse;
 import com.nevolyn.officemanagement.auth.service.AuthService;
@@ -55,7 +56,7 @@ public class AuthController {
             HttpServletResponse httpResponse
     ) {
         String clientIp = IpUtils.extractClientIp(httpRequest);
-        AuthService.AuthResult result = authService.login(request, clientIp);
+        AuthResult result = authService.login(request, clientIp);
 
         // Build secure HTTP-only cookie via Spring's ResponseCookie
         ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(cookieName, result.token())
