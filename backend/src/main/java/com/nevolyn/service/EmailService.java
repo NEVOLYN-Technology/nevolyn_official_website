@@ -371,12 +371,11 @@ For personal data privacy, administrators cannot set or view your phone number, 
 
 PUBLIC WEBSITE PROFILE DETAILS (REPLY TO THIS EMAIL):
 For your official team profile on nevolyn.com:
-• Role Overview (Paragraph 1) & Responsibilities will be assigned directly by NEVOLYN.
+• Role Overview (Paragraph 1), Summary Bio & Responsibilities will be assigned directly by NEVOLYN.
 • Please reply to this email with:
-  1. Bio: 1 concise sentence summary
-  2. Education & Specialization (Paragraph 2): University, degrees, core engineering background
-  3. Academic Research & Key Achievements (Paragraph 3): Thesis, papers, awards, notable projects
-  4. Professional & Research Profiles:
+  1. Education & Specialization (Paragraph 2): University, degrees, core engineering background
+  2. Academic Research & Key Achievements (Paragraph 3): Thesis, papers, awards, notable projects
+  3. Professional & Research Profiles:
      - LinkedIn: [URL]
      - GitHub: [URL]
      - Personal Portfolio: [URL]
@@ -439,10 +438,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   </div>
   <div class="profile-box">
     <strong>Official Website Profile Submission (Reply to this Email):</strong><br/>
-    NEVOLYN will provide your Role Overview (Paragraph 1) and Key Responsibilities.<br/>
+    NEVOLYN will provide your Role Overview (Paragraph 1), Summary Bio, and Key Responsibilities.<br/>
     Please reply to this email with:
     <ol class="steps">
-      <li>1-sentence Bio summary</li>
       <li>Education &amp; Specialization (Paragraph 2)</li>
       <li>Academic Research &amp; Key Achievements (Paragraph 3)</li>
       <li>Profiles: LinkedIn, GitHub, Portfolio, Google Scholar, ORCID</li>

@@ -133,12 +133,11 @@ For personal data privacy, administrators cannot set or view your phone number, 
 
 PUBLIC WEBSITE PROFILE DETAILS (REPLY TO THIS EMAIL):
 For your official team profile on nevolyn.com:
-• Role Overview (Paragraph 1) & Responsibilities will be assigned directly by NEVOLYN.
+• Role Overview (Paragraph 1), Summary Bio & Responsibilities will be assigned directly by NEVOLYN.
 • Please reply to this email with:
-  1. Bio: 1 concise sentence summary
-  2. Education & Specialization (Paragraph 2): University, degrees, core engineering background
-  3. Academic Research & Key Achievements (Paragraph 3): Thesis, papers, awards, notable projects
-  4. Professional & Research Profiles:
+  1. Education & Specialization (Paragraph 2): University, degrees, core engineering background
+  2. Academic Research & Key Achievements (Paragraph 3): Thesis, papers, awards, notable projects
+  3. Professional & Research Profiles:
      - LinkedIn: [URL]
      - GitHub: [URL]
      - Personal Portfolio: [URL]
@@ -155,7 +154,7 @@ NEVOLYN • https://nevolyn.com`;
       await navigator.clipboard.writeText(fullEmail);
       setCopiedType("msg");
       setTimeout(() => setCopiedType(null), 3000);
-    } catch {}
+    } catch { }
   };
 
   const handleOpenEmailClient = () => {
@@ -172,7 +171,7 @@ NEVOLYN • https://nevolyn.com`;
       await navigator.clipboard.writeText(createdAccount.password);
       setCopiedType("pass");
       setTimeout(() => setCopiedType(null), 3000);
-    } catch {}
+    } catch { }
   };
 
   const handlePrintSlip = () => {
@@ -228,7 +227,7 @@ NEVOLYN • https://nevolyn.com`;
             </div>
 
             <div class="notice">
-              <div class="notice-title">MANDATORY INSTRUCTIONS / নির্দেশনা:</div>
+              <div class="notice-title">IMPORTANT INSTRUCTIONS:</div>
               Office portal e nijer phone, profile photo, bank details and password change er authority admin er rakha hoy nai aita employee hisebe login korei kora lagbe including personal phone number & photo upload.<br/><br/>
               <strong>Action Steps on First Login:</strong><br/>
               1. Add your verified personal phone number.<br/>
@@ -239,8 +238,8 @@ NEVOLYN • https://nevolyn.com`;
 
             <div class="notice" style="margin-top: 12px; background: #f0fdf4; border-color: #bbf7d0;">
               <div class="notice-title" style="color: #166534;">WEBSITE PUBLIC PROFILE SUBMISSION / ওয়েবসাইটের তথ্যের জন্য:</div>
-              NEVOLYN will provide your Role Overview (Paragraph 1) and Key Responsibilities.<br/>
-              Please reply to your onboarding email with: 1-sentence Bio, Education & Specialization (Paragraph 2), Research & Achievements (Paragraph 3), and professional links (LinkedIn, GitHub, Portfolio, Google Scholar, ORCID).
+              NEVOLYN will provide your Role Overview (Paragraph 1), Summary Bio, and Key Responsibilities.<br/>
+              Please reply to your onboarding email with: Education & Specialization (Paragraph 2), Research & Achievements (Paragraph 3), and professional links (LinkedIn, GitHub, Portfolio, Google Scholar, ORCID).
             </div>
 
             <div class="url-row">
@@ -263,7 +262,7 @@ NEVOLYN • https://nevolyn.com`;
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white border border-slate-200/90 rounded-3xl max-w-xl w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-6 space-y-5 shadow-2xl my-8">
-        
+
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <div>
@@ -271,8 +270,8 @@ NEVOLYN • https://nevolyn.com`;
               {createdAccount
                 ? "Personnel Credentials Slip & Handout"
                 : isSuperAdmin
-                ? "Add Employee or Administrator"
-                : "Add New Employee"}
+                  ? "Add Employee or Administrator"
+                  : "Add New Employee"}
             </h2>
             <p className="text-[11px] text-slate-500 font-medium">
               {createdAccount

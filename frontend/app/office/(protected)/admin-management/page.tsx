@@ -135,12 +135,11 @@ For security and privacy governance, administrators cannot set or view your pers
 
 PUBLIC WEBSITE PROFILE DETAILS (REPLY TO THIS EMAIL):
 For your official team profile on nevolyn.com:
-• Role Overview (Paragraph 1) & Responsibilities will be assigned directly by NEVOLYN.
+• Role Overview (Paragraph 1), Summary Bio & Responsibilities will be assigned directly by NEVOLYN.
 • Please reply to this email with:
-  1. Bio: 1 concise sentence summary
-  2. Education & Specialization (Paragraph 2): University, degrees, core engineering background
-  3. Academic Research & Key Achievements (Paragraph 3): Thesis, papers, awards, notable projects
-  4. Professional & Research Profiles:
+  1. Education & Specialization (Paragraph 2): University, degrees, core engineering background
+  2. Academic Research & Key Achievements (Paragraph 3): Thesis, papers, awards, notable projects
+  3. Professional & Research Profiles:
      - LinkedIn: [URL]
      - GitHub: [URL]
      - Personal Portfolio: [URL]
@@ -241,8 +240,8 @@ NEVOLYN • https://nevolyn.com`;
 
             <div class="notice" style="margin-top: 12px; background: #f0fdf4; border-color: #bbf7d0;">
               <div class="notice-title" style="color: #166534;">WEBSITE PUBLIC PROFILE SUBMISSION / ওয়েবসাইটের তথ্যের জন্য:</div>
-              NEVOLYN will provide your Role Overview (Paragraph 1) and Key Responsibilities.<br/>
-              Please reply to your onboarding email with: 1-sentence Bio, Education & Specialization (Paragraph 2), Research & Achievements (Paragraph 3), and professional links (LinkedIn, GitHub, Portfolio, Google Scholar, ORCID).
+              NEVOLYN will provide your Role Overview (Paragraph 1), Summary Bio, and Key Responsibilities.<br/>
+              Please reply to your onboarding email with: Education & Specialization (Paragraph 2), Research & Achievements (Paragraph 3), and professional links (LinkedIn, GitHub, Portfolio, Google Scholar, ORCID).
             </div>
 
             <div class="url-row">

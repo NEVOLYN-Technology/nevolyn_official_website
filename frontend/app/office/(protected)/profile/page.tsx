@@ -547,17 +547,7 @@ export default function ProfilePage() {
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
               <div className="flex items-center gap-5">
-                <div className="relative group shrink-0">
-                  <EmployeeAvatar user={user} size="lg" shape="rounded" />
-                  <button
-                    type="button"
-                    onClick={handleOpenPhotoModal}
-                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-slate-900 hover:bg-teal-600 text-white flex items-center justify-center shadow-md transition cursor-pointer border-2 border-white"
-                    title="Upload or Change Official Profile Photo"
-                  >
-                    <Camera className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                <EmployeeAvatar user={user} size="lg" shape="rounded" />
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
