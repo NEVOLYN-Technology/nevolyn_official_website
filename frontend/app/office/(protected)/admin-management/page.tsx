@@ -156,7 +156,7 @@ NEVOLYN • https://nevolyn.com`;
       await navigator.clipboard.writeText(fullEmail);
       setCopiedType("msg");
       setTimeout(() => setCopiedType(null), 3000);
-    } catch {}
+    } catch { }
   };
 
   const handleOpenEmailClient = () => {
@@ -173,7 +173,7 @@ NEVOLYN • https://nevolyn.com`;
       await navigator.clipboard.writeText(createdAdmin.password);
       setCopiedType("pass");
       setTimeout(() => setCopiedType(null), 3000);
-    } catch {}
+    } catch { }
   };
 
   const handlePrintSlip = () => {
@@ -229,7 +229,7 @@ NEVOLYN • https://nevolyn.com`;
             </div>
 
             <div class="notice">
-              <div class="notice-title">MANDATORY INSTRUCTIONS / নির্দেশনা:</div>
+              <div class="notice-title">MANDATORY INSTRUCTIONS:</div>
               Office portal e nijer phone, profile photo, bank details and password change er authority admin er rakha hoy nai aita individual account login korei kora lagbe.<br/><br/>
               <strong>Action Steps on First Login:</strong><br/>
               1. Add your verified personal phone number.<br/>
@@ -264,7 +264,7 @@ NEVOLYN • https://nevolyn.com`;
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white border border-slate-200/90 rounded-3xl max-w-lg w-full max-h-[92dvh] overflow-y-auto p-4 sm:p-6 space-y-5 shadow-2xl my-8">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <div className="flex items-center gap-2">
@@ -752,11 +752,10 @@ export default function AdminManagementPage() {
                         onClick={() => toggleMutation.mutate(admin.id)}
                         disabled={toggleMutation.isPending || deleteMutation.isPending}
                         title={admin.isActive ? "Deactivate account" : "Activate account"}
-                        className={`p-2 rounded-xl border transition-colors cursor-pointer ${
-                          admin.isActive
+                        className={`p-2 rounded-xl border transition-colors cursor-pointer ${admin.isActive
                             ? "bg-slate-100 text-slate-600 border-slate-200 hover:text-rose-700 hover:bg-rose-50 hover:border-rose-200"
                             : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                        }`}
+                          }`}
                       >
                         <Power className="w-4 h-4" />
                       </button>
