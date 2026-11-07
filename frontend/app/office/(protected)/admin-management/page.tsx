@@ -647,20 +647,6 @@ export default function AdminManagementPage() {
 
   if (!isSuperAdmin) return null;
 
-  const roleBadge = (role: string) => {
-    if (role === "super_admin")
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-300/80 text-amber-800 text-[10px] font-bold">
-          <Crown className="w-2.5 h-2.5 text-amber-600" /> SUPER ADMIN
-        </span>
-      );
-    return (
-      <span className="px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-300/80 text-teal-800 text-[10px] font-bold">
-        ADMIN
-      </span>
-    );
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -731,7 +717,6 @@ export default function AdminManagementPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-bold text-slate-900">{admin.fullName}</span>
-                        {roleBadge(admin.role)}
                         {!admin.isActive && (
                           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                             INACTIVE

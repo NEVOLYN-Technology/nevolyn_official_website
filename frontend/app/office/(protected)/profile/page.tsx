@@ -556,21 +556,6 @@ export default function ProfilePage() {
                     <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-900 text-white font-mono font-bold">
                       @{user?.username}
                     </span>
-                    <span
-                      className={`text-[10px] uppercase font-mono font-extrabold px-2.5 py-0.5 rounded-full ${
-                        user?.role === "super_admin"
-                          ? "bg-amber-100 text-amber-800 border border-amber-300"
-                          : user?.role === "admin"
-                          ? "bg-teal-100 text-teal-800 border border-teal-300"
-                          : "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                      }`}
-                    >
-                      {user?.role === "super_admin"
-                        ? "Super Admin"
-                        : user?.role === "admin"
-                        ? "Administrator"
-                        : "Staff Member"}
-                    </span>
                   </div>
                   <div className="flex items-center gap-3 mt-1 flex-wrap">
                     <p className="text-xs text-slate-500 font-medium">

@@ -12,7 +12,6 @@ import {
   Trash2,
   AlertTriangle,
   Search,
-  Crown,
   ShieldCheck,
   Landmark,
   Mail,
@@ -188,23 +187,8 @@ export default function EmployeesPage() {
                 <div className="pointer-events-none absolute -top-16 -right-16 w-32 h-32 rounded-full bg-teal-400/10 blur-2xl group-hover:bg-teal-400/20 transition" />
 
                 <div className="flex flex-col flex-1">
-                  {/* Top Badges */}
-                  <div className="flex items-center justify-between gap-2 mb-4 h-6">
-                    <div>
-                      {isTargetSuperAdmin ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-300/80">
-                          <Crown className="w-2.5 h-2.5 text-amber-600" /> SUPER ADMIN
-                        </span>
-                      ) : isTargetAdmin ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-300/80">
-                          <ShieldCheck className="w-2.5 h-2.5 text-teal-600" /> ADMIN
-                        </span>
-                      ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                          EMPLOYEE
-                        </span>
-                      )}
-                    </div>
+                  {/* Top Status */}
+                  <div className="flex items-center justify-end mb-4 h-6">
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                         u.isActive
