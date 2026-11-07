@@ -15,9 +15,7 @@ import {
   Eye,
   EyeOff,
   UserCheck,
-  MessageSquare,
   Mail,
-  ExternalLink,
 } from "lucide-react";
 
 interface AddEmployeeModalProps {
@@ -57,8 +55,7 @@ export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) 
 
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [copiedType, setCopiedType] = useState<"whatsapp" | "email" | "pass" | null>(null);
-  const [previewTab, setPreviewTab] = useState<"whatsapp" | "email">("whatsapp");
+  const [copiedType, setCopiedType] = useState<"msg" | "pass" | null>(null);
 
   // Success state holding credentials for printable handover slip
   const [createdAccount, setCreatedAccount] = useState<{
@@ -106,46 +103,7 @@ export function AddEmployeeModal({ onClose, onSuccess }: AddEmployeeModalProps) 
     return parts[0] || createdAccount.fullName;
   };
 
-  // 1. Customized WhatsApp Message
-  const buildWhatsAppMessage = () => {
-    if (!createdAccount) return "";
-    const portalUrl = typeof window !== "undefined" ? `${window.location.origin}/office/login` : "https://nevolyn.com/office/login";
-    const firstName = getFirstName();
-
-    return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏢 *NEVOLYN TECHNOLOGY — OFFICIAL ONBOARDING*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Dear *${createdAccount.fullName}*,
-
-Welcome to NEVOLYN! Your official employee account on the NEVOLYN Office Portal has been successfully provisioned.
-
-🔑 *YOUR ACCESS CREDENTIALS:*
-• *Portal URL:* ${portalUrl}
-• *Username:* \`${createdAccount.username}\`
-• *Employee ID:* \`${createdAccount.employeeId}\`
-• *Initial Password:* \`${createdAccount.password}\`
-• *Designation:* ${createdAccount.designation || "R&D Staff Member"}
-• *Work Email:* ${createdAccount.email || "Not specified"}
-
-📢 *MANDATORY FIRST-TIME ACTIONS / গুরুত্বপূর্ণ নির্দেশনা:*
-Office portal-এ নিজের ফোন নম্বর, ব্যাংক ডিটেইলস (Primary & Secondary), এবং পাসওয়ার্ড পরিবর্তনের এক্সেস অ্যাডমিনের কাছে রাখা হয় নাই—কোম্পানির প্রাইভেসি পলিসি ও তথ্যের সুরক্ষার্থে এটা প্রত্যেক কর্মীকে নিজে লগইন করেই আপডেট করতে হবে।
-
-অনুগ্রহ করে লগইন করে নিচের কাজগুলো অবিলম্বে সম্পন্ন করুন:
-1️⃣ প্রথমে উপরের লিংক থেকে লগইন করুন।
-2️⃣ "Profile & Security" ট্যাবে গিয়ে আপনার ব্যক্তিগত ফোন নম্বর (Phone Number) যুক্ত করুন।
-3️⃣ আপনার দুটি ব্যাংক অ্যাকাউন্ট (Primary & Secondary Bank Accounts) সঠিকভাবে প্রদান করুন।
-4️⃣ আপনার নিজস্ব সিকিউর পাসওয়ার্ড সেট করে আপডেট করে নিন।
-
-⚠️ *নিরাপত্তা নির্দেশনা:* আপনার প্রাথমিক পাসওয়ার্ডটি কারও সাথে শেয়ার করবেন না এবং প্রথমবার লগইন করেই পাসওয়ার্ড পরিবর্তন করে নিন।
-
-Congratulations & welcome aboard, ${firstName}!
-— Operations & Human Resources
-NEVOLYN Technology (https://nevolyn.com)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-  };
-
-  // 2. Customized Formal Corporate Email Subject & Body
+  // Official Corporate Email Subject & Body
   const getEmailSubject = () => {
     if (!createdAccount) return "[NEVOLYN] Your Office Portal Credentials";
     return `[NEVOLYN] Welcome ${createdAccount.fullName} — Your Office Portal Credentials & Setup Instructions`;
@@ -154,7 +112,6 @@ NEVOLYN Technology (https://nevolyn.com)
   const buildEmailBody = () => {
     if (!createdAccount) return "";
     const portalUrl = typeof window !== "undefined" ? `${window.location.origin}/office/login` : "https://nevolyn.com/office/login";
-    const firstName = getFirstName();
 
     return `Dear ${createdAccount.fullName},
 
@@ -197,25 +154,11 @@ Official Website: https://nevolyn.com
 Office Portal: ${portalUrl}`;
   };
 
-  const handleCopyWhatsApp = async () => {
-    try {
-      await navigator.clipboard.writeText(buildWhatsAppMessage());
-      setCopiedType("whatsapp");
-      setTimeout(() => setCopiedType(null), 3000);
-    } catch {}
-  };
-
-  const handleSendWhatsAppDirect = () => {
-    const text = buildWhatsAppMessage();
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-    window.open(url, "_blank");
-  };
-
-  const handleCopyEmail = async () => {
+  const handleCopyMessage = async () => {
     try {
       const fullEmail = `Subject: ${getEmailSubject()}\n\n${buildEmailBody()}`;
       await navigator.clipboard.writeText(fullEmail);
-      setCopiedType("email");
+      setCopiedType("msg");
       setTimeout(() => setCopiedType(null), 3000);
     } catch {}
   };
@@ -401,135 +344,74 @@ Office Portal: ${portalUrl}`;
               </div>
             </div>
 
-            {/* Format Selection Tabs: WhatsApp vs Professional Email */}
+            {/* Personalized Onboarding Email Preview */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Send className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Personalized Onboarding Handout Message:</span>
-                </span>
-                <div className="flex items-center p-0.5 rounded-xl bg-slate-100 border border-slate-200 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setPreviewTab("whatsapp")}
-                    className={`px-3 py-1 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
-                      previewTab === "whatsapp"
-                        ? "bg-white text-emerald-700 shadow-2xs"
-                        : "text-slate-500 hover:text-slate-800"
-                    }`}
-                  >
-                    <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>WhatsApp</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPreviewTab("email")}
-                    className={`px-3 py-1 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
-                      previewTab === "email"
-                        ? "bg-white text-indigo-700 shadow-2xs"
-                        : "text-slate-500 hover:text-slate-800"
-                    }`}
-                  >
-                    <Mail className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Corporate Email</span>
-                  </button>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs space-y-2.5">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <div className="min-w-0">
+                    <span className="font-extrabold text-xs text-slate-900 block truncate">
+                      Subject: {getEmailSubject()}
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-mono mt-0.5 block truncate">
+                      To: {createdAccount.email || "employee@nevolyn.com"}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-teal-800 font-bold bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-md shrink-0">
+                    Official Onboarding Email
+                  </span>
                 </div>
-              </div>
 
-              {/* Message Preview Box */}
-              {previewTab === "whatsapp" ? (
-                <div className="p-3.5 rounded-2xl bg-emerald-50/50 border border-emerald-200/90 text-xs space-y-2">
-                  <div className="flex items-center justify-between border-b border-emerald-100 pb-2">
-                    <span className="font-extrabold text-[11px] text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
-                      <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Customized WhatsApp Message for {createdAccount.fullName}</span>
-                    </span>
-                    <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-100/70 px-2 py-0.5 rounded-md">
-                      Ready to Send
-                    </span>
-                  </div>
-                  <pre className="text-[11px] font-sans text-slate-800 whitespace-pre-wrap leading-relaxed max-h-56 overflow-y-auto pr-1">
-                    {buildWhatsAppMessage()}
-                  </pre>
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-emerald-100">
-                    <button
-                      type="button"
-                      onClick={handleCopyWhatsApp}
-                      className="px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
-                    >
-                      {copiedType === "whatsapp" ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copiedType === "whatsapp" ? "Copied WhatsApp Text!" : "Copy WhatsApp Text"}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSendWhatsAppDirect}
-                      className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Open in WhatsApp</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-3.5 rounded-2xl bg-indigo-50/50 border border-indigo-200/90 text-xs space-y-2">
-                  <div className="flex items-center justify-between border-b border-indigo-100 pb-2">
-                    <div className="min-w-0">
-                      <span className="font-extrabold text-[11px] text-indigo-900 uppercase tracking-wider block">
-                        Subject: {getEmailSubject()}
-                      </span>
-                      <span className="text-[10px] text-indigo-700 font-mono mt-0.5 block truncate">
-                        To: {createdAccount.email || "employee@nevolyn.com"}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-indigo-700 font-semibold bg-indigo-100/70 px-2 py-0.5 rounded-md shrink-0">
-                      Formal Email
-                    </span>
-                  </div>
-                  <pre className="text-[11px] font-sans text-slate-800 whitespace-pre-wrap leading-relaxed max-h-56 overflow-y-auto pr-1">
-                    {buildEmailBody()}
-                  </pre>
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-indigo-100">
-                    <button
-                      type="button"
-                      onClick={handleCopyEmail}
-                      className="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-50 text-indigo-800 text-xs font-bold border border-indigo-300 transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
-                    >
-                      {copiedType === "email" ? <Check className="w-3.5 h-3.5 text-indigo-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copiedType === "email" ? "Copied Email!" : "Copy Email Body"}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleOpenEmailClient}
-                      className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                      <span>Open in Email App</span>
-                    </button>
-                  </div>
-                </div>
-              )}
+                <pre className="text-[11px] font-sans text-slate-800 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto pr-1 bg-white p-3.5 rounded-xl border border-slate-200">
+                  {buildEmailBody()}
+                </pre>
+              </div>
             </div>
 
-            {/* Handout Buttons */}
+            {/* Handout Buttons: Copy Option, Mail Option, PDF Option, Done */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-slate-200">
-              <button
-                type="button"
-                onClick={handlePrintSlip}
-                className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-300 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
-              >
-                <Printer className="w-4 h-4 text-slate-700" />
-                <span>Print / Save PDF Slip</span>
-              </button>
-
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* 1. PDF Option */}
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer text-center"
+                  onClick={handlePrintSlip}
+                  className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-300 shadow-2xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  title="Print or Save as PDF Slip"
                 >
-                  Done & Close
+                  <Printer className="w-4 h-4 text-slate-700" />
+                  <span>Print / Save PDF</span>
+                </button>
+
+                {/* 2. Mail Option */}
+                <button
+                  type="button"
+                  onClick={handleOpenEmailClient}
+                  className="px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  title="Open default email application"
+                >
+                  <Mail className="w-4 h-4 text-white" />
+                  <span>Open in Mail</span>
+                </button>
+
+                {/* 3. Copy Option */}
+                <button
+                  type="button"
+                  onClick={handleCopyMessage}
+                  className="px-3.5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-md shadow-teal-600/20 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  title="Copy formatted email message to clipboard"
+                >
+                  {copiedType === "msg" ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white" />}
+                  <span>{copiedType === "msg" ? "Copied Message!" : "Copy Message"}</span>
                 </button>
               </div>
+
+              {/* Done & Close */}
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer text-center"
+              >
+                Done & Close
+              </button>
             </div>
           </div>
         ) : (
