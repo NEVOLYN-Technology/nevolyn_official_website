@@ -6,7 +6,17 @@ export const metadata: Metadata = {
     absolute: "NEVOLYN Office",
   },
   description:
-    "Official NEVOLYN Technology Office Management, HRM, R&D Project Tracking, and Attendance Portal.",
+    "Official NEVOLYN Office Management, HRM, R&D Project Tracking, and Attendance Portal.",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
 };
 
 export default function OfficeRootLayout({

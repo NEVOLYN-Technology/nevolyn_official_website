@@ -1,6 +1,9 @@
 User-agent: *
 Allow: /
-Allow: /admin
+Disallow: /admin
+Disallow: /admin/
+Disallow: /office
+Disallow: /office/
 Disallow: /api/
 Disallow: /verify
 

@@ -514,48 +514,17 @@ export const nevolynJsonLd = {
 // ----------------------------------------------------------------------------
 
 export const adminSiteMetadata: Metadata = {
-  title: 'NEVOLYN Admin Login — Executive Operations & Control Center',
-  description:
-    'Official administrative login and operational control center for NEVOLYN Technology. Manage job applications, candidate CV dossiers, and business inquiries.',
-  keywords: [
-    ...NEVOLYN_BRAND_ALIASES,
-    ...NEVOLYN_OFFICE_KEYWORDS,
-    'nevolyn admin',
-    'nevolyn admin login',
-    'nevolyn operations portal',
-    'nevolyn control center',
-    'nevolyn dashboard',
-    'nevolyn executive dashboard',
-    'নেভোলিন অ্যাডমিন',
-    'নেভোলিন অ্যাডমিন লগইন',
-    'নেভোলিন এডমিন ড্যাশবোর্ড',
-  ],
-  alternates: {
-    canonical: `${NEVOLYN_SEO_CONFIG.siteUrl}/admin`,
-  },
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    siteName: 'NEVOLYN Technology',
-    title: 'NEVOLYN Admin Login — Executive Operations & Control Center',
-    description:
-      'Official administrative login and operational control center for NEVOLYN Technology. Manage job applications, applicant CV dossiers, and business inquiries.',
-    url: `${NEVOLYN_SEO_CONFIG.siteUrl}/admin`,
-    images: [
-      {
-        url: '/nevolyn-logo.png',
-        width: 1200,
-        height: 630,
-        alt: 'NEVOLYN Technology',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'NEVOLYN Admin Login',
-    description:
-      'Official administrative login and operational control center for NEVOLYN Technology.',
-    images: ['/nevolyn-logo.png'],
+  title: 'NEVOLYN Admin Login',
+  description: 'Official administrative access control.',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
   },
 }
 
