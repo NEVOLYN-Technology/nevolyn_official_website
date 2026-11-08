@@ -191,25 +191,30 @@ export const Footer = (): JSX.Element => {
                 Direct
               </span>
             </div>
-            <ul className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-2.5 md:gap-4 lg:gap-1.5 text-xs sm:text-[13px] text-slate-600 font-medium">
+            <ul className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-2.5 md:gap-4 lg:gap-2.5 text-xs sm:text-[13px] text-slate-600 font-medium">
               {/* Address */}
               <li className="flex items-start gap-2">
-                <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600" />
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-emerald-600" />
                 <a
                   href={CONTACT.address.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-emerald-700 transition-colors"
-                  aria-label="Location Map Link"
+                  className="hover:text-emerald-700 transition-colors leading-relaxed group"
+                  title="View NEVOLYN on Google Maps"
                 >
-                  {CONTACT.address.label}
+                  <span className="font-semibold text-slate-900 block group-hover:text-emerald-700 transition-colors">
+                    {CONTACT.companyName || 'NEVOLYN'}
+                  </span>
+                  <span className="block text-xs text-slate-500 group-hover:text-slate-700 transition-colors">
+                    {CONTACT.address.label}
+                  </span>
                 </a>
               </li>
 
               {/* Phone numbers */}
               <li className="flex items-start gap-2">
-                <Phone className="w-3.5 h-3.5 mt-0.5 shrink-0 text-sky-500" />
-                <div className="flex flex-wrap gap-x-2.5 gap-y-0.5">
+                <Phone className="w-4 h-4 mt-0.5 shrink-0 text-sky-500" />
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   {CONTACT.phones.map((phone, idx) => (
                     <React.Fragment key={phone.href}>
                       <a
@@ -219,9 +224,8 @@ export const Footer = (): JSX.Element => {
                       >
                         {phone.label}
                       </a>
-                      {/* Bullet separator between numbers — hidden on mobile */}
                       {idx < CONTACT.phones.length - 1 && (
-                        <span className="text-slate-300 hidden sm:inline md:hidden lg:inline">•</span>
+                        <span className="text-slate-300">•</span>
                       )}
                     </React.Fragment>
                   ))}
@@ -229,8 +233,8 @@ export const Footer = (): JSX.Element => {
               </li>
 
               {/* Email */}
-              <li className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+              <li className="flex items-start gap-2">
+                <Mail className="w-4 h-4 mt-0.5 shrink-0 text-rose-500" />
                 <a
                   href={`mailto:${CONTACT.email}`}
                   aria-label={`Email ${CONTACT.email}`}
@@ -248,8 +252,11 @@ export const Footer = (): JSX.Element => {
 
         {/* Bottom Section */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] sm:text-xs text-slate-500">
-          <p>© 2026 NEVOLYN Technology. All rights reserved.</p>
-          <div className="flex items-center gap-3 text-slate-500 font-medium">
+          <p className="font-medium text-slate-600">
+            &copy; {new Date().getFullYear()} NEVOLYN. All rights reserved.
+          </p>
+
+          <div className="flex items-center gap-2 text-slate-500 font-medium">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />

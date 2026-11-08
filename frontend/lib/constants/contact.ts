@@ -24,13 +24,13 @@ export interface PhoneEntry {
 
 /** Complete contact details for NEVOLYN Technology. */
 export interface ContactDetails {
+  companyName: string
   address: {
     label: string
     mapsUrl: string
   }
   phones: PhoneEntry[]
   email: string
-  mapEmbedUrl: string
 }
 
 /**
@@ -39,9 +39,11 @@ export interface ContactDetails {
  * Update this object when office address, phone numbers, or email change.
  */
 export const CONTACT: ContactDetails = {
+  companyName: 'NEVOLYN',
   address: {
-    label: '13/2, Abdus Sattar Master Road, Tongi, Gazipur',
-    mapsUrl: 'https://maps.app.goo.gl/rTMDffWdKmaRdSth6?g_st=ac',
+    label: 'Level 5, Jaroms Textile Building, 13/2 Abdus Sattar Master Road, Tongi 1710',
+    mapsUrl:
+      'https://www.google.com/maps/place/NEVOLYN/@23.9250899,90.3904398,17z/data=!3m1!4b1!4m6!3m5!1s0x3755c554bdcff14f:0x591c436a33915bae!8m2!3d23.9250899!4d90.3904398!16s%2Fg%2F11z_c1p6hs',
   },
   phones: [
     {
@@ -56,6 +58,4 @@ export const CONTACT: ContactDetails = {
     },
   ],
   email: 'info@nevolyn.com',
-  mapEmbedUrl:
-    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3645.979573698516!2d90.39695911543293!3d23.895097884556836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c1139c39f7a9%3A0x2df6b3e8d2017d1e!2sTongi%2C%20Gazipur!5e0!3m2!1sen!2sbd!4v1690000000000!5m2!1sen!2sbd',
 } as const
