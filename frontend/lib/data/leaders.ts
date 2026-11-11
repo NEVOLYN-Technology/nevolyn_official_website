@@ -50,6 +50,10 @@
 export interface TeamMember {
   /** Unique identifier — used as React list key (e.g. 'ninad'). */
   id: string
+  /** URL slug for deep-linking (e.g. 'ninad', 'rahin', 'jane-doe'). */
+  slug: string
+  /** Alternative alias slugs for deep-linking (e.g. ['nobo', 'ninad-mahmud-nobo']). */
+  aliases?: string[]
   /** Full name of the team member. */
   name: string
   /** Official job title (e.g. 'Lead AI Software Engineer'). */
@@ -98,6 +102,8 @@ export const teamDepartments: Department[] = [
     members: [
       {
         id: 'chagla',
+        slug: 'chagla',
+        aliases: ['chagla-amanullah', 'amanullah-chagla', 'amanullah'],
         name: 'Chagla Amanullah',
         title: 'Managing Director',
         bio: 'Providing strategic leadership, driving innovation and engineering excellence at NEVOLYN.',
@@ -123,6 +129,8 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'lutfar',
+        slug: 'lutfar',
+        aliases: ['md-lutfar-rahman', 'lutfar-rahman'],
         name: 'Md Lutfar Rahman',
         title: 'Director of Finance & Operations',
         bio: 'Driving operational execution and financial discipline to support the growth and development at NEVOLYN.',
@@ -153,6 +161,8 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'rahin',
+        slug: 'rahin',
+        aliases: ['md-rahinur-rahman', 'rahinur-rahman', 'rahin-rahman'],
         name: 'Md Rahinur Rahman',
         title: 'Founder & AI Systems Engineer',
         bio: 'Designing and engineering industrial AI systems and automation platforms at NEVOLYN.',
@@ -179,6 +189,8 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'ninad',
+        slug: 'ninad',
+        aliases: ['nobo', 'mohammad-ninad-mahmud-nobo', 'ninad-mahmud-nobo', 'ninad-nobo'],
         name: 'Mohammad Ninad Mahmud Nobo',
         title: 'Co-Founder & AI Software Engineer',
         bio: 'Engineering applied computer vision architectures and scalable full-stack web platforms at NEVOLYN.',
@@ -206,6 +218,8 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'afzal',
+        slug: 'afzal',
+        aliases: ['afzal-hossan'],
         name: 'Afzal Hossan',
         title: 'AI Software Engineer',
         bio: 'Engineering applied computer vision architectures and scalable full-stack web platforms at NEVOLYN.',
@@ -233,6 +247,8 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'nomrota',
+        slug: 'nomrota',
+        aliases: ['mobashira-mehajabin-nomrota', 'mehajabin-nomrota'],
         name: 'Mobashira Mehajabin Nomrota',
         title: 'Innovation and Systems Engineer',
         bio: 'Contributing to engineering innovation, technical development, and strategic growth at NEVOLYN.',
@@ -262,3 +278,27 @@ export const teamDepartments: Department[] = [
 
 /** Direct export of leadership members for component consumption. */
 export const leaders: TeamMember[] = teamDepartments[0].members
+
+/** Alias for scalable team references matching industry conventions */
+export const teamMembers: TeamMember[] = leaders
+
+/**
+ * Finds a leadership/team member by slug, ID, or alias.
+ * Handles hash prefixes like '#team/ninad', '#leaders/ninad', or 'ninad'.
+ */
+export function findMemberBySlug(slug: string): TeamMember | undefined {
+  if (!slug) return undefined
+  const query = slug
+    .toLowerCase()
+    .trim()
+    .replace(/^#/, '')
+    .replace(/^(?:team|leaders|innovators)\//, '')
+    .trim()
+
+  return leaders.find((member) => {
+    if (member.slug && member.slug.toLowerCase() === query) return true
+    if (member.id && member.id.toLowerCase() === query) return true
+    if (member.aliases?.some((a) => a.toLowerCase() === query)) return true
+    return false
+  })
+}

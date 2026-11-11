@@ -139,6 +139,7 @@
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 6rem;
     scroll-behavior: smooth;
+    scrollbar-gutter: stable;
   }
 
   body {

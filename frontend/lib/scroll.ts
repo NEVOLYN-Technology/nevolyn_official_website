@@ -41,7 +41,10 @@ export function scrollToSection(sectionId: string): void {
   const element =
     document.getElementById(sectionId) ||
     (sectionId === 'latest-news' ? document.getElementById('news') : null) ||
-    (sectionId === 'news' ? document.getElementById('latest-news') : null)
+    (sectionId === 'news' ? document.getElementById('latest-news') : null) ||
+    (sectionId === 'team' ? document.getElementById('leaders') : null) ||
+    (sectionId === 'leaders' ? document.getElementById('team') : null) ||
+    (sectionId === 'innovators' ? document.getElementById('leaders') : null)
   if (!element) return
 
   // getBoundingClientRect() is viewport-relative, so add the current scroll

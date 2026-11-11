@@ -25,11 +25,11 @@
 'use client'
 
 import type { JSX } from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { User, ChevronDown } from 'lucide-react'
-import { leaders } from '@/lib/data/leaders'
+import { leaders, findMemberBySlug } from '@/lib/data/leaders'
 import { LeaderDetails } from '@/components/ui/LeaderDetails'
 import { fadeInUpVariants, staggerContainer, defaultViewport } from '@/lib/animations'
 import type { TeamMember } from '@/lib/data/leaders'
@@ -54,6 +54,41 @@ const LinkedinIcon = ({ className = 'w-5 h-5' }: { className?: string }): JSX.El
 export function LeadersSection(): JSX.Element {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
   const selectedIdx = selectedMember ? leaders.indexOf(selectedMember) : -1
+
+  // Deep-link URL hash synchronization and background alignment
+  useEffect(() => {
+    const syncFromHash = () => {
+      const hash = typeof window !== 'undefined' ? window.location.hash : ''
+      const match = hash.match(/^#(?:team|leaders|innovators)\/([^/?#]+)/i)
+      if (match) {
+        const found = findMemberBySlug(match[1])
+        if (found) {
+          setSelectedMember(found)
+          // Align background page to team section so closing reveals the cards rather than hero
+          setTimeout(() => {
+            const section = document.getElementById('team') || document.getElementById('leaders')
+            if (section) {
+              const targetTop = section.getBoundingClientRect().top + window.scrollY - 96
+              window.scrollTo({ top: Math.max(0, targetTop), behavior: 'instant' })
+            }
+          }, 20)
+          return
+        }
+      }
+      if (
+        hash === '#team' ||
+        hash === '#leaders' ||
+        hash === '#innovators' ||
+        (!hash.startsWith('#team/') && !hash.startsWith('#leaders/') && !hash.startsWith('#innovators/'))
+      ) {
+        setSelectedMember(null)
+      }
+    }
+
+    syncFromHash()
+    window.addEventListener('hashchange', syncFromHash)
+    return () => window.removeEventListener('hashchange', syncFromHash)
+  }, [])
 
   const executiveLeaders = leaders.filter(
     (m) => m.id === 'chagla' || m.id === 'lutfar' || m.title.toLowerCase().includes('director')
@@ -101,12 +136,16 @@ export function LeadersSection(): JSX.Element {
 
           <div className="mt-auto">
             <div className={`w-8 h-[2px] mx-auto mt-4 mb-4 rounded-full ${dividerBg}`} />
-            <button
-              onClick={() => setSelectedMember(member)}
+            <a
+              href={`#team/${member.slug || member.id}`}
+              onClick={(e) => {
+                e.preventDefault()
+                setSelectedMember(member)
+              }}
               className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:shadow-md hover:scale-105 active:scale-95 mb-1 cursor-pointer ${btnStyle}`}
             >
-              View Details <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
-            </button>
+              <span>View Details</span> <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
+            </a>
           </div>
         </div>
 
@@ -133,6 +172,10 @@ export function LeadersSection(): JSX.Element {
 
   return (
     <section id="leaders" className={`relative pt-12 pb-16 px-4 md:px-8 overflow-hidden ${SECTION_BG.alternate} ${SECTION_BG.border}`}>
+      {/* Anchor aliases for #team and #innovators deep-linking and smooth scrolling */}
+      <div id="team" className="scroll-mt-24 pointer-events-none absolute -top-24" aria-hidden="true" />
+      <div id="innovators" className="scroll-mt-24 pointer-events-none absolute -top-24" aria-hidden="true" />
+
       <div className="max-w-7xl mx-auto">
 
         {/* ── Section Header ─────────────────────────────────── */}
@@ -210,5 +253,8 @@ export function LeadersSection(): JSX.Element {
     </section>
   )
 }
+
+/** Scalable alias for TeamSection */
+export const TeamSection = LeadersSection
 
 

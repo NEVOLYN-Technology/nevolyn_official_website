@@ -149,6 +149,10 @@ export const Navbar = (): JSX.Element => {
 
         // Keep URL hash in sync with the active section while scrolling
         if (syncHash) {
+          const currentHash = typeof window !== 'undefined' ? window.location.hash : ''
+          if (currentHash.includes('/') || (current && currentHash.startsWith(`#${current}/`))) {
+            return // Do not overwrite deep sub-hashes during scroll-spy
+          }
           const expectedHash = current === 'home' ? '' : `#${current}`
           if (window.location.hash !== expectedHash) {
             window.history.replaceState(

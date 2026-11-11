@@ -31,10 +31,12 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
   const headingId = useId()
 
   // Integrates browser history so phone back button / edge swipe closes the modal smoothly
+  const hash = `#team/${member.slug || member.id}`
   const { handleClose } = useModalHistory({
     isOpen: true,
     onClose,
     modalId: 'leader-details',
+    hash,
   })
 
   const accentRing = 'ring-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
