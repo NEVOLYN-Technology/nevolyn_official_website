@@ -102,8 +102,8 @@ export const teamDepartments: Department[] = [
     members: [
       {
         id: 'chagla',
-        slug: 'chagla',
-        aliases: ['chagla-amanullah', 'amanullah-chagla', 'amanullah'],
+        slug: 'chaglaamanullah',
+        aliases: ['chagla', 'amanullahchagla', 'amanullah'],
         name: 'Chagla Amanullah',
         title: 'Managing Director',
         bio: 'Providing strategic leadership, driving innovation and engineering excellence at NEVOLYN.',
@@ -129,8 +129,8 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'lutfar',
-        slug: 'lutfar',
-        aliases: ['md-lutfar-rahman', 'lutfar-rahman'],
+        slug: 'mdlutfarrahman',
+        aliases: ['lutfar', 'lutfarrahman'],
         name: 'Md Lutfar Rahman',
         title: 'Director of Finance & Operations',
         bio: 'Driving operational execution and financial discipline to support the growth and development at NEVOLYN.',
@@ -161,13 +161,13 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'rahin',
-        slug: 'rahin',
-        aliases: ['md-rahinur-rahman', 'rahinur-rahman', 'rahin-rahman'],
+        slug: 'mdrahinurrahman',
+        aliases: ['rahin', 'rahinrahman', 'mdrahinurrahman', 'rahinurrahman'],
         name: 'Md Rahinur Rahman',
         title: 'Founder & AI Systems Engineer',
         bio: 'Designing and engineering industrial AI systems and automation platforms at NEVOLYN.',
         extendedBio: [
-          'Rahin leads the design and development of AI-powered industrial automation solutions at NEVOLYN, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
+          'Md Rahinur Rahman leads the design and development of AI-powered industrial automation solutions at NEVOLYN, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
           'He graduated in Electrical and Electronic Engineering (EEE) from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools, with a specialization in Communication and Signal Processing (CSP). His academic foundation provided a solid basis in digital signal processing, mathematical modeling, and pattern recognition, bridging deep engineering theory with practical AI systems.',
           'Throughout his academic and research work, he explored advanced signal analysis, embedded systems, and computer vision algorithms for real-world problems. His hands-on research in hardware-software co-design and intelligent imaging built the technical foundation for his current work in industrial automation, edge AI, and real-time inspection systems.'
         ],
@@ -189,13 +189,13 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'ninad',
-        slug: 'ninad',
-        aliases: ['nobo', 'mohammad-ninad-mahmud-nobo', 'ninad-mahmud-nobo', 'ninad-nobo'],
+        slug: 'mohammadninadmahmudnobo',
+        aliases: ['ninad', 'nobo', 'mninadmnobo', 'ninadmahmudnobo', 'ninadnobo'],
         name: 'Mohammad Ninad Mahmud Nobo',
         title: 'Co-Founder & AI Software Engineer',
         bio: 'Engineering applied computer vision architectures and scalable full-stack web platforms at NEVOLYN.',
         extendedBio: [
-          'Ninad leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
+          'Mohammad Ninad Mahmud Nobo leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
           'He graduated in Computer Science and Engineering from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools. There, he explored how AI could tackle complex, real-world challenges, from automated software testing to medical image analysis to Bangla speech processing. That foundation of rigorous research and hands-on building led him to industrial AI, where the software challenges are just as demanding, but the impact is immediate and visible on the factory floor.',
           'His research includes AutoTestGenX, a multi-agent system that writes and executes software tests autonomously, and MedCAR, which resolves conflicting AI readings of chest X-rays. Beyond FABINS, he has built impactful AI applications including MindTrace, providing caregivers simple tools for dementia support, and GemmaVetCare, delivering edge AI livestock health guidance for low-connectivity environments.'
         ],
@@ -218,19 +218,19 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'afzal',
-        slug: 'afzal',
-        aliases: ['afzal-hossan'],
+        slug: 'afzalhossan',
+        aliases: ['afzal'],
         name: 'Afzal Hossan',
         title: 'AI Software Engineer',
         bio: 'Engineering applied computer vision architectures and scalable full-stack web platforms at NEVOLYN.',
         extendedBio: [
-          'Afzal leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
+          'Afzal contributes to machine learning model development for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
           'He completed his undergraduate degree in Computer Science and Engineering at Bangladesh University of Engineering and Technology (BUET), where he developed a strong foundation in algorithms, computational methods, and software engineering. His academic achievements include a Dean’s List Award and the University Merit Scholarship. His undergraduate thesis introduced him to research-driven problem solving, strengthening his ability to analyze complex datasets, develop computational methods, and conduct systematic experiments.',
           'His research focuses on Bioinformatics and Computational Biology, particularly the application of artificial intelligence and machine learning to biological data analysis. His work includes INCENT, a hierarchical optimal transport framework for aligning spatial transcriptomics data to investigate cellular correspondences and spatial tissue organization. Through his research and teaching, he aims to advance computational biology, contribute to scientific discovery, and help students develop the knowledge and problem-solving skills needed to address real-world challenges.'
         ],
         email: 'afzalhossan80@gmail.com',
         responsibilities: [
-          'Full-stack development of NEVOLYN & FABINS web applications',
+          'Contribution to company’s product design and development',
           'Image processing, computer vision model training for FABINS',
           'ML pipeline architecture & production deployment',
           'API design, software quality standards, & DevOps automation'
@@ -247,8 +247,8 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'nomrota',
-        slug: 'nomrota',
-        aliases: ['mobashira-mehajabin-nomrota', 'mehajabin-nomrota'],
+        slug: 'mehajabinnomrota',
+        aliases: ['nomrota', 'mehajabinnomrota'],
         name: 'Mobashira Mehajabin Nomrota',
         title: 'Innovation and Systems Engineer',
         bio: 'Contributing to engineering innovation, technical development, and strategic growth at NEVOLYN.',
@@ -263,8 +263,6 @@ export const teamDepartments: Department[] = [
           'Explore and develop innovative engineering solutions for industrial applications',
           'Contribute to electrical systems design, energy solutions, and technology integration',
           'Support product development, technical research, and process improvement initiatives',
-          'Drive marketing initiatives, brand communication, and strategic business development',
-          'Bridge technical innovation with market opportunities and business growth'
         ],
         social: {
           portfolio: 'https://nomrota.vercel.app/',
@@ -288,17 +286,34 @@ export const teamMembers: TeamMember[] = leaders
  */
 export function findMemberBySlug(slug: string): TeamMember | undefined {
   if (!slug) return undefined
-  const query = slug
+  const raw = decodeURIComponent(slug)
     .toLowerCase()
     .trim()
     .replace(/^#/, '')
     .replace(/^(?:team|leaders|innovators)\//, '')
     .trim()
 
+  const normalized = raw.replace(/[^a-z0-9]/g, '')
+
   return leaders.find((member) => {
-    if (member.slug && member.slug.toLowerCase() === query) return true
-    if (member.id && member.id.toLowerCase() === query) return true
-    if (member.aliases?.some((a) => a.toLowerCase() === query)) return true
+    // 1. Exact match on slug, id, or hyphenated full name
+    if (member.slug && member.slug.toLowerCase() === raw) return true
+    if (member.id && member.id.toLowerCase() === raw) return true
+    if (member.name && member.name.toLowerCase().replace(/[\s.]+/g, '-').replace(/-+/g, '-') === raw) return true
+
+    // 2. Alphanumeric match (ignoring hyphens, spaces, dots)
+    if (member.slug && member.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized) return true
+    if (member.name && member.name.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized) return true
+    if (member.id && member.id.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized) return true
+
+    // 3. Aliases
+    if (member.aliases?.some((a) => {
+      const aliasClean = a.toLowerCase().trim()
+      return aliasClean === raw || aliasClean.replace(/[^a-z0-9]/g, '') === normalized
+    })) {
+      return true
+    }
+
     return false
   })
 }
