@@ -31,7 +31,7 @@ export function LeaderDetails({ member, isFeatured: _isFeatured, onClose }: Lead
   const headingId = useId()
 
   // Integrates browser history so phone back button / edge swipe closes the modal smoothly
-  const hash = `#team/${member.slug || member.id}`
+  const hash = `#leaders/${member.slug || member.id}`
   const { handleClose } = useModalHistory({
     isOpen: true,
     onClose,

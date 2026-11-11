@@ -102,17 +102,15 @@ export const teamDepartments: Department[] = [
     members: [
       {
         id: 'chagla',
-        slug: 'chaglaamanullah',
-        aliases: ['chagla', 'amanullahchagla', 'amanullah'],
+        slug: 'amanullahchagla',
+        aliases: ['chagla', 'amanullah'],
         name: 'Chagla Amanullah',
         title: 'Managing Director',
         bio: 'Providing strategic leadership, driving innovation and engineering excellence at NEVOLYN.',
 
         extendedBio: [
           'Amanullah Chagla provides the strategic leadership for NEVOLYN, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and engineering excellence work together to create lasting industrial value.',
-
           'With decades of experience in industry and entrepreneurship, he has led the development and expansion of operations while building strong partnerships with globally recognized organizations and institutions. His leadership philosophy combines business excellence with continuous innovation, responsible engineering, and long-term value creation for customers and stakeholders alike.',
-
           'Recognizing research and development as a key driver of future competitiveness, he actively supports the NEVOLYN Technology team in advancing AI-powered automation, intelligent systems, computer vision, and next-generation engineering technologies. His vision is to establish NEVOLYN as a future-ready organization where innovation continuously transforms ideas into practical, high-impact technology solutions.'
         ],
 
@@ -124,12 +122,11 @@ export const teamDepartments: Department[] = [
           'Oversee and support Research & Development initiatives across the organization',
           'Build strategic partnerships with global clients, technology partners, and academic institutions',
           'Promote responsible innovation, continuous improvement, and engineering-led growth',
-          'Mentor leadership teams while fostering a culture of collaboration, integrity, and innovation'
         ]
       },
       {
         id: 'lutfar',
-        slug: 'mdlutfarrahman',
+        slug: 'lutfarrahman',
         aliases: ['lutfar', 'lutfarrahman'],
         name: 'Md Lutfar Rahman',
         title: 'Director of Finance & Operations',
@@ -137,9 +134,7 @@ export const teamDepartments: Department[] = [
 
         extendedBio: [
           'Md Lutfar Rahman provides broad operational and execution-focused leadership at NEVOLYN Technology, supporting the organization’s day-to-day execution, financial coordination, administrative functions, and strategic initiatives. As Executive Director, he works closely with the leadership team to ensure that NEVOLYN’s business, technology, and operational priorities are effectively translated into structured execution and sustainable organizational growth.',
-
           'With approximately 25 years of experience in the textile industry and around 18 years of experience in accounting and finance leadership, he brings extensive expertise in financial management, operational planning, organizational coordination, and business support. Having been associated with Saturn Textiles Limited for approximately eight years, he contributes a strong understanding of industrial operations and financial management while helping bridge the operational requirements of the textile industry with NEVOLYN’s technology-driven initiatives.',
-
           'At NEVOLYN Technology, he plays a key role in ensuring that strategic plans are supported by effective execution, financial discipline, and organizational coordination. He works closely with the leadership and engineering teams to facilitate resources, manage operational priorities, support business initiatives, and maintain alignment between the company’s technological ambitions and its organizational capabilities. His experience provides an important foundation for NEVOLYN’s continued development as a deep-tech organization focused on practical industrial innovation.'
         ],
 
@@ -149,19 +144,14 @@ export const teamDepartments: Department[] = [
           'Oversee NEVOLYN Technology’s operational execution and organizational priorities',
           'Support financial planning, budgeting, accounting, and resource management',
           'Coordinate business operations across leadership and engineering teams',
-          'Translate strategic decisions into structured operational execution',
           'Support business development, partnerships, procurement, and resource planning',
           'Coordinate operational activities with Saturn Textiles Limited and industry partners',
-          'Provide financial and operational insights for strategic decision-making',
-          'Strengthen organizational processes, accountability, and operational efficiency',
-          'Facilitate resources and support for Research & Development initiatives',
-          'Ensure alignment between technology, business, finance, and operations'
         ],
         image: '/ed-photo.png',
       },
       {
         id: 'rahin',
-        slug: 'mdrahinurrahman',
+        slug: 'rahinrahman',
         aliases: ['rahin', 'rahinrahman', 'mdrahinurrahman', 'rahinurrahman'],
         name: 'Md Rahinur Rahman',
         title: 'Founder & AI Systems Engineer',
@@ -189,7 +179,7 @@ export const teamDepartments: Department[] = [
       },
       {
         id: 'ninad',
-        slug: 'mohammadninadmahmudnobo',
+        slug: 'mninadmnobo',
         aliases: ['ninad', 'nobo', 'mninadmnobo', 'ninadmahmudnobo', 'ninadnobo'],
         name: 'Mohammad Ninad Mahmud Nobo',
         title: 'Co-Founder & AI Software Engineer',

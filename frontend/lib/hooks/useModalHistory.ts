@@ -32,7 +32,7 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal', hash }: Us
     }
 
     if (typeof window !== 'undefined' && hash && window.location.hash.includes('/')) {
-      const parentHash = window.location.hash.split('/')[0] || '#team'
+      const parentHash = window.location.hash.split('/')[0] || '#leaders'
       window.history.replaceState(null, '', `${window.location.pathname}${parentHash}`)
     }
 
@@ -55,8 +55,8 @@ export function useModalHistory({ isOpen, onClose, modalId = 'modal', hash }: Us
 
       if (isDirectDeepLink) {
         // Direct arrival from shared link: pre-populate base section in history first,
-        // then push the modal state so hitting Back/Close stays on the site's team section.
-        const parentHash = hash?.split('/')[0] || '#team'
+        // then push the modal state so hitting Back/Close stays on the site's leaders section.
+        const parentHash = hash?.split('/')[0] || '#leaders'
         window.history.replaceState({ ...currentState, isBase: true }, '', `${window.location.pathname}${parentHash}`)
         window.history.pushState({ ...currentState, [modalId]: true }, '', targetUrl)
         hasPushedStateRef.current = true

@@ -137,7 +137,7 @@ export function LeadersSection(): JSX.Element {
           <div className="mt-auto">
             <div className={`w-8 h-[2px] mx-auto mt-4 mb-4 rounded-full ${dividerBg}`} />
             <a
-              href={`#team/${member.slug || member.id}`}
+              href={`#leaders/${member.slug || member.id}`}
               onClick={(e) => {
                 e.preventDefault()
                 setSelectedMember(member)
