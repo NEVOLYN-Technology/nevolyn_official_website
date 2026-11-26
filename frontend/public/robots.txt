@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /office
+Disallow: /office/
+Disallow: /api/
+Disallow: /verify
+
+Sitemap: https://nevolyn.com/sitemap.xml

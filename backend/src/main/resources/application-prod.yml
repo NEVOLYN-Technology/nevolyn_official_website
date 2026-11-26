@@ -1,0 +1,223 @@
+# ==============================================================================
+# NEVOLYN Technology Backend — PRODUCTION profile
+# ==============================================================================
+# Activated with SPRING_PROFILES_ACTIVE=prod (set in render.yaml).
+#
+# Spring loads application.yml FIRST, then merges this file over it. Only keys
+# that must differ in production appear below; everything else is inherited.
+#
+# Every value here is env-driven so the same image can be promoted between
+# environments without a rebuild.
+# ==============================================================================
+
+server:
+  forward-headers-strategy: framework
+
+spring:
+
+  # --------------------------------------------------------------------------
+  # PostgreSQL datasource
+  # --------------------------------------------------------------------------
+  # These three properties are normally supplied at runtime by the
+  # ApplicationEnvironmentPreparedEvent listener in NevolynApplication, which
+  # parses the provider's DATABASE_URL and injects clean JDBC values at highest
+  # precedence BEFORE HikariCP starts.
+  #
+  # Why that listener exists: Render/Heroku publish a libpq-style URL
+  #   postgres://user:password@host/dbname
+  # which the PostgreSQL JDBC driver cannot parse — it requires
+  #   jdbc:postgresql://host:5432/dbname
+  # with credentials passed separately. See docs/CICD_AND_DEPLOYMENT.md §2.
+  #
+  # The placeholders below are the fallback path for platforms that already hand
+  # over well-formed JDBC settings (and for the render.yaml wiring).
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DATABASE_USERNAME:}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DATABASE_PASSWORD:}}
+    driver-class-name: org.postgresql.Driver
+
+    # ------------------------------------------------------------------------
+    # HikariCP pool sizing
+    # ------------------------------------------------------------------------
+    # Render's free Postgres tier allows a small number of concurrent
+    # connections, and the free web service is a single small instance. A large
+    # pool would exhaust the server's connection slots long before it helped
+    # throughput, so this stays deliberately tight.
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:5}
+      minimum-idle: ${DB_POOL_MIN:1}
+      # Give up waiting for a free connection after 30 s.
+      connection-timeout: 30000
+      # Recycle below Postgres' own idle timeout so the pool never hands out a
+      # connection the server has already closed.
+      idle-timeout: 300000
+      max-lifetime: 900000
+
+  # --------------------------------------------------------------------------
+  # Flyway — owns the production schema
+  # --------------------------------------------------------------------------
+  # Migrations in classpath:db/migration run before Hibernate initialises.
+  # Each file is applied once, in version order, and recorded with a checksum in
+  # flyway_schema_history; editing an applied migration makes startup fail
+  # rather than silently diverge. To change the schema, add a new V<n>__ file.
+  flyway:
+    enabled: true
+    # Lets Flyway adopt a database that already contains tables — for example
+    # one whose schema was created outside Flyway — by recording a baseline
+    # instead of attempting to re-create those tables and failing.
+    baseline-on-migrate: true
+    baseline-version: 0
+    validate-on-migrate: ${FLYWAY_VALIDATE_ON_MIGRATE:false}
+
+  jpa:
+    # Dialect is intentionally NOT set: Hibernate detects it from the live
+    # JDBC connection metadata. Setting it explicitly triggers HHH90000025.
+    # If the env var SPRING_JPA_DATABASE_PLATFORM is set in the Render
+    # dashboard, remove it — that is the only remaining source of the warning.
+    open-in-view: false
+    hibernate:
+      # 'validate' — Hibernate compares the entities against the schema Flyway
+      # produced and refuses to start on a mismatch. It issues no DDL, so a stray
+      # entity edit cannot rewrite a live table. Keep it at 'validate': the
+      # migrations are the only thing permitted to change the production schema.
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    # Never log SQL in production — it is noisy and leaks submission contents.
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  h2:
+    console:
+      # An open DB console on a public host would be a full data breach.
+      enabled: false
+
+  # --------------------------------------------------------------------------
+  # Mail transport — SMTPS on port 465
+  # --------------------------------------------------------------------------
+  # EmailService prefers the Brevo HTTPS REST API (port 443) whenever
+  # SPRING_MAIL_PASSWORD is a Brevo key ('xsmtpsib-…'). The settings below are
+  # the SMTP fallback used otherwise.
+  #
+  # Port 465 (implicit SSL) is used instead of 587 (STARTTLS) because Render,
+  # Heroku and most AWS accounts block outbound 25/587 to limit spam. On 587 the
+  # connection does not get refused — it hangs until the socket times out, which
+  # looks like "email silently not sending". See docs/CICD_AND_DEPLOYMENT.md §3.
+  mail:
+    host: ${SPRING_MAIL_HOST:mail.nevolyn.com}
+    port: ${SPRING_MAIL_PORT:465}
+    username: ${SPRING_MAIL_USERNAME:info@nevolyn.com}
+    password: "${SPRING_MAIL_PASSWORD:}"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: ${SPRING_MAIL_SSL_ENABLE:true}
+            trust: "*"
+          starttls:
+            enable: ${SPRING_MAIL_STARTTLS_ENABLE:false}
+          socketFactory:
+            port: ${SPRING_MAIL_PORT:465}
+            class: javax.net.ssl.SSLSocketFactory
+        smtps:
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+  thymeleaf:
+    # Compile each email template once and reuse it.
+    cache: true
+
+# ==============================================================================
+# Actuator — health probe for the platform, and nothing else
+# ==============================================================================
+# Only /actuator/health is exposed. The other endpoints (env, beans, mappings,
+# heapdump, loggers) describe the internals of a public, unauthenticated service
+# and must never be reachable.
+#
+# show-details=never keeps the response to a bare {"status":"UP"}: the detailed
+# form names the database, driver and validation query, which is more than a
+# health probe needs to disclose.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+  # Report DOWN when the datasource is unreachable, so Render pulls a broken
+  # instance out of rotation rather than serving 500s to visitors.
+  # Mail health is disabled: the actuator tries to open an SMTP connection on
+  # every health poll, which fails with AuthenticationFailedException when
+  # SPRING_MAIL_PASSWORD is not set — returning DOWN and blocking every deploy.
+  # Email delivery is tested end-to-end when a form is actually submitted.
+  health:
+    db:
+      enabled: true
+    mail:
+      enabled: false
+
+# ==============================================================================
+# Logging
+# ==============================================================================
+# DEBUG/TRACE from the dev profile would flood Render's log quota and record
+# personal data from submissions. INFO keeps the deployment diagnostics that
+# matter (sanitized JDBC URL, mail engine chosen, delivery outcome).
+logging:
+  level:
+    root: WARN
+    com.nevolyn: ${LOG_LEVEL_APP:INFO}
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+
+app:
+  admin:
+    username: ${NEVOLYN_ADMIN_USERNAME:${ADMIN_USERNAME:admin}}
+    password: ${NEVOLYN_ADMIN_PASSWORD:${ADMIN_PASSWORD:}}
+
+  backend-url: ${APP_BACKEND_URL:https://api.nevolyn.com}
+  frontend-url: ${APP_FRONTEND_URL:https://nevolyn.com}
+
+  storage:
+    # Absolute path inside the container. NOTE: Render's free tier has an
+    # ephemeral filesystem — uploaded CVs are lost on every redeploy or cold
+    # start. Attach a Render Disk, or move storage to S3/Cloudinary, before
+    # treating resumes as durable. They are emailed to the admin on
+    # verification, which is currently the only lasting copy.
+    upload-dir: ${APP_UPLOAD_DIR:/app/uploads/resumes}
+
+  mail:
+    admin-address: ${APP_MAIL_ADMIN_ADDRESS:${APP_EMAIL_ADMIN:info@nevolyn.com}}
+    from-address: ${APP_MAIL_FROM_ADDRESS:${APP_EMAIL_FROM:info@nevolyn.com}}
+    sender-name: ${APP_MAIL_SENDER_NAME:${APP_EMAIL_SENDER_NAME:NEVOLYN}}
+    admin-subject: "[NEVOLYN] %s Submission: %s"
+    sender-subject: "[NEVOLYN] %s Confirmed [Ref: %s]"
+    acknowledgement-subject: "[NEVOLYN] %s Acknowledged [Ref: %s]"
+
+  email:
+    from: ${APP_EMAIL_FROM:info@nevolyn.com}
+    admin: ${APP_EMAIL_ADMIN:info@nevolyn.com}
+    sender-name: ${APP_EMAIL_SENDER_NAME:NEVOLYN}
+    frontend-url: ${APP_FRONTEND_URL:https://nevolyn.com}
+    backend-url: ${APP_BACKEND_URL:https://api.nevolyn.com}
+
+  rate-limit:
+    # Keep enabled in production — these endpoints are public, unauthenticated,
+    # and each accepted request writes a row and sends email.
+    enabled: ${APP_RATE_LIMIT_ENABLED:true}
+    max-requests: ${APP_RATE_LIMIT_MAX:5}
+    window-minutes: ${APP_RATE_LIMIT_WINDOW_MINUTES:10}
+
+  cors:
+    # Allowed origins for browser fetch calls
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:https://nevolyn.com,https://www.nevolyn.com,https://*.nevolyn.com,https://nevolyn.vercel.app,https://nevolyn-*.vercel.app,http://localhost:3000}
+
+  jwt:
+    secret: ${JWT_SECRET:${OFFICE_JWT_SECRET:}}
+    expiration-ms: ${JWT_EXPIRATION_MS:28800000}
+    cookie-secure: ${JWT_COOKIE_SECURE:true}
+    cookie-same-site: Lax

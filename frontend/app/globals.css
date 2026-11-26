@@ -1,0 +1,371 @@
+/**
+ * globals.css — global styles for NEVOLYN Technology official website.
+ *
+ * Structure:
+ * 1. Tailwind CSS imports
+ * 2. Dark mode variant definition
+ * 3. @theme — maps CSS custom properties to Tailwind utility class names
+ * 4. :root — light-mode design tokens (currently not used; app is locked to dark)
+ * 5. .dark — dark-mode design tokens (active; set by className="dark" in app/layout.tsx)
+ * 6. @layer base — global element defaults
+ *
+ * Token groups in use:
+ * - background / foreground — body + page background (primary page bg)
+ * - section-alt — alternate section background (About, Leaders, Contact)
+ * - bg-footer — footer background
+ * - bg-ticker — marquee ticker band background
+ * - bg-hero-card — hero presentation card background
+ * - card / card-foreground — card surfaces
+ * - secondary / secondary-foreground — the electric-blue accent (nav active, progress bars)
+ * - muted / muted-foreground — subdued text, placeholders
+ * - accent / accent-foreground — link/interactive hover
+ * - destructive — error states
+ * - border / input / ring — form and outline styling
+ * - chart-3 / chart-4 — reused by badge.tsx for success (green) and warning (amber) tones
+ * - radius — border-radius scale used by utility classes (radius-sm through radius-4xl)
+ */
+
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Ethnocentric';
+  font-style: normal;
+  font-weight: 400 900;
+  src: url('/fonts/ethnocentric.woff') format('woff');
+  font-display: swap;
+}
+
+/* Dark mode activates when an ancestor has class="dark" (set globally on <html>). */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-brand: 'Ethnocentric', sans-serif;
+  /* Color utilities — all resolved from CSS vars; never hardcode hex here */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  /* chart-3 = green (badge success), chart-4 = amber (badge warning) */
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+
+  /*
+   * Section-tier background tokens.
+   * Usage: className="bg-section-alt" | "bg-footer" | "bg-ticker" | "bg-hero-card"
+   * Change a shade once in :root and every section updates automatically.
+   */
+  --color-section-alt: var(--section-alt);
+  --color-footer: var(--footer-bg);
+  --color-ticker: var(--ticker-bg);
+  --color-hero-card: var(--hero-card-bg);
+
+  /* Border-radius scale */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ── Light theme tokens ─────────────────────────────────────────────────────
+   These are defined for completeness but the app currently forces dark mode
+   via className="dark" on <html> in app/layout.tsx. To enable light mode,
+   remove that class (and wire up next-themes — see ThemeProvider.tsx).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+
+  /* ── Primary page background ────────────────────────────────────────────────
+     This is THE single source of truth for the overall page background.
+     Update this one value and every section that uses bg-background updates. */
+  --background: #eef1f5;
+  --foreground: #0f172a;
+
+  /* ── Section-tier backgrounds ───────────────────────────────────────────────
+     Three distinct tiers create visual rhythm across the page:
+       background  → primary  (Hero, Products, Latest News, PageShell, body)
+       section-alt → alternate (About, Leaders, Contact) — slightly cooler
+       footer-bg   → footer — anchoring the bottom
+     Change a hex here; every component using the semantic class updates.     */
+  --section-alt: #e8edf2;
+  --footer-bg: #dde3ea;
+  --ticker-bg: #dde5ef;
+  --hero-card-bg: #e2eaf4;
+
+  /* ── Ambient decoration for PageShell ── */
+  --glow-a: rgba(14, 165, 233, 0.16);
+  --glow-b: rgba(6, 182, 212, 0.12);
+
+  /* ── Component tokens ───────────────────────────────────────────────────── */
+  --card: #f9fafb;
+  --card-foreground: #0f172a;
+  --primary: #0ea5e9;
+  --primary-foreground: #ffffff;
+  --secondary: #06b6d4;
+  --secondary-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #38bdf8;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: #e2e8f0;
+  --input: #ffffff;
+  --ring: #38bdf8;
+  --chart-3: #10b981;
+  --chart-4: #f59e0b;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--primary-foreground);
+  }
+
+  /* Custom scrollbar. WebKit/Blink only; Firefox keeps its native one. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--section-alt);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+    border: 2px solid var(--section-alt);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Utility to completely hide scrollbar across all browsers */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Ultra-smooth momentum touch swipe */
+  .scroll-smooth-touch {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+  }
+}
+
+.font-brand {
+  font-family: 'Ethnocentric', sans-serif;
+}
+
+/* Subtle precision technical grid matching FABINS */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.09) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Marquee infinite scroll animation — GPU accelerated */
+@keyframes marqueeScroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marqueeScroll 32s linear infinite;
+}
+
+/* Continuous smooth streams for Featured News and updates */
+.animate-continuous-featured {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marqueeScroll 42s linear infinite;
+}
+
+.animate-continuous-news {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marqueeScroll 55s linear infinite;
+}
+
+.animate-marquee:hover,
+.animate-continuous-featured:hover,
+.animate-continuous-news:hover {
+  animation-play-state: paused !important;
+}
+
+@media (hover: hover) {
+  .animate-marquee:hover,
+  .animate-continuous-featured:hover,
+  .animate-continuous-news:hover {
+    animation-play-state: paused !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Office Management Portal Accent Utilities
+ * ───────────────────────────────────────────────────────────── */
+.metric-stripe-red {
+  position: relative;
+  overflow: hidden;
+}
+.metric-stripe-red::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #ef4444;
+}
+
+.metric-stripe-green {
+  position: relative;
+  overflow: hidden;
+}
+.metric-stripe-green::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #10b981;
+}
+
+.metric-stripe-warning {
+  position: relative;
+  overflow: hidden;
+}
+.metric-stripe-warning::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #f59e0b;
+}
+
+.metric-stripe-blue {
+  position: relative;
+  overflow: hidden;
+}
+.metric-stripe-blue::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #38bdf8;
+}
+
+.action-tile-top-red::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #ef4444;
+}
+
+.action-tile-top-green::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #10b981;
+}
+
+.action-tile-top-warning::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #f59e0b;
+}
+
+.action-tile-top-blue::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #38bdf8;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * NEVOLYN Office Portal — Executive Alabaster & Slate Light Theme System
+ * Native Tailwind light-mode classes are used directly across all /office
+ * pages and components; form controls default to crisp light-mode styling.
+ * ───────────────────────────────────────────────────────────────────────────── */
+.office-light-portal {
+  color-scheme: light;
+}
+
+

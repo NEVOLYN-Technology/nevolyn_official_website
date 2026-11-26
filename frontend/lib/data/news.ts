@@ -1,0 +1,259 @@
+/**
+ * Recent News & Updates Data Store — NEVOLYN Technology.
+ *
+ * Single source of truth for chronological news timeline updates.
+ * Rendered in the "Latest News" section within `LatestNewsSection.tsx`.
+ *
+ * Strictly sorted in reverse chronological order (Newest -> Top, Oldest -> Bottom):
+ * 2026-10-30 — Global Change Award 2027 — Shortlisted (CARE Bangladesh & H&M Foundation)
+ * 2026-10-20 — Bangladesh AI Business Summit 2026 — Selected to Showcase (DCCI & MoST)
+ * 2026-09-29 — Needle Innovation Challenge 3.0 — Shortlisted (Existing Solutions)
+ * 2026-09-14 — Bangladesh Innovation Fair 2026 — Award & Prize Recognition
+ * 2026-09-12 — Honorable Prime Minister Visits FABINS at Stall No. 15
+ * 2026-09-10 — Bangladesh Innovation Fair 2026 — Top 50 Selection
+ * 2026-09-09 — Strategic NDA Signed with Axentec PLC (A Robi Axiata Company)
+ * 2026-08-28 — Onboarded to Founders’ Leadership Program (FLP) Cohort 4 by NSU Startups Next
+ * 2026-07-28 — Exploring New Possibilities with Ontik Technology Leadership
+ * 2026-07-21 — First FABINS Prototype Showcased at BUET IRAB
+ * 2026-07-01 — Strategic Partnership with Saturn Textiles & Saturn R&D
+ * 2026-06-28 — First Working POC of FABINS Successfully Completed at Saturn
+ *
+ * @module lib/data/news
+ */
+
+export interface NewsItem {
+  /** Unique identifier — used as React list key. */
+  id: string
+  /** Headline title of the news item. */
+  title: string
+  /** Short 1-2 sentence preview description for timeline card. */
+  description: string
+  /**
+   * Full announcement text for detail modal or article view.
+   *
+   * Paragraphs are separated by a blank line (`\n\n`). A paragraph that contains
+   * `Website:` and/or `Email:` lines is rendered by `NewsDetailModal.tsx` as a
+   * contact card (title = first line, email button on the left, website on the right).
+   *
+   * Standard closing contact blocks (keep this exact format in every post):
+   *
+   *   FABINS - Fabric Inspection Automation
+   *   Website: https://fabins.nevolyn.com
+   *   Email: fabins@nevolyn.com
+   *
+   *   NEVOLYN Technology
+   *   Website: https://nevolyn.com
+   *   Email: info@nevolyn.com
+   *
+   * The modal reads the email from the `Email:` line, so a post without that
+   * line will show only the website button.
+   */
+  content: string
+  /** Category tag classification. */
+  category: string
+  /** ISO publication date string (YYYY-MM-DD). */
+  date: string
+  /** Exact path to image asset in `/public`. */
+  image: string
+  /** Optional secondary image shown in detail view. */
+  secondaryImage?: string
+  /** Optional list of all media gallery images for detail view. */
+  images?: string[]
+  /** Direct link to LinkedIn post or page. */
+  linkedinUrl: string
+  /** Direct link to Facebook post or page. */
+  facebookUrl: string
+}
+
+/**
+ * Chronological news update feed ordered newest-first with verified NEVOLYN official links.
+ */
+export const news: NewsItem[] = [
+  {
+    id: 'news-global-change-award-2027',
+    title: 'Global Change Award 2027 - Shortlisted for Final Presentation & Jury Evaluation',
+    description:
+      'FABINS has been shortlisted for the Global Change Award 2027 Final Presentation and Jury Evaluation by nominator CARE Bangladesh.',
+    content:
+      'Another Exciting Milestone for FABINS | Global Change Award 2027! 🌍\n\nWe are delighted to share that FABINS (Fabric Inspection Automation) has been shortlisted for the Global Change Award 2027 Final Presentation and Jury Evaluation, organised by CARE Bangladesh as an official nominator for the H&M Foundation’s Global Change Award.\n\nThe Global Change Award focuses on bold innovations with the potential to accelerate the transition toward a more sustainable and net-zero fashion and textile industry. We are excited to present how FABINS can contribute to more efficient, responsible, and sustainable textile production.\n\n🏆 Shortlisted | Global Change Award 2027\n🏢 Organised by: CARE Bangladesh\n🌍 Award Initiative: H&M Foundation’s Global Change Award\n🎤 Event: Final Presentation and Jury Evaluation\n📅 Date: October 31, 2026\n📍 Venue: CARE Bangladesh Country Office, RAOWA Complex, Mohakhali, Dhaka\n\n🌐 FABINS | Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\n🌐 NEVOLYN\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com\n\nFABINS | An Innovation by NEVOLYN',
+    category: 'Global Change Award',
+    date: '2026-10-30',
+    image: '/news_fabinsXgca.jpg',
+    images: ['/news_fabinsXgca.jpg'],
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-globalchangeaward2027-activity-7521916174830538752-Qfz_',
+    facebookUrl: 'https://www.facebook.com/share/p/1DmbkHN5tN/',
+  },
+  {
+    id: 'news-dcci-ai-summit-2026',
+    title: 'Bangladesh AI Business Summit 2026 - Selected to Showcase',
+    description:
+      'FABINS was selected to showcase its AI inspection solution at the Bangladesh AI Business Summit 2026, jointly organized by DCCI & MoST.',
+    content:
+      'A Proud Milestone for FABINS - Fabric Inspection Automation\n\nWe are proud to share that FABINS has been selected to showcase its innovative solution at the Bangladesh AI Business Summit 2026, jointly organized by the Dhaka Chamber of Commerce & Industry (DCCI) and the Ministry of Science and Technology (MoST), Government of Bangladesh.\n\nThis recognition marks an important milestone in our journey to transform traditional fabric inspection through AI-powered computer vision and industrial automation.\n\nAs a product of NEVOLYN, FABINS aims to make fabric inspection smarter, more accurate, and more efficient for the textile and Ready-Made Garment (RMG) industry.\n\nWe are excited to showcase our innovation at this prestigious summit and contribute to the advancement of AI-driven industrial solutions in Bangladesh.\n\nSelected to Showcase | Bangladesh AI Business Summit 2026\nInnovation: AI-Powered Fabric Inspection Automation\nDate: November 5, 2026\nVenue: Bangladesh-China Friendship Conference Centre (BCFCC), Dhaka\n\nFABINS | Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'AI Summit Showcase',
+    date: '2026-10-20',
+    image: '/news_fabinsXdcci.jpg',
+    secondaryImage: '/news_fabinsXdcci01.jpg',
+    images: [
+      '/news_fabinsXdcci.jpg',
+      '/news_fabinsXdcci01.jpg',
+      '/news_fabinsXdcci02.jpg',
+      '/news_fabinsXdcci03.jpg',
+      '/news_fabinsXdcci04.jpg',
+    ],
+    linkedinUrl:
+      'https://www.linkedin.com/feed/update/urn:li:activity:7518267793624969217',
+    facebookUrl: 'https://www.facebook.com/share/p/19xgeHqdiE/',
+  },
+  {
+    id: 'news-needle-innovation-challenge-3',
+    title: 'Needle Innovation Challenge 3.0 - Shortlisted (Existing Solutions)',
+    description:
+      'FABINS was shortlisted for the next evaluation round of the Needle Innovation Challenge 3.0 under the Existing Solutions category.',
+    content:
+      'We’re proud to share that FABINS - Fabric Inspection Automation has been shortlisted for the next evaluation round of the Needle Innovation Challenge 3.0 under the Existing Solutions category.\n\nThis recognition marks another milestone for NEVOLYN’s journey to advance AI-powered fabric inspection and industrial automation for the textile and RMG industry.\n\nNeedle Innovation Challenge 3.0\nShortlisted for the Next Evaluation Round\nCategory: Existing Solutions\n\nFABINS | Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'Innovation Challenge',
+    date: '2026-09-29',
+    image: '/news_fabinsXneedle.jpg',
+    images: ['/news_fabinsXneedle.jpg'],
+    linkedinUrl:
+      'https://www.linkedin.com/feed/update/urn:li:activity:7514731472616988673',
+    facebookUrl: 'https://www.facebook.com/share/p/1Bgapc31MN/',
+  },
+  {
+    id: 'news-fair-award-top50',
+    title: 'Bangladesh Innovation Fair 2026 - Award & Prize Recognition',
+    description:
+      'FABINS was selected among the Top 50 Innovations out of 950+ innovations and awarded at the official ceremony with prize recognition.',
+    content:
+      'A Proud Milestone for NEVOLYN & FABINS - Fabric Inspection Automation\n\nWe are proud to share that FABINS has been selected among the Top 50 Innovations out of 950+ innovations at the Bangladesh Innovation Fair 2026.\n\nFABINS has been showcased at the fair, and being recognized among the Top 50 innovations is a truly meaningful achievement for our team.\n\nThe Top 50 recognition was celebrated through an award-giving ceremony, marking another important step in our journey from innovation and prototype development toward real-world impact.\n\nWe are grateful for this recognition and proud to represent Bangladeshi innovation, AI, and automation through FABINS.\n\nInnovation Hub | Bangladesh Innovation Fair 2026\nTop 50 Innovations / 950+ Innovations\n\nFABINS - Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'Award & Prize',
+    date: '2026-09-14',
+    image: '/news_fabinsXfair02.jpg',
+    secondaryImage: '/news_fabinsXfair03.jpg',
+    images: ['/news_fabinsXfair02.jpg', '/news_fabinsXfair03.jpg'],
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-bangladeshinnovationfair2026-activity-7508553026446512128-zo3h?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/1Dic4Zk1C1/',
+  },
+  {
+    id: 'news-pm-visit-stall-15',
+    title: 'Honorable Prime Minister Visited FABINS at Stall No. 15 | Bangladesh Innovation Fair 2026',
+    description:
+      'The Honorable Prime Minister visited our Stall No. 15 at Novo Theatre, Dhaka, discussing AI vision and smart RMG manufacturing.',
+    content:
+      'A Proud Moment at Bangladesh Innovation Fair 2026\n\nA truly proud moment for FABINS Automation and NEVOLYN Technology as the Honorable Prime Minister visited our Stall No. 15, at Bangladesh Innovation Fair 2026.\n\nWe had the pleasure of showcasing FABINS and engaging in an insightful conversation about our technology, innovation, and vision for smarter manufacturing. We missed our very own co-founder Rahin Rahman. Unfortunately he could not attend the fair due to medical emergency. We are very thankful to him for the immense support and instruction.\n\nBeing able to present our work at such a national innovation platform and receive this valuable attention is a meaningful achievement for our entire team. We are proud to see FABINS representing Bangladeshi innovation and taking another step forward.\n\n📍 Innovation Hub - Booth No. 15 | Novo Theatre, Dhaka\n📅 12–14 September 2026\n\nFABINS - Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'VIP Exhibition',
+    date: '2026-09-12',
+    image: '/news_fabinsXfair04.jpg',
+    secondaryImage: '/news_fabinsXfair05.jpg',
+    images: [
+      '/news_fabinsXfair04.jpg',
+      '/news_fabinsXfair05.jpg',
+      '/news_fabinsXfair06.jpg',
+      '/news_fabinsXfair07.jpg',
+    ],
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-bangladeshinnovationfair2026-activity-7508552627731722240-UWcm?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/1EWaRZbEjL/',
+  },
+  {
+    id: 'news-fair-selection-top50',
+    title: 'Bangladesh Innovation Fair 2026 - Top 50 Selection & Showcase',
+    description:
+      'FABINS was selected among the Top 50 innovations out of 950+ submissions to showcase at the national innovation platform at Novo Theatre, Dhaka.',
+    content:
+      'We are honored to share that FABINS Automation has been selected to showcase at the Bangladesh Innovation Fair 2026 - a national platform for innovation organized under the ICT Division and Science Ministry.\n\nBeing selected for this national platform is a meaningful milestone for our team. We’re proud to represent Bangladeshi innovation through FABINS and take another step toward turning our technology into real-world impact.\n\n📍 Location: Novo Theatre, Dhaka\n📅 Dates: 12–14 September 2026\n\nFABINS - Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'Top 50 Selection',
+    date: '2026-09-10',
+    image: '/news_fabinsXfair01.jpg',
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-bangladeshinnovationfair2026-activity-7508552213913419776-FhHB?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/1Dneow7TW9/',
+  },
+  {
+    id: 'news-axentec-nda',
+    title: 'Strategic NDA Signed with Axentec PLC (A Robi Axiata Company)',
+    description:
+      'Axentec PLC signed an NDA with FABINS, opening discussions with senior technical leadership including CTOs for future collaboration.',
+    content:
+      'A New Step Toward Collaboration with Axentec PLC\n\nWe’re pleased to share that Axentec PLC, a Robi Axiata company, has signed a Non-Disclosure Agreement (NDA) with FABINS, opening the way for further discussions and potential future collaboration.\n\nWe had the opportunity to meet with the senior technical and business leadership teams of Robi and Axentec, including their CTOs, to discuss FABINS, its technology, and possible areas of collaboration.\n\nWe are especially grateful to Md. Adil Hossain Noble, Managing Director & CEO of Axentec PLC, for the referral and for helping connect us with the right team.\n\nFABINS - Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'Corporate Partnership',
+    date: '2026-09-09',
+    image: '/news_fabinsXexentec.jpg',
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_nevolyn-fabins-fabricinspection-activity-7508471434042785792-6YqT?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/1KFM2uWrgb/',
+  },
+  {
+    id: 'news-nsu-startups-next',
+    title: 'Onboarded to Founders’ Leadership Program (FLP) Cohort 4 by NSU Startups Next',
+    description:
+      'FABINS was onboarded to the Founders’ Leadership Program (FLP) — Cohort 4 by NSU Startups Next, establishing a connection for startup growth.',
+    content:
+      'A New Chapter with NSU Startups Next\n\nWe’re excited to share that FABINS has been onboarded to the Founders’ Leadership Program (FLP) — Cohort 4 by NSU Startups Next.\n\nThis marks a meaningful new connection between NSU Startups Next, NEVOLYN, and FABINS. A big thank you to NSU Startups Next for welcoming NEVOLYN and FABINS into this journey—we’re excited to learn, connect, and grow together through FLP Cohort 4.\n\nFABINS - Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'Accelerator Program',
+    date: '2026-08-28',
+    image: '/news_fabinsXnsu.jpg',
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_nevolyn-fabins-nsu-activity-7508470824220303362-3Cqq?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/1CCYuHFcQ4/',
+  },
+  {
+    id: 'news-ontik-technology',
+    title: 'Exploring New Possibilities with Ontik Technology Leadership',
+    description:
+      'Engaged in an insightful discussion with Farjad Ahmed (CEO) and S.M. Mohiuddin Milton (CSO) of Ontik Technology to explore technology synergy.',
+    content:
+      'Exploring New Possibilities with Ontik Technology\n\nWe’re grateful to have had the opportunity to meet and have an insightful discussion with Farjad Ahmed, Chief Executive Officer (CEO), and S.M. Mohiuddin Milton, Chief Strategy Officer (CSO) of Ontik Technology.\n\nWe look forward to exploring how we can work together and create meaningful impact through technology and innovation.\n\nFABINS - Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'Industry Dialogue',
+    date: '2026-07-28',
+    image: '/news_fabinsXontik.jpg',
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508467193739853824-OYF7?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/196S5r5pyA/',
+  },
+  {
+    id: 'news-buet-irab-showcase',
+    title: 'First FABINS Prototype Showcased at BUET IRAB',
+    description:
+      'First FABINS prototype provided to IRAB BUET for an exclusive one-week project showcase following request from Department of EEE, BUET.',
+    content:
+      'Our first FABINS prototype was provided to IRAB (Institution of Robotics and Automation, BUET) for project showcasing, following a request from the Department of EEE, BUET.\n\nThe prototype was showcased for one week, marking another meaningful step in our journey.\n\nFABINS - Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'Academic Showcase',
+    date: '2026-07-21',
+    image: '/news_fabinsXbuet.jpg',
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508466089102643200-nWOb?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/1ExQkVx3WH/',
+  },
+  {
+    id: 'news-saturn-partnership',
+    title: 'Strategic Partnership with Saturn Textiles & Saturn R&D',
+    description:
+      'FABINS officially established a strategic partnership with Saturn R&D as our first client and collaborator to advance from prototype to production.',
+    content:
+      'A New Chapter for FABINS & NEVOLYN \n\nWe are proud to announce our official strategic industrial partnership marking an important milestone in the journey of FABINS.\n\nThis partnership represents our first major commercial collaboration and client deployment, helping us take FABINS from a working prototype toward a real-world industrial solution. The collaboration has given us the opportunity to continue building, testing, and improving our technology directly on factory production floors.\n\nWe are looking forward to building smarter solutions for real-world industries and creating sustainable impact through AI, computer vision, and automation.\n\nFABINS — Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'Strategic Partnership',
+    date: '2026-07-01',
+    image: '/news_fabinsXsaturn.jpg',
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508463008101056512-7NoV?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/1Cu2GnNnWQ/',
+  },
+  {
+    id: 'news-saturn-poc',
+    title: 'First POC Demonstration of FABINS Successfully Completed at Saturn',
+    description:
+      'FABINS successfully completed and demonstrated its first Proof of Concept (POC) as a working industrial fabric inspection system at Saturn.',
+    content:
+      'A Big Milestone for FABINS!\n\nWe’re excited to share that we have successfully completed the first POC (Proof of Concept) of FABINS.\n\nWith our first prototype, we were able to prove the core concept and demonstrate FABINS as a working solution directly on industrial inspection frames at Saturn Textiles.\n\nThis is an important first step for us, and we’re now focused on improving the system and taking FABINS closer to a production-ready solution for the RMG industry.\n\nFABINS is the first product of NEVOLYN Technology, built to deliver smart automation solutions for a better future.\n\nFABINS - Fabric Inspection Automation\nWebsite: https://fabins.nevolyn.com\nEmail: fabins@nevolyn.com\n\n\nNEVOLYN Technology\nWebsite: https://nevolyn.com\nEmail: info@nevolyn.com',
+    category: 'POC Demonstration',
+    date: '2026-06-28',
+    image: '/news_poc_1.jpg',
+    linkedinUrl:
+      'https://www.linkedin.com/posts/nevolyn_fabins-nevolyn-fabricinspection-activity-7508451195204718592-72CT?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADz_70oBqriO2ZWG-YtRkXzgRBDHA7NFaTk',
+    facebookUrl: 'https://www.facebook.com/share/p/14qC7DiQEA4/',
+  },
+]

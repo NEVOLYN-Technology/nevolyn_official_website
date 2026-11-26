@@ -1,0 +1,350 @@
+/**
+ * Team & leadership content.
+ *
+ * Single source of truth for all **leadership profiles** and **engineering team members**
+ * shown in the "Our Leaders" section on the homepage (`components/sections/LeadersSection.tsx`).
+ *
+ * ## 📋 Standard Template for Adding a New Team Member
+ *
+ * When creating or updating a profile entry, follow this exact 7-part structure:
+ *
+ * 1. `id` — Kebab-case unique slug (e.g. 'ninad', 'rahin', 'jane-doe').
+ * 2. `name` & `title` — Full display name and official job title.
+ * 3. `bio` — 1 concise sentence summary for the homepage leadership card.
+ * 4. `extendedBio` (3-Paragraph Narrative Flow):
+ *    - Paragraph 1: Role & NEVOLYN Impact (FABINS, web ecosystem, engineering focus).
+ *    - Paragraph 2: Education & Specialization (BUET, EEE/CSE, core theoretical background).
+ *    - Paragraph 3: Academic Research & Applied Engineering Accomplishments.
+ * 5. `responsibilities` — 4 to 5 bullet points of concrete areas of ownership.
+ * 6. `social` — GitHub, LinkedIn, Portfolio, ORCID, and `scholar` + `scholarName` (exact Google Scholar author name).
+ * 7. `image` & `imagePosition` (optional) — photo path under /public. If a portrait's head is cropped at the top
+ *    inside the circular avatar, set `imagePosition: 'center top'` (CSS object-position). Fine-tune with values
+ *    like `'center 15%'`. Defaults to `'center'` when omitted.
+ *
+ * ```ts
+ * {
+ *   id: 'jane-doe',
+ *   name: 'Dr. Jane Doe',
+ *   title: 'Senior AI Engineer',
+ *   bio: 'Leads computer vision and edge deployment for NEVOLYN Technology.',
+ *   extendedBio: [
+ *     'Jane leads AI vision systems development at NEVOLYN Technology...',
+ *     'She graduated from BUET with a specialization in signal processing...',
+ *     'Her academic research focused on autonomous vision systems...'
+ *   ],
+ *   email: 'jane@example.com',
+ *   responsibilities: ['AI model optimization', 'Camera integration'],
+ *   social: {
+ *     github: 'https://github.com/janedoe',
+ *     linkedin: 'https://linkedin.com/in/janedoe',
+ *     scholar: 'https://scholar.google.com/citations?user=xyz',
+ *     scholarName: 'Jane Doe'
+ *   },
+ *   image: '/jane-photo.png',
+ *   imagePosition: 'center top' // optional: keeps the head from being cropped in the circular avatar
+ * }
+ * ```
+ */
+
+/**
+ * Represents a single person's public leadership/engineering profile.
+ * 
+ * Used by `LeadersSection.tsx` for card rendering and `LeaderDetails.tsx` for full modal views.
+ */
+export interface TeamMember {
+  /** Unique identifier — used as React list key (e.g. 'ninad'). */
+  id: string
+  /** URL slug for deep-linking (e.g. 'ninad', 'rahin', 'jane-doe'). */
+  slug: string
+  /** Alternative alias slugs for deep-linking (e.g. ['nobo', 'ninad-mahmud-nobo']). */
+  aliases?: string[]
+  /** Full name of the team member. */
+  name: string
+  /** Official job title (e.g. 'Lead AI Software Engineer'). */
+  title: string
+  /** Short 1-2 sentence biography shown on the profile card. */
+  bio: string
+  /** List of key responsibilities and areas of ownership. */
+  responsibilities: string[]
+  /** Optional multi-paragraph extended bio displayed inside the detail modal. */
+  extendedBio?: string[]
+  /** Optional contact email address. */
+  email?: string
+  /** Optional profile image path (relative to /public). */
+  image?: string
+  /** Optional CSS object-position for the circular avatar crop (e.g. 'center top' keeps heads from being cut off). */
+  imagePosition?: string
+  /** Optional social and academic profile links. */
+  social?: {
+    github?: string
+    linkedin?: string
+    portfolio?: string
+    scholar?: string
+    scholarName?: string
+    orcid?: string
+  }
+}
+
+/**
+ * Represents a functional department or organizational team grouping.
+ */
+export interface Department {
+  /** Unique department ID. */
+  id: string
+  /** Department display name (e.g. 'Leadership & Research Team'). */
+  name: string
+  /** One-line department mission description. */
+  description: string
+  /** List of team members belonging to this department. */
+  members: TeamMember[]
+}
+
+export const teamDepartments: Department[] = [
+  {
+    id: 'leadership',
+    name: 'Leadership & Engineering Team',
+    description:
+      'World-class innovators driving technology and intelligent systems into the future through AI, deep-tech engineering, and applied science.',
+    members: [
+      {
+        id: 'chagla',
+        slug: 'amanullahchagla',
+        aliases: ['chagla', 'amanullah'],
+        name: 'Amanullah Chagla',
+        title: 'Managing Director',
+        bio: 'Providing strategic leadership, driving innovation and engineering excellence at NEVOLYN.',
+
+        extendedBio: [
+          'Amanullah Chagla provides the strategic leadership for NEVOLYN, driving the organization\'s long-term vision through innovation, operational excellence, and sustainable growth. As Managing Director, he oversees the company\'s business strategy while fostering a culture where technology, research, and engineering excellence work together to create lasting industrial value.',
+          'With decades of experience in industry and entrepreneurship, he has led the development and expansion of operations while building strong partnerships with globally recognized organizations and institutions. His leadership philosophy combines business excellence with continuous innovation, responsible engineering, and long-term value creation for customers and stakeholders alike.',
+          'Recognizing research and development as a key driver of future competitiveness, he actively supports the NEVOLYN Technology team in advancing AI-powered automation, intelligent systems, computer vision, and next-generation engineering technologies. His vision is to establish NEVOLYN as a future-ready organization where innovation continuously transforms ideas into practical, high-impact technology solutions.'
+        ],
+
+        email: '',
+
+        responsibilities: [
+          'Define the long-term strategic vision and innovation roadmap for NEVOLYN Technology',
+          'Lead business growth through operational excellence, digital transformation, and advanced engineering',
+          'Oversee and support Research & Development initiatives across the organization',
+          'Build strategic partnerships with global clients, technology partners, and academic institutions',
+          'Promote responsible innovation, continuous improvement, and engineering-led growth',
+        ],
+        image: '/md-photo.png',
+        imagePosition: 'center top',
+      },
+      {
+        id: 'lutfar',
+        slug: 'lutfarrahman',
+        aliases: ['lutfar', 'lutfarrahman'],
+        name: 'Md Lutfar Rahman',
+        title: 'Director of Finance & Operations',
+        bio: 'Driving operational execution and financial discipline to support the development at NEVOLYN.',
+
+        extendedBio: [
+          'Md Lutfar Rahman provides broad operational and execution-focused leadership at NEVOLYN Technology, supporting the organization’s day-to-day execution, financial coordination, administrative functions, and strategic initiatives. As Executive Director, he works closely with the leadership team to ensure that NEVOLYN’s business, technology, and operational priorities are effectively translated into structured execution and sustainable organizational growth.',
+          'With approximately 25 years of experience in the textile industry and around 18 years of experience in accounting and finance leadership, he brings extensive expertise in financial management, operational planning, organizational coordination, and business support. Having been associated with Saturn Textiles Limited for approximately eight years, he contributes a strong understanding of industrial operations and financial management while helping bridge the operational requirements of the textile industry with NEVOLYN’s technology-driven initiatives.',
+          'At NEVOLYN Technology, he plays a key role in ensuring that strategic plans are supported by effective execution, financial discipline, and organizational coordination. He works closely with the leadership and engineering teams to facilitate resources, manage operational priorities, support business initiatives, and maintain alignment between the company’s technological ambitions and its organizational capabilities. His experience provides an important foundation for NEVOLYN’s continued development as a deep-tech organization focused on practical industrial innovation.'
+        ],
+
+        email: '',
+
+        responsibilities: [
+          'Oversee NEVOLYN Technology’s operational execution and organizational priorities',
+          'Support financial planning, budgeting, accounting, and resource management',
+          'Coordinate business operations across leadership and engineering teams',
+          'Support business development, partnerships, procurement, and resource planning',
+          'Coordinate operational activities with Saturn Textiles Limited and industry partners',
+        ],
+        image: '/ed-photo.png',
+      },
+      {
+        id: 'rahin',
+        slug: 'rahinrahman',
+        aliases: ['rahin', 'rahinrahman', 'mdrahinurrahman', 'rahinurrahman'],
+        name: 'Md Rahinur Rahman',
+        title: 'Founder & AI Systems Engineer',
+        bio: 'Designing and engineering industrial AI systems and automation platforms at NEVOLYN.',
+        extendedBio: [
+          'Md Rahinur Rahman leads the design and development of AI-powered industrial automation solutions at NEVOLYN, specializing in computer vision, intelligent manufacturing systems, and production-ready AI technologies.',
+          'He graduated in Electrical and Electronic Engineering (EEE) from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools, with a specialization in Communication and Signal Processing (CSP). His academic foundation provided a solid basis in digital signal processing, mathematical modeling, and pattern recognition, bridging deep engineering theory with practical AI systems.',
+          'Throughout his academic and research work, he explored advanced signal analysis, embedded systems, and computer vision algorithms for real-world problems. His hands-on research in hardware-software co-design and intelligent imaging built the technical foundation for his current work in industrial automation, edge AI, and real-time inspection systems.'
+        ],
+        email: 'rahin.rahman11@gmail.com',
+        responsibilities: [
+          'Lead AI architecture and industrial automation initiatives at NEVOLYN',
+          'Computer vision and deep learning model development for FABINS',
+          'Industrial camera integration & zero-latency trigger pipelines',
+          'Industrial imaging systems and digital transformation'
+        ],
+        social: {
+          github: 'https://github.com/rahin11',
+          linkedin: 'https://www.linkedin.com/in/rahin-rahman-94a8a0246',
+          scholar: 'https://scholar.google.com/citations?user=Jq0HF_kAAAAJ',
+          scholarName: 'Md Rahinur Rahman',
+          orcid: 'https://orcid.org/0009-0004-8490-2358'
+        },
+        image: '/rahin-photo.png',
+      },
+      {
+        id: 'ninad',
+        slug: 'mninadmnobo',
+        aliases: ['ninad', 'nobo', 'mninadmnobo', 'ninadmahmudnobo', 'ninadnobo'],
+        name: 'Mohammad Ninad Mahmud Nobo',
+        title: 'Co-Founder & AI Software Engineer',
+        bio: 'Engineering applied computer vision architectures and scalable full-stack web platforms at NEVOLYN.',
+        extendedBio: [
+          'Mohammad Ninad Mahmud Nobo leads full-stack web application development, production deployment, and machine learning model contributions for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
+          'He graduated in Computer Science and Engineering from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering schools. There, he explored how AI could tackle complex, real-world challenges, from automated software testing to medical image analysis to Bangla speech processing. That foundation of rigorous research and hands-on building led him to industrial AI, where the software challenges are just as demanding, but the impact is immediate and visible on the factory floor.',
+          'His research includes AutoTestGenX, a multi-agent system that writes and executes software tests autonomously, and MedCAR, which resolves conflicting AI readings of chest X-rays. Beyond FABINS, he has built impactful AI applications including MindTrace, providing caregivers simple tools for dementia support, and GemmaVetCare, delivering edge AI livestock health guidance for low-connectivity environments.'
+        ],
+        email: 'mninadmnobo@gmail.com',
+        responsibilities: [
+          'Full-stack development of NEVOLYN & FABINS web applications',
+          'Image processing, computer vision model training for FABINS',
+          'ML pipeline architecture & production deployment',
+          'API design, software quality standards, & DevOps automation'
+        ],
+        social: {
+          portfolio: 'https://mninadmnobo.github.io',
+          github: 'https://github.com/mninadmnobo',
+          linkedin: 'https://www.linkedin.com/in/mninadmnobo',
+          scholar: 'https://scholar.google.com/citations?user=y5-A2oAAAAAJ&hl=en&oi=ao',
+          scholarName: 'M Ninad M Nobo',
+          orcid: 'https://orcid.org/0009-0006-2781-6693'
+        },
+        image: '/ninad-photo.png',
+      },
+      {
+        id: 'afzal',
+        slug: 'afzalhossan',
+        aliases: ['afzal'],
+        name: 'Afzal Hossan',
+        title: 'AI Software Engineer',
+        bio: 'Engineering applied computer vision architectures and scalable full-stack web platforms at NEVOLYN.',
+        extendedBio: [
+          'Afzal contributes to machine learning model development for FABINS (Fabric Inspection System) and NEVOLYN. His work integrates computer vision pipelines, interactive web dashboards, industrial camera controls, and scalable REST API architectures.',
+          'He completed his undergraduate degree in Computer Science and Engineering at Bangladesh University of Engineering and Technology (BUET), where he developed a strong foundation in algorithms, computational methods, and software engineering. His academic achievements include a Dean’s List Award and the University Merit Scholarship. His undergraduate thesis introduced him to research-driven problem solving, strengthening his ability to analyze complex datasets, develop computational methods, and conduct systematic experiments.',
+          'His research focuses on Bioinformatics and Computational Biology, particularly the application of artificial intelligence and machine learning to biological data analysis. His work includes INCENT, a hierarchical optimal transport framework for aligning spatial transcriptomics data to investigate cellular correspondences and spatial tissue organization. Through his research and teaching, he aims to advance computational biology, contribute to scientific discovery, and help students develop the knowledge and problem-solving skills needed to address real-world challenges.'
+        ],
+        email: 'afzalhossan80@gmail.com',
+        responsibilities: [
+          'Contribution to company’s product design and development',
+          'Image processing, computer vision model training for FABINS',
+          'ML pipeline architecture & production deployment',
+          'API design, software quality standards, & DevOps automation'
+        ],
+        social: {
+          portfolio: 'https://afzal-hossan.me/',
+          github: 'https://github.com/AfzalHossan-2005021',
+          linkedin: 'https://www.linkedin.com/in/afzal-hossan/',
+          scholar: 'https://scholar.google.com/citations?user=Q9BkMvcAAAAJ&hl=en',
+          scholarName: 'Afzal Hossan',
+          orcid: 'https://orcid.org/0009-0008-1604-8822'
+        },
+        image: '/afzal-photo.jpg',
+        imagePosition: 'center top',
+      },
+      {
+        id: 'nomrota',
+        slug: 'mehajabinnomrota',
+        aliases: ['nomrota', 'mehajabinnomrota'],
+        name: 'Mobashira Mehajabin Nomrota',
+        title: 'Innovation and Systems Engineer',
+        bio: 'Contributing to engineering innovation, development, and strategic growth at NEVOLYN.',
+        extendedBio: [
+          'Nomrota contributes to research, innovation, and technical development at NEVOLYN, working at the intersection of electrical engineering, emerging technologies, and industrial solutions. Her role also extends to marketing and strategic communication, helping bridge technical innovation with business development and market opportunities.',
+          'She graduated in Electrical and Electronic Engineering (EEE) from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s leading engineering institutions, with a major in Electrical Energy and Power Systems. Her academic foundation provided strong knowledge of electrical power systems, renewable energy, power electronics, and energy conversion, equipping her to approach complex engineering challenges with analytical and practical perspectives.',
+          'Throughout her academic and research journey, she explored renewable energy technologies, indoor photovoltaic energy harvesting, maximum power point tracking (MPPT), and intelligent energy management systems. Beyond her technical background, her leadership experience in university organizations, debating, and volunteering has strengthened her communication, coordination, and problem-solving abilities. She brings together engineering knowledge, creative thinking, and strategic communication to contribute to innovation, technical development, and the broader growth of NEVOLYN.'
+        ],
+        email: 'mehzabinmobashira@gmail.com',
+        responsibilities: [
+          'Lead research, innovation, and technical development initiatives at NEVOLYN',
+          'Explore and develop innovative engineering solutions for industrial applications',
+          'Contribute to electrical systems design, energy solutions, and technology integration',
+          'Support product development, technical research, and process improvement initiatives',
+        ],
+        social: {
+          portfolio: 'https://nomrota.vercel.app/',
+          linkedin: 'https://www.linkedin.com/in/mobashira-meh+ajabin-nomrota-2a39b9325'
+        },
+        image: '/nomrota-photo.jpg',
+      },
+      {
+        id: 'sadi',
+        slug: 'sadatulislamsadi',
+        aliases: ['sadi', 'sadatulislam-sadi', 'sadatul-islam-sadi'],
+        name: 'Sadatul Islam Sadi',
+        title: 'AI & Software Project Lead',
+        bio: 'Architecting AI-powered software systems and scalable intelligent platforms at NEVOLYN.',
+        extendedBio: [
+          'Sadatul Islam Sadi leads software projects and intelligent system initiatives at NEVOLYN, bridging artificial intelligence, machine learning, software architecture, and hardware-software integration. As an AI & Software Engineering Lead, he coordinates end-to-end technical execution, translating complex algorithmic requirements into production-ready industrial applications and scalable software platforms.',
+          'He graduated in Computer Science and Engineering from Bangladesh University of Engineering and Technology (BUET), one of Bangladesh\'s top engineering institutions, with an exceptional academic standing (CGPA 3.96/4.00). His technical specialization spans artificial intelligence, machine learning, large language models, computer vision, system architecture, and cloud computing. He has also shared his expertise in academia as a Lecturer in Computer Science and Engineering at BRAC University and United International University.',
+          'His research and applied engineering experience includes LLM-integrated software testing, agentic AI, multimodal architectures, and production-grade software infrastructure. He has collaborated on advanced research with institutions including UC Irvine, Qatar Computing Research Institute (QCRI), BUET Samsung Lab, and UESTC. At NEVOLYN, he channels this rigorous research and systems background into building robust, high-performance intelligent technologies for real-world deployment.'
+        ],
+
+        email: 'sadatulislamsadi@gmail.com',
+
+        responsibilities: [
+          'Lead software and intelligent systems project execution at NEVOLYN',
+          'Hardware-software system integration and technical architecture',
+          'AI/ML model development, LLM systems, and vision pipelines',
+          'Scalable application architecture, cloud infrastructure, and DevOps'
+        ],
+
+        social: {
+          github: 'https://github.com/Sadatul',
+          linkedin: 'https://www.linkedin.com/in/sadatul/',
+          scholar: 'https://scholar.google.com/citations?user=z0h07AgAAAAJ&hl=en',
+          scholarName: 'Sadatul Islam Sadi',
+          orcid: 'https://orcid.org/0009-0009-4884-1443'
+        },
+
+        image: '/sadi-photo.png',
+      }
+    ],
+  },
+]
+
+/** Direct export of leadership members for component consumption. */
+export const leaders: TeamMember[] = teamDepartments[0].members
+
+/** Alias for scalable team references matching industry conventions */
+export const teamMembers: TeamMember[] = leaders
+
+/**
+ * Finds a leadership/team member by slug, ID, or alias.
+ * Handles hash prefixes like '#team/ninad', '#leaders/ninad', or 'ninad'.
+ */
+export function findMemberBySlug(slug: string): TeamMember | undefined {
+  if (!slug) return undefined
+  const raw = decodeURIComponent(slug)
+    .toLowerCase()
+    .trim()
+    .replace(/^#/, '')
+    .replace(/^(?:team|leaders|innovators)\//, '')
+    .trim()
+
+  const normalized = raw.replace(/[^a-z0-9]/g, '')
+
+  return leaders.find((member) => {
+    // 1. Exact match on slug, id, or hyphenated full name
+    if (member.slug && member.slug.toLowerCase() === raw) return true
+    if (member.id && member.id.toLowerCase() === raw) return true
+    if (member.name && member.name.toLowerCase().replace(/[\s.]+/g, '-').replace(/-+/g, '-') === raw) return true
+
+    // 2. Alphanumeric match (ignoring hyphens, spaces, dots)
+    if (member.slug && member.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized) return true
+    if (member.name && member.name.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized) return true
+    if (member.id && member.id.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized) return true
+
+    // 3. Aliases
+    if (member.aliases?.some((a) => {
+      const aliasClean = a.toLowerCase().trim()
+      return aliasClean === raw || aliasClean.replace(/[^a-z0-9]/g, '') === normalized
+    })) {
+      return true
+    }
+
+    return false
+  })
+}

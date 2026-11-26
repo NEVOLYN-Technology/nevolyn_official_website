@@ -1,0 +1,126 @@
+import type { Metadata } from 'next'
+import type { ReactNode } from 'react'
+
+/**
+ * Metadata configuration for NEVOLYN Careers & Join Us page.
+ *
+ * Targeted specifically for user search queries:
+ * - "nevolyn career", "career nevolyn", "nevolyn careers", "careers nevolyn"
+ * - "job nevolyn", "nevolyn job", "jobs nevolyn", "nevolyn jobs"
+ * - "vacancy nevolyn", "nevolyn vacancy", "nevolyn vacancies"
+ * - "nevolyn join us", "join us nevolyn", "join nevolyn"
+ * - "nevolyn career search", "nevolyn hiring", "nevolyn recruitment"
+ */
+export const metadata: Metadata = {
+  title: {
+    absolute: 'NEVOLYN Careers',
+  },
+  description:
+    'Explore NEVOLYN career opportunities, job vacancies, and engineering internships. Apply to join our deep-tech team building industrial robotics, AI systems, and automation software in Dhaka, Bangladesh.',
+  keywords: [
+    'nevolyn career',
+    'career nevolyn',
+    'job nevolyn',
+    'nevolyn job',
+    'vacancy nevolyn',
+    'nevolyn vacancy',
+    'nevolyn vacancies',
+    'nevolyn career search',
+    'nevolyn careers',
+    'careers nevolyn',
+    'jobs nevolyn',
+    'nevolyn jobs',
+    'nevolyn join us',
+    'join us nevolyn',
+    'join nevolyn',
+    'nevolyn recruitment',
+    'nevolyn hiring',
+    'nevolyn job circular',
+    'nevolyn circular',
+    'nevolyn software engineer job',
+    'nevolyn ai engineer job',
+    'nevolyn automation engineer job',
+    'nevolyn internship',
+    'nevolyn tech jobs',
+    // ── FABINS Career & Job Search Queries ──
+    'fabins career',
+    'fabins careers',
+    'career fabins',
+    'careers fabins',
+    'join fabins',
+    'fabins join us',
+    'join us fabins',
+    'fabins job',
+    'fabins jobs',
+    'job fabins',
+    'jobs fabins',
+    'fabins vacancy',
+    'fabins vacancies',
+    'vacancy fabins',
+    'fabins career search',
+    'fabins hiring',
+    'fabins recruitment',
+    'fabins job circular',
+    'fabins internship',
+    'fabins automation career',
+    'fabins automation jobs',
+    'join fabins automation',
+    'ফেবিন্স ক্যারিয়ার',
+    'ফেবিন্স চাকরি',
+    'ফেবিন্স জব',
+    'ফেবিন্স নিয়োগ',
+    'ফেবিন্স সার্কুলার',
+    // ── Bengali Script Career & Vacancy Variations ──
+    'নেভোলিন ক্যারিয়ার',
+    'নেভোলিন চাকরি',
+    'নেভোলিন জব',
+    'নেভোলিন নিয়োগ',
+    'নেভোলিন সার্কুলার',
+    'নেভোলিন ক্যারিয়ার সার্চ',
+  ],
+  alternates: {
+    canonical: 'https://nevolyn.com/career',
+  },
+  openGraph: {
+    title: 'NEVOLYN Careers',
+    description:
+      'Explore NEVOLYN career opportunities, job vacancies, and engineering internships. Apply to join our deep-tech team building industrial robotics, AI systems, and automation software in Dhaka, Bangladesh.',
+    url: 'https://nevolyn.com/career',
+    siteName: 'NEVOLYN',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NEVOLYN Careers',
+    description:
+      'Explore NEVOLYN career opportunities, job vacancies, and engineering internships. Apply to join our deep-tech team building industrial robotics, AI systems, and automation software in Dhaka, Bangladesh.',
+  },
+}
+
+export default function JoinUsLayout({ children }: { children: ReactNode }) {
+  const careerSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': 'https://nevolyn.com/career#webpage',
+    url: 'https://nevolyn.com/career',
+    name: 'NEVOLYN Careers',
+    description:
+      'Official career opportunities and engineering roles at NEVOLYN Technology.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'NEVOLYN',
+      url: 'https://nevolyn.com',
+    },
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(careerSchema) }}
+      />
+      {children}
+    </>
+  )
+}

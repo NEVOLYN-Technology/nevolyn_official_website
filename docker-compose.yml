@@ -1,0 +1,121 @@
+# =============================================================================
+# NEVOLYN — Full Stack Docker Compose Local & Production Stack
+#
+# Launches:
+#   1. PostgreSQL 16 DB (Port 5432) — unified schema (Website + Office / HRM)
+#   2. Unified Spring Boot 3 REST API (Port 8080) — Website + Office / HRM APIs
+#   3. Unified Next.js 16 Web App (Port 3000) — Official Website + /admin + /office
+#
+# Quick Start Commands:
+#   - Start full stack:        docker compose up --build
+#   - Run in background (-d):   docker compose up -d --build
+#   - View live logs:          docker compose logs -f
+#   - Stop stack & volumes:    docker compose down -v
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. DATABASE SERVICE — PostgreSQL 16
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: nevolyn-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
+      POSTGRES_USER: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
+    ports:
+      # Bound strictly to 127.0.0.1 to prevent public internet exposure of database
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}} -d ${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # 2. UNIFIED BACKEND SERVICE — Spring Boot REST API (Website + Office / HRM)
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nevolyn-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: 8080
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
+      DATABASE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-${DB_NAME:-nevolyn_db}}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-${DB_USER:-nevolyn_admin}}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASS:-}}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-${ALLOWED_ORIGINS:-http://localhost:3000,https://nevolyn.com,https://www.nevolyn.com}}
+      APP_BACKEND_URL: ${APP_BACKEND_URL:-${NEVOLYN_BACKEND_URL:-http://localhost:8080}}
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:3000}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-mail.nevolyn.com}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-465}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-info@nevolyn.com}
+      SPRING_MAIL_FROM: ${SPRING_MAIL_FROM:-${APP_EMAIL_FROM:-info@nevolyn.com}}
+      APP_EMAIL_ADMIN: ${APP_EMAIL_ADMIN:-${NEVOLYN_ADMIN_ADDRESS:-info@nevolyn.com}}
+      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-${SPRING_MAIL_FROM:-info@nevolyn.com}}
+      APP_UPLOAD_DIR: /app/uploads/resumes
+      FILE_UPLOAD_DIR: /app/uploads/office
+      JWT_SECRET: ${OFFICE_JWT_SECRET:-${JWT_SECRET:-}}
+      APP_JWT_SECRET: ${JWT_SECRET:-${OFFICE_JWT_SECRET:-}}
+      # ── Shared Role-Tier Passwords, Mail Password & Personnel Bootstrap Accounts
+      #    are loaded directly via `env_file: - .env` above.
+    ports:
+      # Bound strictly to 127.0.0.1 for host Nginx reverse proxy access only
+      - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
+    volumes:
+      - resume_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # 3. UNIFIED FRONTEND SERVICE — Next.js 16 Web Application (Website + /office)
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-${NEXT_PUBLIC_API_BASE_URL:-https://nevolyn.com/api/v1}}
+    container_name: nevolyn-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      OFFICE_BACKEND_API_URL: http://backend:8080/api/v1
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-${NEXT_PUBLIC_API_BASE_URL:-https://nevolyn.com/api/v1}}
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-${NEXT_PUBLIC_API_URL:-https://nevolyn.com/api/v1}}
+    ports:
+      # Bound strictly to 127.0.0.1 for host Nginx reverse proxy access only
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+
+# -----------------------------------------------------------------------------
+# PERSISTENT VOLUMES
+# -----------------------------------------------------------------------------
+volumes:
+  postgres_data:
+    driver: local
+  resume_uploads:
+    driver: local

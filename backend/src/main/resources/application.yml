@@ -1,0 +1,207 @@
+# ==============================================================================
+# NEVOLYN Technology Backend — DEFAULT (local development) configuration
+# ==============================================================================
+# This profile is what runs when no SPRING_PROFILES_ACTIVE is set, i.e. on a
+# developer laptop. It is deliberately zero-setup: in-memory database, no mail
+# account required, verbose logging.
+#
+# Production overrides live in application-prod.yml and are activated with
+#   SPRING_PROFILES_ACTIVE=prod
+# Spring merges the two, with prod winning on any key it redefines.
+#
+# Placeholder syntax used throughout: ${ENV_VAR:fallback}
+#   - ENV_VAR is read from the OS environment (what Render/Docker inject).
+#   - fallback applies when the variable is absent, keeping local runs working.
+# ==============================================================================
+
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework
+  servlet:
+    # Root context: endpoints are /api/v1/** with no extra prefix. Changing this
+    # also changes every URL the frontend calls — keep it in sync with
+    # NEXT_PUBLIC_API_URL on the Vercel side.
+    context-path: /
+
+spring:
+  application:
+    name: nevolyn-backend
+
+  # --------------------------------------------------------------------------
+  # Datasource — in-memory H2
+  # --------------------------------------------------------------------------
+  # DB_CLOSE_DELAY=-1 keeps the schema alive for the whole JVM lifetime rather
+  # than dropping it when the last connection closes, which would otherwise wipe
+  # seeded data between requests.
+  #
+  # FUTURE CUSTOM DOMAIN / CLOUD DATABASE:
+  # Do not point this at a cloud Postgres instance. Production database settings
+  # belong in application-prod.yml, which reads DATABASE_URL. See
+  # NevolynApplication for how a postgres:// URL is converted to JDBC form.
+  datasource:
+    url: jdbc:h2:mem:nevolyn_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+
+  h2:
+    console:
+      # Browsable DB inspector at http://localhost:8080/h2-console
+      # (JDBC URL: jdbc:h2:mem:nevolyn_db, user: sa, empty password).
+      # Disabled in prod — see application-prod.yml.
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    # Dialect is intentionally NOT set: Hibernate detects it from the JDBC
+    # connection metadata, and naming it explicitly triggers HHH90000025.
+    #
+    # open-in-view=false closes the persistence context when the service layer
+    # returns, instead of holding a connection open through view rendering. On a
+    # 5-connection pool that difference is the gap between serving traffic and
+    # deadlocking on connection acquisition.
+    open-in-view: false
+    hibernate:
+      # 'update' lets entity changes reshape the throwaway dev schema without a
+      # migration. The project has no migration tool wired up yet, so prod also
+      # runs 'update'; adopting Flyway and switching prod to 'validate' is the
+      # recommended next step before the data becomes irreplaceable.
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  servlet:
+    multipart:
+      # Candidate CV uploads. max-request-size sits above max-file-size to leave
+      # room for the accompanying text fields in the same multipart body.
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 12MB
+
+  # --------------------------------------------------------------------------
+  # Mail transport
+  # --------------------------------------------------------------------------
+  # With SPRING_MAIL_PASSWORD unset (the default), EmailService logs messages
+  # instead of sending them — no mail account needed to develop locally.
+  #
+  # Port 587 STARTTLS is fine from a laptop. It is NOT usable on Render or most
+  # AWS accounts, which block outbound 25/587; production uses SMTPS on 465 plus
+  # the Brevo HTTPS API. See application-prod.yml.
+  mail:
+    host: ${SPRING_MAIL_HOST:mail.nevolyn.com}
+    port: ${SPRING_MAIL_PORT:465}
+    username: ${SPRING_MAIL_USERNAME:info@nevolyn.com}
+    password: "${SPRING_MAIL_PASSWORD:}"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: ${SPRING_MAIL_SSL_ENABLE:true}
+            trust: "*"
+          starttls:
+            enable: ${SPRING_MAIL_STARTTLS_ENABLE:false}
+          socketFactory:
+            port: ${SPRING_MAIL_PORT:465}
+            class: javax.net.ssl.SSLSocketFactory
+          connectiontimeout: 8000
+          timeout: 8000
+          writetimeout: 8000
+        smtps:
+          connectiontimeout: 8000
+          timeout: 8000
+          writetimeout: 8000
+
+  # --------------------------------------------------------------------------
+  # Flyway — disabled for local development
+  # --------------------------------------------------------------------------
+  # The dev database is a throwaway in-memory H2 instance, and Hibernate's
+  # ddl-auto=update reshapes it from the entities on every boot. Running the
+  # PostgreSQL-flavoured migrations against it would add friction with no
+  # benefit.
+  #
+  # Production sets this to true and pins ddl-auto=validate — see
+  # application-prod.yml. The migrations themselves are exercised by
+  # FlywayMigrationValidationTest, which runs them against H2 in PostgreSQL
+  # compatibility mode and then asks Hibernate to validate the entity mappings
+  # against the result.
+  flyway:
+    enabled: false
+
+  thymeleaf:
+    # Renders HTML bodies in src/main/resources/templates/
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+
+logging:
+  level:
+    com.nevolyn: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# ==============================================================================
+# Application-specific settings
+# ==============================================================================
+app:
+  admin:
+    username: ${NEVOLYN_ADMIN_USERNAME:${ADMIN_USERNAME:admin}}
+    password: ${NEVOLYN_ADMIN_PASSWORD:${ADMIN_PASSWORD:}}
+
+  backend-url: ${APP_BACKEND_URL:http://localhost:8080}
+  frontend-url: ${APP_FRONTEND_URL:http://localhost:3000}
+
+  storage:
+    # Resume upload target. Relative to the process working directory, so it
+    # lands in backend/uploads/resumes during local runs. Production remaps this
+    # to an absolute container path.
+    upload-dir: ./uploads/resumes
+
+  # Transactional Mail Routing Contract (MAIL_STRUCTURE.md & Fabins parity)
+  mail:
+    admin-address: ${APP_MAIL_ADMIN_ADDRESS:${APP_EMAIL_ADMIN:info@nevolyn.com}}
+    from-address: ${APP_MAIL_FROM_ADDRESS:${APP_EMAIL_FROM:info@nevolyn.com}}
+    sender-name: ${APP_MAIL_SENDER_NAME:${APP_EMAIL_SENDER_NAME:NEVOLYN}}
+    admin-subject: "[NEVOLYN] %s Submission: %s"
+    sender-subject: "[NEVOLYN] %s Confirmed [Ref: %s]"
+    acknowledgement-subject: "[NEVOLYN] %s Acknowledged [Ref: %s]"
+
+  # Legacy email properties retained for backwards compatibility
+  email:
+    from: ${APP_EMAIL_FROM:info@nevolyn.com}
+    admin: ${APP_EMAIL_ADMIN:info@nevolyn.com}
+    sender-name: ${APP_EMAIL_SENDER_NAME:NEVOLYN}
+    frontend-url: ${APP_FRONTEND_URL:http://localhost:3000}
+    backend-url: ${APP_BACKEND_URL:http://localhost:8080}
+
+  rate-limit:
+    # Per-IP fixed window over the public write endpoints (RateLimitFilter).
+    # Sized for a human filling in a form, not for load: five submissions in ten
+    # minutes is generous for a real visitor and cheap for an abuser to hit.
+    enabled: ${APP_RATE_LIMIT_ENABLED:true}
+    max-requests: ${APP_RATE_LIMIT_MAX:5}
+    window-minutes: ${APP_RATE_LIMIT_WINDOW_MINUTES:10}
+
+  cors:
+    # Browsers reject any cross-origin API response whose origin is not listed here
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,https://nevolyn.com,https://www.nevolyn.com,https://*.nevolyn.com,https://nevolyn.vercel.app,https://nevolyn-*.vercel.app}
+
+  jwt:
+    secret: ${JWT_SECRET:}
+    expiration-ms: ${JWT_EXPIRATION_MS:28800000}
+
+  file:
+    upload-dir: ${FILE_UPLOAD_DIR:./uploads}
+
+  attendance:
+    late-threshold-time: ${LATE_THRESHOLD_TIME:09:15:00}
+    office-end-time: ${OFFICE_END_TIME:18:00:00}
+    min-work-hours: ${MIN_WORK_HOURS:8.0}
+    timezone: ${OFFICE_TIMEZONE:Asia/Dhaka}
+    qr-checkin-url: ${QR_CHECKIN_URL:https://nevolyn.com/office/attendance}
